@@ -22,7 +22,8 @@
   padding: 20px;
   width: 300px;
   text-align: center;
-  margin: 0 auto; /* Center the card */
+  margin: 0 auto;
+  border: 2px solid black;
 }
 
 .customer-image {
