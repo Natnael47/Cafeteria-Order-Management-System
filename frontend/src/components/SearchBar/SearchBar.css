@@ -1,0 +1,31 @@
+/* SearchBar.css */
+
+.search_bar {
+  border-top: 1px solid #e5e7eb; /* Light gray, equivalent to border-t */
+  border-bottom: 1px solid #e5e7eb; /* Light gray, equivalent to border-b */
+  background-color: #f9fafb; /* bg-gray-50 */
+  text-align: center;
+}
+
+.bar {
+  display: inline-flex;
+  align-items: center; /* Vertically center items */
+  justify-content: center; /* Horizontally center items */
+  border: 1px solid #9ca3af; /* border-gray-400 */
+  padding: 0.5rem 1.25rem; /* Equivalent to px-5 py-2 */
+  width: 100%; /* Take up full width */
+}
+
+.bar input {
+  flex-grow: 1; /* Equivalent to flex-1 */
+  outline: none;
+}
+
+.bar img {
+  width: 1rem; /* Equivalent to w-4 */
+}
+
+.search_bar img {
+  width: 0.75rem; /* Equivalent to w-3 */
+  cursor: pointer; /* Equivalent to cursor-pointer */
+}

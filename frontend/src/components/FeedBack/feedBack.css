@@ -1,0 +1,57 @@
+.feedback-container {
+  margin-top: 80px;
+  text-align: center;
+  padding: 20px;
+  background-color: #f4f8f4;
+}
+
+.feedback-container h2 {
+  padding-bottom: 20px;
+}
+
+.feedback-container h2 {
+  font-size: 24px;
+  font-weight: bold;
+  margin-bottom: 20px;
+}
+
+.feedback-card {
+  background-color: #e7f5e8;
+  border-radius: 10px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  padding: 20px;
+  width: 300px;
+  text-align: center;
+  margin: 0 auto; /* Center the card */
+}
+
+.customer-image {
+  width: 100px;
+  height: 100px;
+  border-radius: 50%;
+  object-fit: cover;
+  margin: 0 auto 10px;
+}
+
+.feedback-card h3 {
+  margin: 10px 0;
+  font-size: 18px;
+  color: #333;
+}
+
+.feedback-card p {
+  font-size: 14px;
+  color: #666;
+  line-height: 1.5;
+}
+
+.rating {
+  display: flex;
+  justify-content: center;
+  margin-top: 10px;
+}
+
+.rating span {
+  font-size: 20px;
+  color: #ffcc00;
+}
