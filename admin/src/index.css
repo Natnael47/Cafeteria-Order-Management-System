@@ -1,34 +1,21 @@
 @import url("https://fonts.googleapis.com/css2?family=Outfit:wght@100..900&display=swap");
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
 
 * {
-  padding: 0;
-  margin: 0;
-  box-sizing: border-box;
   font-family: Outfit;
 }
 
-body {
-  min-height: 100vh;
-  background-color: #f4f8f4;
+select,
+input,
+textarea {
+  border: 1px solid black;
+  outline-color: #bbefc0;
+  border-radius: 4px;
 }
 
-a {
-  text-decoration: none;
-  color: inherit;
-}
-
-hr {
-  border: none;
-  height: 2px;
-  background-color: #a9a9a9;
-}
-
-.app-content {
-  display: flex;
-}
-
-.flex-col {
-  display: flex;
-  flex-direction: column;
-  gap: 10px;
+.active {
+  background-color: #bbefc0;
+  border-color: black;
 }

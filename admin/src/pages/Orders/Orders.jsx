@@ -3,7 +3,6 @@ import React, { useEffect, useState } from 'react';
 import { toast } from "react-toastify";
 import { backendUrl } from '../../App';
 import { assets } from '../../assets/assets';
-import "./Orders.css";
 
 const Orders = ({ token }) => {
 
@@ -19,6 +18,25 @@ const Orders = ({ token }) => {
         }
     };
 
+    const fetchOrder = async () => {
+        if (!token) {
+            return null;
+        }
+        try {
+            const response = await axios.post(backendUrl + "/api/order/list", {}, { headers: { token } })
+            if (response.data.success) {
+                setOrders(response.data.orders);
+                console.log(response.data.orders);
+
+            } else {
+                toast.error(response.data.message)
+            }
+
+        } catch (error) {
+            toast.error(error.message)
+        }
+    }
+
     const statusHandler = async (event, orderId) => {
         try {
             // Send a request to update the order status
@@ -30,7 +48,7 @@ const Orders = ({ token }) => {
             // Check if the response indicates success
             if (response.data.success) {
                 // Refresh the list of orders after updating the status
-                await fetchAllOrders();
+                await fetchOrder(); //this must be this fetchAllOrders()
             } else {
                 // Handle the error if the update was not successful
                 console.error("Failed to update status:", response.data.message);
@@ -44,47 +62,92 @@ const Orders = ({ token }) => {
     };
 
     useEffect(() => {
-        fetchAllOrders();
-    }, []);
+        fetchOrder();
+    }, [token]);
 
     return (
-        <div className='order add'>
-            <h3>Order Page</h3>
-            <div className="order-list">
-                {orders.map((order, index) => {
-                    return (  // Add the return statement here
-                        <div key={index} className="order-item">
-                            <img src={assets.parcel_icon} alt="" />
+        <div>
+            <h3>ORDER PAGE</h3>
+            <div>
+                {
+                    orders.map((order, index) => (
+                        <div className='grid grid-cols-1 sm:grid-cols-[0.5fr_2fr_1fr] lg:grid-cols-[0.5fr_2fr_1fr_1fr_1fr] gap-3 items-start border-2 border-black p-5 md:p-8 my-3 md:my-4 text-xs sm:text-sm text-black' key={index}>
+                            <img className='w-16' src={assets.parcel_icon} alt="" />
                             <div>
-                                <p className='order-item-food'>
+
+                                <div>
                                     {order.items.map((item, index) => {
                                         if (index === order.items.length - 1) {
-                                            return item.name + " x " + item.quantity;
+                                            return <p className='py-0.5' key={index}> {item.name} X <span>  {item.quantity} </span></p>
                                         } else {
-                                            return item.name + " x " + item.quantity + ", ";
+                                            return <p className='py-0.5' key={index}> {item.name} X <span>  {item.quantity} ,</span></p>
                                         }
                                     })}
-                                </p>
-                                <p className='order-item-name'>{order.address.firstName + " " + order.address.lastName}</p>
-                                <div className="order-item-address">
-                                    <p>{order.address.street + ", "}</p>
+                                </div>
+                                <p className='mt-3 mb-2 font-medium'>{order.address.firstName + " " + order.address.lastName}</p>
+                                <div>
+                                    <p>{order.address.street + ","}</p>
                                     <p>{order.address.city + ", " + order.address.state + ", " + order.address.country + ", " + order.address.zipcode}</p>
                                 </div>
-                                <p className="order-item-phone">Phone :{order.address.phone}</p>
+                                <p>{order.address.phone}</p>
                             </div>
-                            <p>Items: {order.items.length}</p>
-                            <p>${order.amount}</p>
-                            <select onChange={(event) => statusHandler(event, order._id)} value={order.status}>
+                            <div>
+                                <p className='text-sm sm:text-[15px]'>Items : {order.items.length}</p>
+                                <p className='mt-3'>Method : {order.paymentMethod}</p>
+                                <p>Payment : {order.payment ? "Done" : "pending"}</p>
+                                <p>Date : {new Date(order.date).toLocaleDateString()}</p>
+                            </div>
+                            <p className='text-sm sm:text-[15px] font-bold'>${order.amount}</p>
+                            <select onChange={(event) => statusHandler(event, order._id)} value={order.status} className='p-2 font-semibold'>
+                                <option value="Order Placed">Order Placed</option>
                                 <option value="Food Processing">Food Processing</option>
-                                <option value="Out for Delivery">Out for Delivery</option>
+                                <option value="Shipped">Shipped</option>
+                                <option value="Out For Delivery">Out For Delivery</option>
                                 <option value="Delivered">Delivered</option>
                             </select>
                         </div>
-                    );
-                })}
+                    ))
+                }
             </div>
         </div>
     );
 };
+
+//   <div className='order add'>
+//       <h3>Order Page</h3>
+//       <div className="order-list">
+//           {orders.map((order, index) => {
+//               return (  // Add the return statement here
+//                   <div key={index} className="order-item">
+//                       <img src={assets.parcel_icon} alt="" />
+//                       <div>
+//                           <p className='order-item-food'>
+//                               {order.items.map((item, index) => {
+//                                   if (index === order.items.length - 1) {
+//                                       return item.name + " X " + item.quantity;
+//                                   } else {
+//                                       return item.name + " x " + item.quantity + ", ";
+//                                   }
+//                               })}
+//                           </p>
+//                           <p className='order-item-name'>{order.address.firstName + " " + order.address.lastName}</p>
+//                           <div className="order-item-address">
+//                               <p>{order.address.street + ", "}</p>
+//                               <p>{order.address.city + ", " + order.address.state + ", " + order.address.country + ", " + order.address.zipcode}</p>
+//                           </div>
+//                           <p className="order-item-phone">Phone :{order.address.phone}</p>
+//                       </div>
+//                       <p>Items: {order.items.length}</p>
+//                       <p>${order.amount}</p>
+//                       <select onChange={(event) => statusHandler(event, order._id)} value={order.status}>
+//                           <option value="Food Processing">Food Processing</option>
+//                           <option value="Out for Delivery">Out for Delivery</option>
+//                           <option value="Delivered">Delivered</option>
+//                       </select>
+//                   </div>
+//               );
+//           })}
+//       </div>
+//   </div>
 
 export default Orders;

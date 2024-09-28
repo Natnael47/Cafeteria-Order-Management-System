@@ -5,27 +5,38 @@ import { StoreContext } from '../../context/StoreContext';
 import "./Verify.css";
 
 const Verify = () => {
+    const { token, setCartItems, backendUrl } = useContext(StoreContext);
 
     const [searchParams, setSearchParams] = useSearchParams();
+
     const success = searchParams.get("success");
     const orderId = searchParams.get("orderId");
-    const { url } = useContext(StoreContext);
+
     const navigate = useNavigate();
-    // console.log(success, orderId);
 
     const verifyPayment = async () => {
-        const response = await axios.post(url + "/api/order/verify", { success, orderId });
-        if (response.data.success) {
-            navigate("/myorders");
-        } else {
-            navigate("/");
+        try {
+            if (!token) {
+                return null;
+            }
+
+            const response = await axios.post(backendUrl + '/api/order/verifyStripe', { success, orderId }, { headers: { token } })
+            if (response.data.success) {
+                setCartItems({});
+                navigate('/myorders')
+            } else {
+                navigate('/cart')
+            }
+
+        } catch (error) {
+            console.log(error);
+            toast.error(error.message);
         }
     }
 
     useEffect(() => {
         verifyPayment();
-        // eslint-disable-next-line
-    }, [])
+    }, [token]);
 
     return (
         <div className='verify'>

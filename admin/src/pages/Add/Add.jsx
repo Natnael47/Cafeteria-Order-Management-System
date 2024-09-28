@@ -3,7 +3,7 @@ import React, { useState } from 'react';
 import { toast } from "react-toastify";
 import { backendUrl } from "../../App";
 import { assets } from '../../assets/assets';
-import "./Add.css";
+//import "./Add.css";
 
 const Add = ({ token }) => {
 
@@ -46,27 +46,27 @@ const Add = ({ token }) => {
     }
 
     return (
-        <div className='add'>
-            <form className='flex-col' onSubmit={onSubmitHandler}>
+        <div >
+            <form className='flex flex-col w-full items-start gap-3' onSubmit={onSubmitHandler}>
                 <div className="add-img-upload flex-col">
-                    <p>Upload Image</p>
+                    <p className='mt-3 mb-1'>Upload Image</p>
                     <label htmlFor='image'>
-                        <img src={image ? URL.createObjectURL(image) : assets.upload_area} alt='' />
+                        <img className="w-40" src={image ? URL.createObjectURL(image) : assets.upload_area} alt='' />
                     </label>
                     <input onChange={(e) => setImage(e.target.files[0])} type='file' id='image' hidden required />
                 </div>
-                <div className="add-product-name flex-col">
-                    <p>Product name</p>
-                    <input onChange={onChangeHandler} value={data.name} type='text' name='name' placeholder='Type here' required />
+                <div className="w-full">
+                    <p className="mb-2">Product name</p>
+                    <input className="w-full max-w-[500px] px-3 py-2" onChange={onChangeHandler} value={data.name} type='text' name='name' placeholder='Type here' required />
                 </div>
-                <div className="add-product-description flex-col">
-                    <p>Product Description</p>
-                    <textarea onChange={onChangeHandler} value={data.description} name='description' rows="6" placeholder='Write Content' required />
+                <div className="w-full ">
+                    <p className="mb-2">Product Description</p>
+                    <textarea className="w-full max-w-[500px] max-h-[100px] px-3 py-2" onChange={onChangeHandler} value={data.description} name='description' rows="6" placeholder='Write Content Here' required />
                 </div>
-                <div className="add-category-price">
-                    <div className="add-category flex-col">
-                        <p>Product category</p>
-                        <select onChange={onChangeHandler} value={data.category} name='category'>
+                <div className="flex flex-col sm:flex-row gap-2 w-full sm:gap-8">
+                    <div>
+                        <p className="mb-2">Product category</p>
+                        <select className="w-full px-3 py-2 sm:w-[120px]" onChange={onChangeHandler} value={data.category} name='category'>
                             <option value="Salad">Salad</option>
                             <option value="Rolls">Rolls</option>
                             <option value="Deserts">Deserts</option>
@@ -77,12 +77,15 @@ const Add = ({ token }) => {
                             <option value="Noodles">Noodles</option>
                         </select>
                     </div>
-                    <div className="add-price flex-col">
-                        <p>Product Price</p>
-                        <input onChange={onChangeHandler} value={data.price} type='number' name='price' placeholder='$20' required />
+
+                    <div>
+                        <p className="mb-2">Product Price</p>
+                        <input className="w-full px-3 py-2 sm:w-[120px] max-h-[40px]" onChange={onChangeHandler} value={data.price} type='number' name='price' placeholder='$20' required />
                     </div>
+
                 </div>
-                <button type='submit' className='add-btn'>ADD</button>
+
+                <button type='submit' className='w-28 py-3 mt-4 bg-black text-white font-bold rounded-md'>ADD</button>
             </form>
         </div>
     )
