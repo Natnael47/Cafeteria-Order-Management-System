@@ -10,7 +10,7 @@ const Sidebar = () => {
                     <img src={assets.home_icon} alt='' />
                     <p className='hidden md:block'>Dashboard</p>
                 </NavLink>
-                <NavLink to='/add' className="flex items-center gap-3 border border-black border-r-0 px-3 py-2 rounded-1">
+                <NavLink to='/add' className="flex items-center gap-3 border border-black border-r-0 px-3 py-2 rounded-1" >
                     <img src={assets.add_icon} alt='' />
                     <p className='hidden md:block'>Add Food</p>
                 </NavLink>
