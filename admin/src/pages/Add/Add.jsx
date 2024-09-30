@@ -56,17 +56,17 @@ const Add = ({ token }) => {
                     <input onChange={(e) => setImage(e.target.files[0])} type='file' id='image' hidden required />
                 </div>
                 <div className="w-full">
-                    <p className="mb-2">Product name</p>
-                    <input className="w-full max-w-[500px] px-3 py-2" onChange={onChangeHandler} value={data.name} type='text' name='name' placeholder='Type here' required />
+                    <p className="mb-2">Food name</p>
+                    <input className="w-full max-w-[500px] px-3 py-2" onChange={onChangeHandler} value={data.name} type='text' name='name' placeholder='Write Name' required />
                 </div>
                 <div className="w-full ">
-                    <p className="mb-2">Product Description</p>
-                    <textarea className="w-full max-w-[500px] max-h-[100px] px-3 py-2" onChange={onChangeHandler} value={data.description} name='description' rows="6" placeholder='Write Content Here' required />
+                    <p className="mb-2">Description</p>
+                    <textarea className="w-full max-w-[500px] max-h-[100px] px-3 py-2" onChange={onChangeHandler} value={data.description} name='description' rows="6" placeholder='Write Description Here' required />
                 </div>
                 <div className="flex flex-col sm:flex-row gap-2 w-full sm:gap-8">
                     <div>
-                        <p className="mb-2">Product category</p>
-                        <select className="w-full px-3 py-2 sm:w-[120px]" onChange={onChangeHandler} value={data.category} name='category'>
+                        <p className="mb-2">Food category</p>
+                        <select className="w-full px-3 py-2 sm:w-[120px] relative max-h-48 overflow-y-auto" onChange={onChangeHandler} value={data.category} name='category'>
                             <option value="Salad">Salad</option>
                             <option value="Rolls">Rolls</option>
                             <option value="Deserts">Deserts</option>
@@ -79,7 +79,7 @@ const Add = ({ token }) => {
                     </div>
 
                     <div>
-                        <p className="mb-2">Product Price</p>
+                        <p className="mb-2">Price</p>
                         <input className="w-full px-3 py-2 sm:w-[120px] max-h-[40px]" onChange={onChangeHandler} value={data.price} type='number' name='price' placeholder='$20' required />
                     </div>
 

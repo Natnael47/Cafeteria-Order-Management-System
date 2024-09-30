@@ -94,7 +94,10 @@ const Orders = ({ token }) => {
                             <div>
                                 <p className='text-sm sm:text-[15px]'>Items : {order.items.length}</p>
                                 <p className='mt-3'>Method : {order.paymentMethod}</p>
-                                <p>Payment : {order.payment ? "Done" : "pending"}</p>
+                                <div className='flex flex-row'>
+                                    <p>Payment : </p>
+                                    <p className={order.payment ? 'text-green-500 font-semibold' : 'text-red-500 font-semibold'}>_{order.payment ? "Done" : "Pending"}</p>
+                                </div>
                                 <p>Date : {new Date(order.date).toLocaleDateString()}</p>
                             </div>
                             <p className='text-sm sm:text-[15px] font-bold'>${order.amount}</p>

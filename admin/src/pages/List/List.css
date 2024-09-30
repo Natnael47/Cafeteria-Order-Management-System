@@ -5,15 +5,20 @@
   gap: 10px;
   padding: 12px 15px;
   border: 1px solid #cacaca;
-  font-size: 13px;
+  font-size: 15px;
 }
 
 .list-table-format.title {
   background-color: #f9f9f9;
+  font-weight: 500;
+}
+
+.all-food {
+  margin-bottom: 10px;
 }
 
 .list-table-format img {
-  width: 50px;
+  width: 80px;
 }
 
 .cursor {

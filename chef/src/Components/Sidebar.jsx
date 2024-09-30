@@ -12,12 +12,12 @@ const SideBar = () => {
             {
                 cToken && <ul className='text-black mt-5'>
 
-                    <NavLink className={({ isActive }) => `flex items-center gap-3 py-3.5 px-3 md:px-9 md:min-w-72 cursor-pointer ${isActive ? 'bg-[#BBEFC0] border-r-4 border-primary' : ''}`} to={'/dashboard'}>
+                    <NavLink className={({ isActive }) => `flex items-center gap-3 py-3.5 px-3 md:px-9 md:min-w-72 cursor-pointer ${isActive ? 'bg-[#DDF7DF] border-r-4 border-primary' : ''}`} to={'/dashboard'}>
                         <img src={assets.home_icon} alt="" />
                         <p>DashBoard</p>
                     </NavLink>
 
-                    <NavLink className={({ isActive }) => `flex items-center gap-3 py-3.5 px-3 md:px-9 md:min-w-72 cursor-pointer ${isActive ? 'bg-[#BBEFC0] border-r-4 border-primary' : ''}`} to={'/orders'}>
+                    <NavLink className={({ isActive }) => `flex items-center gap-3 py-3.5 px-3 md:px-9 md:min-w-72 cursor-pointer ${isActive ? 'bg-[#DDF7DF] border-r-4 border-primary' : ''}`} to={'/orders'}>
                         <img src={assets.order_icon} alt="" />
                         <p>Orders</p>
                     </NavLink>
