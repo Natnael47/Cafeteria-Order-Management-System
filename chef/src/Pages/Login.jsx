@@ -1,6 +1,7 @@
 import axios from "axios";
 import React, { useContext, useState } from "react";
 import { toast } from "react-toastify";
+import { backendUrl } from "../App";
 import { ChefContext } from "../Context/ChefContext";
 
 const Login = () => {
@@ -10,14 +11,14 @@ const Login = () => {
     const [email, setEmail] = useState("");
     const [password, setPassword] = useState("");
 
-    const { setCToken, backendUrl } = useContext(ChefContext);
+    const { setCToken } = useContext(ChefContext);
 
     const onSubmitHandler = async (event) => {
         event.preventDefault();
 
         try {
             if (state === "Chef") {
-                const { data } = await axios.post(backendUrl + "/api/user/admin", { email, password });
+                const { data } = await axios.post(backendUrl + "/api/admin/login", { email, password });
                 if (data.success) {
                     localStorage.setItem('cToken', data.token)
                     setCToken(data.token);

@@ -3,8 +3,8 @@ import { createContext } from "react";
 export const WaiterContext = createContext();
 
 const WaiterContextProvider = (props) => {
-    const value = {
 
+    const value = {
 
     }
     return (

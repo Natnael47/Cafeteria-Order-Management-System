@@ -6,11 +6,8 @@ const ChefContextProvider = (props) => {
 
     const [cToken, setCToken] = useState(localStorage.getItem('cToken') ? localStorage.getItem('cToken') : '');
 
-    const backendUrl = import.meta.env.VITE_BACKEND_URL
-
     const value = {
-        cToken, setCToken,
-        backendUrl
+        cToken, setCToken
     }
     return (
         <ChefContext.Provider value={value}>

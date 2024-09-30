@@ -9,6 +9,8 @@ import Dashboard from './Pages/Chef/Dashboard';
 import Orders from './Pages/Chef/Orders';
 import Login from './Pages/Login';
 
+export const backendUrl = import.meta.env.VITE_BACKEND_URL
+
 const App = () => {
 
   const { cToken } = useContext(ChefContext)
