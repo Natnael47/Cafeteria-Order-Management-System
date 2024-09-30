@@ -119,7 +119,7 @@ const PlaceOrderRazorpay = async (req, res) => {};
 //all orders data for admin panel
 const allOrders = async (req, res) => {
   try {
-    const orders = await orderModel.find({});
+    const orders = (await orderModel.find({})).reverse();
     res.json({ success: true, orders });
   } catch (error) {
     console.log(error);
@@ -132,6 +132,7 @@ const userOrders = async (req, res) => {
   try {
     const { userId } = req.body;
     const orders = await orderModel.find({ userId });
+
     res.json({ success: true, orders });
   } catch (error) {
     console.log(error);

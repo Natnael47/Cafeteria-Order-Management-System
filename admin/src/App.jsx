@@ -15,8 +15,6 @@ export const backendUrl = import.meta.env.VITE_BACKEND_URL
 
 const App = () => {
 
-  const url = "http://localhost:4000";
-
   const [token, setToken] = useState(localStorage.getItem('token') ? localStorage.getItem('token') : '');
 
   useEffect(() => {
@@ -36,11 +34,11 @@ const App = () => {
             <Sidebar />
             <div className='w-[70%] mx-auto ml-[max(5vw,25px)] my-8 text-black text-base'>
               <Routes>
-                <Route path='/dashboard' element={<Dashboard url={url} token={token} />} />
+                <Route path='/dashboard' element={<Dashboard url={backendUrl} token={token} />} />
                 <Route path='/add' element={<Add token={token} />} />
                 <Route path='/list' element={<List token={token} />} />
                 <Route path='/orders' element={<Orders token={token} />} />
-                <Route path='/reports' element={<Reports url={url} token={token} />} />
+                <Route path='/reports' element={<Reports url={backendUrl} token={token} />} />
               </Routes>
             </div>
           </div>
