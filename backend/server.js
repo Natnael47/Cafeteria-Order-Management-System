@@ -19,7 +19,7 @@ app.use(cors());
 //db connection
 connectDB();
 
-//api endpoints
+//api endpoints for Customer
 app.use("/api/food", foodRouter);
 app.use("/images", express.static("uploads"));
 app.use("/api/user", userRouter);
