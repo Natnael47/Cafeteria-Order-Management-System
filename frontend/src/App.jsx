@@ -4,7 +4,9 @@ import Footer from "./components/Footer/Footer";
 import LoginPopUp from "./components/LoginPopUp/LoginPopUp";
 import { Navbar } from "./components/Navbar/Navbar";
 import SearchBar from "./components/SearchBar/SearchBar";
+import About from "./pages/About";
 import Cart from './pages/Cart/Cart';
+import Contact from "./pages/Contact";
 import Home from './pages/Home/Home';
 import Menu from "./pages/Menu/Menu";
 import MyOrders from "./pages/MyOrders/MyOrders";
@@ -32,6 +34,8 @@ const App = () => {
           <Route path="/menu" element={<Menu />} />
           <Route path="/myprofile" element={<MyProfile />} />
           <Route path="/verify" element={<Verify />} />
+          <Route path="/about" element={<About />} />
+          <Route path="/contact" element={<Contact />} />
         </Routes>
       </div>
       <Footer />

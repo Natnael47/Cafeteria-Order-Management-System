@@ -32,8 +32,9 @@ export const Navbar = ({ setShowLogin }) => {
                     ? <Link to='/menu' onClick={() => setMenu("menu") & setCurrState("home")} className={menu === "menu" ? "active" : ""}>menu</Link>
                     : <a href="#explore-menu" onClick={() => setMenu("menu")} className={menu === "menu" ? "active" : ""}>menu</a>
                 }
-                <a href="#app-download" onClick={() => setMenu("mobile-app")} className={menu === "mobile-app" ? "active" : ""}>About</a>
-                <a href="#footer" onClick={() => setMenu("contact-us")} className={menu === "contact-us" ? "active" : ""}>contact us</a>
+                <Link to='/about' onClick={() => setMenu("about")} className={menu === "about" ? "active" : ""}>About</Link>
+                <Link to='/contact' onClick={() => setMenu("contact-us")} className={menu === "contact-us" ? "active" : ""}>Contact Us</Link>
+
             </ul>
             <div className="navbar-right">
                 <img onClick={() => setShowSearch(true)} src={assets.search_icon} alt="" className="search" />

@@ -44,6 +44,7 @@ import food_7 from "./food_7.png";
 import food_8 from "./food_8.png";
 import food_9 from "./food_9.png";
 
+import about_us from "./about.png";
 import add_icon_green from "./add_icon_green.png";
 import add_icon_white from "./add_icon_white.png";
 import app_store from "./app_store.png";
@@ -56,6 +57,7 @@ import facebook_iconBlue from "./facebook.png";
 import facebook_icon from "./facebook_icon.png";
 import burger_image from "./hamburger.png";
 import instagram_icon from "./instagram.png";
+import kare from "./kare.jpg";
 import linkedin_icon from "./linkedin_icon.png";
 import location_icon from "./location17.png";
 import logo2 from "./logo2.png";
@@ -106,6 +108,8 @@ export const assets = {
   profile_pic,
   razorpay_logo,
   stripe_logo,
+  about_us,
+  kare,
 };
 
 export const menu_list = [
