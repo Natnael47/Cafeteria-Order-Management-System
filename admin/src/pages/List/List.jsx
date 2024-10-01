@@ -23,9 +23,9 @@ const List = ({ token }) => {
         const response = await axios.post(backendUrl + "/api/food/remove", { id: foodId }, { headers: { token } })
         await fetchList();
         if (response.data.success) {
-            toast.success(response.data.message);
+            toast.success("Food Removed");
         } else {
-            toast.error("Error");
+            toast.error("Error removing");
         }
     }
 

@@ -39,9 +39,9 @@ const Add = ({ token }) => {
                 category: "Salad"
             })
             setImage(false);
-            toast.success(response.data.message);
+            toast.success("Food added successfully");
         } else {
-            toast.error(response.data.message);
+            toast.error("Failed to add");
         }
     }
 

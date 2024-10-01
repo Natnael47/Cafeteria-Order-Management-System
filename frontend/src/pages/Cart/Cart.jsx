@@ -58,7 +58,7 @@ const Cart = () => {
                             <b>${getTotalCartAmount() === 0 ? 0 : getTotalCartAmount() + 2}</b>
                         </div>
                     </div>
-                    <button onClick={() => navigate('/orders')}>PROCEED TO CHECKOUT</button>
+                    <button className='bg-primary text-white px-16 py-3 text-sm border rounded hover:bg-black hover:text-white transition-all' onClick={() => navigate('/orders')}>PROCEED TO CHECKOUT</button>
                 </div>
                 <div className="cart-promocode">
                     <div>
