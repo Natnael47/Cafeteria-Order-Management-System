@@ -52,6 +52,7 @@ import bag_icon from "./bag_icon.png";
 import cart_icon from "./cart.png";
 import cross_icon from "./cross_icon.png";
 import person from "./customer-image.png";
+import drop_down_icon from "./dropdown_icon.svg";
 import email_icon17 from "./email17.png";
 import facebook_iconBlue from "./facebook.png";
 import facebook_icon from "./facebook_icon.png";
@@ -110,6 +111,7 @@ export const assets = {
   stripe_logo,
   about_us,
   kare,
+  drop_down_icon,
 };
 
 export const menu_list = [

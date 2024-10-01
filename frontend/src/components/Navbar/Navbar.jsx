@@ -42,16 +42,18 @@ export const Navbar = ({ setShowLogin }) => {
                     <Link to='/cart'><img src={assets.cart_icon} alt="" onClick={() => setCurrState("cart")} /></Link>
                     <div className={getTotalCartAmount() === 0 ? "" : "dot"}></div>
                 </div>
-                {!token ? <button onClick={() => setShowLogin(true)}>sign in</button> : <div className="navbar-profile">
-                    <img src={assets.profile_icon} alt="" />
-                    <ul className="nav-profile-dropdown">
-                        <li onClick={() => navigate('/myorders')}><img src={assets.bag_icon} alt="" /><p>Orders</p></li>
-                        <hr />
-                        <li onClick={logout}><img src={assets.logout_icon} alt="" /><p>Logout</p></li>
-                        <hr />
-                        <li onClick={() => navigate('/myprofile')}><img src={assets.profile_icon} alt="" /><p>Profile</p></li>
-                    </ul>
-                </div>}
+                {!token ? <button onClick={() => setShowLogin(true)}>sign in</button>
+                    : <div className="flex items-center gap-2 cursor-pointer group relative">
+                        <img src={assets.profile_icon} alt="" />
+                        <img className="w-2.5" src={assets.drop_down_icon} alt="" />
+                        <div className="absolute top-0 right-0 pt-14 text-base font-medium text-gray-500 z-20 hidden group-hover:block">
+                            <div className="min-w-40 bg-[#FBFDFB] rounded flex flex-col gap-4 p-4 border border-primary">
+                                <p onClick={() => navigate('/myprofile')} className=" hover:text-black cursor-pointer">My Profile</p>
+                                <p onClick={() => navigate('/myorders')} className=" hover:text-black cursor-pointer">My Orders</p>
+                                <p onClick={logout} className=" hover:text-red-700 cursor-pointer">Logout</p>
+                            </div>
+                        </div>
+                    </div>}
 
             </div>
         </div>
