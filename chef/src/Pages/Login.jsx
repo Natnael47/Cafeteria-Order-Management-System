@@ -3,6 +3,7 @@ import React, { useContext, useState } from "react";
 import { toast } from "react-toastify";
 import { backendUrl } from "../App";
 import { ChefContext } from "../Context/ChefContext";
+import { WaiterContext } from "../Context/WaiterContext";
 
 const Login = () => {
 
@@ -12,6 +13,8 @@ const Login = () => {
     const [password, setPassword] = useState("");
 
     const { setCToken } = useContext(ChefContext);
+
+    const { wToken, setWToken } = useContext(WaiterContext);
 
     const onSubmitHandler = async (event) => {
         event.preventDefault();
@@ -26,7 +29,20 @@ const Login = () => {
                     toast.error(data.message)
                 }
             } else {
+
+                const { data } = await axios.post(backendUrl + "/api/admin/login", { email, password });
+                if (data.success) {
+                    localStorage.setItem('wToken', data.token)
+                    setWToken(data.token);
+                } else {
+                    toast.error(data.message)
+                }
             }
+
+            //console.log(email, password);
+            // const response = await axios.post(backendUrl + '/api/admin/login', { email, password })
+            // console.log(response);
+
         } catch (error) { }
     };
 

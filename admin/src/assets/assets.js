@@ -3,6 +3,7 @@ import chef_icon from "./chef_icon.png";
 import home_icon from "./home_icon.png";
 import logo from "./logo.png";
 import logo2 from "./logo2.png";
+import modify_icon from "./modify.png";
 import order_icon from "./order_icon.png";
 import parcel_icon from "./parcel_icon.png";
 import patients_icon from "./patients_icon.svg";
@@ -26,6 +27,7 @@ export const assets = {
   chef_icon,
   patients_icon,
   people_icon,
+  modify_icon,
 };
 
 //export const url = 'http://localhost:4000'

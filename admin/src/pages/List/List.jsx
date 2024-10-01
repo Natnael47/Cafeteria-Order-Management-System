@@ -9,6 +9,8 @@ const List = ({ token }) => {
 
     const [list, setList] = useState([]);
 
+    const [isEdit, setIsEdit] = useState(false);
+
     const fetchList = async () => {
         const response = await axios.get(backendUrl + "/api/food/list", { headers: { token } });
         //console.log(response.data);
@@ -43,6 +45,7 @@ const List = ({ token }) => {
                     <b>Category</b>
                     <b>Price</b>
                     <b>Remove</b>
+                    <b>Modify</b>
                 </div>
                 {list.map((item, index) => {
                     return (
@@ -50,8 +53,9 @@ const List = ({ token }) => {
                             <img src={backendUrl + "/images/" + item.image} alt="" />
                             <p>{item.name}</p>
                             <p>{item.category}</p>
-                            <p>${item.price}</p>
+                            <p>{item.price}</p>
                             <p onClick={() => removeFood(item._id)} className="cursor"><img src={assets.trash_icon} alt="" /></p>
+                            <p className="cursor" onClick={() => setIsEdit(true)}><img src={assets.modify_icon} alt="" /></p>
                         </div>
                     )
                 })}

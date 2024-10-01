@@ -2,17 +2,25 @@ import React, { useContext } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { assets } from '../../../admin/src/assets/assets'
 import { ChefContext } from '../Context/ChefContext'
+import { WaiterContext } from '../Context/WaiterContext'
 
 const Navbar = () => {
 
-    const { cToken, setCToken } = useContext(ChefContext)
+    const { cToken, setCToken } = useContext(ChefContext);
+
+    const { wToken, setWToken } = useContext(WaiterContext);
 
     const navigate = useNavigate()
 
     const logout = () => {
         navigate('/')
+
+        wToken && setWToken('')
+        wToken && localStorage.removeItem('wToken')
+
         cToken && setCToken('')
         cToken && localStorage.removeItem('cToken')
+
     }
 
     return (

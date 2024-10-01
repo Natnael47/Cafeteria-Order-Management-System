@@ -1,6 +1,6 @@
 .list-table-format {
   display: grid;
-  grid-template-columns: 0.5fr 2fr 1fr 1fr 0.5fr;
+  grid-template-columns: 0.5fr 0.9fr 0.8fr 0.8fr 0.5fr 0.5fr;
   align-items: center;
   gap: 10px;
   padding: 12px 15px;
@@ -28,6 +28,10 @@
 
 .cursor img {
   width: 30px;
+}
+
+.cursor img:hover {
+  transform: scale(1.05);
 }
 
 @media (max-width: 600px) {
