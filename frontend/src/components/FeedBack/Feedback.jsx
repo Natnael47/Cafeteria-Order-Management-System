@@ -1,6 +1,6 @@
 import React from 'react'
 import { assets } from '../../assets/assets'
-import "./Feedback.css"
+import "./feedback.css"
 
 const Feedback = () => {
     return (
