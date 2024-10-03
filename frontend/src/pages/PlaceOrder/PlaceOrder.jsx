@@ -2,6 +2,7 @@ import axios from 'axios';
 import React, { useContext, useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { toast } from 'react-toastify';
+import { backendUrl } from '../../App';
 import { assets } from '../../assets/assets';
 import CartTotal from '../../components/CartTotal';
 import Title from '../../components/Title';
@@ -11,7 +12,7 @@ import { StoreContext } from '../../context/StoreContext';
 
 const PlaceOrder = () => {
 
-    const { getTotalCartAmount, token, food_list, cartItems, url, backendUrl, setCartItems } = useContext(StoreContext);
+    const { getTotalCartAmount, token, food_list, cartItems, setCartItems } = useContext(StoreContext);
 
     const navigate = useNavigate();
 

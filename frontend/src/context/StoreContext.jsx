@@ -1,13 +1,14 @@
 import axios from "axios";
 import { createContext, useEffect, useState } from "react";
 import { toast } from "react-toastify";
+import { backendUrl } from "../App";
 //import { food_list } from "../assets/assets";
 
 export const StoreContext = createContext(null)
 
 const StoreContextProvider = (props) => {
 
-    const backendUrl = import.meta.env.VITE_BACKEND_URL
+    //const backendUrl = import.meta.env.VITE_BACKEND_URL
 
     const [food_list, setFoodList] = useState([]);
 
@@ -17,7 +18,7 @@ const StoreContextProvider = (props) => {
 
     const [showSearch, setShowSearch] = useState(false);
 
-    const url = "http://localhost:4000";
+    //const url = "http://localhost:4000";
 
     const [token, setToken] = useState("");
 
@@ -112,7 +113,6 @@ const StoreContextProvider = (props) => {
         addToCart,
         removeFromCart,
         getTotalCartAmount,
-        url,
         token,
         setToken,
         backendUrl,

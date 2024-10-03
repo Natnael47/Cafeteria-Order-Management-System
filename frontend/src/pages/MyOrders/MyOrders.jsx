@@ -1,5 +1,6 @@
 import axios from 'axios';
 import React, { useContext, useEffect, useState } from 'react';
+import { backendUrl } from '../../App';
 import { assets } from '../../assets/assets';
 import Title from '../../components/Title';
 import { StoreContext } from '../../context/StoreContext';
@@ -8,7 +9,7 @@ import './MyOrders.css';
 const MyOrders = () => {
 
     const [orders, setOrders] = useState([]);
-    const { url, token, backendUrl } = useContext(StoreContext);
+    const { url, token } = useContext(StoreContext);
 
     //  const fetchOrders = async () => {
     //      const response = await axios.post(url + "/api/order/userorders", {}, { headers: { token } });
