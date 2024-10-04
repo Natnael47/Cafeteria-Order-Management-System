@@ -3,11 +3,11 @@ import { assets } from '../assets/assets';
 
 const Footer = () => {
     return (
-        <div className="text-[#d9d9d9] bg-[#323232] flex flex-col items-center gap-5 px-[8vw] pt-20 mt-[100px]" id="footer">
-            <div className="w-full grid grid-cols-[2fr_1fr_1fr] gap-[80px] max-w-screen-lg">
+        <div className="text-[#d9d9d9] bg-[#323232] flex flex-col gap-5 px-[8vw] pt-20 mt-[50px]" id="footer">
+            <div className="w-full grid grid-cols-[2fr_1fr_1fr] gap-[80px]">
                 <div className="flex flex-col items-start gap-5">
-                    <img src={assets.logo} alt="" />
-                    <p>Kare plus grill & Lounge is one of the well-known grill and restaurant houses in Addis Ababa!</p>
+                    <img className='mb-5' src={assets.logo} alt="" />
+                    <p className='w-full md:w-2/3 leading-6'>Kare plus grill & Lounge is one of the well-known grill and restaurant houses in Addis Ababa!</p>
                     <div className="flex">
                         <img src={assets.twitter_iconBlue} alt="Twitter" className="w-[40px] mr-4" />
                         <img src={assets.instagram_icon} alt="Instagram" className="w-[40px] mr-4" />
@@ -38,8 +38,8 @@ const Footer = () => {
                     </ul>
                 </div>
             </div>
-            <hr className="w-full h-[2px] my-5 bg-gray-500 border-none" />
-            <p className="text-center">Copyright 2024 @ Order.com - All Rights Reserved.</p>
+            <hr className="w-full h-[2px] mt-5 bg-gray-500 border-none" />
+            <p className=" text-center mb-5">Copyright 2024 @ Order.com - All Rights Reserved.</p>
         </div>
     );
 }

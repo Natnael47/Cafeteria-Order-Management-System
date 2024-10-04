@@ -53,7 +53,7 @@ export const Navbar = ({ setShowLogin }) => {
                         <div className="absolute right-0 top-0 pt-14 z-20 hidden group-hover:block">
                             <div className="bg-[#FBFDFB] rounded border border-primary p-4 flex flex-col gap-4 min-w-[160px]">
                                 <p onClick={() => navigate('/myprofile')} className="cursor-pointer hover:text-black">My Profile</p>
-                                <p onClick={() => navigate('/myorders')} className="cursor-pointer hover:text-black">My Orders</p>
+                                <p onClick={() => navigate('/myorders')} className="cursor-pointer hover:text-black"> My Orders</p>
                                 <p onClick={logout} className="cursor-pointer hover:text-red-700">Logout</p>
                             </div>
                         </div>
