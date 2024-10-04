@@ -1,17 +1,17 @@
 import React, { useState } from "react";
 import { Route, Routes } from "react-router-dom";
-import Footer from "./components/Footer/Footer";
-import LoginPopUp from "./components/LoginPopUp/LoginPopUp";
-import { Navbar } from "./components/Navbar/Navbar";
+import Footer from "./components/Footer";
+import LoginPopUp from "./components/LoginPopUp";
+import { Navbar } from "./components/Navbar";
 import SearchBar from "./components/SearchBar/SearchBar";
 import About from "./pages/About";
-import Cart from './pages/Cart/Cart';
+import Cart from './pages/Cart';
 import Contact from "./pages/Contact";
-import Home from './pages/Home/Home';
-import Menu from "./pages/Menu/Menu";
-import MyOrders from "./pages/MyOrders/MyOrders";
-import MyProfile from "./pages/MyProfile/MyProfile";
-import PlaceOrder from './pages/PlaceOrder/PlaceOrder';
+import Home from './pages/Home';
+import Menu from "./pages/Menu";
+import MyOrders from "./pages/MyOrders";
+import MyProfile from "./pages/MyProfile";
+import PlaceOrder from './pages/PlaceOrder';
 import Verify from "./pages/Verify/Verify";
 
 export const backendUrl = import.meta.env.VITE_BACKEND_URL

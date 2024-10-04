@@ -4,6 +4,10 @@
 @tailwind components;
 @tailwind utilities;
 
+::-webkit-scrollbar {
+  @apply hidden;
+}
+
 * {
   padding: 0;
   margin: 0;
