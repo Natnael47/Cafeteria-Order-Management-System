@@ -14,7 +14,7 @@ import MyProfile from "./pages/MyProfile/MyProfile";
 import PlaceOrder from './pages/PlaceOrder/PlaceOrder';
 import Verify from "./pages/Verify/Verify";
 
-export const backendUrl = 'https://cafeteria-order-management-backend.onrender.com'//import.meta.env.VITE_BACKEND_URL
+export const backendUrl = import.meta.env.VITE_BACKEND_URL
 
 const App = () => {
 
