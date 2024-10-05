@@ -1,10 +1,13 @@
 import axios from 'axios';
-import React, { useEffect, useState } from 'react';
+import React, { useContext, useEffect, useState } from 'react';
 import { toast } from "react-toastify";
 import { backendUrl } from '../App';
 import { assets } from '../assets/assets';
+import { AdminContext } from '../context/AdminContext';
 
-const Orders = ({ token }) => {
+const Orders = () => {
+
+    const { token } = useContext(AdminContext);
 
     const [orders, setOrders] = useState([]);
 
@@ -26,7 +29,7 @@ const Orders = ({ token }) => {
             const response = await axios.post(backendUrl + "/api/order/list", {}, { headers: { token } })
             if (response.data.success) {
                 setOrders(response.data.orders);
-                console.log(response.data.orders);
+                //console.log(response.data.orders);
 
             } else {
                 toast.error(response.data.message)
@@ -66,9 +69,9 @@ const Orders = ({ token }) => {
     }, [token]);
 
     return (
-        <div>
-            <h3>ORDER PAGE</h3>
-            <div>
+        <div className='m-5'>
+            <p className="mb-3 text-lg font-semibold">ORDER PAGE</p>
+            <div className='bg-white'>
                 {
                     orders.map((order, index) => (
                         <div className='grid grid-cols-1 sm:grid-cols-[0.5fr_2fr_1fr] lg:grid-cols-[0.5fr_2fr_1fr_1fr_1fr] gap-3 items-start border-2 border-black p-5 md:p-8 my-3 md:my-4 text-xs sm:text-sm text-black' key={index}>

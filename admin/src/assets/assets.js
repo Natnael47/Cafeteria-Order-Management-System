@@ -12,6 +12,7 @@ import profile_image from "./profile_image.png";
 import report_icon from "./report_icon.png";
 import trash_icon from "./trash.png";
 import upload_area from "./upload_area.png";
+import upload_area2 from "./upload_area.svg";
 
 export const assets = {
   logo,
@@ -28,6 +29,7 @@ export const assets = {
   patients_icon,
   people_icon,
   modify_icon,
+  upload_area2,
 };
 
 //export const url = 'http://localhost:4000'

@@ -1,13 +1,15 @@
-import React, { useEffect, useState } from 'react';
+import React, { useContext } from 'react';
 import { Route, Routes } from 'react-router-dom';
 import { ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
-import Login from './components/Login';
 import Navbar from './components/Navbar';
 import Sidebar from './components/Sidebar';
+import { AdminContext } from './context/AdminContext';
 import Add from './pages/Add';
+import AddEmployee from './pages/AddEmployee';
 import Dashboard from './pages/Dashboard';
-import List from './pages/List/List';
+import List from './pages/List';
+import Login from './pages/Login';
 import Orders from './pages/Orders';
 import Reports from './pages/Reports';
 
@@ -15,36 +17,30 @@ export const backendUrl = import.meta.env.VITE_BACKEND_URL
 
 const App = () => {
 
-  const [token, setToken] = useState(localStorage.getItem('token') ? localStorage.getItem('token') : '');
+  const { token } = useContext(AdminContext);
 
-  useEffect(() => {
-    localStorage.setItem('token', token);
-  }, [token])
-
-
-  return (
-    <div className='bg-gray-50 min-h-screen'>
+  return token ? (
+    <div className='bg-gray-100'>
       <ToastContainer />
-      {token === ""
-        ? <Login setToken={setToken} />
-        : <>
-          <Navbar setToken={setToken} />
-          <hr />
-          <div className="flex w-full">
-            <Sidebar />
-            <div className='w-[70%] mx-auto ml-[max(5vw,25px)] my-8 text-black text-base'>
-              <Routes>
-                <Route path='/dashboard' element={<Dashboard url={backendUrl} token={token} />} />
-                <Route path='/add' element={<Add token={token} />} />
-                <Route path='/list' element={<List token={token} />} />
-                <Route path='/orders' element={<Orders token={token} />} />
-                <Route path='/reports' element={<Reports url={backendUrl} token={token} />} />
-              </Routes>
-            </div>
-          </div>
-        </>
-      }
+      <Navbar />
+      <div className='flex items-start'>
+        <Sidebar />
+        <Routes>
+          <Route path='/' element={<></>} />
+          <Route path='/dashboard' element={<Dashboard />} />
+          <Route path='/add' element={<Add />} />
+          <Route path='/list' element={<List />} />
+          <Route path='/orders' element={<Orders />} />
+          <Route path='/reports' element={<Reports />} />
+          <Route path='/add-employees' element={<AddEmployee />} />
+        </Routes>
+      </div>
     </div>
+  ) : (
+    <>
+      <Login />
+      <ToastContainer />
+    </>
   )
 }
 

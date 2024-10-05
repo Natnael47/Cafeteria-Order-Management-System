@@ -14,7 +14,7 @@ const Login = () => {
 
     const { setCToken } = useContext(ChefContext);
 
-    const { wToken, setWToken } = useContext(WaiterContext);
+    const { setWToken } = useContext(WaiterContext);
 
     const onSubmitHandler = async (event) => {
         event.preventDefault();
@@ -43,7 +43,10 @@ const Login = () => {
             // const response = await axios.post(backendUrl + '/api/admin/login', { email, password })
             // console.log(response);
 
-        } catch (error) { }
+        } catch (error) {
+            console.log(error);
+            toast.error(error.message);
+        }
     };
 
     return (
