@@ -4,6 +4,7 @@ import express from "express";
 import { connectDB } from "./config/db.js";
 import adminRouter from "./routes/adminRoute.js";
 import cartRouter from "./routes/cartRoute.js";
+import chefRouter from "./routes/chefRoute.js";
 import foodRouter from "./routes/foodRoute.js";
 import orderRouter from "./routes/orderRoute.js";
 import userRouter from "./routes/userRoute.js";
@@ -27,6 +28,8 @@ app.use("/api/cart", cartRouter);
 app.use("/api/order", orderRouter);
 //For Admin
 app.use("/api/admin", adminRouter);
+//for chef
+app.use("/api/chef", chefRouter);
 
 // Define the route
 app.get("/", (req, res) => {
