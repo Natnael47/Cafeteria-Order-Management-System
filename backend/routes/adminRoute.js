@@ -1,10 +1,21 @@
 import express from "express";
-import { adminDashboard, adminLogin } from "../controllers/adminController.js";
+import {
+  addEmployee,
+  adminDashboard,
+  adminLogin,
+} from "../controllers/adminController.js";
 import adminAuth from "../middleware/adminAuth.js";
+import upload from "../middleware/multer.js";
 
 const adminRouter = express.Router();
 
 adminRouter.get("/dashboard", adminAuth, adminDashboard);
 adminRouter.post("/login", adminLogin);
+adminRouter.post(
+  "/add-employee",
+  adminAuth,
+  upload.single("image"),
+  addEmployee
+);
 
 export default adminRouter;

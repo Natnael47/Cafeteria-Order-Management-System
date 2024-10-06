@@ -15,7 +15,7 @@ const employeeSchema = new mongoose.Schema({
   salary: { type: Number, required: true },
   address: { type: Object, required: true },
   about: { type: String, required: true },
-  hireDate: { type: Number, required: true },
+  date: { type: Number, required: true },
 });
 
 const employeeModel =
