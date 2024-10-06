@@ -51,7 +51,7 @@ const Add = () => {
         <form className='flex flex-col w-full items-start m-5' onSubmit={onSubmitHandler}>
             <p className="mb-3 text-lg font-semibold">Add Food</p>
 
-            <div className="bg-white px-8 py-4 border rounded w-full max-w-4xl max-h-[80vh] overflow-scroll">
+            <div className="bg-white px-8 py-4 border rounded w-full max-w-4xl max-h-[88vh] overflow-scroll">
                 <div className="add-img-upload flex-col">
                     <p className='mt-3 mb-1'>Upload Image</p>
                     <label htmlFor='image'>

@@ -1,6 +1,6 @@
 import express from "express";
-import { chefDashboard } from "../controllers/chefController";
-import chefAuth from "../middleware/chefAuth";
+import { chefDashboard } from "../controllers/chefController.js";
+import chefAuth from "../middleware/chefAuth.js";
 
 const chefRouter = express.Router();
 

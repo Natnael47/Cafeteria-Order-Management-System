@@ -69,52 +69,57 @@ const Orders = () => {
     }, [token]);
 
     return (
-        <div className='m-5'>
-            <p className="mb-3 text-lg font-semibold">ORDER PAGE</p>
-            <div className='bg-white'>
-                {
-                    orders.map((order, index) => (
-                        <div className='grid grid-cols-1 sm:grid-cols-[0.5fr_2fr_1fr] lg:grid-cols-[0.5fr_2fr_1fr_1fr_1fr] gap-3 items-start border-2 border-black p-5 md:p-8 my-3 md:my-4 text-xs sm:text-sm text-black' key={index}>
-                            <img className='w-16' src={assets.parcel_icon} alt="" />
-                            <div>
+        <div className='m-5 w-full'>
+            <p className="text-lg font-semibold">ORDER PAGE</p>
 
+            <div className='bg-[#F3F4F6] rounded w-full max-w-5.3xl max-h-[88vh] overflow-scroll'>
+
+                <div className='bg-[#F3F4F6]'>
+                    {
+                        orders.map((order, index) => (
+                            <div className='grid grid-cols-1 sm:grid-cols-[0.5fr_2fr_1fr] lg:grid-cols-[0.5fr_2fr_1fr_1fr_1fr] gap-3 items-start border-2 border-black p-5 md:p-8 my-3 md:my-4 text-xs sm:text-sm text-black bg-white' key={index}>
+                                <img className='w-16' src={assets.parcel_icon} alt="" />
                                 <div>
-                                    {order.items.map((item, index) => {
-                                        if (index === order.items.length - 1) {
-                                            return <p className='py-0.5' key={index}> {item.name} X <span>  {item.quantity} </span></p>
-                                        } else {
-                                            return <p className='py-0.5' key={index}> {item.name} X <span>  {item.quantity} ,</span></p>
-                                        }
-                                    })}
+
+                                    <div>
+                                        {order.items.map((item, index) => {
+                                            if (index === order.items.length - 1) {
+                                                return <p className='py-0.5' key={index}> {item.name} X <span>  {item.quantity} </span></p>
+                                            } else {
+                                                return <p className='py-0.5' key={index}> {item.name} X <span>  {item.quantity} ,</span></p>
+                                            }
+                                        })}
+                                    </div>
+                                    <p className='mt-3 mb-2 font-medium'>{order.address.firstName + " " + order.address.lastName}</p>
+                                    <div>
+                                        <p>{order.address.street + ","}</p>
+                                        <p>{order.address.city + ", " + order.address.state + ", " + order.address.country + ", " + order.address.zipcode}</p>
+                                    </div>
+                                    <p>{order.address.phone}</p>
                                 </div>
-                                <p className='mt-3 mb-2 font-medium'>{order.address.firstName + " " + order.address.lastName}</p>
                                 <div>
-                                    <p>{order.address.street + ","}</p>
-                                    <p>{order.address.city + ", " + order.address.state + ", " + order.address.country + ", " + order.address.zipcode}</p>
+                                    <p className='text-sm sm:text-[15px]'>Items : {order.items.length}</p>
+                                    <p className='mt-3'>Method : {order.paymentMethod}</p>
+                                    <div className='flex flex-row'>
+                                        <p>Payment : </p>
+                                        <p className={order.payment ? 'text-green-500 font-semibold' : 'text-red-500 font-semibold'}>_{order.payment ? "Done" : "Pending"}</p>
+                                    </div>
+                                    <p>Date : {new Date(order.date).toLocaleDateString()}</p>
                                 </div>
-                                <p>{order.address.phone}</p>
+                                <p className='text-sm sm:text-[15px] font-bold'>${order.amount}</p>
+                                <select onChange={(event) => statusHandler(event, order._id)} value={order.status} className='p-2 font-semibold'>
+                                    <option value="Order Placed">Order Placed</option>
+                                    <option value="Food Processing">Food Processing</option>
+                                    <option value="Shipped">Shipped</option>
+                                    <option value="Out For Delivery">Out For Delivery</option>
+                                    <option value="Delivered">Delivered</option>
+                                </select>
                             </div>
-                            <div>
-                                <p className='text-sm sm:text-[15px]'>Items : {order.items.length}</p>
-                                <p className='mt-3'>Method : {order.paymentMethod}</p>
-                                <div className='flex flex-row'>
-                                    <p>Payment : </p>
-                                    <p className={order.payment ? 'text-green-500 font-semibold' : 'text-red-500 font-semibold'}>_{order.payment ? "Done" : "Pending"}</p>
-                                </div>
-                                <p>Date : {new Date(order.date).toLocaleDateString()}</p>
-                            </div>
-                            <p className='text-sm sm:text-[15px] font-bold'>${order.amount}</p>
-                            <select onChange={(event) => statusHandler(event, order._id)} value={order.status} className='p-2 font-semibold'>
-                                <option value="Order Placed">Order Placed</option>
-                                <option value="Food Processing">Food Processing</option>
-                                <option value="Shipped">Shipped</option>
-                                <option value="Out For Delivery">Out For Delivery</option>
-                                <option value="Delivered">Delivered</option>
-                            </select>
-                        </div>
-                    ))
-                }
+                        ))
+                    }
+                </div>
             </div>
+
         </div>
     );
 };
