@@ -3,6 +3,7 @@ import {
   addEmployee,
   adminDashboard,
   adminLogin,
+  allEmployees,
 } from "../controllers/adminController.js";
 import adminAuth from "../middleware/adminAuth.js";
 import upload from "../middleware/multer.js";
@@ -17,5 +18,6 @@ adminRouter.post(
   upload.single("image"),
   addEmployee
 );
+adminRouter.post("/all-employees", adminAuth, allEmployees);
 
 export default adminRouter;

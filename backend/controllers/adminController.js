@@ -132,4 +132,15 @@ const addEmployee = async (req, res) => {
   }
 };
 
-export { addEmployee, adminDashboard, adminLogin };
+//API to get All Employee list for Admin
+const allEmployees = async (req, res) => {
+  try {
+    const employees = await employeeModel.find({}).select("-password");
+    res.json({ success: true, employees });
+  } catch (error) {
+    console.log(error);
+    res.json({ success: false, message: error.message });
+  }
+};
+
+export { addEmployee, adminDashboard, adminLogin, allEmployees };

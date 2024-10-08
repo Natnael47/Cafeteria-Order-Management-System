@@ -8,6 +8,7 @@ import { AdminContext } from './context/AdminContext';
 import Add from './pages/Add';
 import AddEmployee from './pages/AddEmployee';
 import Dashboard from './pages/Dashboard';
+import EmployeesList from './pages/EmployeesList';
 import List from './pages/List';
 import Login from './pages/Login';
 import Orders from './pages/Orders';
@@ -33,6 +34,7 @@ const App = () => {
           <Route path='/orders' element={<Orders />} />
           <Route path='/reports' element={<Reports />} />
           <Route path='/add-employees' element={<AddEmployee />} />
+          <Route path='/employees-list' element={<EmployeesList />} />
         </Routes>
       </div>
     </div>
