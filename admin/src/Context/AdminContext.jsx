@@ -19,8 +19,7 @@ const AdminContextProvider = (props) => {
             const { data } = await axios.post(backendUrl + '/api/admin/all-employees', {}, { headers: { token } });
             if (data.success) {
                 setEmployees(data.employees);
-                console.log(data.employees);
-
+                //console.log(data.employees);
             } else {
                 toast.error(data.message);
             }
