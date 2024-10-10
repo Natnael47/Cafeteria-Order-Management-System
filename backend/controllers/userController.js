@@ -76,6 +76,7 @@ const registerUser = async (req, res) => {
 const getUserProfile = async (req, res) => {
   try {
     const { userId } = req.body;
+
     const userData = await userModel.findById(userId).select("-password");
 
     if (!userData) {
@@ -89,57 +90,19 @@ const getUserProfile = async (req, res) => {
   }
 };
 
-//API TO UPDATE USER PROFILE DATA
+// Update user profile data
 const updateUserProfile = async (req, res) => {
   try {
-    const { userId, phone } = req.body;
-    const { name, email, gender, address, dob } = req.body;
+    const { userId, name, email, gender, address, dob, phone } = req.body;
 
-    // Log the request body for debugging
-    console.log("Received data:", req.body);
-
-    // Check if required fields are present
-    if (!name || !phone || !gender || !dob || !email || !address) {
-      return res.json({ success: false, message: "All fields are required" });
-    }
-
-    // Ensure email is defined and is a string
-    if (typeof email !== "string") {
-      return res.json({ success: false, message: "Invalid email format" });
-    }
-
-    // Validate email format
-    if (!validator.isEmail(email)) {
-      return res.json({ success: false, message: "Invalid email format" });
-    }
-
-    // Ensure the new email isn't already taken by another user
-    const emailExists = await userModel.findOne({
-      email,
-      _id: { $ne: userId },
-    });
-    if (emailExists) {
-      return res.json({
-        success: false,
-        message: "Email is already in use by another account",
-      });
-    }
-
-    // Ensure address is parsed correctly (if sent as a string)
-    let parsedAddress;
-    try {
-      parsedAddress =
-        typeof address === "string" ? JSON.parse(address) : address;
-    } catch (err) {
-      return res.json({ success: false, message: "Invalid address format" });
-    }
+    console.log(req.body);
 
     // Update user profile
     await userModel.findByIdAndUpdate(userId, {
       name,
       email,
       phone,
-      address: parsedAddress,
+      address: JSON.parse(address),
       dob,
       gender,
     });
