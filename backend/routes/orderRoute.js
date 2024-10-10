@@ -9,7 +9,7 @@ import {
   verifyStripe,
 } from "../controllers/orderController.js";
 import adminAuth from "../middleware/adminAuth.js";
-import authUser from "../middleware/auth.js";
+import authUser from "../middleware/authUser.js";
 
 const orderRouter = express.Router();
 
