@@ -6,13 +6,16 @@ import employeeModel from "../models/employeeModel.js";
 import orderModel from "../models/orderModel.js";
 import userModel from "../models/userModel.js";
 
+//Admin Dashboard Elements like (number of users, number of Employee , latest orders)
 const adminDashboard = async (req, res) => {
   try {
     const users = await userModel.find({});
     const orders = await orderModel.find({});
+    const employees = await employeeModel.find({});
 
     const dashData = {
       users: users.length,
+      employees: employees.length,
       orders: orders.length,
       latestOrders: orders.reverse().slice(0, 5),
     };
@@ -24,6 +27,7 @@ const adminDashboard = async (req, res) => {
   }
 };
 
+//API for Admin Login
 const adminLogin = async (req, res) => {
   try {
     const { email, password } = req.body;
@@ -42,6 +46,7 @@ const adminLogin = async (req, res) => {
   }
 };
 
+//API to ADD Employee
 const addEmployee = async (req, res) => {
   try {
     const {

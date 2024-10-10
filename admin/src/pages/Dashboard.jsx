@@ -9,7 +9,7 @@ const Dashboard = () => {
 
     const { token } = useContext(AdminContext);
 
-    const [dashData, setDashData] = useState({ users: 0, orders: 0, latestOrders: [] });
+    const [dashData, setDashData] = useState({ users: 0, employees: 0, orders: 0, latestOrders: [] });
 
     const getDashData = async () => {
         try {
@@ -44,18 +44,26 @@ const Dashboard = () => {
                     </div>
 
                     <div className='flex items-center gap-2 bg-white p-4 min-w-52 rounded-md border-2 border-gray-100 cursor-pointer hover:scale-105 transition-all'>
-                        <img className='w-14' src={assets.patients_icon} alt="" />
-                        <div>
-                            <p className='text-xl font-semibold text-gray-600'>{dashData.users}</p>
-                            <p className='text-gray-400'>Customers</p>
-                        </div>
-                    </div>
-
-                    <div className='flex items-center gap-2 bg-white p-4 min-w-52 rounded-md border-2 border-gray-100 cursor-pointer hover:scale-105 transition-all'>
                         <img className='w-14' src={assets.order_icon} alt="" />
                         <div>
                             <p className='text-xl font-semibold text-gray-600'>{dashData.orders}</p>
                             <p className='text-gray-400'>Orders</p>
+                        </div>
+                    </div>
+
+                    <div className='flex items-center gap-2 bg-white p-4 min-w-52 rounded-md border-2 border-gray-100 cursor-pointer hover:scale-105 transition-all'>
+                        <img className='w-14' src={assets.people_icon} alt="" />
+                        <div>
+                            <p className='text-xl font-semibold text-gray-600'>{dashData.employees}</p>
+                            <p className='text-gray-400'>Employees</p>
+                        </div>
+                    </div>
+
+                    <div className='flex items-center gap-2 bg-white p-4 min-w-52 rounded-md border-2 border-gray-100 cursor-pointer hover:scale-105 transition-all'>
+                        <img className='w-14' src={assets.people_icon} alt="" />
+                        <div>
+                            <p className='text-xl font-semibold text-gray-600'>{dashData.employees}</p>
+                            <p className='text-gray-400'>Employees</p>
                         </div>
                     </div>
 

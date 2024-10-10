@@ -56,6 +56,7 @@ import drop_down_icon from "./dropdown_icon.svg";
 import email_icon17 from "./email17.png";
 import facebook_iconBlue from "./facebook.png";
 import facebook_icon from "./facebook_icon.png";
+import footerlogo from "./footerlogo.png";
 import burger_image from "./hamburger.png";
 import instagram_icon from "./instagram.png";
 import kare from "./kare.jpg";
@@ -112,6 +113,7 @@ export const assets = {
   about_us,
   kare,
   drop_down_icon,
+  footerlogo,
 };
 
 export const menu_list = [

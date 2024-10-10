@@ -3,10 +3,10 @@ import { assets } from '../assets/assets';
 
 const Footer = () => {
     return (
-        <div className="text-[#d9d9d9] bg-[#323232] flex flex-col gap-5 px-[8vw] pt-20 mt-[50px]" id="footer">
+        <div className="text-black bg-[#DBDBDA] flex flex-col gap-5 px-[8vw] pt-20 mt-[50px]" id="footer">
             <div className="w-full grid grid-cols-[2fr_1fr_1fr] gap-[80px]">
                 <div className="flex flex-col items-start gap-5">
-                    <img className='mb-5' src={assets.logo} alt="" />
+                    <img className='max-w-[210px]' src={assets.footerlogo} alt="" />
                     <p className='w-full md:w-2/3 leading-6'>Cozy Cafe is a family-owned business
                         that has been serving the community
                         for over 10 years. We are dedicated to
@@ -19,7 +19,7 @@ const Footer = () => {
                     </div>
                 </div>
                 <div className="flex flex-col items-start gap-5">
-                    <h2 className="text-white">COMPANY</h2>
+                    <h2 className="font-semibold">COMPANY</h2>
                     <ul>
                         <li className="list-none mb-2 cursor-pointer">Home</li>
                         <li className="list-none mb-2 cursor-pointer">About us</li>
@@ -28,7 +28,7 @@ const Footer = () => {
                     </ul>
                 </div>
                 <div className="flex flex-col items-start gap-5">
-                    <h2 className="text-white">GET IN TOUCH</h2>
+                    <h2 className="font-semibold">GET IN TOUCH</h2>
                     <ul>
                         <li className="list-none mb-2 cursor-pointer flex items-center">
                             <img src={assets.location_icon} alt="Location" className="pr-2" /> Lebu, Addis Ababa, Ethiopia
