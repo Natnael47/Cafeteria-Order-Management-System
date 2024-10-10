@@ -1,5 +1,6 @@
 import axios from "axios";
 import { createContext, useEffect, useState } from "react";
+import { useNavigate } from "react-router-dom";
 import { toast } from "react-toastify";
 import { backendUrl } from "../App";
 //import { food_list } from "../assets/assets";
@@ -15,6 +16,8 @@ const StoreContextProvider = (props) => {
     const [cartItems, setCartItems] = useState({});
 
     const [search, setSearch] = useState('');
+
+    const navigate = useNavigate();
 
     const [showSearch, setShowSearch] = useState(false);
 
@@ -119,7 +122,8 @@ const StoreContextProvider = (props) => {
         search,
         setSearch,
         showSearch,
-        setShowSearch
+        setShowSearch,
+        navigate
     }
 
     return (

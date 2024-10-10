@@ -5,6 +5,9 @@ export default {
     extend: {
       colors: {
         primary: "#39db4a",
+        SoftCream: "#FFF8DC",
+        RichGreen: "#4CAF50",
+        WarmOrange: "#FFA500",
       },
     },
   },

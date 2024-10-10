@@ -46,7 +46,7 @@ const LoginPopUp = ({ setShowLogin }) => {
         <div className="absolute z-10 w-full h-full bg-gray-700/90 grid place-items-center">
             <form onSubmit={onLogin} className="w-[max(23vw,330px)] text-gray-500 bg-white flex flex-col gap-6 p-6 rounded-md text-sm animate-fadeIn">
                 <div className="flex justify-between items-center text-black text-[16px]">
-                    <h2>{currState}</h2>
+                    <h2 className='font-semibold'>{currState}</h2>
                     <img onClick={() => setShowLogin(false)} src={assets.cross_icon} alt="Close" className="w-4 cursor-pointer" />
                 </div>
                 <div className="flex flex-col gap-5">

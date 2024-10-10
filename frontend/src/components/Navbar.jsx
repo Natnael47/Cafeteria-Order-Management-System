@@ -1,19 +1,15 @@
 import React, { useContext, useState } from "react";
-import { Link, useNavigate } from "react-router-dom";
+import { Link } from "react-router-dom";
 import { assets } from "../assets/assets";
 import { StoreContext } from "../context/StoreContext";
 
-export const Navbar = ({ setShowLogin }) => {
+export const Navbar = ({ setShowLogin, setShowFeedback }) => {
 
     const [currState, setCurrState] = useState("home");
 
     const [menu, setMenu] = useState("home");
 
-    const { getTotalCartAmount, token, setToken } = useContext(StoreContext);
-
-    const navigate = useNavigate();
-
-    const { setShowSearch } = useContext(StoreContext);
+    const { getTotalCartAmount, token, setToken, navigate, setShowSearch } = useContext(StoreContext);
 
     const logout = () => {
         localStorage.removeItem("token");
@@ -44,6 +40,7 @@ export const Navbar = ({ setShowLogin }) => {
                     </Link>
                     {getTotalCartAmount() !== 0 && <div className="absolute top-[-8px] right-[-8px] w-[10px] h-[10px] bg-tomato rounded-full"></div>}
                 </div>
+
                 {!token ?
                     <button onClick={() => setShowLogin(true)} className="bg-[#39db4a] text-white text-lg font-medium py-2 px-6 rounded-full transition hover:bg-black">Sign In</button>
                     :
@@ -52,9 +49,10 @@ export const Navbar = ({ setShowLogin }) => {
                         <img className="w-2.5" src={assets.drop_down_icon} alt="Dropdown" />
                         <div className="absolute right-0 top-0 pt-14 z-20 hidden group-hover:block">
                             <div className="bg-[#FBFDFB] rounded border border-primary p-4 flex flex-col gap-4 min-w-[160px]">
-                                <p onClick={() => navigate('/myprofile')} className="cursor-pointer hover:text-black">My Profile</p>
-                                <p onClick={() => navigate('/myorders')} className="cursor-pointer hover:text-black"> My Orders</p>
-                                <p onClick={logout} className="cursor-pointer hover:text-red-700">Logout</p>
+                                <p onClick={() => navigate('/myprofile')} className="cursor-pointer hover:text-primary">My Profile</p>
+                                <p onClick={() => navigate('/myorders')} className="cursor-pointer hover:text-primary"> My Orders</p>
+                                <p onClick={() => setShowFeedback(true)} className="cursor-pointer hover:text-primary">Feedback</p>
+                                <p onClick={logout} className="cursor-pointer hover:text-red-500">Logout</p>
                             </div>
                         </div>
                     </div>

@@ -7,7 +7,11 @@ const Footer = () => {
             <div className="w-full grid grid-cols-[2fr_1fr_1fr] gap-[80px]">
                 <div className="flex flex-col items-start gap-5">
                     <img className='mb-5' src={assets.logo} alt="" />
-                    <p className='w-full md:w-2/3 leading-6'>Kare plus grill & Lounge is one of the well-known grill and restaurant houses in Addis Ababa!</p>
+                    <p className='w-full md:w-2/3 leading-6'>Cozy Cafe is a family-owned business
+                        that has been serving the community
+                        for over 10 years. We are dedicated to
+                        providing high-quality food and
+                        exceptional customer service.</p>
                     <div className="flex">
                         <img src={assets.twitter_iconBlue} alt="Twitter" className="w-[40px] mr-4" />
                         <img src={assets.instagram_icon} alt="Instagram" className="w-[40px] mr-4" />

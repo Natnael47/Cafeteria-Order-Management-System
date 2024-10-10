@@ -1,5 +1,6 @@
 import React, { useState } from "react";
 import { Route, Routes } from "react-router-dom";
+import FeedbackPopUp from "./components/FeedbackPopUp";
 import Footer from "./components/Footer";
 import LoginPopUp from "./components/LoginPopUp";
 import { Navbar } from "./components/Navbar";
@@ -19,12 +20,14 @@ export const backendUrl = import.meta.env.VITE_BACKEND_URL
 const App = () => {
 
   const [showLogin, setShowLogin] = useState(false)
+  const [showFeedback, setShowFeedback] = useState(false)
 
   return (
     <>
       {showLogin ? <LoginPopUp setShowLogin={setShowLogin} /> : <></>}
+      {showFeedback ? <FeedbackPopUp setShowFeedback={setShowFeedback} /> : <></>}
       <div className="app">
-        <Navbar setShowLogin={setShowLogin} />
+        <Navbar setShowLogin={setShowLogin} setShowFeedback={setShowFeedback} />
         <SearchBar />
         <Routes>
           <Route path='/' element={<Home />} />
