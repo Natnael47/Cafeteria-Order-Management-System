@@ -25,7 +25,7 @@ const StoreContextProvider = (props) => {
 
     const [token, setToken] = useState("");
 
-
+    const [userData, setUserData] = useState(false);
 
     const fetchFoodList = async () => {
         try {
@@ -103,9 +103,33 @@ const StoreContextProvider = (props) => {
         loadData();
     }, [])
 
+    useEffect(() => {
+        if (token) {
+            loadUserProfileData()
+        } else {
+            setUserData(false);
+        }
+    }, [token])
+
     const loadCartData = async (token) => {
         const response = await axios.post(backendUrl + "/api/cart/get", {}, { headers: { token } });
         setCartItems(response.data.cartData);
+    }
+
+    const loadUserProfileData = async () => {
+        try {
+
+            const { data } = await axios.get(backendUrl + "/api/user/get-profile", { headers: { token } });
+            if (data.success) {
+                setUserData(data.userData);
+            } else {
+                toast.error(data.message);
+            }
+
+        } catch (error) {
+            console.log(error);
+            toast.error(error.message);
+        }
     }
 
 
@@ -123,7 +147,9 @@ const StoreContextProvider = (props) => {
         setSearch,
         showSearch,
         setShowSearch,
-        navigate
+        navigate,
+        userData, setUserData,
+        loadUserProfileData
     }
 
     return (

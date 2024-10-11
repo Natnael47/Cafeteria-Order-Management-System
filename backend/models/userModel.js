@@ -6,9 +6,9 @@ const userSchema = new mongoose.Schema(
     email: { type: String, required: true, unique: true },
     password: { type: String, required: true },
     gender: { type: String, default: "not selected" },
-    address: { type: Object, default: { line1: "", line2: "" } },
+    address: { type: Object, default: { line1: "none", line2: "none" } },
     dob: { type: String, default: "not selected" },
-    phone: { type: String, default: "0900000000" },
+    phone: { type: String, default: "0909090909" },
     cartData: { type: Object, default: {} },
   },
   { minimize: false }
