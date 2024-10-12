@@ -38,7 +38,7 @@ const MyProfile = () => {
 
     return userData && (
         <div className='max-w-lg flex flex-col gap-2 text-sm'>
-            <img className='w-36 rounded' src={userData.image} alt="" />
+
             {
                 isEdit
                     ? <input className='bg-gray-50 text-3xl font-medium max-w-60 mt-4' type='text' value={userData.name} onChange={e => setUserData(prev => ({ ...prev, name: e.target.value }))} />

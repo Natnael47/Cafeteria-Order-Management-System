@@ -93,14 +93,17 @@ const getUserProfile = async (req, res) => {
 // Update user profile data
 const updateUserProfile = async (req, res) => {
   try {
-    const { userId, name, email, gender, address, dob, phone } = req.body;
+    const { userId, name, gender, address, dob, phone } = req.body;
 
     console.log(req.body);
+
+    if (!name || !phone || !dob || !gender) {
+      return res.json({ success: false, message: "Data missing" });
+    }
 
     // Update user profile
     await userModel.findByIdAndUpdate(userId, {
       name,
-      email,
       phone,
       address: JSON.parse(address),
       dob,
