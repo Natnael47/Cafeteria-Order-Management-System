@@ -54,6 +54,16 @@ const StoreContextProvider = (props) => {
         }
     }
 
+    const getCartItems = () => {
+        let totalItems = 0;
+        for (const item in cartItems) {
+            if (cartItems[item] > 0) {
+                totalItems += cartItems[item];
+            }
+        }
+        return totalItems;
+    }
+
     const removeFromCart = async (itemId) => {
         const id = Number(itemId); // Ensure itemId is a number
         setCartItems((prev) => ({ ...prev, [id]: prev[id] - 1 }));
@@ -137,6 +147,7 @@ const StoreContextProvider = (props) => {
         food_list,
         cartItems,
         setCartItems,
+        getCartItems,
         addToCart,
         removeFromCart,
         getTotalCartAmount,
