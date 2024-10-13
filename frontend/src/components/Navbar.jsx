@@ -9,7 +9,7 @@ export const Navbar = ({ setShowLogin, setShowFeedback }) => {
 
     const [menu, setMenu] = useState("home");
 
-    const { getTotalCartAmount, token, setToken, navigate, setShowSearch } = useContext(StoreContext);
+    const { getTotalCartAmount, token, setToken, navigate, setShowSearch, getCartItems } = useContext(StoreContext);
 
     const logout = () => {
         localStorage.removeItem("token");
@@ -23,22 +23,22 @@ export const Navbar = ({ setShowLogin, setShowFeedback }) => {
                 <img src={assets.logo2} alt="Logo" className="w-[150px] md:w-[120px] lg:w-[150px]" />
             </Link>
             <ul className="flex list-none gap-5 text-black text-lg lg:gap-4 md:gap-3 md:text-base sm:flex">
-                <Link to='/' onClick={() => setMenu("home")} className={menu === "home" ? "border-b-2 border-[#49557e] pb-1 font-semibold" : ""}>Home</Link>
-                {currState === "cart" ?
-                    <Link to='/menu' onClick={() => { setMenu("menu"); setCurrState("home"); }} className={menu === "menu" ? "border-b-2 border-[#49557e] pb-1 font-semibold" : ""}>Menu</Link>
+                <Link to='/' onClick={() => setMenu("home")} className={menu === "home" ? "border-b-2 border-black pb-1 font-semibold" : ""}>Home</Link>
+                {menu !== "home" ?
+                    <Link to='/menu' onClick={() => { setMenu("menu"); setCurrState("home"); }} className={menu === "menu" ? "border-b-2 border-black pb-1 font-semibold" : ""}>Menu</Link>
                     :
-                    <a href="#explore-menu" onClick={() => setMenu("menu")} className={menu === "menu" ? "border-b-2 border-[#49557e] pb-1 font-semibold" : ""}>Menu</a>
+                    <a href="#explore-menu" onClick={() => setMenu("menu")} className={menu === "menu" ? "border-b-2 border-black pb-1 font-semibold" : ""}>Menu</a>
                 }
-                <Link to='/about' onClick={() => setMenu("about")} className={menu === "about" ? "border-b-2 border-[#49557e] pb-1 font-semibold" : ""}>About</Link>
-                <Link to='/contact' onClick={() => setMenu("contact-us")} className={menu === "contact-us" ? "border-b-2 border-[#49557e] pb-1" : ""}>Contact Us</Link>
+                <Link to='/about' onClick={() => setMenu("about")} className={menu === "about" ? "border-b-2 border-black pb-1 font-semibold" : ""}>About</Link>
+                <Link to='/contact' onClick={() => setMenu("contact-us")} className={menu === "contact-us" ? "border-b-2 border-black pb-1" : ""}>Contact Us</Link>
             </ul>
             <div className="flex items-center gap-10 md:gap-8">
                 <img onClick={() => setShowSearch(true)} src={assets.search_icon} alt="Search" className="w-[30px] md:w-[22px] lg:w-[20px] cursor-pointer" />
-                <div className="relative">
-                    <Link to='/cart'>
-                        <img src={assets.cart_icon} alt="Cart" onClick={() => setCurrState("cart")} className="cursor-pointer" />
+                <div className="flex items-center gap-[30px]">
+                    <Link to='/cart' className="relative">
+                        <img src={assets.cart_icon} alt="Cart" onClick={() => setCurrState("cart")} className="cursor-pointer w-8" />
                     </Link>
-                    {getTotalCartAmount() !== 0 && <div className="absolute top-[-8px] right-[-8px] w-[10px] h-[10px] bg-tomato rounded-full"></div>}
+                    <div className={getTotalCartAmount() === 0 ? "hidden" : "w-4 h-4 flex justify-center items-center -mt-[35px] -ml-[35px] rounded-[11px] text-[10px] bg-red-600 text-white"}>{getCartItems()}</div>
                 </div>
 
                 {!token ?

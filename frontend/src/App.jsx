@@ -3,7 +3,7 @@ import { Route, Routes } from "react-router-dom";
 import FeedbackPopUp from "./components/FeedbackPopUp";
 import Footer from "./components/Footer";
 import LoginPopUp from "./components/LoginPopUp";
-import { Navbar } from "./components/Navbar/Navbar";
+import { Navbar } from "./components/Navbar";
 import SearchBar from "./components/SearchBar/SearchBar";
 import About from "./pages/About";
 import Cart from './pages/Cart';
