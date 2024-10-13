@@ -13,9 +13,9 @@ const Footer = () => {
                         providing high-quality food and
                         exceptional customer service.</p>
                     <div className="flex">
-                        <img src={assets.twitter_iconBlue} alt="Twitter" className="w-[40px] mr-4" />
+                        <img src={assets.twitter_icon} alt="Twitter" className="w-[40px] mr-4" />
                         <img src={assets.instagram_icon} alt="Instagram" className="w-[40px] mr-4" />
-                        <img src={assets.facebook_iconBlue} alt="Facebook" className="w-[40px]" />
+                        <img src={assets.facebook_icon} alt="Facebook" className="w-[40px]" />
 
                     </div>
                 </div>

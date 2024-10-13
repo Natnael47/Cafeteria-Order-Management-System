@@ -6,11 +6,11 @@ const About = () => {
     return (
         <div>
             <div className='text-center text-2xl pt-10 text-black'>
-                <Title text1={'ABOUT'} text2={'US'} />
+                <Title text1={'ABOUT'} text2={'Us'} />
             </div>
             <div className='my-10 flex  flex-col md:flex-row gap-12'>
                 <img className='w-full md:max-w-[360px]' src={assets.about_us} alt="" />
-                <div className='flex flex-col justify-center gap-6 md:w-2/4 text-sm text-gray-800'>
+                <div className='flex flex-col justify-center gap-6 md:w-2/4 text-lg text-gray-800'>
                     <p>Welcome to CoZy Cafe, where we believe great food brings people together. Our mission is to serve fresh, delicious meals in a cozy and welcoming environment. With a wide variety of dishes, we cater to every taste and preference.</p>
                     <p>We pride ourselves on using high-quality ingredients sourced from local suppliers. Whether you're stopping by for a quick bite or a relaxing meal with friends, we are committed to making your dining experience enjoyable.</p>
                     <b className='text-gray-900'>OUR VISION</b>

@@ -5,9 +5,9 @@ const ExploreMenu = ({ category, setCategory }) => {
 
     return (
         <div className="flex flex-col gap-5" id="explore-menu">
-            <hr className="my-2 h-[2px] bg-[#e2e2e2] border-none" />
-            <h1 className="text-[#262626] font-medium">Popular Dishes From Our Menu</h1>
-            <p className="max-w-[80%] text-[#808080] md:max-w-full md:text-sm">
+            <hr className="my-2 h-[2px] bg-gray-500 border-none" />
+            <h1 className="text-[#262626] font-bold text-2xl">Explore our menu</h1>
+            <p className="max-w-[80%] text-[#808080] md:max-w-full md:text-base">
                 Choose from a diverse menu featuring a delectable array of dishes. Our mission is to satisfy your cravings and elevate your dining experience, one delicious meal at a time.
             </p>
             <div className="flex justify-between items-center gap-[30px] text-center my-5 overflow-x-scroll no-scrollbar">
@@ -23,12 +23,12 @@ const ExploreMenu = ({ category, setCategory }) => {
                                 src={item.menu_image}
                                 alt={item.menu_name}
                             />
-                            <p className="mt-2 text-[#747474] text-[max(1.4vw,16px)] cursor-pointer">{item.menu_name}</p>
+                            <p className="mt-2 text-black text-[max(1.4vw,16px)] cursor-pointer">{item.menu_name}</p>
                         </div>
                     )
                 })}
             </div>
-            <hr className="my-2 h-[2px] bg-[#e2e2e2] border-none" />
+            <hr className="my-2 h-[2px] bg-gray-500 border-none" />
         </div>
     );
 }

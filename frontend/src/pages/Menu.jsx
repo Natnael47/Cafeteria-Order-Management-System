@@ -8,9 +8,13 @@ const Menu = () => {
     const [category, setCategory] = useState("All");
 
     return (
-        <div className='text-2xl'>
-            <Title text1={'OUR'} text2={'MENU'} />
-            <FoodDisplay category={category} />
+        <div>
+            <div className='text-center text-2xl pt-10 text-black'>
+                <Title text1={'OUR'} text2={'Menu'} />
+            </div>
+            <div className='text-2xl'>
+                <FoodDisplay category={category} />
+            </div>
         </div>
     )
 }

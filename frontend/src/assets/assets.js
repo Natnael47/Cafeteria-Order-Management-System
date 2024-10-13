@@ -53,15 +53,14 @@ import cart_icon from "./cart_icon.png";
 import cross_icon from "./cross_icon.png";
 import person from "./customer-image.png";
 import drop_down_icon from "./dropdown_icon.svg";
-import email_icon17 from "./email17.png";
-import facebook_iconBlue from "./facebook.png";
-import facebook_icon from "./facebook_icon.png";
+import email_icon17 from "./email_icon.png";
+import { default as facebook_icon } from "./facebook_icon.png";
 import footerlogo from "./footerlogo.png";
 import burger_image from "./hamburger.png";
-import instagram_icon from "./instagram.png";
+import instagram_icon from "./instagram_icon.png";
 import kare from "./kare.jpg";
 import linkedin_icon from "./linkedin_icon.png";
-import location_icon from "./location17.png";
+import location_icon from "./location_icon.png";
 import logo2 from "./logo2.png";
 import logout_icon from "./logout_icon.png";
 import parcel_icon from "./parcel_icon.png";
@@ -72,10 +71,9 @@ import rating_starts from "./rating_starts.png";
 import razorpay_logo from "./razorpay_logo.png";
 import remove_icon_red from "./remove_icon_red.png";
 import selector_icon from "./selector_icon.png";
-import simCard_icon from "./sim_card17.png";
+import simCard_icon from "./sim_icon.png";
 import stripe_logo from "./stripe_logo.png";
-import twitter_iconBlue from "./twitter.png";
-import twitter_icon from "./twitter_icon.png";
+import { default as twitter_icon } from "./twitter_icon.png";
 
 export const assets = {
   logo,
@@ -99,11 +97,9 @@ export const assets = {
   parcel_icon,
   cart_icon,
   email_icon17,
-  facebook_iconBlue,
   instagram_icon,
   location_icon,
   simCard_icon,
-  twitter_iconBlue,
   burger_image,
   person,
   logo2,
