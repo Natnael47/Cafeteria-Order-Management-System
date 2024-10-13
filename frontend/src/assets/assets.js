@@ -49,7 +49,7 @@ import add_icon_green from "./add_icon_green.png";
 import add_icon_white from "./add_icon_white.png";
 import app_store from "./app_store.png";
 import bag_icon from "./bag_icon.png";
-import cart_icon from "./cart.png";
+import cart_icon from "./cart_icon.png";
 import cross_icon from "./cross_icon.png";
 import person from "./customer-image.png";
 import drop_down_icon from "./dropdown_icon.svg";
