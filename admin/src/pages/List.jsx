@@ -14,6 +14,7 @@ const List = () => {
     const fetchList = async () => {
         const response = await axios.get(backendUrl + "/api/food/list", { headers: { token } });
         if (response.data.success) {
+            //console.log(response.data.data);
             setList(response.data.data);
         } else {
             toast.error("Error fetching list");
@@ -21,6 +22,7 @@ const List = () => {
     }
 
     const removeFood = async (foodId) => {
+        //console.log({ foodId });
         const response = await axios.post(backendUrl + "/api/food/remove", { id: foodId }, { headers: { token } });
         await fetchList();
         if (response.data.success) {
