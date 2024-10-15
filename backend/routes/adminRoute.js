@@ -18,6 +18,6 @@ adminRouter.post(
   upload.single("image"),
   addEmployee
 );
-adminRouter.post("/all-employees", adminAuth, allEmployees);
+adminRouter.post("/get-employees", adminAuth, allEmployees);
 
 export default adminRouter;

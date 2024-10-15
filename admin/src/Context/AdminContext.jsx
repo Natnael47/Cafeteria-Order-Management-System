@@ -16,10 +16,10 @@ const AdminContextProvider = (props) => {
 
     const getAllEmployees = async () => {
         try {
-            const { data } = await axios.post(backendUrl + '/api/admin/all-employees', {}, { headers: { token } });
+            const { data } = await axios.post(backendUrl + '/api/admin/get-employees', {}, { headers: { token } });
             if (data.success) {
                 setEmployees(data.employees);
-                //console.log(data.employees);
+                console.log(data.employees);
             } else {
                 toast.error(data.message);
             }
