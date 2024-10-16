@@ -1,0 +1,79 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
+// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "mysql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id        Int        @id @default(autoincrement())
+  firstName String     @db.VarChar(255)
+  lastName  String     @db.VarChar(255)
+  email     String     @unique @db.VarChar(255)
+  password  String     @db.VarChar(255)
+  gender    String     @default("not selected") @db.VarChar(50)
+  address   Json
+  dob       String     @default("not selected") @db.VarChar(100)
+  phone     String     @default("+251 911524856") @db.VarChar(20)
+  cartData  Json       @default("{}") // Storing cart data as JSON
+  feedbacks Feedback[] // Corrected: Renamed to plural for consistency and better readability
+}
+
+model Employee {
+  id         Int      @id @default(autoincrement())
+  firstName  String   @db.VarChar(255)
+  lastName   String   @db.VarChar(255)
+  gender     String   @db.VarChar(50)
+  email      String   @unique @db.VarChar(255)
+  password   String   @db.VarChar(255)
+  image      String   @db.VarChar(255)
+  phone      String   @db.VarChar(20)
+  position   String   @db.VarChar(100)
+  shift      String   @db.VarChar(100)
+  education  String   @db.VarChar(255)
+  experience String   @db.VarChar(255)
+  salary     Float    @db.Float
+  address    Json // Storing address as JSON to maintain flexibility
+  about      String   @db.Text
+  date       DateTime @db.DateTime
+}
+
+model Food {
+  id          Int    @id @default(autoincrement())
+  name        String @db.VarChar(255)
+  description String @db.VarChar(255)
+  price       Float
+  image       String @db.VarChar(255)
+  category    String @db.VarChar(255)
+}
+
+model Order {
+  id            Int      @id @default(autoincrement())
+  userId        Int
+  items         Json // Storing items as JSON for flexibility
+  amount        Float
+  address       Json // Storing address as JSON for flexibility
+  status        String   @default("Food Processing") @db.VarChar(255)
+  paymentMethod String   @db.VarChar(255)
+  payment       Boolean  @default(false)
+  date          DateTime @default(now())
+}
+
+model Feedback {
+  id      Int      @id @default(autoincrement())
+  userId  Int
+  comment String   @db.Text
+  rating  Float    @db.Double
+  date    DateTime @default(now())
+
+  // Relation with User model
+  user User @relation(fields: [userId], references: [id])
+}

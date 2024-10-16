@@ -8,6 +8,7 @@ import cartRouter from "./routes/cartRoute.js";
 import chefRouter from "./routes/chefRoute.js";
 import foodRouter from "./routes/foodRoute.js";
 import orderRouter from "./routes/orderRoute.js";
+import prismaRoute from "./routes/prismaRoute.js";
 import userRouter from "./routes/userRoute.js";
 
 // app config
@@ -32,6 +33,10 @@ app.use("/api/order", orderRouter);
 app.use("/api/admin", adminRouter);
 //for chef
 app.use("/api/chef", chefRouter);
+
+//-------------------------------Test Prisma route
+app.use("/api/prisma", prismaRoute);
+app.use("/emp", express.static("uploadsEmp"));
 
 // Define the route
 app.get("/", (req, res) => {

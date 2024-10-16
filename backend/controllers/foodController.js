@@ -79,6 +79,7 @@ const listFood = (req, res) => {
 };
 
 // Remove food item
+// Remove food item
 const removeFood = (req, res) => {
   console.log("Request body:", req.body); // Check the complete request body
 
@@ -127,13 +128,33 @@ const removeFood = (req, res) => {
             return;
           }
 
+          console.log("Food item deleted from database:", deleteResult);
+
           // Delete the associated image if it exists
           if (food.image) {
-            fs.unlink(`uploads/${food.image}`, (fsErr) => {
-              if (fsErr) console.log("Error deleting image:", fsErr);
-              res.json({ success: true, message: "Food removed" });
+            const imagePath = `uploads/${food.image}`;
+            console.log("Attempting to delete image at:", imagePath);
+
+            fs.unlink(imagePath, (fsErr) => {
+              if (fsErr) {
+                console.log("Error deleting image:", fsErr);
+                res.json({
+                  success: true,
+                  message: "Food removed, but image could not be deleted",
+                });
+                return;
+              }
+
+              console.log("Image deleted successfully:", imagePath);
+              res.json({
+                success: true,
+                message: "Food removed and image deleted",
+              });
             });
           } else {
+            console.log(
+              "No image found for food item. Skipping image deletion."
+            );
             res.json({ success: true, message: "Food removed" });
           }
         }

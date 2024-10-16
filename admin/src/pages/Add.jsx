@@ -10,6 +10,7 @@ const Add = () => {
     const { token } = useContext(AdminContext);
 
     const [image, setImage] = useState(false);
+
     const [data, setData] = useState({
         name: "",
         description: "",
