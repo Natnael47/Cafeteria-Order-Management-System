@@ -10,6 +10,14 @@ import {
   removeFood,
 } from "../Prisma Controller/FoodController.js";
 import {
+  PlaceOrder,
+  PlaceOrderStripe,
+  allOrders,
+  updateStatus,
+  userOrders,
+  verifyStripe,
+} from "../Prisma Controller/OrderController.js";
+import {
   getUserProfile,
   loginUser,
   registerUser,
@@ -66,5 +74,20 @@ const upload3 = multer({ storage: storage2 });
 
 prismaRoute.post("/add-emp", adminAuth, upload3.single("image"), addEmployee2);
 prismaRoute.post("/get-emp", adminAuth, allEmployees2);
+
+//Order route
+//admin features
+prismaRoute.post("/list", adminAuth, allOrders);
+prismaRoute.post("/status", adminAuth, updateStatus);
+
+//payment methods
+prismaRoute.post("/place", authUser, PlaceOrder);
+prismaRoute.post("/stripe", authUser, PlaceOrderStripe);
+
+//user features
+prismaRoute.post("/userorders", authUser, userOrders);
+
+//verify payment
+prismaRoute.post("/verifyStripe", authUser, verifyStripe);
 
 export default prismaRoute;

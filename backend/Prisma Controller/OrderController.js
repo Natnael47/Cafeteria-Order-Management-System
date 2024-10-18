@@ -1,34 +1,39 @@
+import { PrismaClient } from "@prisma/client";
 import Stripe from "stripe";
-import orderModel from "../models/orderModel.js";
-import userModel from "../models/userModel.js";
 
-// gateway initialization
+// Prisma Client initialization
+const prisma = new PrismaClient();
+
+// Stripe initialization
 const stripe = new Stripe(process.env.STRIPE_SECRET_KEY);
 
-//Global Variables
+// Global Variables
 const currency = "USD";
 const delivery_charge = 10;
 
-//const frontend_url = "http://localhost:5174";
+const frontend_url = "http://localhost:5174";
 
-//placing orders on cash on delivery
+// Placing orders on cash on delivery
 const PlaceOrder = async (req, res) => {
   try {
     const { userId, items, amount, address } = req.body;
-    const orderData = {
-      userId,
-      items,
-      address,
-      amount,
-      paymentMethod: "COD",
-      payment: false,
-      date: Date.now(),
-    };
 
-    const newOrder = new orderModel(orderData);
-    await newOrder.save();
+    const newOrder = await prisma.order.create({
+      data: {
+        userId,
+        items,
+        address,
+        amount,
+        paymentMethod: "COD",
+        payment: false,
+        date: new Date(),
+      },
+    });
 
-    await userModel.findByIdAndUpdate(userId, { cartData: {} });
+    await prisma.user.update({
+      where: { id: userId },
+      data: { cartData: {} },
+    });
 
     res.json({ success: true, message: "Order Placed successfully" });
   } catch (error) {
@@ -37,74 +42,75 @@ const PlaceOrder = async (req, res) => {
   }
 };
 
-//placing orders using stripe method
+// Placing orders using Stripe method
 const PlaceOrderStripe = async (req, res) => {
   try {
     const { userId, items, amount, address } = req.body;
     const { origin } = req.headers;
 
-    const orderData = {
-      userId,
-      items,
-      address,
-      amount,
-      paymentMethod: "stripe",
-      payment: false,
-      date: Date.now(),
-    };
-
-    const newOrder = new orderModel(orderData);
-    await newOrder.save();
+    const newOrder = await prisma.order.create({
+      data: {
+        userId,
+        items,
+        address,
+        amount,
+        paymentMethod: "stripe",
+        payment: false,
+        date: new Date(),
+      },
+    });
 
     const line_items = items.map((item) => ({
       price_data: {
-        currency: currency, // Use the appropriate currency
-        product_data: {
-          name: item.name,
-        },
-        unit_amount: item.price * 100, // Ensure price is in the correct format for Stripe (cents)
+        currency,
+        product_data: { name: item.name },
+        unit_amount: item.price * 100,
       },
       quantity: item.quantity,
     }));
 
     line_items.push({
       price_data: {
-        currency: currency,
-        product_data: {
-          name: "Delivery Charges",
-        },
-        unit_amount: delivery_charge * 100, // Assuming delivery charge is 2 USD
+        currency,
+        product_data: { name: "Delivery Charges" },
+        unit_amount: delivery_charge * 100,
       },
       quantity: 1,
     });
 
-    // Create a Stripe checkout session
     const session = await stripe.checkout.sessions.create({
-      line_items: line_items,
+      line_items,
       mode: "payment",
-      success_url: `${origin}/verify?success=true&orderId=${newOrder._id}`,
-      cancel_url: `${origin}/verify?success=false&orderId=${newOrder._id}`,
+      success_url: `${origin}/verify?success=true&orderId=${newOrder.id}`,
+      cancel_url: `${origin}/verify?success=false&orderId=${newOrder.id}`,
     });
 
     res.json({ success: true, session_url: session.url });
-    // Send the session URL to the client for checkout
   } catch (error) {
     console.log(error);
     res.json({ success: false, message: "Error" });
   }
 };
 
-// verify Stripe checkout
+// Verify Stripe checkout
 const verifyStripe = async (req, res) => {
   const { orderId, success, userId } = req.body;
 
   try {
     if (success === "true") {
-      await orderModel.findByIdAndUpdate(orderId, { payment: true });
-      await userModel.findByIdAndUpdate(userId, { cartData: {} });
+      await prisma.order.update({
+        where: { id: orderId },
+        data: { payment: true },
+      });
+
+      await prisma.user.update({
+        where: { id: userId },
+        data: { cartData: {} },
+      });
+
       res.json({ success: true, message: "Payment Successful" });
     } else {
-      await orderModel.findByIdAndDelete(orderId);
+      await prisma.order.delete({ where: { id: orderId } });
       res.json({ success: false, message: "Payment Failed" });
     }
   } catch (error) {
@@ -113,13 +119,12 @@ const verifyStripe = async (req, res) => {
   }
 };
 
-//placing orders using Razorpay method
-const PlaceOrderRazorpay = async (req, res) => {};
-
-//all orders data for admin panel
+// Fetch all orders for admin panel
 const allOrders = async (req, res) => {
   try {
-    const orders = (await orderModel.find({})).reverse();
+    const orders = await prisma.order.findMany({
+      orderBy: { date: "desc" },
+    });
     res.json({ success: true, orders });
   } catch (error) {
     console.log(error);
@@ -127,11 +132,13 @@ const allOrders = async (req, res) => {
   }
 };
 
-//user order data for frontend
+// Fetch user orders for frontend
 const userOrders = async (req, res) => {
   try {
     const { userId } = req.body;
-    const orders = await orderModel.find({ userId });
+    const orders = await prisma.order.findMany({
+      where: { userId },
+    });
 
     res.json({ success: true, orders });
   } catch (error) {
@@ -140,23 +147,33 @@ const userOrders = async (req, res) => {
   }
 };
 
-//update order status for admin
+// Update order status for admin
 const updateStatus = async (req, res) => {
   try {
     const { orderId, status } = req.body;
-    await orderModel.findByIdAndUpdate(orderId, { status });
+
+    // Ensure the orderId is provided
+    if (!orderId) {
+      return res.json({ success: false, message: "Order ID is required" });
+    }
+
+    // Update the order status using Prisma
+    await prisma.order.update({
+      where: { id: parseInt(orderId) }, // Ensure orderId is parsed as an integer if needed
+      data: { status },
+    });
+
     res.json({ success: true, message: "Status updated" });
   } catch (error) {
-    console.log(error.message);
+    console.error(error.message);
     res.json({ success: false, message: error.message });
   }
 };
 
 export {
-  PlaceOrder,
-  PlaceOrderRazorpay,
-  PlaceOrderStripe,
   allOrders,
+  PlaceOrder,
+  PlaceOrderStripe,
   updateStatus,
   userOrders,
   verifyStripe,
