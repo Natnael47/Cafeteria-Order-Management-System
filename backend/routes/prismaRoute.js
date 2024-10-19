@@ -3,6 +3,7 @@ import multer from "multer";
 import {
   addEmployee2,
   allEmployees2,
+  loginEmployee,
 } from "../Prisma Controller/EmployeeController.js";
 import {
   addFood,
@@ -44,6 +45,7 @@ prismaRoute.post(
   adminAuth,
   addEmployee
 );
+prismaRoute.post("/login-emp", loginEmployee);
 
 //FOOD ROUTE
 //Image storage engine
