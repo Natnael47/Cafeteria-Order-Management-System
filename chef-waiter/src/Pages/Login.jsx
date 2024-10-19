@@ -50,8 +50,8 @@ const Login = () => {
     };
 
     return (
-        <form onSubmit={onSubmitHandler} className="min-h-[80vh] flex items-center">
-            <div className="flex flex-col gap-3 m-auto items-start p-8 min-w-[340px] sm:min-w-96 border rounded-xl text-[#5E5E5E] text-sm shadow-lg bg-white">
+        <form onSubmit={onSubmitHandler} className="min-h-[100vh] flex items-center bg-gray-100">
+            <div className="flex flex-col gap-3 m-auto items-start p-8 min-w-[340px] sm:min-w-96 border rounded-xl text-[#5E5E5E] text-sm shadow-xl bg-white">
                 <p className="text-2xl font-bold text-black m-auto">
                     <span className="text-primary"> {state} </span> Login
                 </p>
@@ -75,7 +75,7 @@ const Login = () => {
                         required
                     />
                 </div>
-                <button className="bg-primary text-white w-full py-2 rounded-md text-base font-bold">
+                <button className="bg-primary text-white w-full py-2 rounded-md text-base font-bold mt-2 hover:bg-[#269231]">
                     Login
                 </button>
                 {state === "Chef" ? (
