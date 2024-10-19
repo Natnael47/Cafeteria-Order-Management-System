@@ -42,7 +42,7 @@ const List = () => {
             <p className="mb-3 text-lg font-semibold">All Foods List</p>
             <div className="bg-[#F3F4F6] rounded w-full max-w-5.3xl max-h-[88vh] overflow-scroll">
                 <div>
-                    <div className="grid grid-cols-[0.5fr_0.9fr_0.8fr_0.8fr_0.5fr_0.5fr] items-center gap-2 p-3 border border-black text-sm font-medium bg-gray-200 sm:grid">
+                    <div className="grid grid-cols-[0.5fr_0.9fr_0.8fr_0.8fr_0.5fr_0.5fr] items-center gap-2 p-3 border border-black text-sm font-medium bg-gray-700 text-white sm:grid">
                         <b>Image</b>
                         <b>Name</b>
                         <b>Category</b>
@@ -57,10 +57,10 @@ const List = () => {
                             <p>{item.category}</p>
                             <p>${item.price}</p>
                             <p onClick={() => removeFood(item._id)} className="cursor-pointer pl-1">
-                                <img src={assets.trash_icon} alt="" className="w-7 ml-2 hover:scale-105 transition-transform duration-200" />
+                                <img src={assets.trash_icon} alt="" className="w-7 ml-2 hover:scale-125 transition-transform" />
                             </p>
                             <p className="cursor-pointer pl-1" onClick={() => setIsEdit(true)}>
-                                <img src={assets.modify_icon} alt="" className="w-7 ml-2 hover:scale-105 transition-transform duration-200" />
+                                <img src={assets.modify_icon} alt="" className="w-7 ml-2 hover:scale-125 transition-transform" />
                             </p>
                         </div>
                     ))}

@@ -22,10 +22,6 @@ const Sidebar = () => {
                     <img src={assets.chef_icon} alt='' />
                     <p className='hidden md:block'>Orders</p>
                 </NavLink>
-                <NavLink to='/reports' className={({ isActive }) => `flex items-center gap-3 py-3.5 px-3 md:px-9 md:min-w-72 cursor-pointer ${isActive ? 'bg-[#DDF7DF] border-r-4 border-primary' : ''}`}>
-                    <img src={assets.report_icon} alt='' />
-                    <p className='hidden md:block'>Reports</p>
-                </NavLink>
                 <NavLink to='/add-employees' className={({ isActive }) => `flex items-center gap-3 py-3.5 px-3 md:px-9 md:min-w-72 cursor-pointer ${isActive ? 'bg-[#DDF7DF] border-r-4 border-primary' : ''}`}>
                     <img src={assets.add_icon} alt='' />
                     <p className='hidden md:block'>Add Employees</p>
@@ -33,6 +29,10 @@ const Sidebar = () => {
                 <NavLink to='/employees-list' className={({ isActive }) => `flex items-center gap-3 py-3.5 px-3 md:px-9 md:min-w-72 cursor-pointer ${isActive ? 'bg-[#DDF7DF] border-r-4 border-primary' : ''}`}>
                     <img src={assets.report_icon} alt='' />
                     <p className='hidden md:block'>Employee List</p>
+                </NavLink>
+                <NavLink to='/reports' className={({ isActive }) => `flex items-center gap-3 py-3.5 px-3 md:px-9 md:min-w-72 cursor-pointer ${isActive ? 'bg-[#DDF7DF] border-r-4 border-primary' : ''}`}>
+                    <img src={assets.report_icon} alt='' />
+                    <p className='hidden md:block'>Reports</p>
                 </NavLink>
             </div>
         </div>
