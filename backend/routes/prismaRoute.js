@@ -9,6 +9,7 @@ import {
   addFood,
   listFood,
   removeFood,
+  updateFood,
 } from "../Prisma Controller/FoodController.js";
 import {
   PlaceOrder,
@@ -58,11 +59,10 @@ const storage = multer.diskStorage({
 
 const upload2 = multer({ storage: storage });
 
-prismaRoute.post("/add", adminAuth, upload2.single("image"), addFood);
-
-prismaRoute.get("/list", listFood);
-
-prismaRoute.post("/remove", adminAuth, removeFood);
+prismaRoute.post("/add-food", adminAuth, upload2.single("image"), addFood);
+prismaRoute.get("/list-food", listFood);
+prismaRoute.post("/remove-food", adminAuth, removeFood);
+prismaRoute.post("/update-food", adminAuth, updateFood);
 
 //FOR ADDING EMPLOYEE AND STORE IMAGE LOCALLY
 const storage2 = multer.diskStorage({

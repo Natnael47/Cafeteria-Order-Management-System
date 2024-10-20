@@ -79,7 +79,9 @@ const MyOrders = () => {
 
                             </div>
                             <div className='md:w-[60%] flex justify-between'>
-                                <p className='text-lg font-bold'>${order.amount}.00</p>
+                                <div className='flex items-center'>
+                                    <p className='text-lg font-bold'>${order.amount}.00</p>
+                                </div>
 
                                 <div className='flex items-center gap-2'>
                                     <p className='min-w-2 h-2 rounded-full bg-green-600'></p>
