@@ -26,6 +26,7 @@ connectCloudinary();
 //api endpoints for Customer
 app.use("/api/food", foodRouter);
 app.use("/images", express.static("uploads"));
+app.use("/empIMG", express.static("uploadsEmp"));
 app.use("/api/user", userRouter);
 app.use("/api/cart", cartRouter);
 app.use("/api/order", orderRouter);
@@ -36,7 +37,6 @@ app.use("/api/chef", chefRouter);
 
 //-------------------------------Test Prisma route
 app.use("/api/prisma", prismaRoute);
-app.use("/emp", express.static("uploadsEmp"));
 
 // Define the route
 app.get("/", (req, res) => {
