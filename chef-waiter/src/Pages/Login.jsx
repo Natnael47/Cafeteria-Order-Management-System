@@ -21,7 +21,7 @@ const Login = () => {
 
         try {
             if (state === "Chef") {
-                const { data } = await axios.post(backendUrl + "/api/admin/login", { email, password });
+                const { data } = await axios.post(backendUrl + "/api/employee/login-chef", { email, password });
                 if (data.success) {
                     localStorage.setItem('cToken', data.token)
                     setCToken(data.token);
