@@ -4,14 +4,14 @@ import Stripe from "stripe";
 // Prisma Client initialization
 const prisma = new PrismaClient();
 
-// Stripe initialization
+// Stripe gateway initialization
 const stripe = new Stripe(process.env.STRIPE_SECRET_KEY);
 
 // Global Variables
 const currency = "USD";
 const delivery_charge = 10;
 
-const frontend_url = "http://localhost:5174";
+//const frontend_url = "http://localhost:5174";
 
 // Placing orders on cash on delivery
 const PlaceOrder = async (req, res) => {
@@ -79,7 +79,7 @@ const PlaceOrderStripe = async (req, res) => {
     });
 
     const session = await stripe.checkout.sessions.create({
-      line_items,
+      line_items: line_items,
       mode: "payment",
       success_url: `${origin}/verify?success=true&orderId=${newOrder.id}`,
       cancel_url: `${origin}/verify?success=false&orderId=${newOrder.id}`,

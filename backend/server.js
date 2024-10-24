@@ -6,6 +6,7 @@ import { connectDB } from "./config/db.js";
 import adminRouter from "./routes/adminRoute.js";
 import cartRouter from "./routes/cartRoute.js";
 import chefRouter from "./routes/chefRoute.js";
+import employeeRoute from "./routes/employeeRoute.js";
 import foodRouter from "./routes/foodRoute.js";
 import orderRouter from "./routes/orderRoute.js";
 import prismaRoute from "./routes/prismaRoute.js";
@@ -27,13 +28,17 @@ connectCloudinary();
 app.use("/api/food", foodRouter);
 app.use("/images", express.static("uploads"));
 app.use("/empIMG", express.static("uploadsEmp"));
+//API For USERS
 app.use("/api/user", userRouter);
 app.use("/api/cart", cartRouter);
+//API For Orders
 app.use("/api/order", orderRouter);
 //For Admin
 app.use("/api/admin", adminRouter);
 //for chef
 app.use("/api/chef", chefRouter);
+//API For Employees
+app.use("/api/employee", employeeRoute);
 
 //-------------------------------Test Prisma route
 app.use("/api/prisma", prismaRoute);

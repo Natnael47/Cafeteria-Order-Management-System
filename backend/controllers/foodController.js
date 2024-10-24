@@ -1,166 +1,128 @@
+import { PrismaClient } from "@prisma/client";
 import fs from "fs";
-import mysql from "mysql2";
 
-// Create a connection to the MySQL database
-const connection = mysql.createConnection({
-  host: "localhost",
-  user: "root",
-  password: "23@user!23",
-  database: "nodejs",
-});
-
-// Connect to the MySQL server
-connection.connect((err) => {
-  if (err) {
-    console.error("Error connecting to the database:", err);
-    return;
-  }
-  console.log("Connected to the MYSQL database.");
-
-  // SQL query to create the food table with specified attributes
-  const createTableQuery = `
-    CREATE TABLE IF NOT EXISTS food (
-      _id INT AUTO_INCREMENT PRIMARY KEY,
-      name VARCHAR(255) NOT NULL,
-      description TEXT NOT NULL,
-      price DECIMAL(10, 2) NOT NULL,
-      image VARCHAR(255) NOT NULL,
-      category VARCHAR(255) NOT NULL
-    )
-  `;
-
-  // Execute the create table query
-  connection.query(createTableQuery, (err, result) => {
-    if (err) {
-      console.error("Error creating table:", err);
-      connection.end();
-      return;
-    }
-    console.log('Table "food" created');
-  });
-});
+const prisma = new PrismaClient();
 
 // Add food item
-const addFood = (req, res) => {
-  const image_filename = req.file ? req.file.filename : null;
+const addFood = async (req, res) => {
+  try {
+    const imageFilename = req.file ? req.file.filename : null;
 
-  const food = {
-    name: req.body.name,
-    description: req.body.description,
-    price: req.body.price,
-    category: req.body.category,
-    image: image_filename,
-  };
+    const food = await prisma.food.create({
+      data: {
+        name: req.body.name,
+        description: req.body.description,
+        price: parseFloat(req.body.price),
+        category: req.body.category,
+        image: imageFilename,
+      },
+    });
 
-  const query = "INSERT INTO food SET ?";
-
-  connection.query(query, food, (err, result) => {
-    if (err) {
-      console.log(err);
-      res.json({ success: false, message: "Error adding food" });
-      return;
-    }
-    res.json({ success: true, message: "Food added" });
-  });
+    res.json({ success: true, message: "Food added", data: food });
+  } catch (error) {
+    console.error("Error adding food:", error);
+    res.json({ success: false, message: "Error adding food" });
+  }
 };
 
 // List all food items
-const listFood = (req, res) => {
-  const query = "SELECT * FROM food";
+const listFood = async (req, res) => {
+  try {
+    const foods = await prisma.food.findMany();
+    res.json({ success: true, data: foods });
+  } catch (error) {
+    console.error("Error retrieving food items:", error);
+    res.json({ success: false, message: "Error retrieving food items" });
+  }
+};
 
-  connection.query(query, (err, results) => {
-    if (err) {
-      console.log(err);
-      res.json({ success: false, message: "Error retrieving food items" });
+// Remove food item
+const removeFood = async (req, res) => {
+  try {
+    const foodId = parseInt(req.body.id, 10);
+    if (isNaN(foodId)) {
+      res.json({ success: false, message: "Invalid food ID" });
       return;
     }
-    res.json({ success: true, data: results });
-  });
-};
 
-// Remove food item
-// Remove food item
-const removeFood = (req, res) => {
-  console.log("Request body:", req.body); // Check the complete request body
+    // Find the food item to get the image filename
+    const food = await prisma.food.findUnique({
+      where: { id: foodId },
+    });
 
-  // Parse and validate food ID
-  const foodId = req.body.id ? parseInt(req.body.id, 10) : NaN;
-  console.log("Parsed foodId:", foodId); // Debugging line
-
-  if (isNaN(foodId)) {
-    console.log("Invalid food ID:", req.body.id);
-    res.json({ success: false, message: "Invalid food ID" });
-    return;
-  }
-
-  console.log("Attempting to remove food with ID:", foodId);
-
-  // Fetch the food item to get the image filename
-  connection.query(
-    "SELECT * FROM food WHERE _id = ?",
-    [foodId],
-    (err, results) => {
-      if (err) {
-        console.log("Database query error:", err);
-        res.json({ success: false, message: "Error retrieving food item" });
-        return;
-      }
-
-      console.log("Query results:", results);
-
-      if (results.length === 0) {
-        console.log("No food item found with ID:", foodId);
-        res.json({ success: false, message: "Food item not found" });
-        return;
-      }
-
-      const food = results[0];
-      console.log("Found food item:", food);
-
-      // Delete the food item from the database
-      connection.query(
-        "DELETE FROM food WHERE _id = ?",
-        [foodId],
-        (deleteErr, deleteResult) => {
-          if (deleteErr) {
-            console.log("Error removing food:", deleteErr);
-            res.json({ success: false, message: "Error removing food" });
-            return;
-          }
-
-          console.log("Food item deleted from database:", deleteResult);
-
-          // Delete the associated image if it exists
-          if (food.image) {
-            const imagePath = `uploads/${food.image}`;
-            console.log("Attempting to delete image at:", imagePath);
-
-            fs.unlink(imagePath, (fsErr) => {
-              if (fsErr) {
-                console.log("Error deleting image:", fsErr);
-                res.json({
-                  success: true,
-                  message: "Food removed, but image could not be deleted",
-                });
-                return;
-              }
-
-              console.log("Image deleted successfully:", imagePath);
-              res.json({
-                success: true,
-                message: "Food removed and image deleted",
-              });
-            });
-          } else {
-            console.log(
-              "No image found for food item. Skipping image deletion."
-            );
-            res.json({ success: true, message: "Food removed" });
-          }
-        }
-      );
+    if (!food) {
+      res.json({ success: false, message: "Food item not found" });
+      return;
     }
-  );
+
+    // Delete the food item
+    await prisma.food.delete({
+      where: { id: foodId },
+    });
+
+    // Delete the associated image if it exists
+    if (food.image) {
+      fs.unlink(`uploads/${food.image}`, (fsErr) => {
+        if (fsErr) console.error("Error deleting image:", fsErr);
+        res.json({ success: true, message: "Food removed" });
+      });
+    } else {
+      res.json({ success: true, message: "Food removed" });
+    }
+  } catch (error) {
+    console.log("Error removing food:", error);
+    res.json({ success: false, message: "Error removing food" });
+  }
 };
 
-export { addFood, listFood, removeFood };
+// Update food item
+const updateFood = async (req, res) => {
+  try {
+    const foodId = parseInt(req.body.id, 10);
+    if (isNaN(foodId)) {
+      res.json({ success: false, message: "Invalid food ID" });
+      return;
+    }
+
+    // Find the food item to get the current image filename
+    const existingFood = await prisma.food.findUnique({
+      where: { id: foodId },
+    });
+
+    if (!existingFood) {
+      res.json({ success: false, message: "Food item not found" });
+      return;
+    }
+
+    // If a new image is uploaded, delete the old one and update the image filename
+    let imageFilename = existingFood.image;
+    if (req.file) {
+      // Delete the old image if it exists
+      if (existingFood.image) {
+        fs.unlink(`uploads/${existingFood.image}`, (fsErr) => {
+          if (fsErr) console.error("Error deleting old image:", fsErr);
+        });
+      }
+      imageFilename = req.file.filename;
+    }
+
+    // Update the food item
+    const updatedFood = await prisma.food.update({
+      where: { id: foodId },
+      data: {
+        name: req.body.name || existingFood.name,
+        description: req.body.description || existingFood.description,
+        price: req.body.price ? parseFloat(req.body.price) : existingFood.price,
+        category: req.body.category || existingFood.category,
+        image: imageFilename,
+      },
+    });
+
+    res.json({ success: true, message: "Food updated", data: updatedFood });
+  } catch (error) {
+    console.error("Error updating food:", error);
+    res.json({ success: false, message: "Error updating food" });
+  }
+};
+
+export { addFood, listFood, removeFood, updateFood };

@@ -1,4 +1,5 @@
 import React, { useContext, useEffect } from 'react';
+import { backendUrl } from '../App';
 import { AdminContext } from '../context/AdminContext';
 
 const EmployeesList = () => {
@@ -18,10 +19,10 @@ const EmployeesList = () => {
                 {
                     employees.map((item, index) => (
                         <div className='border border-indigo-200 bg-white rounded-xl max-w-56 overflow-hidden cursor-pointer group hover:scale-105 transition-all' key={index}>
-                            <img className='bg-indigo-50 group-hover:bg-primary transition-all duration-500' src={item.image} alt="" />
+                            <img className='bg-indigo-50 group-hover:bg-primary transition-all duration-500' src={backendUrl + "/empIMG/" + item.image} alt="" />
                             <div className='p-4'>
                                 <p className='text-neutral-800 text-lg font-medium'>{item.firstName + " " + item.lastName}</p>
-                                <p className='text-zinc-600 text-sm'>{item.Position}</p>
+                                <p className='text-zinc-600 text-sm'>{item.position}</p>
                                 <p className='text-zinc-600 text-sm'>Shift :{" " + item.shift}</p>
                             </div>
                         </div>

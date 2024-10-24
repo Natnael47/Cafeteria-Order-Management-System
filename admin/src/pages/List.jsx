@@ -56,7 +56,7 @@ const List = () => {
                             <p>{item.name}</p>
                             <p>{item.category}</p>
                             <p>${item.price}</p>
-                            <p onClick={() => removeFood(item._id)} className="cursor-pointer pl-1">
+                            <p onClick={() => removeFood(item.id)} className="cursor-pointer pl-1">
                                 <img src={assets.trash_icon} alt="" className="w-7 ml-2 hover:scale-125 transition-transform" />
                             </p>
                             <p className="cursor-pointer pl-1" onClick={() => setIsEdit(true)}>

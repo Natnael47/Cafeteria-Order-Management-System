@@ -1,10 +1,13 @@
 import bcrypt from "bcryptjs";
-import { v2 as cloudinary } from "cloudinary";
 import jwt from "jsonwebtoken";
 import validator from "validator";
 import employeeModel from "../models/employeeModel.js";
 import orderModel from "../models/orderModel.js";
 import userModel from "../models/userModel.js";
+
+import { PrismaClient } from "@prisma/client";
+
+const prisma = new PrismaClient();
 
 //Admin Dashboard Elements like (number of users, number of Employee , latest orders)
 const adminDashboard = async (req, res) => {
@@ -46,7 +49,7 @@ const adminLogin = async (req, res) => {
   }
 };
 
-//API to ADD Employee
+// API to ADD Employee
 const addEmployee = async (req, res) => {
   try {
     const {
@@ -67,7 +70,7 @@ const addEmployee = async (req, res) => {
 
     const imageFile = req.file;
 
-    //checking for all data to add Employee
+    // Checking for all required fields
     if (
       !firstName ||
       !lastName ||
@@ -86,12 +89,12 @@ const addEmployee = async (req, res) => {
       return res.json({ success: false, message: "All fields are required" });
     }
 
-    //validating email format
+    // Validating email format
     if (!validator.isEmail(email)) {
       return res.json({ success: false, message: "Invalid email format" });
     }
 
-    //validating strong password
+    // Validating password length
     if (password.length < 8) {
       return res.json({
         success: false,
@@ -99,51 +102,79 @@ const addEmployee = async (req, res) => {
       });
     }
 
-    // hashing Employee password
+    // Hashing the password
     const salt = await bcrypt.genSalt(10);
     const hashedPassword = await bcrypt.hash(password, salt);
 
-    //upload image to cloudinary
-    const imageUpload = await cloudinary.uploader.upload(imageFile.path, {
-      resource_type: "image",
+    // Upload image to Cloudinary
+    //    const imageUpload = await cloudinary.uploader.upload(imageFile.path, {
+    //      resource_type: "image",
+    //    });
+    //
+    // const imageUrl = imageUpload.secure_url;
+
+    const imageFilename = req.file ? req.file.filename : null;
+
+    // Parsing the address JSON
+    const parsedAddress = JSON.parse(address);
+
+    // Create a new employee using Prisma
+    const newEmployee = await prisma.employee.create({
+      data: {
+        firstName,
+        lastName,
+        gender,
+        email,
+        password: hashedPassword,
+        image: imageFilename,
+        phone,
+        position: Position,
+        shift,
+        education,
+        experience,
+        salary: parseFloat(salary),
+        address: parsedAddress,
+        about,
+        date: new Date(),
+      },
     });
-    const imageUrl = imageUpload.secure_url;
 
-    const employeeData = {
-      firstName,
-      lastName,
-      gender,
-      email,
-      image: imageUrl,
-      password: hashedPassword,
-      phone,
-      Position,
-      shift,
-      education,
-      experience,
-      salary,
-      address: JSON.parse(address),
-      about,
-      date: Date.now(),
-    };
-
-    const newEmployee = new employeeModel(employeeData);
-    await newEmployee.save();
-
-    res.json({ success: true, message: "Employee added successfully" });
+    res.json({
+      success: true,
+      message: "Employee added successfully",
+      newEmployee,
+    });
   } catch (error) {
-    console.log(error);
+    console.log("Error adding employee:", error);
     res.json({ success: false, message: error.message });
   }
 };
 
-//API to get All Employee list for Admin
+// API to get All Employee list for Admin
 const allEmployees = async (req, res) => {
   try {
-    const employees = await employeeModel.find({}).select("-password");
+    const employees = await prisma.employee.findMany({
+      select: {
+        id: true,
+        firstName: true,
+        lastName: true,
+        gender: true,
+        email: true,
+        phone: true,
+        position: true,
+        shift: true,
+        education: true,
+        experience: true,
+        salary: true,
+        address: true,
+        about: true,
+        image: true,
+        date: true,
+      },
+    });
     res.json({ success: true, employees });
   } catch (error) {
-    console.log(error);
+    console.log("Error retrieving employees:", error);
     res.json({ success: false, message: error.message });
   }
 };

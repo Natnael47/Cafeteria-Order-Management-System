@@ -22,16 +22,16 @@ const Cart = () => {
                 <br />
                 <hr className='h-[1px] bg-gray-300 border-none' />
                 {food_list.map((item) => {
-                    if (cartItems[item._id] > 0) {
+                    if (cartItems[item.id] > 0) {
                         return (
-                            <div key={item._id}>
+                            <div key={item.id}>
                                 <div className='grid grid-cols-[1fr_1.5fr_1.1fr_0.9fr_1fr_0.5fr] items-center text-black my-2'>
                                     <img src={backendUrl + "/images/" + item.image} alt='' className='w-[60px]' />
                                     <p>{item.name}</p>
                                     <p>${item.price}</p>
-                                    <p>{cartItems[item._id]}</p>
-                                    <p>${item.price * cartItems[item._id]}</p>
-                                    <p onClick={() => removeFromCart(item._id)} className='text-black cursor-pointer pl-2 w-[30px] h-[30px] flex items-center ml-2'>X</p>
+                                    <p>{cartItems[item.id]}</p>
+                                    <p>${item.price * cartItems[item.id]}</p>
+                                    <p onClick={() => removeFromCart(item.id)} className='text-black cursor-pointer pl-2 w-[30px] h-[30px] flex items-center ml-2'>X</p>
                                 </div>
                                 <hr className='h-[1px] bg-gray-300 border-none' />
                             </div>

@@ -81,7 +81,7 @@ const StoreContextProvider = (props) => {
                 const itemId = Number(item);
 
                 // Find the item info from food_list
-                const itemInfo = food_list.find((product) => product._id === itemId);
+                const itemInfo = food_list.find((product) => product.id === itemId);
 
                 if (!itemInfo) {
                     console.error("Item not found in food_list:", itemId);
