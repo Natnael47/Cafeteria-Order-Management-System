@@ -26,20 +26,16 @@ const loginEmployee = async (req, res, role) => {
     });
 
     if (!employee) {
-      return res.status(404).json({
+      return res.json({
         success: false,
-        message: `${
-          role.charAt(0).toUpperCase() + role.slice(1)
-        } not found or not authorized`,
+        message: "User not found", // More specific message for user not found
       });
     }
 
     // Compare password
     const isMatch = await bcrypt.compare(password, employee.password);
     if (!isMatch) {
-      return res
-        .status(401)
-        .json({ success: false, message: "Incorrect password" });
+      return res.json({ success: false, message: "Password incorrect" }); // Specific message for incorrect password
     }
 
     // Generate token
