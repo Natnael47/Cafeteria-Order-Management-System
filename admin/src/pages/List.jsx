@@ -89,11 +89,11 @@ const List = () => {
                 cancelEdit();
             } else {
                 toast.error("Error updating food");
+                console.log(error.message);
             }
         } catch (error) {
             // Handle the error appropriately
-            console.error("Error updating food:", error);
-            toast.error("Error updating food");
+            console.log("Error updating food:", error.message);
         }
     }
 
