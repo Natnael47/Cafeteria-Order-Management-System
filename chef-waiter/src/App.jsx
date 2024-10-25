@@ -9,6 +9,7 @@ import { WaiterContext } from './Context/WaiterContext';
 import Dashboard from './Pages/Chef/Dashboard';
 import Orders from './Pages/Chef/Orders';
 import Login from './Pages/Login';
+import Profile from './Pages/Profile';
 import Customer from './Pages/Waiter/Customer';
 import MyOrders from './Pages/Waiter/MyOrders';
 import Tip from './Pages/Waiter/Tip';
@@ -28,8 +29,9 @@ const App = () => {
       <div className='flex items-start'>
         <SideBar />
         <Routes>
-          {/* Chef Route----- */}
           <Route path='/' element={<></>} />
+          <Route path='/profile' element={<Profile />} />
+          {/* Chef Route----- */}
           <Route path='/dashboard' element={<Dashboard />} />
           <Route path='/orders' element={<Orders />} />
 
