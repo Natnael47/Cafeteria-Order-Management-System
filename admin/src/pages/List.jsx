@@ -145,73 +145,81 @@ const List = () => {
                             {editIndex === index && (
                                 <div className="bg-white p-5 rounded shadow-md mt-2 mb-3">
                                     <h2 className="text-lg font-semibold mb-4">Edit Food</h2>
-                                    <div className="mb-4">
-                                        <label className="block text-sm font-medium mb-1">Name</label>
-                                        <input
-                                            type="text"
-                                            name="name"
-                                            value={editFood.name}
-                                            onChange={handleInputChange}
-                                            className="w-full border p-2 rounded"
-                                        />
-                                    </div>
-                                    <div className="mb-4">
-                                        <p className="block text-sm font-medium mb-1">Category</p>
-                                        <select
-                                            className="w-full px-3 py-2 border rounded"
-                                            onChange={handleInputChange}
-                                            value={editFood.category}
-                                            name='category'
-                                        >
-                                            <option value="Salad">Salad</option>
-                                            <option value="Rolls">Rolls</option>
-                                            <option value="Deserts">Deserts</option>
-                                            <option value="Sandwich">Sandwich</option>
-                                            <option value="Cake">Cake</option>
-                                            <option value="Pure Veg">Pure Veg</option>
-                                            <option value="Pasta">Pasta</option>
-                                            <option value="Noodles">Noodles</option>
-                                        </select>
-                                    </div>
-                                    <div className="mb-4">
-                                        <label className="block text-sm font-medium mb-1">Price</label>
-                                        <input
-                                            type="number"
-                                            name="price"
-                                            value={editFood.price}
-                                            onChange={handleInputChange}
-                                            className="w-full border p-2 rounded"
-                                        />
-                                    </div>
-                                    <div className="mb-4">
-                                        <label className="block text-sm font-medium mb-1">Description</label>
-                                        <textarea
-                                            name="description"
-                                            value={editFood.description}
-                                            onChange={handleInputChange}
-                                            className="w-full border p-2 rounded"
-                                        />
-                                    </div>
-                                    <div className="mb-4 add-img-upload flex-col">
-                                        <p className='mt-3 mb-1'>Upload Image</p>
-                                        <label htmlFor='image'>
-                                            <img
-                                                className="w-40"
-                                                src={image ? URL.createObjectURL(image) : backendUrl + "/images/" + editFood.image}
-                                                alt=''
+
+                                    <div>
+
+                                        <div className="flex flex-row mb-4 mt-3 gap-8">
+                                            <div className="add-img-upload flex-col">
+                                                <p className='mb-1'>Upload Image</p>
+                                                <label htmlFor='image' className="flex items-center justify-center w-40 h-30 border-2 border-dashed border-black rounded mb-2 cursor-pointer overflow-hidden">
+                                                    <img
+                                                        className="w-40 object-cover"
+                                                        src={image ? URL.createObjectURL(image) : backendUrl + "/images/" + editFood.image}
+                                                        alt=''
+                                                    />
+                                                </label>
+                                                <input
+                                                    onChange={handleImageChange}
+                                                    type='file'
+                                                    id='image'
+                                                    hidden
+                                                    accept="image/*"
+                                                />
+                                            </div>
+                                            <div className="mb-4">
+                                                <label className="block text-sm font-medium mb-1">Name</label>
+                                                <input
+                                                    type="text"
+                                                    name="name"
+                                                    value={editFood.name}
+                                                    onChange={handleInputChange}
+                                                    className="w-full border p-2 rounded"
+                                                />
+                                            </div>
+                                            <div className="mb-4">
+                                                <p className="block text-sm font-medium mb-1">Category</p>
+                                                <select
+                                                    className="w-full px-3 py-2 border rounded"
+                                                    onChange={handleInputChange}
+                                                    value={editFood.category}
+                                                    name='category'
+                                                >
+                                                    <option value="Salad">Salad</option>
+                                                    <option value="Rolls">Rolls</option>
+                                                    <option value="Deserts">Deserts</option>
+                                                    <option value="Sandwich">Sandwich</option>
+                                                    <option value="Cake">Cake</option>
+                                                    <option value="Pure Veg">Pure Veg</option>
+                                                    <option value="Pasta">Pasta</option>
+                                                    <option value="Noodles">Noodles</option>
+                                                </select>
+                                            </div>
+                                        </div>
+
+                                        <div className="mb-4">
+                                            <label className="block text-sm font-medium mb-1">Price</label>
+                                            <input
+                                                type="number"
+                                                name="price"
+                                                value={editFood.price}
+                                                onChange={handleInputChange}
+                                                className="w-full border p-2 rounded"
                                             />
-                                        </label>
-                                        <input
-                                            onChange={handleImageChange}
-                                            type='file'
-                                            id='image'
-                                            hidden
-                                            accept="image/*"
-                                        />
-                                    </div>
-                                    <div className="flex justify-end">
-                                        <button onClick={cancelEdit} className="bg-gray-300 px-4 py-2 rounded mr-2">Cancel</button>
-                                        <button onClick={updateFood} className="bg-blue-500 text-white px-4 py-2 rounded">Update</button>
+                                        </div>
+                                        <div className="mb-4">
+                                            <label className="block text-sm font-medium mb-1">Description</label>
+                                            <textarea
+                                                name="description"
+                                                value={editFood.description}
+                                                onChange={handleInputChange}
+                                                className="w-full border p-2 rounded"
+                                            />
+                                        </div>
+
+                                        <div className="flex justify-end">
+                                            <button onClick={cancelEdit} className="bg-gray-300 px-4 py-2 rounded mr-2">Cancel</button>
+                                            <button onClick={updateFood} className="bg-blue-500 text-white px-4 py-2 rounded">Update</button>
+                                        </div>
                                     </div>
                                 </div>
                             )}
