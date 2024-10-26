@@ -16,7 +16,7 @@ const Sidebar = () => {
                 </NavLink>
                 <NavLink to='/list' className={({ isActive }) => `flex items-center gap-3 py-3.5 px-3 md:px-9 md:min-w-72 cursor-pointer ${isActive ? 'bg-[#DDF7DF] border-r-4 border-primary' : ''}`}>
                     <img src={assets.order_icon} alt='' />
-                    <p className='hidden md:block'>List Items</p>
+                    <p className='hidden md:block'>Food Items</p>
                 </NavLink>
                 <NavLink to='/orders' className={({ isActive }) => `flex items-center gap-3 py-3.5 px-3 md:px-9 md:min-w-72 cursor-pointer ${isActive ? 'bg-[#DDF7DF] border-r-4 border-primary' : ''}`}>
                     <img src={assets.chef_icon} alt='' />
