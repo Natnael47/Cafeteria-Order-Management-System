@@ -5,7 +5,7 @@ import {
   login_Chef,
   update_Employee_Profile,
 } from "../controllers/employeeController.js";
-import empAuth from "../middleware/emplAuth.js";
+import empAuth from "../middleware/empAuth.js";
 
 const employeeRoute = express.Router();
 
