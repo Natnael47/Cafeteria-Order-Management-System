@@ -3,6 +3,8 @@ import multer from "multer";
 import {
   addEmployee2,
   allEmployees2,
+  empLogin,
+  empProfile,
   loginEmployee,
 } from "../Prisma Controller/EmployeeController.js";
 import {
@@ -28,6 +30,7 @@ import {
 import { addEmployee, allEmployees } from "../Prisma Controller/prismaAdmin.js";
 import adminAuth from "../middleware/adminAuth.js";
 import authUser from "../middleware/authUser.js";
+import chefAuth from "../middleware/chefAuth.js";
 import upload from "../middleware/multer.js";
 
 const prismaRoute = express.Router();
@@ -47,6 +50,8 @@ prismaRoute.post(
   addEmployee
 );
 prismaRoute.post("/login-emp", loginEmployee);
+prismaRoute.get("/profile", chefAuth, empProfile);
+prismaRoute.post("/login-emp2", empLogin);
 
 //FOOD ROUTE
 //Image storage engine

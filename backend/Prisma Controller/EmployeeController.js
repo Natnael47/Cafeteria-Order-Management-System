@@ -2,6 +2,7 @@ import { PrismaClient } from "@prisma/client";
 import bcrypt from "bcryptjs";
 import jwt from "jsonwebtoken";
 import validator from "validator";
+import employeeModel from "../models/employeeModel.js";
 
 const prisma = new PrismaClient();
 
@@ -158,5 +159,40 @@ export const loginEmployee = async (req, res) => {
   } catch (error) {
     console.log("Error logging in employee:", error);
     res.json({ success: false, message: error.message });
+  }
+};
+
+export const empProfile = async (req, res) => {
+  try {
+    const { empId } = req.body;
+    const employeeData = await employeeModel
+      .findById(empId)
+      .select("-password");
+
+    res.json({ success: true, employeeData });
+  } catch (error) {
+    console.log(error);
+    res.json({ success: false, message: error.message });
+  }
+};
+
+export const empLogin = async (req, res) => {
+  try {
+    const { email, password } = req.body;
+
+    const employee = await employeeModel.findOne({ email });
+    if (!employee) {
+      return res.json({ success: false, message: "user Not found" });
+    }
+    const isMatch = await bcrypt.compare(password, employee.password);
+    if (isMatch) {
+      const token = createToken(employee._id);
+      res.json({ success: true, token });
+    } else {
+      res.json({ success: false, message: "incorrect password" });
+    }
+  } catch (error) {
+    console.log(error);
+    res.status(500).json({ success: false, message: "Internal server error" });
   }
 };

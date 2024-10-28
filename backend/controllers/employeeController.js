@@ -55,6 +55,7 @@ export const login_Barista = (req, res) => loginEmployee(req, res, "barista");
 export const employee_Profile = async (req, res) => {
   const { empId } = req.body; // Fetching empId from the request body
   //console.log("Employee ID:", empId); // Log empId to check its value
+
   try {
     // Fetching employee data from the database using Prisma
     const employeeData = await prisma.employee.findUnique({
@@ -63,6 +64,7 @@ export const employee_Profile = async (req, res) => {
         id: true,
         firstName: true,
         lastName: true,
+        image: true,
         gender: true,
         email: true,
         phone: true,

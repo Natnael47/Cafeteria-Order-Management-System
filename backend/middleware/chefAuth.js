@@ -1,24 +1,22 @@
 import jwt from "jsonwebtoken";
 
 const chefAuth = async (req, res, next) => {
+  //console.log("Received headers:", req.headers);
   try {
-    const { token } = req.headers;
-    if (!token) {
-      return res.json({ success: false, message: "Not Authorized" });
-    }
-
-    const token_decode = jwt.verify(token, process.env.JWT_SECRET);
-
-    if (token_decode !== process.env.ADMIN_EMAIL + process.env.ADMIN_PASSWORD) {
+    const { ctoken } = req.headers;
+    if (!ctoken) {
       return res.json({
         success: false,
-        message: "Not Authorized for this operation",
+        message: "Not Authorized Login failed",
       });
     }
+
+    const token_decode = jwt.verify(ctoken, process.env.JWT_SECRET);
+    req.body.empId = token_decode.id;
     next();
   } catch (error) {
     console.log(error);
-    res.json({ success: false, message: error.message });
+    res.json({ success: false, message: "Error" });
   }
 };
 
