@@ -8,6 +8,7 @@ import order_icon from "./order_icon.png";
 import parcel_icon from "./parcel_icon.png";
 import patients_icon from "./patients_icon.svg";
 import people_icon from "./people_icon.svg";
+import picnic_icon from "./picnic.png";
 import profile_image from "./profile_image.png";
 import report_icon from "./report_icon.png";
 import trash_icon from "./trash.png";
@@ -30,6 +31,7 @@ export const assets = {
   people_icon,
   modify_icon,
   upload_area2,
+  picnic_icon,
 };
 
 //export const url = 'http://localhost:4000'

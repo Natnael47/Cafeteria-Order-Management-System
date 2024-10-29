@@ -9,12 +9,13 @@ const prisma = new PrismaClient();
 // Admin Dashboard Elements like (number of users, number of employees, total orders, latest orders)
 const adminDashboard = async (req, res) => {
   try {
-    // Fetch the total count of users, employees, and orders
-    const [usersCount, employeesCount, ordersCount, latestOrders] =
+    // Fetch the total count of users, employees, orders, and foods
+    const [usersCount, employeesCount, ordersCount, foodsCount, latestOrders] =
       await Promise.all([
         prisma.user.count(),
         prisma.employee.count(),
         prisma.order.count(), // Get the total number of orders
+        prisma.food.count(), // Get the total number of food items
         prisma.order.findMany({
           orderBy: { date: "desc" },
           take: 5, // Get the latest 5 orders
@@ -25,6 +26,7 @@ const adminDashboard = async (req, res) => {
       users: usersCount,
       employees: employeesCount,
       totalOrders: ordersCount, // Total number of orders
+      totalFoods: foodsCount, // Total number of food items
       latestOrders: latestOrders, // Latest 5 orders
     };
 
