@@ -1,31 +1,36 @@
 import bcrypt from "bcryptjs";
 import jwt from "jsonwebtoken";
 import validator from "validator";
-import employeeModel from "../models/employeeModel.js";
-import orderModel from "../models/orderModel.js";
-import userModel from "../models/userModel.js";
 
 import { PrismaClient } from "@prisma/client";
 
 const prisma = new PrismaClient();
 
-//Admin Dashboard Elements like (number of users, number of Employee , latest orders)
+// Admin Dashboard Elements like (number of users, number of employees, total orders, latest orders)
 const adminDashboard = async (req, res) => {
   try {
-    const users = await userModel.find({});
-    const orders = await orderModel.find({});
-    const employees = await employeeModel.find({});
+    // Fetch the total count of users, employees, and orders
+    const [usersCount, employeesCount, ordersCount, latestOrders] =
+      await Promise.all([
+        prisma.user.count(),
+        prisma.employee.count(),
+        prisma.order.count(), // Get the total number of orders
+        prisma.order.findMany({
+          orderBy: { date: "desc" },
+          take: 5, // Get the latest 5 orders
+        }),
+      ]);
 
     const dashData = {
-      users: users.length,
-      employees: employees.length,
-      orders: orders.length,
-      latestOrders: orders.reverse().slice(0, 5),
+      users: usersCount,
+      employees: employeesCount,
+      totalOrders: ordersCount, // Total number of orders
+      latestOrders: latestOrders, // Latest 5 orders
     };
 
     res.json({ success: true, data: dashData });
   } catch (error) {
-    console.log(error);
+    console.log("Error fetching dashboard data:", error);
     res.json({ success: false, message: error.message });
   }
 };

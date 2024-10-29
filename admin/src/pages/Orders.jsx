@@ -107,7 +107,7 @@ const Orders = () => {
                                     <p>Date : {new Date(order.date).toLocaleDateString()}</p>
                                 </div>
                                 <p className='text-sm sm:text-[15px] font-bold'>${order.amount}</p>
-                                <select onChange={(event) => statusHandler(event, order._id)} value={order.status} className='p-2 font-semibold'>
+                                <select onChange={(event) => statusHandler(event, order.id)} value={order.status} className='p-2 font-semibold'>
                                     <option value="Order Placed">Order Placed</option>
                                     <option value="Food Processing">Food Processing</option>
                                     <option value="Shipped">Shipped</option>
