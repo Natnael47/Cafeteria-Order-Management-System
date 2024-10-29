@@ -39,8 +39,8 @@ const PlaceOrder = () => {
             event.preventDefault();
             let orderItems = [];
             food_list.forEach((item) => {
-                if (cartItems[item._id] > 0) {
-                    let itemInfo = { ...item, quantity: cartItems[item._id] }; // Properly clone item with quantity
+                if (cartItems[item.id] > 0) {
+                    let itemInfo = { ...item, quantity: cartItems[item.id] }; // Properly clone item with quantity
                     orderItems.push(itemInfo);
                 }
             });

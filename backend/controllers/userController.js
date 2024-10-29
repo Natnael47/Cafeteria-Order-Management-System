@@ -1,47 +1,29 @@
+import { PrismaClient } from "@prisma/client";
 import bcrypt from "bcryptjs";
 import jwt from "jsonwebtoken";
 import validator from "validator";
-import userModel from "../models/userModel.js";
 
-//login user
-const loginUser = async (req, res) => {
-  const { email, password } = req.body;
-  try {
-    //check if user exist
-    const user = await userModel.findOne({ email });
-    if (!user) {
-      return res.json({ success: false, message: "User not found" });
-    }
-
-    //compare password
-    const isMatch = await bcrypt.compare(password, user.password);
-    if (!isMatch) {
-      return res.json({ success: false, message: "Incorrect password" });
-    }
-
-    //generate token
-    const token = createToken(user._id);
-    res.json({ success: true, token });
-  } catch (error) {
-    console.log(error);
-    res.json({ success: false, message: "Error" });
-  }
-};
+const prisma = new PrismaClient();
 
 const createToken = (id) => {
-  return jwt.sign({ id }, process.env.JWT_SECRET);
+  if (!process.env.JWT_SECRET) {
+    throw new Error("JWT_SECRET is not defined");
+  }
+  return jwt.sign({ id }, process.env.JWT_SECRET, { expiresIn: "1h" });
 };
 
-//register user
+// Register a new user
 const registerUser = async (req, res) => {
-  const { name, password, email } = req.body;
+  const { firstName, lastName, password, email, gender, dob, phone, address } =
+    req.body;
   try {
-    //check if user already exist
-    const exists = await userModel.findOne({ email });
+    // Check if user already exists
+    const exists = await prisma.user.findUnique({ where: { email } });
     if (exists) {
-      return res.json({ success: false, message: "User already exist" });
+      return res.json({ success: false, message: "User already exists" });
     }
-    //validating email format & password
+
+    // Validate email format & password
     if (!validator.isEmail(email)) {
       return res.json({ success: false, message: "Invalid email format" });
     }
@@ -52,32 +34,51 @@ const registerUser = async (req, res) => {
       });
     }
 
-    //hash password
+    // Hash password
     const salt = await bcrypt.genSalt(10);
     const hashedPassword = await bcrypt.hash(password, salt);
 
-    const newUser = new userModel({
-      name: name,
-      email: email,
-      password: hashedPassword,
+    // Create new user
+    const newUser = await prisma.user.create({
+      data: {
+        firstName,
+        lastName,
+        email,
+        password: hashedPassword,
+        gender,
+        dob,
+        phone,
+        address: typeof address === "string" ? JSON.parse(address) : address,
+      },
     });
 
-    const user = await newUser.save();
-    const token = createToken(user._id);
+    // Generate token
+    const token = createToken(newUser.id);
 
     res.json({ success: true, token });
   } catch (error) {
-    console.log(error);
-    res.json({ success: false, message: "Error" });
+    console.log("Error in registerUser:", error);
+    res.json({ success: false, message: "Error during registration" });
   }
 };
 
-//API TO GET USER PROFILE DATA
+// Get user profile by ID
 const getUserProfile = async (req, res) => {
+  const { userId } = req.body;
   try {
-    const { userId } = req.body;
-
-    const userData = await userModel.findById(userId).select("-password");
+    const userData = await prisma.user.findUnique({
+      where: { id: parseInt(userId) },
+      select: {
+        id: true,
+        firstName: true,
+        lastName: true,
+        email: true,
+        gender: true,
+        address: true,
+        dob: true,
+        phone: true,
+      },
+    });
 
     if (!userData) {
       return res.json({ success: false, message: "User not found" });
@@ -85,43 +86,65 @@ const getUserProfile = async (req, res) => {
 
     res.json({ success: true, userData });
   } catch (error) {
-    console.log(error);
-    res.json({ success: false, message: "Error" });
+    console.log("Error in getUserProfile:", error);
+    res.json({ success: false, message: "Error fetching user profile" });
   }
 };
 
-// Update user profile data
+// Update user profile
 const updateUserProfile = async (req, res) => {
+  const { userId, firstName, lastName, gender, address, dob, phone } = req.body;
   try {
-    const { userId, name, gender, address, dob, phone } = req.body;
-
-    console.log("Request Body:", req.body);
-
     // Check for missing fields
-    if (!name || !phone || !dob || !gender || !address) {
-      return res.json({ success: false, message: "Data missing" });
+    if (!firstName || !lastName || !gender || !dob || !phone) {
+      return res.json({ success: false, message: "Missing required fields" });
     }
 
-    // Parse address if it's a string
-    const parsedAddress =
-      typeof address === "string" ? JSON.parse(address) : address;
-
-    // Update user profile
-    await userModel.findByIdAndUpdate(userId, {
-      name: name,
-      gender: gender,
-      address: parsedAddress,
-      dob: dob,
-      phone: phone,
+    // Update user profile in Prisma
+    await prisma.user.update({
+      where: { id: parseInt(userId) },
+      data: {
+        firstName,
+        lastName,
+        gender,
+        dob,
+        phone,
+        address: typeof address === "string" ? JSON.parse(address) : address,
+      },
     });
 
     res.json({ success: true, message: "Profile updated successfully" });
   } catch (error) {
-    console.log("Update error:", error);
-    res.json({
+    console.error("Error updating profile:", error);
+    res.status(500).json({
       success: false,
       message: "An error occurred while updating the profile",
     });
+  }
+};
+
+// Login a user
+const loginUser = async (req, res) => {
+  const { email, password } = req.body;
+  try {
+    // Check if user exists
+    const user = await prisma.user.findUnique({ where: { email } });
+    if (!user) {
+      return res.json({ success: false, message: "User not found" });
+    }
+
+    // Compare password
+    const isMatch = await bcrypt.compare(password, user.password);
+    if (!isMatch) {
+      return res.json({ success: false, message: "Incorrect password" });
+    }
+
+    // Generate token
+    const token = createToken(user.id);
+    res.json({ success: true, token });
+  } catch (error) {
+    console.log("Error in loginUser:", error);
+    res.json({ success: false, message: "Error logging in" });
   }
 };
 

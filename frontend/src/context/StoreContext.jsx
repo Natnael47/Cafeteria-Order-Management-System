@@ -3,143 +3,126 @@ import { createContext, useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { toast } from "react-toastify";
 import { backendUrl } from "../App";
-//import { food_list } from "../assets/assets";
 
-export const StoreContext = createContext(null)
+export const StoreContext = createContext(null);
 
 const StoreContextProvider = (props) => {
-
-    //const backendUrl = import.meta.env.VITE_BACKEND_URL
-
     const [food_list, setFoodList] = useState([]);
-
-    const [cartItems, setCartItems] = useState({});
-
+    const [cartItems, setCartItems] = useState(() => {
+        // Load cartItems from localStorage if available
+        const savedCart = localStorage.getItem("cartItems");
+        return savedCart ? JSON.parse(savedCart) : {};
+    });
     const [search, setSearch] = useState('');
-
-    const navigate = useNavigate();
-
+    const [token, setToken] = useState(localStorage.getItem("token") || ""); // Get token from local storage initially
+    const [userData, setUserData] = useState(null);
     const [showSearch, setShowSearch] = useState(false);
-
-    //const url = "http://localhost:4000";
-
-    const [token, setToken] = useState("");
-
-    const [userData, setUserData] = useState(false);
+    const navigate = useNavigate();
 
     const fetchFoodList = async () => {
         try {
-            const response = await axios.get(backendUrl + "/api/food/list");
+            const response = await axios.get(`${backendUrl}/api/food/list`);
             if (response.data.success) {
                 setFoodList(response.data.data);
             } else {
                 toast.error(response.data.message);
             }
         } catch (error) {
-            console.log(error);
+            console.error(error);
             toast.error(error.message);
-
         }
-    }
+    };
 
     const addToCart = async (itemId) => {
-        const id = Number(itemId); // Ensure itemId is a number
-        if (!cartItems[id]) {
-            setCartItems((prev) => ({ ...prev, [id]: 1 }));
-        } else {
-            setCartItems((prev) => ({ ...prev, [id]: prev[id] + 1 }));
-        }
+        const id = Number(itemId);
+        setCartItems((prev) => {
+            const updatedCart = { ...prev, [id]: (prev[id] || 0) + 1 };
+            localStorage.setItem("cartItems", JSON.stringify(updatedCart)); // Save to localStorage
+            return updatedCart;
+        });
         if (token) {
-            await axios.post(backendUrl + "/api/cart/add", { itemId: id }, { headers: { token } })
+            await axios.post(`${backendUrl}/api/cart/add`, { itemId: id }, { headers: { token } });
         }
-    }
-
-    const getCartItems = () => {
-        let totalItems = 0;
-        for (const item in cartItems) {
-            if (cartItems[item] > 0) {
-                totalItems += cartItems[item];
-            }
-        }
-        return totalItems;
-    }
+    };
 
     const removeFromCart = async (itemId) => {
-        const id = Number(itemId); // Ensure itemId is a number
-        setCartItems((prev) => ({ ...prev, [id]: prev[id] - 1 }));
+        const id = Number(itemId);
+        setCartItems((prev) => {
+            const updatedCart = { ...prev, [id]: prev[id] > 1 ? prev[id] - 1 : 0 };
+            localStorage.setItem("cartItems", JSON.stringify(updatedCart)); // Save to localStorage
+            return updatedCart;
+        });
         if (token) {
-            await axios.post(backendUrl + "/api/cart/remove", { itemId: id }, { headers: { token } })
+            await axios.post(`${backendUrl}/api/cart/remove`, { itemId: id }, { headers: { token } });
         }
-    }
+    };
+
+    const getCartItems = () => {
+        // Count unique items only
+        return Object.keys(cartItems).filter((item) => cartItems[item] > 0).length;
+    };
 
     const getTotalCartAmount = () => {
         let totalAmount = 0;
-
         for (const item in cartItems) {
             if (cartItems[item] > 0) {
-                // Ensure item ID is treated as a number if needed
-                const itemId = Number(item);
-
-                // Find the item info from food_list
-                const itemInfo = food_list.find((product) => product.id === itemId);
-
-                if (!itemInfo) {
-                    console.error("Item not found in food_list:", itemId);
-                    continue; // Skip this item if it's not found
+                const itemInfo = food_list.find((product) => product.id === Number(item));
+                if (itemInfo) {
+                    const price = parseFloat(itemInfo.price);
+                    if (!isNaN(price)) {
+                        totalAmount += price * cartItems[item];
+                    }
                 }
-
-                // Convert price to number
-                const price = parseFloat(itemInfo.price);
-                if (isNaN(price)) {
-                    console.error("Price is not a valid number for item:", itemInfo);
-                    continue; // Skip this item if price is not valid
-                }
-
-                totalAmount += price * cartItems[item];
             }
         }
-
         return totalAmount;
+    };
+
+    const loadCartData = async (token) => {
+        try {
+            const response = await axios.post(`${backendUrl}/api/cart/get`, {}, { headers: { token } });
+            if (response.data.cartData) {
+                setCartItems(response.data.cartData);
+                localStorage.setItem("cartItems", JSON.stringify(response.data.cartData)); // Save to localStorage
+            }
+        } catch (error) {
+            console.error("Error loading cart data:", error);
+            toast.error("Failed to load cart items.");
+        }
+    };
+
+    const loadUserProfileData = async () => {
+        try {
+            const { data } = await axios.get(`${backendUrl}/api/user/get-profile`, { headers: { token } });
+            if (data.success) {
+                setUserData({
+                    firstName: data.userData.firstName,
+                    lastName: data.userData.lastName,
+                    email: data.userData.email,
+                    gender: data.userData.gender,
+                    address: data.userData.address,
+                    dob: data.userData.dob,
+                    phone: data.userData.phone,
+                });
+            } else {
+                toast.error(data.message);
+            }
+        } catch (error) {
+            console.error("Error loading profile data:", error);
+            toast.error(error.message);
+        }
     };
 
     useEffect(() => {
         async function loadData() {
             await fetchFoodList();
-            if (localStorage.getItem("token")) {
-                setToken(localStorage.getItem("token"));
-                await loadCartData(localStorage.getItem("token"));
+            if (token) {
+                await loadCartData(token);
+                await loadUserProfileData();
             }
         }
         loadData();
-    }, [])
-
-    useEffect(() => {
-        if (token) {
-            loadUserProfileData()
-        } else {
-            setUserData(false);
-        }
-    }, [token])
-
-    const loadCartData = async (token) => {
-        const response = await axios.post(backendUrl + "/api/cart/get", {}, { headers: { token } });
-        setCartItems(response.data.cartData);
-    }
-
-    const loadUserProfileData = async () => {
-        try {
-            const { data } = await axios.get(backendUrl + "/api/user/get-profile", { headers: { token } });
-            if (data.success) {
-                setUserData(data.userData);
-            } else {
-                toast.error(data.message);
-            }
-
-        } catch (error) {
-            console.log(error);
-            toast.error(error.message);
-        }
-    }
+    }, [token]);
 
     const contextValue = {
         food_list,
@@ -157,15 +140,16 @@ const StoreContextProvider = (props) => {
         showSearch,
         setShowSearch,
         navigate,
-        userData, setUserData,
-        loadUserProfileData
-    }
+        userData,
+        setUserData,
+        loadUserProfileData,
+    };
 
     return (
         <StoreContext.Provider value={contextValue}>
             {props.children}
         </StoreContext.Provider>
-    )
-}
+    );
+};
 
 export default StoreContextProvider;

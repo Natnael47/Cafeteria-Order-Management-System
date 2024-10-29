@@ -5,13 +5,12 @@ import { assets } from '../assets/assets';
 import { StoreContext } from '../context/StoreContext';
 
 const LoginPopUp = ({ setShowLogin }) => {
-
     const [currState, setCurrState] = useState("Login");
-
     const { setToken } = useContext(StoreContext);
 
     const [data, setData] = useState({
-        name: "",
+        firstName: "",
+        lastName: "",
         email: "",
         password: ""
     });
@@ -19,19 +18,16 @@ const LoginPopUp = ({ setShowLogin }) => {
     const onChangeHandler = (event) => {
         const name = event.target.name;
         const value = event.target.value;
-        setData(data => ({ ...data, [name]: value }));
+        setData(prevData => ({ ...prevData, [name]: value }));
     };
 
     const onLogin = async (event) => {
         event.preventDefault();
-        let newUrl = backendUrl;
-        if (currState === "Login") {
-            newUrl += "/api/user/login";
-        } else {
-            newUrl += "/api/user/register";
-        }
+        let url = `${backendUrl}/api/user/`;
 
-        const response = await axios.post(newUrl, data);
+        url += currState === "Login" ? "login" : "register";
+
+        const response = await axios.post(url, data);
 
         if (response.data.success) {
             setToken(response.data.token);
@@ -49,10 +45,51 @@ const LoginPopUp = ({ setShowLogin }) => {
                     <h2 className='font-semibold'>{currState}</h2>
                     <img onClick={() => setShowLogin(false)} src={assets.cross_icon} alt="Close" className="w-4 cursor-pointer" />
                 </div>
-                <div className="flex flex-col gap-5">
-                    {currState === "Login" ? null : <input name="name" onChange={onChangeHandler} value={data.name} type="text" placeholder="Your Name" required className="border border-gray-300 p-2 rounded-md focus:outline-none" />}
-                    <input name="email" onChange={onChangeHandler} value={data.email} type="email" placeholder="Your Email" required className="border border-gray-300 p-2 rounded-md focus:outline-none" />
-                    <input name="password" onChange={onChangeHandler} value={data.password} type="password" placeholder="Password" required className="border border-gray-300 p-2 rounded-md focus:outline-none" />
+                <div className="flex flex-col">
+                    {currState === "Sign Up" && (
+                        <>
+                            <label htmlFor="firstName" className="text-gray-600 mb-2 font-semibold">First Name</label>
+                            <input
+                                name="firstName"
+                                onChange={onChangeHandler}
+                                value={data.firstName}
+                                type="text"
+                                placeholder="First Name"
+                                required
+                                className="border border-gray-500 p-2 rounded-md focus:outline-none mb-2"
+                            />
+                            <label htmlFor="lastName" className="text-gray-600 mb-2 font-semibold">Last Name</label>
+                            <input
+                                name="lastName"
+                                onChange={onChangeHandler}
+                                value={data.lastName}
+                                type="text"
+                                placeholder="Last Name"
+                                required
+                                className="border border-gray-500 p-2 rounded-md focus:outline-none mb-2"
+                            />
+                        </>
+                    )}
+                    <label htmlFor="email" className="text-gray-600 mb-2 font-semibold">Email</label>
+                    <input
+                        name="email"
+                        onChange={onChangeHandler}
+                        value={data.email}
+                        type="email"
+                        placeholder="Your Email"
+                        required
+                        className="border border-gray-500 p-2 rounded-md focus:outline-none mb-2"
+                    />
+                    <label htmlFor="password" className="text-gray-600 mb-2 font-semibold">Password</label>
+                    <input
+                        name="password"
+                        onChange={onChangeHandler}
+                        value={data.password}
+                        type="password"
+                        placeholder="Password"
+                        required
+                        className="border border-gray-500 p-2 rounded-md focus:outline-none"
+                    />
                 </div>
                 <button type="submit" className="bg-primary text-white py-2 rounded-md font-semibold hover:bg-black text-[14px] transition-colors">
                     {currState === "Sign Up" ? "Create Account" : "Login"}
@@ -73,6 +110,6 @@ const LoginPopUp = ({ setShowLogin }) => {
             </form>
         </div>
     );
-}
+};
 
 export default LoginPopUp;

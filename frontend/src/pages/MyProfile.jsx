@@ -1,5 +1,5 @@
 import axios from 'axios';
-import React, { useContext, useState } from 'react';
+import React, { useContext, useEffect, useState } from 'react';
 import { toast } from 'react-toastify';
 import { backendUrl } from '../App';
 import { StoreContext } from '../context/StoreContext';
@@ -8,14 +8,28 @@ const MyProfile = () => {
     const { userData, setUserData, token, loadUserProfileData } = useContext(StoreContext);
     const [isEdit, setIsEdit] = useState(false);
 
+    useEffect(() => {
+        // Ensure that each field in userData has an initial value to prevent uncontrolled warnings.
+        setUserData((prev) => ({
+            firstName: prev.firstName || '',
+            lastName: prev.lastName || '',
+            gender: prev.gender || '',
+            phone: prev.phone || '',
+            address: { line1: prev.address?.line1 || '', line2: prev.address?.line2 || '' },
+            dob: prev.dob || '',
+            email: prev.email || '',
+        }));
+    }, [setUserData]);
+
     const updateUserProfileData = async () => {
         try {
-            // Prepare JSON payload
+            // Separate first and last name fields while sending the update.
             const updatedData = {
-                name: userData.name,
+                firstName: userData.firstName,
+                lastName: userData.lastName,
                 gender: userData.gender,
                 phone: userData.phone,
-                address: userData.address, // Ensure address is a JSON object
+                address: userData.address,
                 dob: userData.dob,
             };
 
@@ -37,16 +51,21 @@ const MyProfile = () => {
     return userData && (
         <div className='max-w-lg flex flex-col gap-2 text-sm'>
             {/* Display Name */}
+            <p className='text-neutral-500 underline mt-3'>USER INFORMATION</p>
             {
                 isEdit ? (
                     <input
-                        className='bg-gray-50 text-3xl font-medium max-w-60 mt-4'
+                        className='bg-gray-50 text-3xl font-medium max-w-60 mt-2'
                         type='text'
-                        value={userData.name}
-                        onChange={e => setUserData(prev => ({ ...prev, name: e.target.value }))}
+                        value={`${userData.firstName} ${userData.lastName}`}
+                        onChange={e => {
+                            const [firstName, lastName] = e.target.value.split(' ');
+                            setUserData(prev => ({ ...prev, firstName: firstName || '', lastName: lastName || '' }));
+                        }}
+                        placeholder="First Name Last Name"
                     />
                 ) : (
-                    <p className='font-medium text-3xl text-neutral-800 mt-4'>{userData.name}</p>
+                    <p className='font-medium text-3xl text-neutral-800 mt-2'>{`${userData.firstName} ${userData.lastName}`}</p>
                 )
             }
 
