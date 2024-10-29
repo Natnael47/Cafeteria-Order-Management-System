@@ -26,6 +26,6 @@ foodRouter.get("/list", listFood);
 
 foodRouter.post("/remove", adminAuth, removeFood);
 
-foodRouter.post("/update", adminAuth, updateFood);
+foodRouter.post("/update", adminAuth, upload.single("image"), updateFood);
 
 export default foodRouter;
