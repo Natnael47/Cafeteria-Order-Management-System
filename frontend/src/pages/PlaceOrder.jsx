@@ -105,10 +105,10 @@ const PlaceOrder = () => {
 
     useEffect(() => {
         if (!token) {
-            toast.error("Please sign in first");
+            toast.error("Sign In");
             navigate("/cart");
         } else if (getTotalCartAmount() === 0) {
-            toast.error("Please select food first");
+            toast.error("No Food Selected");
             navigate("/cart");
         }
     }, [token, getTotalCartAmount, navigate]); // Ensure navigate and getTotalCartAmount are in dependencies
