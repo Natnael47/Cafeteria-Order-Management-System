@@ -93,12 +93,19 @@ const getUserProfile = async (req, res) => {
 
 // Update user profile
 const updateUserProfile = async (req, res) => {
-  const { userId, firstName, gender, address, dob, phone } = req.body;
   try {
-    // Validate required fields
-    if (!userId || !firstName || !phone || !dob || !gender || !address) {
+    const { userId, firstName, gender, address, dob, phone } = req.body;
+
+    console.log("Request Body:", req.body);
+
+    // Check for missing fields
+    if (!firstName || !phone || !dob || !gender || !address) {
       return res.json({ success: false, message: "Data missing" });
     }
+
+    // Parse address if it's a string
+    const parsedAddress =
+      typeof address === "string" ? JSON.parse(address) : address;
 
     // Update user profile in Prisma
     await prisma.user.update({
@@ -106,7 +113,7 @@ const updateUserProfile = async (req, res) => {
       data: {
         firstName,
         gender,
-        address: JSON.parse(address),
+        address: parsedAddress,
         dob,
         phone,
       },

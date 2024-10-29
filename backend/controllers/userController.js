@@ -97,33 +97,25 @@ const updateUserProfile = async (req, res) => {
 
     console.log("Request Body:", req.body);
 
-    if (!name || !phone || !dob || !gender) {
+    // Check for missing fields
+    if (!name || !phone || !dob || !gender || !address) {
       return res.json({ success: false, message: "Data missing" });
     }
 
-    const updateData = { name, phone, dob, gender };
-    if (address) {
-      try {
-        updateData.address = JSON.parse(address);
-      } catch (err) {
-        console.log("Address parsing error:", err);
-        return res.json({ success: false, message: "Invalid address format" });
-      }
-    }
+    // Parse address if it's a string
+    const parsedAddress =
+      typeof address === "string" ? JSON.parse(address) : address;
 
-    const updatedUser = await userModel.findByIdAndUpdate(userId, updateData, {
-      new: true,
+    // Update user profile
+    await userModel.findByIdAndUpdate(userId, {
+      name: name,
+      gender: gender,
+      address: parsedAddress,
+      dob: dob,
+      phone: phone,
     });
 
-    if (!updatedUser) {
-      return res.json({ success: false, message: "User not found" });
-    }
-
-    res.json({
-      success: true,
-      message: "Profile updated successfully",
-      updatedUser,
-    });
+    res.json({ success: true, message: "Profile updated successfully" });
   } catch (error) {
     console.log("Update error:", error);
     res.json({
