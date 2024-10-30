@@ -9,7 +9,7 @@ const MyProfile = () => {
     const [isEdit, setIsEdit] = useState(false);
 
     useEffect(() => {
-        // Ensure that each field in userData has an initial value to prevent uncontrolled warnings.
+        // Ensure each field in userData has an initial value to prevent uncontrolled warnings.
         setUserData((prev) => ({
             firstName: prev.firstName || '',
             lastName: prev.lastName || '',
@@ -54,16 +54,22 @@ const MyProfile = () => {
             <p className='text-neutral-500 underline mt-3'>USER INFORMATION</p>
             {
                 isEdit ? (
-                    <input
-                        className='bg-gray-50 text-3xl font-medium max-w-60 mt-2'
-                        type='text'
-                        value={`${userData.firstName} ${userData.lastName}`}
-                        onChange={e => {
-                            const [firstName, lastName] = e.target.value.split(' ');
-                            setUserData(prev => ({ ...prev, firstName: firstName || '', lastName: lastName || '' }));
-                        }}
-                        placeholder="First Name Last Name"
-                    />
+                    <div className="flex gap-4 mt-2">
+                        <input
+                            className='bg-white text-3xl font-medium max-w-52 border-2 border-gray-500 rounded'
+                            type='text'
+                            value={userData.firstName}
+                            onChange={(e) => setUserData(prev => ({ ...prev, firstName: e.target.value }))}
+                            placeholder="First Name"
+                        />
+                        <input
+                            className='bg-white text-3xl font-medium max-w-52 border-2 border-gray-500 rounded'
+                            type='text'
+                            value={userData.lastName}
+                            onChange={(e) => setUserData(prev => ({ ...prev, lastName: e.target.value }))}
+                            placeholder="Last Name"
+                        />
+                    </div>
                 ) : (
                     <p className='font-medium text-3xl text-neutral-800 mt-2'>{`${userData.firstName} ${userData.lastName}`}</p>
                 )
@@ -82,7 +88,7 @@ const MyProfile = () => {
                     {
                         isEdit ? (
                             <input
-                                className='bg-gray-100 max-w-52'
+                                className='bg-white max-w-52 border-2 border-gray-500 rounded'
                                 type='text'
                                 value={userData.phone}
                                 onChange={e => setUserData(prev => ({ ...prev, phone: e.target.value }))}
@@ -98,14 +104,14 @@ const MyProfile = () => {
                             isEdit ? (
                                 <>
                                     <input
-                                        className='bg-gray-50'
+                                        className='bg-white max-w-52 border-2 border-gray-500 rounded'
                                         onChange={(e) => setUserData(prev => ({ ...prev, address: { ...prev.address, line1: e.target.value } }))}
                                         value={userData.address.line1}
                                         type="text"
                                         placeholder="Address Line 1"
                                     />
                                     <input
-                                        className='bg-gray-50'
+                                        className='bg-white max-w-52 border-2 border-gray-500 rounded'
                                         onChange={(e) => setUserData(prev => ({ ...prev, address: { ...prev.address, line2: e.target.value } }))}
                                         value={userData.address.line2}
                                         type="text"
@@ -132,7 +138,7 @@ const MyProfile = () => {
                     {
                         isEdit ? (
                             <select
-                                className='max-w-20 bg-gray-100'
+                                className='max-w-20 bg-white border-2 border-gray-500 rounded'
                                 onChange={(e) => setUserData(prev => ({ ...prev, gender: e.target.value }))}
                                 value={userData.gender}
                             >
@@ -149,7 +155,7 @@ const MyProfile = () => {
                     {
                         isEdit ? (
                             <input
-                                className='max-w-28 bg-gray-100'
+                                className='max-w-28 bg-white border-2 border-gray-500 rounded'
                                 type='date'
                                 value={userData.dob}
                                 onChange={e => setUserData(prev => ({ ...prev, dob: e.target.value }))}

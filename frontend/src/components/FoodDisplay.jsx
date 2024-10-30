@@ -38,7 +38,7 @@ const FoodDisplay = ({ category }) => {
                         className="text-green-500 font-medium hover:underline"
                         onClick={() => setShowAll(!showAll)}
                     >
-                        {showAll ? "Show Less" : "Show All"}
+                        {showAll ? "See Less" : "See All"}
                     </button>
                 </div>
             )}
