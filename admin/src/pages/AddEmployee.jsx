@@ -141,7 +141,7 @@ const AddEmployee = () => {
                         </div>
 
                         <div className='flex-1 flex flex-col gap-1'>
-                            <p>Fees</p>
+                            <p>Salary</p>
                             <input onChange={(e) => setSalary(e.target.value)} value={salary} className='border rounded px-3 py-2' type="number" placeholder='Fees' required />
                         </div>
 
