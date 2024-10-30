@@ -9,9 +9,15 @@ export const StoreContext = createContext(null);
 const StoreContextProvider = (props) => {
     const [food_list, setFoodList] = useState([]);
     const [cartItems, setCartItems] = useState(() => {
-        // Load cartItems from localStorage if available
-        const savedCart = localStorage.getItem("cartItems");
-        return savedCart ? JSON.parse(savedCart) : {};
+        // Check for token and load cartItems from localStorage only if a token exists
+        const token = localStorage.getItem("token");
+        if (token) {
+            const savedCart = localStorage.getItem("cartItems");
+            return savedCart ? JSON.parse(savedCart) : {};
+        } else {
+            localStorage.removeItem("cartItems"); // Clear cartItems if no token
+            return {};
+        }
     });
     const [search, setSearch] = useState('');
     const [token, setToken] = useState(localStorage.getItem("token") || ""); // Get token from local storage initially
@@ -37,7 +43,9 @@ const StoreContextProvider = (props) => {
         const id = Number(itemId);
         setCartItems((prev) => {
             const updatedCart = { ...prev, [id]: (prev[id] || 0) + 1 };
-            localStorage.setItem("cartItems", JSON.stringify(updatedCart)); // Save to localStorage
+            if (token) {
+                localStorage.setItem("cartItems", JSON.stringify(updatedCart)); // Save to localStorage only if logged in
+            }
             return updatedCart;
         });
         if (token) {
@@ -49,7 +57,9 @@ const StoreContextProvider = (props) => {
         const id = Number(itemId);
         setCartItems((prev) => {
             const updatedCart = { ...prev, [id]: prev[id] > 1 ? prev[id] - 1 : 0 };
-            localStorage.setItem("cartItems", JSON.stringify(updatedCart)); // Save to localStorage
+            if (token) {
+                localStorage.setItem("cartItems", JSON.stringify(updatedCart)); // Save to localStorage only if logged in
+            }
             return updatedCart;
         });
         if (token) {
@@ -58,7 +68,6 @@ const StoreContextProvider = (props) => {
     };
 
     const getCartItems = () => {
-        // Count unique items only
         return Object.keys(cartItems).filter((item) => cartItems[item] > 0).length;
     };
 
@@ -122,6 +131,14 @@ const StoreContextProvider = (props) => {
             }
         }
         loadData();
+    }, [token]);
+
+    // Clear cart items when token is removed (user logs out or token expires)
+    useEffect(() => {
+        if (!token) {
+            setCartItems({});
+            localStorage.removeItem("cartItems");
+        }
     }, [token]);
 
     const contextValue = {
