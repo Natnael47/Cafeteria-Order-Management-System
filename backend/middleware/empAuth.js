@@ -2,16 +2,20 @@ import jwt from "jsonwebtoken";
 
 const empAuth = async (req, res, next) => {
   try {
-    const { token } = req.headers;
+    // Retrieve either cToken or wToken from the headers
+    const token = req.headers.ctoken || req.headers.wtoken;
+
+    // Check if a token is provided
     if (!token) {
       return res.json({
         success: false,
-        message: "Not Authorized Login failed",
+        message: "Not Authorized. Login failed",
       });
     }
 
+    // Verify and decode the token
     const token_decode = jwt.verify(token, process.env.JWT_SECRET);
-    req.body.empId = token_decode.id;
+    req.body.empId = token_decode.id; // Store the decoded employee ID for future use
     next();
   } catch (error) {
     console.log(error);

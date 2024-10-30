@@ -49,16 +49,16 @@ const loginEmployee = async (req, res, role) => {
 export const login_Chef = (req, res) => loginEmployee(req, res, "chef");
 
 // Login Barista
-export const login_Barista = (req, res) => loginEmployee(req, res, "barista");
+export const login_Barista = (req, res) => loginEmployee(req, res, "baristas");
 
 // API to get employee profile
 export const employee_Profile = async (req, res) => {
   const { empId } = req.body; // Fetching empId from the request body
-  //console.log("Employee ID:", empId); // Log empId to check its value
+  // console.log("Employee ID:", empId); // Log empId to check its value
 
   try {
     // Fetching employee data from the database using Prisma
-    const employeeData = await prisma.employee.findUnique({
+    const profileData = await prisma.employee.findUnique({
       where: { id: empId },
       select: {
         id: true,
@@ -80,12 +80,12 @@ export const employee_Profile = async (req, res) => {
     });
 
     // Check if employee data exists
-    if (!employeeData) {
+    if (!profileData) {
       return res.json({ success: false, message: "Employee not found" });
     }
 
     // Respond with success and employee data
-    res.json({ success: true, employeeData });
+    res.json({ success: true, profileData });
     //console.log(employeeData);
   } catch (error) {
     console.log(error);

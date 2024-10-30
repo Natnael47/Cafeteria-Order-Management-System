@@ -10,20 +10,29 @@ export const AppContext = createContext(null);
 const AppContextProvider = (props) => {
 
     const { cToken } = useContext(ChefContext);
-
     const { wToken } = useContext(WaiterContext);
 
     const [profileData, setProfileData] = useState(false);
 
     const get_Profile_Data = async () => {
-
         try {
-            const { data } = await axios.get(backendUrl + "/api/employee/profile", { headers: { cToken } });
+            // Check for tokens in localStorage
+            const token = localStorage.getItem("cToken") || localStorage.getItem("wToken");
+
+            if (!token) {
+                return toast.error("No authentication token found.");
+            }
+
+            // Set the appropriate token header
+            const headers = localStorage.getItem("cToken")
+                ? { cToken: token }
+                : { wToken: token };
+
+            const { data } = await axios.get(backendUrl + "/api/employee/profile", { headers });
+
             if (data.success) {
-                console.log("Full response data:", data);
                 setProfileData(data.profileData);
-                console.log(data.profileData);
-                //console.log(cToken);
+                console.log("Profile Data:", data.profileData);
             } else {
                 toast.error(data.message);
             }
@@ -36,11 +45,12 @@ const AppContextProvider = (props) => {
     const value = {
         profileData, setProfileData, get_Profile_Data, cToken
     }
+
     return (
         <AppContext.Provider value={value}>
             {props.children}
         </AppContext.Provider>
-    )
+    );
 }
 
 export default AppContextProvider;

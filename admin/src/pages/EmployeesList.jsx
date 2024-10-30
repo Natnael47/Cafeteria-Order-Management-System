@@ -24,6 +24,7 @@ const EmployeesList = () => {
                                 <p className='text-neutral-800 text-lg font-medium'>{item.firstName + " " + item.lastName}</p>
                                 <p className='text-zinc-600 text-sm'>{item.position}</p>
                                 <p className='text-zinc-600 text-sm'>Shift :{" " + item.shift}</p>
+
                             </div>
                         </div>
                     ))

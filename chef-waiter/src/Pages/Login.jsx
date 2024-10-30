@@ -30,7 +30,7 @@ const Login = () => {
                 }
             } else {
 
-                const { data } = await axios.post(backendUrl + "/api/admin/login", { email, password });
+                const { data } = await axios.post(backendUrl + "/api/employee/login-barista", { email, password });
                 if (data.success) {
                     localStorage.setItem('wToken', data.token)
                     setWToken(data.token);
