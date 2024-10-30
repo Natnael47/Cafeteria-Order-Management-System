@@ -35,7 +35,7 @@ const FoodDisplay = ({ category }) => {
             {filteredItems.length > 8 && (
                 <div className="text-center mt-[20px]">
                     <button
-                        className="text-blue-500 font-medium hover:underline"
+                        className="text-green-500 font-medium hover:underline"
                         onClick={() => setShowAll(!showAll)}
                     >
                         {showAll ? "Show Less" : "Show All"}
