@@ -143,7 +143,7 @@ const List = () => {
 
                             {/* Editable form for the selected item */}
                             {editIndex === index && (
-                                <div className="bg-white p-5 rounded shadow-md mt-2 mb-3">
+                                <div className="bg-white p-5 rounded shadow-md mt-2 mb-3 border-2 border-gray-600">
                                     <h2 className="text-lg font-semibold mb-4">Edit Food</h2>
 
                                     <div>
@@ -167,11 +167,11 @@ const List = () => {
                                                 />
                                             </div>
                                             <div className="mb-4">
-                                                <label className="block text-sm font-medium mb-1">Name</label>
+                                                <label className="block text-sm font-medium mb-1">Price</label>
                                                 <input
-                                                    type="text"
-                                                    name="name"
-                                                    value={editFood.name}
+                                                    type="number"
+                                                    name="price"
+                                                    value={editFood.price}
                                                     onChange={handleInputChange}
                                                     className="w-full border p-2 rounded"
                                                 />
@@ -194,18 +194,20 @@ const List = () => {
                                                     <option value="Noodles">Noodles</option>
                                                 </select>
                                             </div>
+
                                         </div>
 
                                         <div className="mb-4">
-                                            <label className="block text-sm font-medium mb-1">Price</label>
+                                            <label className="block text-sm font-medium mb-1">Name</label>
                                             <input
-                                                type="number"
-                                                name="price"
-                                                value={editFood.price}
+                                                type="text"
+                                                name="name"
+                                                value={editFood.name}
                                                 onChange={handleInputChange}
                                                 className="w-full border p-2 rounded"
                                             />
                                         </div>
+
                                         <div className="mb-4">
                                             <label className="block text-sm font-medium mb-1">Description</label>
                                             <textarea
