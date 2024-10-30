@@ -38,7 +38,7 @@ const MyOrders = () => {
                 {orders.map((order, index) => (
                     <div key={index} className="py-4 border-t border-b border-gray-600 text-black flex flex-col md:flex-row md:items-center md:justify-between gap-4 hover:bg-green-50">
                         <div className='flex items-start gap-5 text-sm'>
-                            <img className='w-16 sm:w-20' src={assets.parcel_icon} alt='Parcel Icon' />
+                            <img className='w-10 sm:w-16' src={assets.delivery_man_icon} alt='Parcel Icon' />
                             <div>
                                 <div className='sm:text-base font-medium'>
                                     {order.items.map((item, index) => (

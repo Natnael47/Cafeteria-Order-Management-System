@@ -1,61 +1,91 @@
-import userModel from "../models/userModel.js";
+import { PrismaClient } from "@prisma/client";
+const prisma = new PrismaClient();
 
-// add items to cart
-const addTooCart = async (req, res) => {
+// Add items to cart
+const addToCart = async (req, res) => {
   try {
-    let userData = await userModel.findById(req.body.userId);
+    const { userId, itemId } = req.body;
+
+    // Find the user by ID
+    const userData = await prisma.user.findUnique({
+      where: { id: parseInt(userId) },
+    });
+
     if (!userData) {
       return res.json({ success: false, message: "User not found" });
     }
 
+    // Parse and update the cart data
     let cartData = userData.cartData || {}; // Ensure cartData is an object
-    if (!cartData[req.body.itemId]) {
-      cartData[req.body.itemId] = 1;
-    } else {
-      cartData[req.body.itemId] += 1;
-    }
-    await userModel.findByIdAndUpdate(req.body.userId, { cartData });
+    cartData[itemId] = (cartData[itemId] || 0) + 1; // Increment item quantity or set to 1 if not present
+
+    // Update the user's cart data
+    await prisma.user.update({
+      where: { id: parseInt(userId) },
+      data: { cartData },
+    });
+
     res.json({ success: true, message: "Added to Cart" });
   } catch (error) {
-    console.log(error);
+    console.error(error);
     res.json({ success: false, message: "Error" });
   }
 };
 
-// remove items from cart
+// Remove items from cart
 const removeFromCart = async (req, res) => {
   try {
-    let userData = await userModel.findById(req.body.userId);
+    const { userId, itemId } = req.body;
+
+    // Find the user by ID
+    const userData = await prisma.user.findUnique({
+      where: { id: parseInt(userId) },
+    });
+
     if (!userData) {
       return res.json({ success: false, message: "User not found" });
     }
 
-    let cartData = userData.cartData || {}; // Ensure cartData is an object
-    if (cartData[req.body.itemId] > 0) {
-      cartData[req.body.itemId] -= 1;
+    // Parse and update the cart data
+    let cartData = userData.cartData || {};
+    if (cartData[itemId] > 0) {
+      cartData[itemId] -= 1;
+      if (cartData[itemId] === 0) delete cartData[itemId]; // Remove the item if quantity is zero
     }
-    await userModel.findByIdAndUpdate(req.body.userId, { cartData });
+
+    // Update the user's cart data
+    await prisma.user.update({
+      where: { id: parseInt(userId) },
+      data: { cartData },
+    });
+
     res.json({ success: true, message: "Removed from Cart" });
   } catch (error) {
-    console.log(error);
+    console.error(error);
     res.json({ success: false, message: "Error" });
   }
 };
 
-// get cart items
+// Get cart items
 const getCart = async (req, res) => {
   try {
-    let userData = await userModel.findById(req.body.userId);
+    const { userId } = req.body;
+
+    // Find the user by ID
+    const userData = await prisma.user.findUnique({
+      where: { id: parseInt(userId) },
+    });
+
     if (!userData) {
       return res.json({ success: false, message: "User not found" });
     }
 
-    let cartData = userData.cartData || {}; // Ensure cartData is an object
+    const cartData = userData.cartData || {}; // Ensure cartData is an object
     res.json({ success: true, cartData });
   } catch (error) {
-    console.log(error);
+    console.error(error);
     res.json({ success: false, message: "Error" });
   }
 };
 
-export { addTooCart, getCart, removeFromCart };
+export { addToCart, getCart, removeFromCart };

@@ -52,6 +52,7 @@ import bag_icon from "./bag_icon.png";
 import cart_icon from "./cart_icon.png";
 import cross_icon from "./cross_icon.png";
 import person from "./customer-image.png";
+import delivery_man_icon from "./delivery-man.png";
 import drop_down_icon from "./dropdown_icon.svg";
 import email_icon17 from "./email_icon.png";
 import { default as facebook_icon } from "./facebook_icon.png";
@@ -110,6 +111,7 @@ export const assets = {
   kare,
   drop_down_icon,
   footerlogo,
+  delivery_man_icon,
 };
 
 export const menu_list = [

@@ -9,19 +9,26 @@ export const StoreContext = createContext(null);
 const StoreContextProvider = (props) => {
     const [food_list, setFoodList] = useState([]);
     const [cartItems, setCartItems] = useState(() => {
-        // Check for token and load cartItems from localStorage only if a token exists
         const token = localStorage.getItem("token");
         if (token) {
             const savedCart = localStorage.getItem("cartItems");
             return savedCart ? JSON.parse(savedCart) : {};
         } else {
-            localStorage.removeItem("cartItems"); // Clear cartItems if no token
+            localStorage.removeItem("cartItems");
             return {};
         }
     });
     const [search, setSearch] = useState('');
-    const [token, setToken] = useState(localStorage.getItem("token") || ""); // Get token from local storage initially
-    const [userData, setUserData] = useState(null);
+    const [token, setToken] = useState(localStorage.getItem("token") || "");
+    const [userData, setUserData] = useState({
+        firstName: '',
+        lastName: '',
+        gender: '',
+        phone: '',
+        address: { line1: '', line2: '' },
+        dob: '',
+        email: ''
+    });
     const [showSearch, setShowSearch] = useState(false);
     const navigate = useNavigate();
 
@@ -44,7 +51,7 @@ const StoreContextProvider = (props) => {
         setCartItems((prev) => {
             const updatedCart = { ...prev, [id]: (prev[id] || 0) + 1 };
             if (token) {
-                localStorage.setItem("cartItems", JSON.stringify(updatedCart)); // Save to localStorage only if logged in
+                localStorage.setItem("cartItems", JSON.stringify(updatedCart));
             }
             return updatedCart;
         });
@@ -58,13 +65,18 @@ const StoreContextProvider = (props) => {
         setCartItems((prev) => {
             const updatedCart = { ...prev, [id]: prev[id] > 1 ? prev[id] - 1 : 0 };
             if (token) {
-                localStorage.setItem("cartItems", JSON.stringify(updatedCart)); // Save to localStorage only if logged in
+                localStorage.setItem("cartItems", JSON.stringify(updatedCart));
             }
             return updatedCart;
         });
         if (token) {
             await axios.post(`${backendUrl}/api/cart/remove`, { itemId: id }, { headers: { token } });
         }
+    };
+
+    const clearCart = () => {
+        setCartItems({});
+        localStorage.removeItem("cartItems");
     };
 
     const getCartItems = () => {
@@ -92,7 +104,7 @@ const StoreContextProvider = (props) => {
             const response = await axios.post(`${backendUrl}/api/cart/get`, {}, { headers: { token } });
             if (response.data.cartData) {
                 setCartItems(response.data.cartData);
-                localStorage.setItem("cartItems", JSON.stringify(response.data.cartData)); // Save to localStorage
+                localStorage.setItem("cartItems", JSON.stringify(response.data.cartData));
             }
         } catch (error) {
             console.error("Error loading cart data:", error);
@@ -133,7 +145,6 @@ const StoreContextProvider = (props) => {
         loadData();
     }, [token]);
 
-    // Clear cart items when token is removed (user logs out or token expires)
     useEffect(() => {
         if (!token) {
             setCartItems({});
@@ -145,6 +156,7 @@ const StoreContextProvider = (props) => {
         food_list,
         cartItems,
         setCartItems,
+        clearCart,
         getCartItems,
         addToCart,
         removeFromCart,
