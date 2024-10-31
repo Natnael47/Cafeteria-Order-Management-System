@@ -151,7 +151,7 @@ const List = () => {
                                         <div className="flex flex-row mb-4 mt-3 gap-8">
                                             <div className="add-img-upload flex-col">
                                                 <p className='mb-1'>Upload Image</p>
-                                                <label htmlFor='image' className="flex items-center justify-center w-40 h-30 border-2 border-dashed border-black rounded mb-2 cursor-pointer overflow-hidden">
+                                                <label htmlFor='image' className="flex items-center justify-center w-40 h-30 border-2 border-gray-500 rounded mb-2 cursor-pointer overflow-hidden">
                                                     <img
                                                         className="w-40 object-cover"
                                                         src={image ? URL.createObjectURL(image) : backendUrl + "/images/" + editFood.image}

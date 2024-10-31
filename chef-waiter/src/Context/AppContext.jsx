@@ -32,7 +32,7 @@ const AppContextProvider = (props) => {
 
             if (data.success) {
                 setProfileData(data.profileData);
-                console.log("Profile Data:", data.profileData);
+                // console.log("Profile Data:", data.profileData);
             } else {
                 toast.error(data.message);
             }
@@ -43,7 +43,7 @@ const AppContextProvider = (props) => {
     }
 
     const value = {
-        profileData, setProfileData, get_Profile_Data, cToken
+        profileData, setProfileData, get_Profile_Data, cToken, wToken
     }
 
     return (
