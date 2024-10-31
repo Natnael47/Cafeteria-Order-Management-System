@@ -11,7 +11,7 @@ import adminAuth from "../middleware/adminAuth.js";
 
 const adminRouter = express.Router();
 
-//FOR ADDING EMPLOYEE AND STORE IMAGE LOCALLY
+// FOR ADDING EMPLOYEE AND STORE IMAGE LOCALLY
 const storage = multer.diskStorage({
   destination: "uploadsEmp",
   filename: (req, file, cb) => {
@@ -21,22 +21,17 @@ const storage = multer.diskStorage({
 
 const uploadImg = multer({ storage: storage });
 
+// Existing routes
 adminRouter.post(
   "/add-employee",
   adminAuth,
   uploadImg.single("image"),
   addEmployee
 );
-
 adminRouter.get("/dashboard", adminAuth, adminDashboard);
 adminRouter.post("/login", adminLogin);
-// adminRouter.post(
-//  "/add-employee",
-//  adminAuth,
-//  upload.single("image"),
-//  addEmployee
-// );
 adminRouter.post("/get-employees", adminAuth, allEmployees);
-adminRouter.post("/emp-profile", employee_Profile);
+
+adminRouter.get("/employee/:employeeId", employee_Profile);
 
 export default adminRouter;

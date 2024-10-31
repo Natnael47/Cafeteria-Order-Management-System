@@ -1,5 +1,6 @@
 import add_icon from "./add_icon.png";
 import chef_icon from "./chef_icon.png";
+import employee_icon from "./employees.png";
 import home_icon from "./home_icon.png";
 import logo from "./logo.png";
 import logo2 from "./logo2.png";
@@ -32,6 +33,7 @@ export const assets = {
   modify_icon,
   upload_area2,
   picnic_icon,
+  employee_icon,
 };
 
 //export const url = 'http://localhost:4000'
