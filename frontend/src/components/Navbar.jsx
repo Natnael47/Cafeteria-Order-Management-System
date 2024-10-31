@@ -6,7 +6,6 @@ import { StoreContext } from "../context/StoreContext";
 export const Navbar = ({ setShowLogin, setShowFeedback }) => {
 
     const [currState, setCurrState] = useState("home");
-
     const [menu, setMenu] = useState("home");
 
     const { getTotalCartAmount, token, setToken, navigate, setShowSearch, getCartItems } = useContext(StoreContext);
@@ -15,10 +14,10 @@ export const Navbar = ({ setShowLogin, setShowFeedback }) => {
         localStorage.removeItem("token");
         setToken("");
         navigate("/");
-    }
+    };
 
     return (
-        <div className="flex justify-between items-center py-5 ">
+        <div className="flex justify-between items-center py-5">
             <Link to='/'>
                 <img src={assets.logo2} alt="Logo" className="w-[150px] md:w-[120px] lg:w-[150px]" />
             </Link>
@@ -32,13 +31,15 @@ export const Navbar = ({ setShowLogin, setShowFeedback }) => {
                 <Link to='/about' onClick={() => setMenu("about")} className={menu === "about" ? "border-b-2 border-black pb-1 font-semibold" : ""}>About</Link>
                 <Link to='/contact' onClick={() => setMenu("contact-us")} className={menu === "contact-us" ? "border-b-2 border-black pb-1 font-semibold" : ""}>Contact Us</Link>
             </ul>
-            <div className=" flex items-center gap-10 md:gap-8">
+            <div className="flex items-center gap-10 md:gap-8">
                 <img onClick={() => setShowSearch(true)} src={assets.search_icon} alt="Search" className="w-[30px] md:w-[22px] lg:w-[20px] cursor-pointer" />
-                <div className=" flex items-center gap-[30px]">
+                <div className="relative flex items-center gap-[30px]">
                     <Link to='/cart' className="relative">
                         <img src={assets.cart_icon} alt="Cart" onClick={() => setCurrState("cart")} className="cursor-pointer w-8" />
+                        <div className={`absolute w-4 h-4 -top-[8px] -right-[10px] rounded-full text-[10px] bg-red-600 text-white flex justify-center items-center transition ${getTotalCartAmount() === 0 ? "opacity-0" : "opacity-100"}`}>
+                            {getCartItems()}
+                        </div>
                     </Link>
-                    <div className={getTotalCartAmount() === 0 ? "hidden" : " w-4 h-4 flex justify-center items-center -mt-[35px] -ml-[35px] rounded-[11px] text-[10px] bg-red-600 text-white"}>{getCartItems()}</div>
                 </div>
 
                 {!token ?
