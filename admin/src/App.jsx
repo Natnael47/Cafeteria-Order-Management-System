@@ -8,16 +8,16 @@ import { AdminContext } from './context/AdminContext';
 import AddEmployee from './pages/Add_Employee';
 import Add from './pages/Add_Food';
 import Dashboard from './pages/Dashboard';
+import EmployeeProfile from './pages/Employee_Profile';
 import EmployeesList from './pages/Employees_List';
 import List from './pages/List_Food';
 import Login from './pages/Login';
 import Orders from './pages/Orders';
 import Reports from './pages/Reports';
 
-export const backendUrl = import.meta.env.VITE_BACKEND_URL
+export const backendUrl = import.meta.env.VITE_BACKEND_URL;
 
 const App = () => {
-
   const { token } = useContext(AdminContext);
 
   return token ? (
@@ -34,6 +34,7 @@ const App = () => {
           <Route path='/reports' element={<Reports />} />
           <Route path='/add-employees' element={<AddEmployee />} />
           <Route path='/employees-list' element={<EmployeesList />} />
+          <Route path='/employee-profile/:employeeId' element={<EmployeeProfile />} /> {/* Updated route */}
         </Routes>
       </div>
     </div>
@@ -42,7 +43,7 @@ const App = () => {
       <Login />
       <ToastContainer />
     </>
-  )
-}
+  );
+};
 
-export default App
+export default App;

@@ -5,6 +5,7 @@ import {
   adminDashboard,
   adminLogin,
   allEmployees,
+  employee_Profile,
 } from "../controllers/adminController.js";
 import adminAuth from "../middleware/adminAuth.js";
 
@@ -36,5 +37,6 @@ adminRouter.post("/login", adminLogin);
 //  addEmployee
 // );
 adminRouter.post("/get-employees", adminAuth, allEmployees);
+adminRouter.post("/emp-profile", employee_Profile);
 
 export default adminRouter;

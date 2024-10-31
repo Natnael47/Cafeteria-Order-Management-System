@@ -186,4 +186,52 @@ const allEmployees = async (req, res) => {
   }
 };
 
-export { addEmployee, adminDashboard, adminLogin, allEmployees };
+// API to get employee profile by employeeId from URL
+const employee_Profile = async (req, res) => {
+  const { employeeId } = req.params; // Fetch employeeId from URL parameters
+
+  try {
+    // Fetching employee data from the database using Prisma
+    const profileData = await prisma.employee.findUnique({
+      where: { id: Number(employeeId) }, // Convert employeeId to number if needed
+      select: {
+        id: true,
+        firstName: true,
+        lastName: true,
+        image: true,
+        gender: true,
+        email: true,
+        phone: true,
+        position: true,
+        shift: true,
+        education: true,
+        experience: true,
+        salary: true,
+        address: true,
+        about: true,
+        date: true,
+      },
+    });
+
+    // Check if employee data exists
+    if (!profileData) {
+      return res
+        .status(404)
+        .json({ success: false, message: "Employee not found" });
+    }
+
+    // Respond with success and employee data
+    res.json({ success: true, profileData });
+  } catch (error) {
+    console.error("Error fetching employee profile:", error);
+    res.status(500).json({ success: false, message: "Internal server error" });
+  }
+};
+
+export {
+  addEmployee,
+  adminDashboard,
+  adminLogin,
+  allEmployees,
+  employee_Profile,
+};
