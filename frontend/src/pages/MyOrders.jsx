@@ -7,20 +7,19 @@ import { StoreContext } from '../context/StoreContext';
 
 const MyOrders = () => {
     const [orders, setOrders] = useState([]);
-    const [showDetails, setShowDetails] = useState(Array(orders.length).fill(false));
-    const { url, token } = useContext(StoreContext);
+    const [showDetails, setShowDetails] = useState({});
+    const { token } = useContext(StoreContext);
 
     const loadOrderData = async () => {
         try {
             if (!token) return;
 
-            const response = await axios.post(backendUrl + "/api/order/userorders", {}, { headers: { token } });
+            const response = await axios.post(`${backendUrl}/api/order/userorders`, {}, { headers: { token } });
             if (response.data.success) {
                 setOrders(response.data.orders.reverse());
-                setShowDetails(Array(response.data.orders.length).fill(false));
             }
         } catch (error) {
-            toast.error(error.message);
+            console.error("Error loading orders:", error);
         }
     };
 
@@ -31,17 +30,16 @@ const MyOrders = () => {
     }, [token]);
 
     const toggleDetails = (index) => {
-        setShowDetails(prevState => {
-            const newShowDetails = [...prevState];
-            newShowDetails[index] = !newShowDetails[index];
-            return newShowDetails;
-        });
+        setShowDetails(prevState => ({
+            ...prevState,
+            [index]: !prevState[index]
+        }));
     };
 
     return (
         <div className='border-t pt-16'>
             <div className='text-2xl'>
-                <Title text1={'MY'} text2={'ORDERS'} />
+                <Title text1='MY' text2='ORDERS' />
             </div>
 
             <div>
@@ -52,12 +50,12 @@ const MyOrders = () => {
                                 <img className='w-10 sm:w-16' src={assets.delivery_man_icon} alt='Parcel Icon' />
                                 <div>
                                     <div className='sm:text-base font-medium'>
-                                        {order.items.map((item, idx) => (
+                                        {order.items.slice(0, 2).map((item, idx) => (
                                             <div className='py-0.5' key={idx}>
-                                                {item.name} _ <span className='font-semibold'>{item.quantity}</span>
-                                                {idx < order.items.length - 1 && <span>,</span>}
+                                                {item.quantity} {item.name}{item.quantity > 1 ? "'s" : ""}
                                             </div>
                                         ))}
+                                        {order.items.length > 2 && <span>and more...</span>}
                                     </div>
                                     <p className='mt-1'>Date: <span className='text-gray-800'>{new Date(order.date).toDateString()}</span></p>
                                     <p className='mt-1'>Payment: <span className='text-gray-800'>{order.paymentMethod}</span></p>
@@ -70,7 +68,7 @@ const MyOrders = () => {
                                 </div>
 
                                 <div className='flex items-center gap-2'>
-                                    <p className='min-w-2 h-2 rounded-full bg-green-600'></p>
+                                    <span className='w-2 h-2 rounded-full bg-green-600'></span>
                                     <p><b>{order.status}</b></p>
                                 </div>
 
@@ -87,22 +85,26 @@ const MyOrders = () => {
                         </div>
 
                         {showDetails[index] && (
-                            <div className="mt-2 pt-4">
-                                <h3>More Details</h3>
-                                {order.items.map((item, idx) => (
-                                    <div key={idx} className='flex flex-col sm:flex-row gap-4 items-center'>
-                                        <img
-                                            className="w-20 rounded-[15px]"
-                                            src={`${backendUrl || ''}/images/${item.image || ''}`}
-                                            alt={item.name}
-                                        />
-                                        <div>
-                                            <p className='font-semibold'>Item: {item.name}</p>
-                                            <p>Quantity: {item.quantity}</p>
-                                            <p>Price: ${item.price}</p>
+                            <div className="mt-2 pt-4 space-y-4 bg-gray-100">
+                                <h3 className='font-semibold'>Order Details</h3>
+                                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                                    {order.items.map((item, idx) => (
+                                        <div key={idx} className='flex flex-col sm:flex-row gap-4 items-center'>
+                                            <img
+                                                className="w-20 rounded-[15px]"
+                                                src={`${backendUrl}/images/${item.image || ''}`}
+                                                alt={item.name}
+                                            />
+                                            <div>
+                                                <p className='font-semibold'>
+                                                    {item.quantity} {item.name}{item.quantity > 1 ? "'s" : ""}
+                                                </p>
+                                                <p>Price: ${item.price * item.quantity}</p>
+                                                <p>Status: {item.status}</p>
+                                            </div>
                                         </div>
-                                    </div>
-                                ))}
+                                    ))}
+                                </div>
                             </div>
                         )}
                     </div>

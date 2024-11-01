@@ -40,7 +40,7 @@ const PlaceOrder = () => {
             let orderItems = [];
             food_list.forEach((item) => {
                 if (cartItems[item.id] > 0) {
-                    let itemInfo = { ...item, quantity: cartItems[item.id] }; // Properly clone item with quantity
+                    let itemInfo = { ...item, quantity: cartItems[item.id], status: "NULL" }; // Properly clone item with quantity
                     orderItems.push(itemInfo);
                 }
             });
