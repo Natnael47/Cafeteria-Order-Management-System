@@ -1,8 +1,6 @@
 import cors from "cors";
 import "dotenv/config";
 import express from "express";
-import connectCloudinary from "./config/cloudinary.js";
-import { connectDB } from "./config/db.js";
 import adminRouter from "./routes/adminRoute.js";
 import cartRouter from "./routes/cartRoute.js";
 import chefRouter from "./routes/chefRoute.js";
@@ -22,8 +20,8 @@ app.use(cors());
 app.use(express.urlencoded({ extended: true }));
 
 //db connection
-connectDB();
-connectCloudinary();
+//connectDB();
+//connectCloudinary();
 
 //api endpoints for Customer
 app.use("/api/food", foodRouter);
