@@ -85,7 +85,7 @@ const MyOrders = () => {
                         </div>
 
                         {showDetails[index] && (
-                            <div className="mt-2 pt-4 space-y-4 bg-gray-100">
+                            <div className="mt-2 pt-4 space-y-4">
                                 <h3 className='font-semibold'>Order Details</h3>
                                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                                     {order.items.map((item, idx) => (

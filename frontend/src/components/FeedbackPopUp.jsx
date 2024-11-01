@@ -1,7 +1,11 @@
 import axios from 'axios';
-import React, { useState } from 'react';
+import React, { useContext, useState } from 'react';
+import { toast } from 'react-toastify'; // Import toast for notifications
+import { backendUrl } from '../App'; // Make sure this path is correct
+import { StoreContext } from '../context/StoreContext';
 
 const FeedbackPopUp = ({ setShowFeedback }) => {
+    const { token } = useContext(StoreContext)// Get token from context
     const [feedback, setFeedback] = useState({
         rating: 0,
         comment: ''
@@ -18,13 +22,27 @@ const FeedbackPopUp = ({ setShowFeedback }) => {
 
     const submitFeedback = async (event) => {
         event.preventDefault();
-        // Replace with your backend URL for submitting feedback
-        const response = await axios.post('/api/feedback', feedback);
+        try {
+            // Construct the feedback data object
+            const feedbackData = {
+                rating: feedback.rating,
+                comment: feedback.comment,
+            };
 
-        if (response.data.success) {
-            setShowFeedback(false);
-        } else {
-            alert('Failed to submit feedback');
+            // Send feedback to the backend
+            const response = await axios.post(backendUrl + '/api/feedback/feedback', feedbackData, {
+                headers: { token } // Include the token in the headers
+            });
+
+            if (response.data.success) {
+                toast.success('Feedback submitted successfully!'); // Notify success
+                setShowFeedback(false); // Close the popup
+            } else {
+                toast.error('Failed to submit feedback'); // Notify failure
+            }
+        } catch (error) {
+            toast.error('An error occurred while submitting feedback'); // Notify error
+            console.error(error); // Log the error
         }
     };
 
@@ -35,7 +53,7 @@ const FeedbackPopUp = ({ setShowFeedback }) => {
                     <h2 className="text-lg font-bold text-black">We Appreciate Your Feedback</h2>
                     <button
                         type="button"
-                        onClick={() => setShowFeedback(false)} // Correctly handle the click to close the popup
+                        onClick={() => setShowFeedback(false)} // Close the popup
                         className="text-lg text-green-600 font-bold cursor-pointer"
                     >
                         ✖
