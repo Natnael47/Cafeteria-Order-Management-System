@@ -6,15 +6,16 @@ import { ChefContext } from "../Context/ChefContext";
 import { WaiterContext } from "../Context/WaiterContext";
 
 const Login = () => {
-
     const [state, setState] = useState("Chef");
 
     const [email, setEmail] = useState("");
     const [password, setPassword] = useState("");
 
     const { setCToken } = useContext(ChefContext);
-
     const { setWToken } = useContext(WaiterContext);
+
+    // State to manage password visibility
+    const [showPassword, setShowPassword] = useState(false);
 
     const onSubmitHandler = async (event) => {
         event.preventDefault();
@@ -23,26 +24,20 @@ const Login = () => {
             if (state === "Chef") {
                 const { data } = await axios.post(backendUrl + "/api/employee/login-chef", { email, password });
                 if (data.success) {
-                    localStorage.setItem('cToken', data.token)
+                    localStorage.setItem('cToken', data.token);
                     setCToken(data.token);
                 } else {
-                    toast.error(data.message)
+                    toast.error(data.message);
                 }
             } else {
-
                 const { data } = await axios.post(backendUrl + "/api/employee/login-barista", { email, password });
                 if (data.success) {
-                    localStorage.setItem('wToken', data.token)
+                    localStorage.setItem('wToken', data.token);
                     setWToken(data.token);
                 } else {
-                    toast.error(data.message)
+                    toast.error(data.message);
                 }
             }
-
-            //console.log(email, password);
-            // const response = await axios.post(backendUrl + '/api/admin/login', { email, password })
-            // console.log(response);
-
         } catch (error) {
             console.log(error);
             toast.error(error.message);
@@ -68,14 +63,23 @@ const Login = () => {
                 </div>
                 <div className="w-full">
                     <p className="text-black font-semibold">Password</p>
-                    <input
-                        onChange={(e) => setPassword(e.target.value)}
-                        className="border border-[#DADADA] rounded w-full p-2 mt-1"
-                        placeholder="Password"
-                        type="password"
-                        value={password}
-                        required
-                    />
+                    <div className="relative">
+                        <input
+                            onChange={(e) => setPassword(e.target.value)}
+                            className="border border-[#DADADA] rounded w-full p-2 mt-1"
+                            placeholder="Password"
+                            type={showPassword ? "text" : "password"} // Toggle input type based on showPassword
+                            value={password}
+                            required
+                        />
+                        <button
+                            type="button"
+                            onClick={() => setShowPassword(!showPassword)} // Toggle password visibility
+                            className="absolute right-2 top-2 text-gray-500"
+                        >
+                            {showPassword ? "Hide" : "Show"} {/* Button text changes based on state */}
+                        </button>
+                    </div>
                 </div>
                 <button className="bg-primary text-white w-full py-2 rounded-md text-base font-bold mt-2 hover:bg-[#269231]">
                     Login

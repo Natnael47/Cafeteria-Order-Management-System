@@ -15,6 +15,9 @@ const LoginPopUp = ({ setShowLogin }) => {
         password: ""
     });
 
+    // State to manage password visibility
+    const [showPassword, setShowPassword] = useState(false);
+
     const onChangeHandler = (event) => {
         const name = event.target.name;
         const value = event.target.value;
@@ -81,15 +84,24 @@ const LoginPopUp = ({ setShowLogin }) => {
                         className="border border-gray-500 p-2 rounded-md focus:outline-none mb-2"
                     />
                     <label htmlFor="password" className="text-gray-600 mb-2 font-semibold">Password</label>
-                    <input
-                        name="password"
-                        onChange={onChangeHandler}
-                        value={data.password}
-                        type="password"
-                        placeholder="Password"
-                        required
-                        className="border border-gray-500 p-2 rounded-md focus:outline-none"
-                    />
+                    <div className="relative">
+                        <input
+                            name="password"
+                            onChange={onChangeHandler}
+                            value={data.password}
+                            type={showPassword ? "text" : "password"} // Toggle input type based on showPassword
+                            placeholder="Password"
+                            required
+                            className="border border-gray-500 p-2 rounded-md focus:outline-none w-full"
+                        />
+                        <button
+                            type="button"
+                            onClick={() => setShowPassword(!showPassword)} // Toggle password visibility
+                            className="absolute right-2 top-2 text-gray-500"
+                        >
+                            {showPassword ? "Hide" : "Show"} {/* Button text changes based on state */}
+                        </button>
+                    </div>
                 </div>
                 <button type="submit" className="bg-primary text-white py-2 rounded-md font-semibold hover:bg-black text-[14px] transition-colors">
                     {currState === "Sign Up" ? "Create Account" : "Login"}
