@@ -7,37 +7,36 @@ import { StoreContext } from '../context/StoreContext';
 const MyProfile = () => {
     const { userData, setUserData, token, loadUserProfileData } = useContext(StoreContext);
     const [isEdit, setIsEdit] = useState(false);
+    const [editedData, setEditedData] = useState({});
 
     useEffect(() => {
-        // Ensure each field in userData has an initial value to prevent uncontrolled warnings.
-        setUserData((prev) => ({
-            firstName: prev.firstName || '',
-            lastName: prev.lastName || '',
-            gender: prev.gender || '',
-            phone: prev.phone || '',
-            address: { line1: prev.address?.line1 || '', line2: prev.address?.line2 || '' },
-            dob: prev.dob || '',
-            email: prev.email || '',
-        }));
-    }, [setUserData]);
+        // Set initial editable copy of user data
+        setEditedData(userData || {});
+    }, [userData]);
+
+    // Function to check if there are any changes
+    const hasChanges = () => {
+        return JSON.stringify(editedData) !== JSON.stringify(userData);
+    };
 
     const updateUserProfileData = async () => {
-        try {
-            // Separate first and last name fields while sending the update.
-            const updatedData = {
-                firstName: userData.firstName,
-                lastName: userData.lastName,
-                gender: userData.gender,
-                phone: userData.phone,
-                address: userData.address,
-                dob: userData.dob,
-            };
+        if (!hasChanges()) {
+            toast.info("No changes detected");
+            setIsEdit(false);
+            return;
+        }
 
-            const { data } = await axios.post(backendUrl + '/api/user/update-profile', updatedData, { headers: { token } });
+        try {
+            const { data } = await axios.post(
+                `${backendUrl}/api/user/update-profile`,
+                editedData,
+                { headers: { token } }
+            );
 
             if (data.success) {
                 toast.success(data.message);
                 await loadUserProfileData();
+                setUserData(editedData);  // Update userData to reflect saved changes
                 setIsEdit(false);
             } else {
                 toast.error(data.message);
@@ -49,36 +48,36 @@ const MyProfile = () => {
     };
 
     return userData && (
-        <div className='max-w-lg flex flex-col gap-2 text-sm'>
+        <div className="max-w-lg mx-auto p-5 border-2 border-green-500 mt-5 rounded-lg flex flex-col items-center gap-4 text-sm">
             {/* Display Name */}
-            <p className='text-neutral-500 underline mt-3'>USER INFORMATION</p>
+            <p className="text-neutral-500 underline">USER INFORMATION</p>
             {
                 isEdit ? (
                     <div className="flex gap-4 mt-2">
                         <input
                             className='bg-white text-3xl font-medium max-w-52 border-2 border-gray-500 rounded'
                             type='text'
-                            value={userData.firstName}
-                            onChange={(e) => setUserData(prev => ({ ...prev, firstName: e.target.value }))}
+                            value={editedData.firstName || ''}
+                            onChange={(e) => setEditedData(prev => ({ ...prev, firstName: e.target.value }))}
                             placeholder="First Name"
                         />
                         <input
                             className='bg-white text-3xl font-medium max-w-52 border-2 border-gray-500 rounded'
                             type='text'
-                            value={userData.lastName}
-                            onChange={(e) => setUserData(prev => ({ ...prev, lastName: e.target.value }))}
+                            value={editedData.lastName || ''}
+                            onChange={(e) => setEditedData(prev => ({ ...prev, lastName: e.target.value }))}
                             placeholder="Last Name"
                         />
                     </div>
                 ) : (
-                    <p className='font-medium text-3xl text-neutral-800 mt-2'>{`${userData.firstName} ${userData.lastName}`}</p>
+                    <p className='font-medium text-3xl text-neutral-800 mt-2 text-center'>{`${userData.firstName} ${userData.lastName}`}</p>
                 )
             }
 
-            <hr className='bg-zinc-400 h-[1px] border-none' />
+            <hr className='bg-zinc-400 h-[1px] border-none w-full' />
 
             {/* Contact Information */}
-            <div>
+            <div className="w-full">
                 <p className='text-neutral-500 underline mt-3'>CONTACT INFORMATION</p>
                 <div className='grid grid-cols-[1fr_3fr] gap-y-2.5 mt-3 text-neutral-700'>
                     <p className='font-medium'>Email:</p>
@@ -90,8 +89,8 @@ const MyProfile = () => {
                             <input
                                 className='bg-white max-w-52 border-2 border-gray-500 rounded'
                                 type='text'
-                                value={userData.phone}
-                                onChange={e => setUserData(prev => ({ ...prev, phone: e.target.value }))}
+                                value={editedData.phone || ''}
+                                onChange={e => setEditedData(prev => ({ ...prev, phone: e.target.value }))}
                             />
                         ) : (
                             <p className='text-blue-400'>{userData.phone}</p>
@@ -105,24 +104,24 @@ const MyProfile = () => {
                                 <>
                                     <input
                                         className='bg-white max-w-52 border-2 border-gray-500 rounded'
-                                        onChange={(e) => setUserData(prev => ({ ...prev, address: { ...prev.address, line1: e.target.value } }))}
-                                        value={userData.address.line1}
+                                        onChange={(e) => setEditedData(prev => ({ ...prev, address: { ...prev.address, line1: e.target.value } }))}
+                                        value={editedData.address?.line1 || ''}
                                         type="text"
                                         placeholder="Address Line 1"
                                     />
                                     <input
                                         className='bg-white max-w-52 border-2 border-gray-500 rounded'
-                                        onChange={(e) => setUserData(prev => ({ ...prev, address: { ...prev.address, line2: e.target.value } }))}
-                                        value={userData.address.line2}
+                                        onChange={(e) => setEditedData(prev => ({ ...prev, address: { ...prev.address, line2: e.target.value } }))}
+                                        value={editedData.address?.line2 || ''}
                                         type="text"
                                         placeholder="Address Line 2"
                                     />
                                 </>
                             ) : (
                                 <p className='text-gray-500'>
-                                    {userData.address.line1}
+                                    {userData.address?.line1}
                                     <br />
-                                    {userData.address.line2}
+                                    {userData.address?.line2}
                                 </p>
                             )
                         }
@@ -131,7 +130,7 @@ const MyProfile = () => {
             </div>
 
             {/* Basic Information */}
-            <div>
+            <div className="w-full">
                 <p className='text-neutral-500 underline mt-3'>BASIC INFORMATION</p>
                 <div className='grid grid-cols-[1fr_3fr] gap-y-2.5 mt-3 text-neutral-700'>
                     <p className='font-medium'>Gender:</p>
@@ -139,8 +138,8 @@ const MyProfile = () => {
                         isEdit ? (
                             <select
                                 className='max-w-20 bg-white border-2 border-gray-500 rounded'
-                                onChange={(e) => setUserData(prev => ({ ...prev, gender: e.target.value }))}
-                                value={userData.gender}
+                                onChange={(e) => setEditedData(prev => ({ ...prev, gender: e.target.value }))}
+                                value={editedData.gender || ''}
                             >
                                 <option value="Male">Male</option>
                                 <option value="Female">Female</option>
@@ -157,8 +156,8 @@ const MyProfile = () => {
                             <input
                                 className='max-w-28 bg-white border-2 border-gray-500 rounded'
                                 type='date'
-                                value={userData.dob}
-                                onChange={e => setUserData(prev => ({ ...prev, dob: e.target.value }))}
+                                value={editedData.dob || ''}
+                                onChange={e => setEditedData(prev => ({ ...prev, dob: e.target.value }))}
                             />
                         ) : (
                             <p className='text-gray-400'>{userData.dob}</p>
