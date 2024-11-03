@@ -1,12 +1,9 @@
 import React, { useContext } from 'react';
-import { useNavigate } from 'react-router-dom';
 import { backendUrl } from '../App';
 import { StoreContext } from '../context/StoreContext';
 
 const Cart = () => {
-    const { cartItems, food_list, removeFromCart, getTotalCartAmount } = useContext(StoreContext);
-
-    const navigate = useNavigate();
+    const { cartItems, food_list, removeFromCart, getTotalCartAmount, navigate } = useContext(StoreContext);
 
     return (
         <div className='mt-[100px]'>
