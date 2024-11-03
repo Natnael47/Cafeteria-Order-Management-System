@@ -11,6 +11,57 @@ const stripe = new Stripe(process.env.STRIPE_SECRET_KEY);
 const currency = "USD";
 const delivery_charge = 10;
 
+// Function to display all orders with "Order Placed" status for chef
+const displayOrdersForChef = async (req, res) => {
+  try {
+    const orders = await prisma.order.findMany({
+      where: {
+        status: "Order Placed",
+      },
+      orderBy: { date: "asc" },
+    });
+
+    res.json({ success: true, orders });
+  } catch (error) {
+    console.log(error);
+    res.json({ success: false, message: error.message });
+  }
+};
+
+// Function for chef to accept an order and start preparing it
+const acceptOrder = async (req, res) => {
+  try {
+    const { orderId } = req.body;
+
+    await prisma.order.update({
+      where: { id: orderId },
+      data: { status: "preparing" },
+    });
+
+    res.json({ success: true, message: "Order accepted, preparing" });
+  } catch (error) {
+    console.log(error);
+    res.json({ success: false, message: error.message });
+  }
+};
+
+// Function for chef to mark an order as ready
+const completeOrder = async (req, res) => {
+  try {
+    const { orderId } = req.body;
+
+    await prisma.order.update({
+      where: { id: orderId },
+      data: { status: "ready" },
+    });
+
+    res.json({ success: true, message: "Order ready for delivery" });
+  } catch (error) {
+    console.log(error);
+    res.json({ success: false, message: error.message });
+  }
+};
+
 // Placing orders on cash on delivery
 const PlaceOrder = async (req, res) => {
   try {
@@ -25,6 +76,7 @@ const PlaceOrder = async (req, res) => {
         paymentMethod: "COD",
         payment: false,
         date: new Date(),
+        status: "Order Placed", // Set initial status to "Order Placed"
       },
     });
 
@@ -55,6 +107,7 @@ const PlaceOrderStripe = async (req, res) => {
         paymentMethod: "stripe",
         payment: false,
         date: new Date(),
+        status: "Order Placed", // Set initial status to "Order Placed"
       },
     });
 
@@ -150,14 +203,12 @@ const updateStatus = async (req, res) => {
   try {
     const { orderId, status } = req.body;
 
-    // Ensure the orderId is provided
     if (!orderId) {
       return res.json({ success: false, message: "Order ID is required" });
     }
 
-    // Update the order status using Prisma
     await prisma.order.update({
-      where: { id: parseInt(orderId) }, // Ensure orderId is parsed as an integer if needed
+      where: { id: parseInt(orderId) },
       data: { status },
     });
 
@@ -170,7 +221,6 @@ const updateStatus = async (req, res) => {
 
 // Placing orders using Razorpay method (currently empty)
 const PlaceOrderRazorpay = async (req, res) => {
-  // Implement Razorpay payment logic here
   res.json({
     success: false,
     message: "Razorpay payment integration not implemented yet.",
@@ -178,7 +228,10 @@ const PlaceOrderRazorpay = async (req, res) => {
 };
 
 export {
+  acceptOrder,
   allOrders,
+  completeOrder,
+  displayOrdersForChef,
   PlaceOrder,
   PlaceOrderRazorpay,
   PlaceOrderStripe,

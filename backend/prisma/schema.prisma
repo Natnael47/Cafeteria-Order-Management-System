@@ -61,7 +61,7 @@ model Order {
   items         Json // Storing items as JSON for flexibility
   amount        Float
   address       Json // Storing address as JSON for flexibility
-  status        String   @default("Food Processing") @db.VarChar(255)
+  status        String   @default("Order Placed") @db.VarChar(255)
   paymentMethod String   @db.VarChar(255)
   payment       Boolean  @default(false)
   date          DateTime @default(now())

@@ -3,7 +3,10 @@ import {
   PlaceOrder,
   PlaceOrderRazorpay,
   PlaceOrderStripe,
+  acceptOrder,
   allOrders,
+  completeOrder,
+  displayOrdersForChef,
   updateStatus,
   userOrders,
   verifyStripe,
@@ -27,5 +30,10 @@ orderRouter.post("/userorders", authUser, userOrders);
 
 //verify payment
 orderRouter.post("/verifyStripe", authUser, verifyStripe);
+
+// chef features
+orderRouter.post("/complete", completeOrder);
+orderRouter.post("/accept", acceptOrder);
+orderRouter.get("/chef-orders", displayOrdersForChef);
 
 export default orderRouter;
