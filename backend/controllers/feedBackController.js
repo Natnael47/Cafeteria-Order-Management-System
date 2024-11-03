@@ -45,31 +45,33 @@ const createFeedback = async (req, res) => {
   }
 };
 
-// Get feedback for admin or user
-const getFeedback = async (req, res) => {
+// Get all feedback with user information
+const getAllFeedback = async (req, res) => {
   try {
-    const { userId } = req.query;
+    const feedback = await prisma.feedback.findMany({
+      orderBy: { date: "desc" },
+      include: {
+        user: {
+          select: {
+            firstName: true,
+            lastName: true,
+          },
+        },
+      },
+    });
 
-    let feedback;
-    if (userId) {
-      // Fetch feedback for a specific user
-      feedback = await prisma.feedback.findMany({
-        where: { userId: parseInt(userId) },
-        orderBy: { date: "desc" },
-      });
-    } else {
-      // Fetch all feedback for admin view
-      feedback = await prisma.feedback.findMany({
-        orderBy: { date: "desc" },
-        include: { user: true }, // Include user info if required in the admin panel
-      });
-    }
+    // Format the feedback data to include user's name
+    const formattedFeedback = feedback.map((fb) => ({
+      username: `${fb.user.firstName} ${fb.user.lastName}`,
+      rating: fb.rating,
+      comment: fb.comment,
+    }));
 
-    res.json({ success: true, feedback });
+    res.json({ success: true, feedback: formattedFeedback });
   } catch (error) {
     console.log(error);
     res.json({ success: false, message: "Error fetching feedback" });
   }
 };
 
-export { createFeedback, getFeedback };
+export { createFeedback, getAllFeedback };
