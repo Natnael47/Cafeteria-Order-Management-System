@@ -1,5 +1,5 @@
 import axios from "axios";
-import React, { useContext, useEffect, useState } from 'react';
+import React, { useContext, useEffect, useRef, useState } from 'react';
 import Modal from 'react-modal';
 import { toast } from "react-toastify";
 import { backendUrl } from "../App";
@@ -17,6 +17,8 @@ const List = () => {
     const [editFood, setEditFood] = useState({ name: '', category: '', price: '', image: '', description: '' });
     const [image, setImage] = useState(false); // State for image preview
 
+    const editRef = useRef(null); // Create a reference for the editable div
+
     const fetchList = async () => {
         const response = await axios.get(backendUrl + "/api/food/list", { headers: { token } });
         if (response.data.success) {
@@ -24,17 +26,17 @@ const List = () => {
         } else {
             toast.error("Error fetching list");
         }
-    }
+    };
 
     const openModal = (foodId) => {
         setSelectedFoodId(foodId);
         setModalIsOpen(true);
-    }
+    };
 
     const closeModal = () => {
         setSelectedFoodId(null);
         setModalIsOpen(false);
-    }
+    };
 
     const handleEditClick = (food, index) => {
         if (editIndex === index) {
@@ -45,25 +47,30 @@ const List = () => {
             setEditFood({ ...food });
             setEditIndex(index); // Set the index of the item being edited
             setImage(false); // Reset image state for each new edit
+
+            // Scroll to and focus on the edit section
+            setTimeout(() => {
+                editRef.current?.scrollIntoView({ behavior: "smooth", block: "center" });
+            }, 100); // Delay slightly to ensure edit section is rendered
         }
-    }
+    };
 
     const cancelEdit = () => {
         setEditIndex(null); // Clear the edit index
         setEditFood({ name: '', category: '', price: '', image: '', description: '' });
         setImage(false); // Reset image state
-    }
+    };
 
     const handleInputChange = (e) => {
         const { name, value } = e.target;
         setEditFood(prevState => ({ ...prevState, [name]: value }));
-    }
+    };
 
     const handleImageChange = (e) => {
         const file = e.target.files[0];
         setImage(file);
         setEditFood(prevState => ({ ...prevState, image: file }));
-    }
+    };
 
     const updateFood = async () => {
         const formData = new FormData();
@@ -92,11 +99,9 @@ const List = () => {
                 console.log(error.message);
             }
         } catch (error) {
-            // Handle the error appropriately
             console.log("Error updating food:", error.message);
         }
-    }
-
+    };
 
     const removeFood = async () => {
         const response = await axios.post(backendUrl + "/api/food/remove", { id: selectedFoodId }, { headers: { token } });
@@ -107,7 +112,7 @@ const List = () => {
         } else {
             toast.error("Error removing");
         }
-    }
+    };
 
     useEffect(() => {
         fetchList();
@@ -143,11 +148,10 @@ const List = () => {
 
                             {/* Editable form for the selected item */}
                             {editIndex === index && (
-                                <div className="bg-white p-5 rounded shadow-md mt-2 mb-3 border-2 border-gray-600">
+                                <div ref={editRef} className="bg-white p-5 rounded shadow-md mt-2 mb-3 border-2 border-gray-600">
                                     <h2 className="text-lg font-semibold mb-4">Edit Food</h2>
 
                                     <div>
-
                                         <div className="flex flex-row mb-4 mt-3 gap-8">
                                             <div className="add-img-upload flex-col">
                                                 <p className='mb-1'>Upload Image</p>
@@ -194,7 +198,6 @@ const List = () => {
                                                     <option value="Noodles">Noodles</option>
                                                 </select>
                                             </div>
-
                                         </div>
 
                                         <div className="mb-4">
@@ -218,9 +221,19 @@ const List = () => {
                                             />
                                         </div>
 
-                                        <div className="flex justify-end">
-                                            <button onClick={cancelEdit} className="bg-gray-300 px-4 py-2 rounded mr-2">Cancel</button>
-                                            <button onClick={updateFood} className="bg-blue-500 text-white px-4 py-2 rounded">Update</button>
+                                        <div className="flex justify-end mt-4">
+                                            <button
+                                                onClick={cancelEdit}
+                                                className="bg-gray-300 px-4 py-2 rounded mr-2"
+                                            >
+                                                Cancel
+                                            </button>
+                                            <button
+                                                onClick={updateFood}
+                                                className="bg-blue-500 text-white px-4 py-2 rounded"
+                                            >
+                                                Save Changes
+                                            </button>
                                         </div>
                                     </div>
                                 </div>
@@ -241,12 +254,12 @@ const List = () => {
                 <h2 className="text-lg font-semibold">Confirm Delete</h2>
                 <p>Are you sure you want to delete this item?</p>
                 <div className="mt-4 flex justify-end">
-                    <button onClick={closeModal} className="bg-gray-300 px-4 py-2 rounded mr-2 ">Cancel</button>
+                    <button onClick={closeModal} className="bg-gray-300 px-4 py-2 rounded mr-2">Cancel</button>
                     <button onClick={removeFood} className="bg-red-500 text-white px-4 py-2 rounded">Delete</button>
                 </div>
             </Modal>
         </div>
-    )
+    );
 }
 
 export default List;
