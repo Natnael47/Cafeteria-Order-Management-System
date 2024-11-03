@@ -6,7 +6,7 @@ import FeedbackPopUp from "./components/FeedbackPopUp";
 import Footer from "./components/Footer";
 import LoginPopUp from "./components/LoginPopUp";
 import { Navbar } from "./components/Navbar";
-import SearchBar from "./components/SearchBar/SearchBar";
+import SearchBar from "./components/SearchBar";
 import About from "./pages/About";
 import Cart from './pages/Cart';
 import Contact from "./pages/Contact";
