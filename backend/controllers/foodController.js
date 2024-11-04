@@ -28,7 +28,11 @@ const addFood = async (req, res) => {
 // List all food items
 const listFood = async (req, res) => {
   try {
-    const foods = await prisma.food.findMany();
+    const foods = await prisma.food.findMany({
+      orderBy: {
+        id: "desc", // Sorts by ID in descending order to show the latest items first
+      },
+    });
     res.json({ success: true, data: foods });
   } catch (error) {
     console.error("Error retrieving food items:", error);
