@@ -305,6 +305,10 @@ const List = () => {
                             )}
                         </div>
                     ))}
+
+                    <div className="bg-gray-700 h-6 sm:grid">
+                    </div>
+
                 </div>
             </div>
 
