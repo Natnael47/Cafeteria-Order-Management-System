@@ -13,6 +13,7 @@ const FoodItem = ({ id, name, price, description, image }) => {
                     className="w-full rounded-t-[15px]"
                     src={`${backendUrl || ''}/images/${image || ''}`}
                     alt={name}
+
                 />
                 {!cartItems?.[id] ? (
                     <img
@@ -49,7 +50,7 @@ const FoodItem = ({ id, name, price, description, image }) => {
                     />
                 </div>
                 <p className="text-black text-[14px]">{description}</p>
-                <p className="text-black text-[22px] font-medium my-[10px]">${price}</p>
+                <p className="text-black text-[22px] font-medium my-[10px]">{price} Birr</p>
             </div>
         </div>
     );
