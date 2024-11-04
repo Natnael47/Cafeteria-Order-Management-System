@@ -289,13 +289,13 @@ const List = () => {
                                         <div className="flex justify-end mt-4">
                                             <button
                                                 onClick={cancelEdit}
-                                                className="bg-gray-300 px-4 py-2 rounded mr-2"
+                                                className="bg-gray-300 px-4 py-2 rounded mr-2 hover:bg-gray-400"
                                             >
                                                 Cancel
                                             </button>
                                             <button
                                                 onClick={updateFood}
-                                                className="bg-blue-500 text-white px-4 py-2 rounded"
+                                                className="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600"
                                             >
                                                 Save Changes
                                             </button>
@@ -321,13 +321,13 @@ const List = () => {
                 <div className="mt-4 flex justify-end">
                     <button
                         onClick={closeModal}
-                        className="bg-gray-300 px-4 py-2 rounded mr-2"
+                        className="bg-gray-300 px-4 py-2 rounded mr-2 hover:bg-gray-400"
                     >
                         Cancel
                     </button>
                     <button
                         onClick={removeFood}
-                        className="bg-red-500 text-white px-4 py-2 rounded"
+                        className="bg-red-500 text-white px-4 py-2 rounded hover:bg-red-600"
                     >
                         Delete
                     </button>
