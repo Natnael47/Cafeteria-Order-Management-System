@@ -1,12 +1,12 @@
 import axios from "axios";
-import React, { useContext, useEffect, useRef, useState } from 'react';
-import Modal from 'react-modal';
+import React, { useContext, useEffect, useRef, useState } from "react";
+import Modal from "react-modal";
 import { toast } from "react-toastify";
 import { backendUrl } from "../App";
 import { assets } from "../assets/assets";
 import { AdminContext } from "../context/AdminContext";
 
-Modal.setAppElement('#root'); // Set the root element for accessibility
+Modal.setAppElement("#root"); // Set the root element for accessibility
 
 const List = () => {
     const { token } = useContext(AdminContext);
@@ -14,13 +14,21 @@ const List = () => {
     const [modalIsOpen, setModalIsOpen] = useState(false);
     const [selectedFoodId, setSelectedFoodId] = useState(null);
     const [editIndex, setEditIndex] = useState(null); // Index of the item being edited
-    const [editFood, setEditFood] = useState({ name: '', category: '', price: '', image: '', description: '' });
+    const [editFood, setEditFood] = useState({
+        name: "",
+        category: "",
+        price: "",
+        image: "",
+        description: "",
+    });
     const [image, setImage] = useState(false); // State for image preview
 
     const editRef = useRef(null); // Create a reference for the editable div
 
     const fetchList = async () => {
-        const response = await axios.get(backendUrl + "/api/food/list", { headers: { token } });
+        const response = await axios.get(backendUrl + "/api/food/list", {
+            headers: { token },
+        });
         if (response.data.success) {
             setList(response.data.data);
         } else {
@@ -50,26 +58,35 @@ const List = () => {
 
             // Scroll to and focus on the edit section
             setTimeout(() => {
-                editRef.current?.scrollIntoView({ behavior: "smooth", block: "center" });
+                editRef.current?.scrollIntoView({
+                    behavior: "smooth",
+                    block: "center",
+                });
             }, 100); // Delay slightly to ensure edit section is rendered
         }
     };
 
     const cancelEdit = () => {
         setEditIndex(null); // Clear the edit index
-        setEditFood({ name: '', category: '', price: '', image: '', description: '' });
+        setEditFood({
+            name: "",
+            category: "",
+            price: "",
+            image: "",
+            description: "",
+        });
         setImage(false); // Reset image state
     };
 
     const handleInputChange = (e) => {
         const { name, value } = e.target;
-        setEditFood(prevState => ({ ...prevState, [name]: value }));
+        setEditFood((prevState) => ({ ...prevState, [name]: value }));
     };
 
     const handleImageChange = (e) => {
         const file = e.target.files[0];
         setImage(file);
-        setEditFood(prevState => ({ ...prevState, image: file }));
+        setEditFood((prevState) => ({ ...prevState, image: file }));
     };
 
     const updateFood = async () => {
@@ -84,12 +101,16 @@ const List = () => {
         }
 
         try {
-            const response = await axios.post(backendUrl + "/api/food/update", formData, {
-                headers: {
-                    token,
-                    'Content-Type': 'multipart/form-data'
+            const response = await axios.post(
+                backendUrl + "/api/food/update",
+                formData,
+                {
+                    headers: {
+                        token,
+                        "Content-Type": "multipart/form-data",
+                    },
                 }
-            });
+            );
             if (response.data.success) {
                 toast.success("Food Updated");
                 fetchList();
@@ -104,7 +125,11 @@ const List = () => {
     };
 
     const removeFood = async () => {
-        const response = await axios.post(backendUrl + "/api/food/remove", { id: selectedFoodId }, { headers: { token } });
+        const response = await axios.post(
+            backendUrl + "/api/food/remove",
+            { id: selectedFoodId },
+            { headers: { token } }
+        );
         await fetchList();
         closeModal();
         if (response.data.success) {
@@ -134,85 +159,125 @@ const List = () => {
                     {list.map((item, index) => (
                         <div key={index}>
                             <div className="grid grid-cols-[0.5fr_0.9fr_0.8fr_0.8fr_0.5fr_0.5fr] items-center gap-2 p-3 border border-black text-sm font-medium bg-white sm:grid">
-                                <img src={backendUrl + "/images/" + item.image} alt="" className="w-20" />
+                                <img
+                                    src={backendUrl + "/images/" + item.image}
+                                    alt=""
+                                    className="w-20"
+                                />
                                 <p>{item.name}</p>
                                 <p>{item.category}</p>
                                 <p>${item.price}</p>
-                                <p onClick={() => openModal(item.id)} className="cursor-pointer pl-1">
-                                    <img src={assets.trash_icon} alt="" className="w-7 ml-2 hover:scale-125 transition-transform" />
+                                <p
+                                    onClick={() => openModal(item.id)}
+                                    className="cursor-pointer pl-1"
+                                >
+                                    <img
+                                        src={assets.trash_icon}
+                                        alt=""
+                                        className="w-7 ml-2 hover:scale-125 transition-transform"
+                                    />
                                 </p>
-                                <p className="cursor-pointer pl-1" onClick={() => handleEditClick(item, index)}>
-                                    <img src={assets.modify_icon} alt="" className="w-7 ml-2 hover:scale-125 transition-transform" />
+                                <p
+                                    className="cursor-pointer pl-1"
+                                    onClick={() => handleEditClick(item, index)}
+                                >
+                                    <img
+                                        src={assets.modify_icon}
+                                        alt=""
+                                        className="w-7 ml-2 hover:scale-125 transition-transform"
+                                    />
                                 </p>
                             </div>
 
                             {/* Editable form for the selected item */}
                             {editIndex === index && (
-                                <div ref={editRef} className="bg-white p-5 rounded shadow-md mt-2 mb-3 border-2 border-gray-600">
+                                <div
+                                    ref={editRef}
+                                    className="bg-white p-5 rounded shadow-md mt-2 mb-3 border-2 border-gray-600"
+                                >
                                     <h2 className="text-lg font-semibold mb-4">Edit Food</h2>
 
                                     <div>
                                         <div className="flex flex-row mb-4 mt-3 gap-8">
                                             <div className="add-img-upload flex-col">
-                                                <p className='mb-1'>Upload Image</p>
-                                                <label htmlFor='image' className="flex items-center justify-center w-40 h-30 border-2 border-gray-500 rounded mb-2 cursor-pointer overflow-hidden">
+                                                <p className="mb-1">Upload Image</p>
+                                                <label
+                                                    htmlFor="image"
+                                                    className="flex items-center justify-center w-40 h-30 border-2 border-gray-500 rounded mb-2 cursor-pointer overflow-hidden"
+                                                >
                                                     <img
                                                         className="w-40 object-cover"
-                                                        src={image ? URL.createObjectURL(image) : backendUrl + "/images/" + editFood.image}
-                                                        alt=''
+                                                        src={
+                                                            image
+                                                                ? URL.createObjectURL(image)
+                                                                : backendUrl + "/images/" + editFood.image
+                                                        }
+                                                        alt=""
                                                     />
                                                 </label>
                                                 <input
                                                     onChange={handleImageChange}
-                                                    type='file'
-                                                    id='image'
+                                                    type="file"
+                                                    id="image"
                                                     hidden
                                                     accept="image/*"
                                                 />
                                             </div>
-                                            <div className="mb-4">
-                                                <label className="block text-sm font-medium mb-1">Price</label>
-                                                <input
-                                                    type="number"
-                                                    name="price"
-                                                    value={editFood.price}
-                                                    onChange={handleInputChange}
-                                                    className="w-full border p-2 rounded"
-                                                />
-                                            </div>
-                                            <div className="mb-4">
-                                                <p className="block text-sm font-medium mb-1">Category</p>
-                                                <select
-                                                    className="w-full px-3 py-2 border rounded"
-                                                    onChange={handleInputChange}
-                                                    value={editFood.category}
-                                                    name='category'
-                                                >
-                                                    <option value="Salad">Salad</option>
-                                                    <option value="Rolls">Rolls</option>
-                                                    <option value="Deserts">Deserts</option>
-                                                    <option value="Sandwich">Sandwich</option>
-                                                    <option value="Cake">Cake</option>
-                                                    <option value="Pure Veg">Pure Veg</option>
-                                                    <option value="Pasta">Pasta</option>
-                                                    <option value="Noodles">Noodles</option>
-                                                </select>
+
+                                            <div className="flex flex-col">
+                                                <div className="flex flex-row mb-4 gap-8">
+                                                    <div className="mb-2">
+                                                        <label className="block text-sm font-medium mb-1">
+                                                            Price
+                                                        </label>
+                                                        <input
+                                                            type="number"
+                                                            name="price"
+                                                            value={editFood.price}
+                                                            onChange={handleInputChange}
+                                                            className="w-full border p-2 rounded"
+                                                        />
+                                                    </div>
+                                                    <div className="mb-2">
+                                                        <p className="block text-sm font-medium mb-1">
+                                                            Category
+                                                        </p>
+                                                        <select
+                                                            className="w-full px-3 py-2 border rounded"
+                                                            onChange={handleInputChange}
+                                                            value={editFood.category}
+                                                            name="category"
+                                                        >
+                                                            <option value="Salad">Salad</option>
+                                                            <option value="Rolls">Rolls</option>
+                                                            <option value="Deserts">Deserts</option>
+                                                            <option value="Sandwich">Sandwich</option>
+                                                            <option value="Cake">Cake</option>
+                                                            <option value="Pure Veg">Pure Veg</option>
+                                                            <option value="Pasta">Pasta</option>
+                                                            <option value="Noodles">Noodles</option>
+                                                        </select>
+                                                    </div>
+                                                </div>
+                                                <div className="mb-1">
+                                                    <label className="block text-sm font-medium mb-1">
+                                                        Name
+                                                    </label>
+                                                    <input
+                                                        type="text"
+                                                        name="name"
+                                                        value={editFood.name}
+                                                        onChange={handleInputChange}
+                                                        className="w-full border p-2 rounded"
+                                                    />
+                                                </div>
                                             </div>
                                         </div>
 
                                         <div className="mb-4">
-                                            <label className="block text-sm font-medium mb-1">Name</label>
-                                            <input
-                                                type="text"
-                                                name="name"
-                                                value={editFood.name}
-                                                onChange={handleInputChange}
-                                                className="w-full border p-2 rounded"
-                                            />
-                                        </div>
-
-                                        <div className="mb-4">
-                                            <label className="block text-sm font-medium mb-1">Description</label>
+                                            <label className="block text-sm font-medium mb-1">
+                                                Description
+                                            </label>
                                             <textarea
                                                 name="description"
                                                 value={editFood.description}
@@ -254,12 +319,22 @@ const List = () => {
                 <h2 className="text-lg font-semibold">Confirm Delete</h2>
                 <p>Are you sure you want to delete this item?</p>
                 <div className="mt-4 flex justify-end">
-                    <button onClick={closeModal} className="bg-gray-300 px-4 py-2 rounded mr-2">Cancel</button>
-                    <button onClick={removeFood} className="bg-red-500 text-white px-4 py-2 rounded">Delete</button>
+                    <button
+                        onClick={closeModal}
+                        className="bg-gray-300 px-4 py-2 rounded mr-2"
+                    >
+                        Cancel
+                    </button>
+                    <button
+                        onClick={removeFood}
+                        className="bg-red-500 text-white px-4 py-2 rounded"
+                    >
+                        Delete
+                    </button>
                 </div>
             </Modal>
         </div>
     );
-}
+};
 
 export default List;
