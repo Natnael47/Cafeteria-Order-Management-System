@@ -76,12 +76,6 @@ const Feedback = () => {
                                 )}
                             </p>
 
-                            {expandedComment === index && (
-                                <div className="overflow-auto max-h-24 text-sm text-gray-600 leading-relaxed mt-2">
-                                    {feedback.comment}
-                                </div>
-                            )}
-
                             <div className="flex justify-center mt-2.5 space-x-1 text-yellow-500 text-xl">
                                 {Array.from({ length: Math.round(feedback.rating) }).map((_, i) => (
                                     <span key={i}>⭐</span>
