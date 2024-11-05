@@ -33,6 +33,7 @@ a {
 .app {
   width: 80%;
   margin: auto;
+  margin-top: 120px;
 }
 
 @keyframes fadein {

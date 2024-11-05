@@ -7,17 +7,15 @@ export const Navbar = ({ setShowLogin, setShowFeedback }) => {
     const location = useLocation();
     const { getTotalCartAmount, token, setToken, navigate, setShowSearch, getCartItems } = useContext(StoreContext);
 
-    // State to track the current active menu item
     const [menu, setMenu] = useState("");
 
     useEffect(() => {
-        // Set the active menu item based on the current path
         const path = location.pathname;
         if (path === "/") setMenu("home");
         else if (path === "/menu") setMenu("menu");
         else if (path === "/about") setMenu("about");
         else if (path === "/contact") setMenu("contact-us");
-        else setMenu(""); // Clear underline if on an unrelated page
+        else setMenu("");
     }, [location.pathname]);
 
     const logout = () => {
@@ -36,7 +34,7 @@ export const Navbar = ({ setShowLogin, setShowFeedback }) => {
     };
 
     return (
-        <div className="flex justify-between items-center py-5">
+        <div className="fixed top-0 w-full bg-[#F0F9F1] z-50 shadow-md flex justify-between items-center py-5 px-4">
             <Link to='/'>
                 <img src={assets.logo2} alt="Logo" className="w-[150px] md:w-[120px] lg:w-[150px]" />
             </Link>

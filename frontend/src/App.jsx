@@ -28,8 +28,10 @@ const App = () => {
       <ToastContainer /> {/* Single ToastContainer placed here */}
       {showLogin && <LoginPopUp setShowLogin={setShowLogin} />}
       {showFeedback && <FeedbackPopUp setShowFeedback={setShowFeedback} />}
+
+      <Navbar setShowLogin={setShowLogin} setShowFeedback={setShowFeedback} />
+
       <div className="app">
-        <Navbar setShowLogin={setShowLogin} setShowFeedback={setShowFeedback} />
         <SearchBar />
         <Routes>
           <Route path='/' element={<Home />} />
@@ -43,6 +45,7 @@ const App = () => {
           <Route path="/contact" element={<Contact />} />
         </Routes>
       </div>
+
       <Footer />
     </>
   );
