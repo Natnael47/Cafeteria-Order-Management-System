@@ -8,6 +8,7 @@ export const Navbar = ({ setShowLogin, setShowFeedback }) => {
     const { getTotalCartAmount, token, setToken, navigate, setShowSearch, getCartItems } = useContext(StoreContext);
 
     const [menu, setMenu] = useState("");
+    const [hasShadow, setHasShadow] = useState(false); // New state for shadow
 
     useEffect(() => {
         const path = location.pathname;
@@ -17,6 +18,20 @@ export const Navbar = ({ setShowLogin, setShowFeedback }) => {
         else if (path === "/contact") setMenu("contact-us");
         else setMenu("");
     }, [location.pathname]);
+
+    useEffect(() => {
+        // Event listener to toggle shadow on scroll
+        const handleScroll = () => {
+            if (window.scrollY > 50) {
+                setHasShadow(true);
+            } else {
+                setHasShadow(false);
+            }
+        };
+
+        window.addEventListener("scroll", handleScroll);
+        return () => window.removeEventListener("scroll", handleScroll);
+    }, []);
 
     const logout = () => {
         localStorage.removeItem("token");
@@ -34,7 +49,7 @@ export const Navbar = ({ setShowLogin, setShowFeedback }) => {
     };
 
     return (
-        <div className="fixed top-0 w-full bg-[#F0F9F1] z-50 shadow-md flex justify-between items-center py-5 px-4">
+        <div className={`fixed top-0 w-full bg-[#F0F9F1] z-50 transition-shadow duration-300 ${hasShadow ? 'shadow-md' : ''} flex justify-between items-center py-5 px-4`}>
             <Link to='/'>
                 <img src={assets.logo2} alt="Logo" className="w-[150px] md:w-[120px] lg:w-[150px]" />
             </Link>
