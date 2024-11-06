@@ -1,6 +1,7 @@
 import express from "express";
 import {
   employee_Profile,
+  get_Single_Employee_Profile,
   login_Barista,
   login_Chef,
   update_Employee_Profile,
@@ -15,5 +16,6 @@ employeeRoute.post("/login-barista", login_Barista);
 //mongos
 employeeRoute.get("/profile", empAuth, employee_Profile);
 employeeRoute.post("/update-profile", update_Employee_Profile);
+employeeRoute.get("/employee-profile/:empId", get_Single_Employee_Profile);
 
 export default employeeRoute;
