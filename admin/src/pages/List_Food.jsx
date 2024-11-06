@@ -6,14 +6,14 @@ import { backendUrl } from "../App";
 import { assets } from "../assets/assets";
 import { AdminContext } from "../context/AdminContext";
 
-Modal.setAppElement("#root"); // Set the root element for accessibility
+Modal.setAppElement("#root");
 
 const List = () => {
     const { token } = useContext(AdminContext);
     const [list, setList] = useState([]);
     const [modalIsOpen, setModalIsOpen] = useState(false);
     const [selectedFoodId, setSelectedFoodId] = useState(null);
-    const [editIndex, setEditIndex] = useState(null); // Index of the item being edited
+    const [editIndex, setEditIndex] = useState(null);
     const [editFood, setEditFood] = useState({
         name: "",
         category: "",
@@ -21,9 +21,11 @@ const List = () => {
         image: "",
         description: "",
     });
-    const [image, setImage] = useState(false); // State for image preview
+    const [originalFood, setOriginalFood] = useState(null);
+    const [image, setImage] = useState(false);
+    const [hasChanges, setHasChanges] = useState(false);
 
-    const editRef = useRef(null); // Create a reference for the editable div
+    const editRef = useRef(null);
 
     const fetchList = async () => {
         const response = await axios.get(backendUrl + "/api/food/list", {
@@ -48,26 +50,25 @@ const List = () => {
 
     const handleEditClick = (food, index) => {
         if (editIndex === index) {
-            // If the same item is clicked again, cancel edit
             cancelEdit();
         } else {
-            // Otherwise, start editing the clicked item
             setEditFood({ ...food });
-            setEditIndex(index); // Set the index of the item being edited
-            setImage(false); // Reset image state for each new edit
+            setOriginalFood({ ...food });
+            setEditIndex(index);
+            setImage(false);
+            setHasChanges(false);
 
-            // Scroll to and focus on the edit section
             setTimeout(() => {
                 editRef.current?.scrollIntoView({
                     behavior: "smooth",
                     block: "center",
                 });
-            }, 100); // Delay slightly to ensure edit section is rendered
+            }, 100);
         }
     };
 
     const cancelEdit = () => {
-        setEditIndex(null); // Clear the edit index
+        setEditIndex(null);
         setEditFood({
             name: "",
             category: "",
@@ -75,18 +76,36 @@ const List = () => {
             image: "",
             description: "",
         });
-        setImage(false); // Reset image state
+        setOriginalFood(null);
+        setImage(false);
+        setHasChanges(false);
+    };
+
+    const isEqual = (obj1, obj2) => {
+        return JSON.stringify(obj1) === JSON.stringify(obj2);
+    };
+
+    const checkForChanges = (newData) => {
+        setHasChanges(!isEqual(originalFood, newData));
     };
 
     const handleInputChange = (e) => {
         const { name, value } = e.target;
-        setEditFood((prevState) => ({ ...prevState, [name]: value }));
+        setEditFood((prevState) => {
+            const updatedFood = { ...prevState, [name]: value };
+            checkForChanges(updatedFood);
+            return updatedFood;
+        });
     };
 
     const handleImageChange = (e) => {
         const file = e.target.files[0];
         setImage(file);
-        setEditFood((prevState) => ({ ...prevState, image: file }));
+        setEditFood((prevState) => {
+            const updatedFood = { ...prevState, image: file };
+            checkForChanges(updatedFood);
+            return updatedFood;
+        });
     };
 
     const updateFood = async () => {
@@ -189,7 +208,6 @@ const List = () => {
                                 </p>
                             </div>
 
-                            {/* Editable form for the selected item */}
                             {editIndex === index && (
                                 <div
                                     ref={editRef}
@@ -239,14 +257,14 @@ const List = () => {
                                                         />
                                                     </div>
                                                     <div className="mb-2">
-                                                        <p className="block text-sm font-medium mb-1">
+                                                        <label className="block text-sm font-medium mb-1">
                                                             Category
-                                                        </p>
+                                                        </label>
                                                         <select
-                                                            className="w-full px-3 py-2 border rounded"
-                                                            onChange={handleInputChange}
-                                                            value={editFood.category}
                                                             name="category"
+                                                            value={editFood.category}
+                                                            onChange={handleInputChange}
+                                                            className="w-full border p-2 rounded"
                                                         >
                                                             <option value="Salad">Salad</option>
                                                             <option value="Rolls">Rolls</option>
@@ -259,7 +277,8 @@ const List = () => {
                                                         </select>
                                                     </div>
                                                 </div>
-                                                <div className="mb-1">
+
+                                                <div className="mb-2">
                                                     <label className="block text-sm font-medium mb-1">
                                                         Name
                                                     </label>
@@ -295,7 +314,8 @@ const List = () => {
                                             </button>
                                             <button
                                                 onClick={updateFood}
-                                                className="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600"
+                                                disabled={!hasChanges} // Disable if no changes
+                                                className={`px-4 py-2 rounded ${hasChanges ? "bg-blue-500 text-white hover:bg-blue-600" : "bg-gray-300 cursor-not-allowed"}`}
                                             >
                                                 Save Changes
                                             </button>
@@ -306,13 +326,10 @@ const List = () => {
                         </div>
                     ))}
 
-                    <div className="bg-gray-700 h-6 sm:grid">
-                    </div>
-
+                    <div className="bg-gray-700 h-6 sm:grid"></div>
                 </div>
             </div>
 
-            {/* Modal for delete confirmation */}
             <Modal
                 isOpen={modalIsOpen}
                 onRequestClose={closeModal}
