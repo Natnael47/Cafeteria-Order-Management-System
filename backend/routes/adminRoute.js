@@ -31,7 +31,6 @@ adminRouter.post(
 adminRouter.get("/dashboard", adminAuth, adminDashboard);
 adminRouter.post("/login", adminLogin);
 adminRouter.post("/get-employees", adminAuth, allEmployees);
-
-adminRouter.get("/employee/:employeeId", employee_Profile);
+adminRouter.get("/employee-profile/:empId", adminAuth, employee_Profile);
 
 export default adminRouter;

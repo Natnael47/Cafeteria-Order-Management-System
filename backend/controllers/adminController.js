@@ -188,12 +188,18 @@ const allEmployees = async (req, res) => {
 
 // API to get employee profile by employeeId from URL
 const employee_Profile = async (req, res) => {
-  const { employeeId } = req.params; // Fetch employeeId from URL parameters
+  const { empId } = req.params; // Fetching empId from URL parameters
+
+  if (!empId || isNaN(empId)) {
+    return res
+      .status(400)
+      .json({ success: false, message: "Invalid Employee ID" });
+  }
 
   try {
-    // Fetching employee data from the database using Prisma
-    const profileData = await prisma.employee.findUnique({
-      where: { id: Number(employeeId) }, // Convert employeeId to number if needed
+    // Ensure empId is a number
+    const employeeProfile = await prisma.employee.findUnique({
+      where: { id: parseInt(empId) }, // Convert empId to an integer
       select: {
         id: true,
         firstName: true,
@@ -214,16 +220,16 @@ const employee_Profile = async (req, res) => {
     });
 
     // Check if employee data exists
-    if (!profileData) {
+    if (!employeeProfile) {
       return res
         .status(404)
         .json({ success: false, message: "Employee not found" });
     }
 
     // Respond with success and employee data
-    res.json({ success: true, profileData });
+    res.json({ success: true, employeeProfile });
   } catch (error) {
-    console.error("Error fetching employee profile:", error);
+    console.log("Error fetching employee profile:", error);
     res.status(500).json({ success: false, message: "Internal server error" });
   }
 };

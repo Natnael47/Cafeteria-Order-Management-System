@@ -28,7 +28,7 @@ const AdminContextProvider = (props) => {
 
     const getEmployeeData = useCallback(async (empId) => {
         try {
-            const { data } = await axios.get(`${backendUrl}/api/employee/employee-profile/${empId}`);
+            const { data } = await axios.get(`${backendUrl}/api/admin/employee-profile/${empId}`, { headers: { token } });
             if (data.success) {
                 setEmployeeProfile(data.employeeProfile);
                 console.log(data.employeeProfile);
