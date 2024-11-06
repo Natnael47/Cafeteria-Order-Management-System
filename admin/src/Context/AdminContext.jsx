@@ -9,13 +9,18 @@ export const AdminContext = createContext();
 const AdminContextProvider = (props) => {
     const navigate = useNavigate();
 
-    const [token, setToken] = useState(localStorage.getItem('token') ? localStorage.getItem('token') : '');
+    const [token, setToken] = useState(localStorage.getItem('token') || '');
     const [employees, setEmployees] = useState([]);
-    const [employeeProfile, setEmployeeProfile] = useState([]);
+    const [employeeProfile, setEmployeeProfile] = useState({}); // Initialize as an object
 
     const getAllEmployees = async () => {
         try {
-            const { data } = await axios.post(backendUrl + '/api/admin/get-employees', {}, { headers: { token } });
+            if (!token) return; // Ensure token exists
+            const { data } = await axios.post(
+                `${backendUrl}/api/admin/get-employees`,
+                {},
+                { headers: { token } }
+            );
             if (data.success) {
                 setEmployees(data.employees);
             } else {
@@ -26,25 +31,34 @@ const AdminContextProvider = (props) => {
         }
     };
 
-    const getEmployeeData = useCallback(async (empId) => {
-        try {
-            const { data } = await axios.get(`${backendUrl}/api/admin/employee-profile/${empId}`, { headers: { token } });
-            if (data.success) {
-                setEmployeeProfile(data.employeeProfile);
-                console.log(data.employeeProfile);
-            } else {
-                toast.error(data.message);
+    const getEmployeeData = useCallback(
+        async (empId) => {
+            try {
+                if (!token) return; // Ensure token exists
+                const { data } = await axios.get(
+                    `${backendUrl}/api/admin/employee-profile/${empId}`,
+                    { headers: { token } }
+                );
+                if (data.success) {
+                    setEmployeeProfile(data.employeeProfile);
+                } else {
+                    toast.error(data.message);
+                }
+            } catch (error) {
+                toast.error(error.message);
             }
-        } catch (error) {
-            toast.error(error.message);
-        }
-    }, []); // Use an empty dependency array to memoize the function
+        },
+        [token] // Add token as a dependency
+    );
 
     const value = {
-        token, setToken,
+        token,
+        setToken,
         navigate,
-        employees, getAllEmployees,
-        employeeProfile, getEmployeeData
+        employees,
+        getAllEmployees,
+        employeeProfile,
+        getEmployeeData,
     };
 
     return (
