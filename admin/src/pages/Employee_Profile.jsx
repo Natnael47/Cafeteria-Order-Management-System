@@ -1,3 +1,4 @@
+import axios from 'axios';
 import React, { useContext, useEffect, useState } from 'react';
 import { useParams } from 'react-router-dom';
 import { backendUrl } from '../App';
@@ -5,17 +6,19 @@ import { AdminContext } from '../context/AdminContext';
 
 const Employee_Profile = () => {
     const { employeeId } = useParams();
-    const { getEmployeeData, employeeProfile } = useContext(AdminContext);
+    const { getEmployeeData, employeeProfile, token } = useContext(AdminContext);
 
     const [isEditing, setIsEditing] = useState(false);
     const [formData, setFormData] = useState({});
 
+    // Fetch employee data when employeeId changes
     useEffect(() => {
         if (employeeId) {
             getEmployeeData(employeeId);
         }
     }, [employeeId, getEmployeeData]);
 
+    // Update form data when employee profile changes
     useEffect(() => {
         if (employeeProfile) {
             setFormData(employeeProfile);
@@ -24,19 +27,62 @@ const Employee_Profile = () => {
 
     if (!employeeProfile) return <p>Loading...</p>;
 
+    // Handle changes in simple input fields
     const handleInputChange = (e) => {
         const { name, value } = e.target;
-        setFormData({ ...formData, [name]: value });
+        setFormData((prev) => ({
+            ...prev,
+            [name]: value,
+        }));
     };
 
+    // Handle changes in nested address fields
+    const handleAddressChange = (e) => {
+        const { name, value } = e.target;
+        setFormData((prev) => ({
+            ...prev,
+            address: {
+                ...prev.address,
+                [name]: value,
+            },
+        }));
+    };
+
+    // Toggle between edit and view mode
     const handleEditToggle = () => {
         setIsEditing(!isEditing);
     };
 
-    const handleSave = (e) => {
+    // Save updated profile data to backend
+    const handleSave = async (e) => {
         e.preventDefault();
-        // Save changes logic here
-        setIsEditing(false);
+
+        try {
+            // Prepare form data for submission
+            const form = new FormData();
+            Object.keys(formData).forEach((key) => {
+                if (key === "address" && typeof formData[key] === "object") {
+                    form.append(key, JSON.stringify(formData[key]));
+                } else {
+                    form.append(key, formData[key]);
+                }
+            });
+
+            // Append image file if it is a File object
+            if (formData.image instanceof File) {
+                form.append("image", formData.image);
+            }
+
+            // Send POST request to update employee data
+            await axios.post(`${backendUrl}/api/admin/update-employee`, form, {
+                headers: { token: token },
+            });
+
+            setIsEditing(false);
+            getEmployeeData(employeeId); // Refresh employee data after update
+        } catch (error) {
+            console.error("Error updating employee profile:", error);
+        }
     };
 
     return (
@@ -44,11 +90,11 @@ const Employee_Profile = () => {
             <p className="mb-3 text-lg font-semibold">Employee Profile</p>
             <div className="bg-white px-8 py-8 border rounded w-full max-w-5xl max-h-[88vh] overflow-scroll">
                 {isEditing ? (
-                    <form onSubmit={handleSave} className='text-gray-600'>
-                        <div className='flex items-center gap-4 mb-8'>
+                    <form onSubmit={handleSave} className="text-gray-600">
+                        <div className="flex items-center gap-4 mb-8">
                             <label htmlFor="emp-img">
                                 <img
-                                    className='w-16 rounded-full cursor-pointer'
+                                    className="w-16 rounded-full cursor-pointer"
                                     src={
                                         formData.image instanceof File
                                             ? URL.createObjectURL(formData.image)
@@ -56,19 +102,18 @@ const Employee_Profile = () => {
                                     }
                                     alt="Employee"
                                 />
-
                             </label>
                             <input
                                 onChange={(e) => setFormData({ ...formData, image: e.target.files[0] })}
                                 type="file"
-                                id='emp-img'
+                                id="emp-img"
                                 hidden
                             />
                             <input
                                 onChange={handleInputChange}
                                 name="firstName"
                                 value={formData.firstName || ''}
-                                className='border rounded px-3 py-2'
+                                className="border rounded px-3 py-2"
                                 placeholder="First Name"
                                 required
                             />
@@ -76,28 +121,27 @@ const Employee_Profile = () => {
                                 onChange={handleInputChange}
                                 name="lastName"
                                 value={formData.lastName || ''}
-                                className='border rounded px-3 py-2'
+                                className="border rounded px-3 py-2"
                                 placeholder="Last Name"
                                 required
                             />
                         </div>
 
-                        {/* Edit Fields (Personal and Professional) */}
-                        <div className='grid grid-cols-1 lg:grid-cols-2 gap-8'>
+                        <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
                             <div>
                                 <h3 className="font-semibold">Personal Information</h3>
                                 <input
                                     onChange={handleInputChange}
                                     name="gender"
                                     value={formData.gender || ''}
-                                    className='border rounded px-3 py-2'
+                                    className="border rounded px-3 py-2"
                                     placeholder="Gender"
                                 />
                                 <input
                                     onChange={handleInputChange}
                                     name="email"
                                     value={formData.email || ''}
-                                    className='border rounded px-3 py-2'
+                                    className="border rounded px-3 py-2"
                                     placeholder="Email"
                                     type="email"
                                 />
@@ -105,21 +149,21 @@ const Employee_Profile = () => {
                                     onChange={handleInputChange}
                                     name="phone"
                                     value={formData.phone || ''}
-                                    className='border rounded px-3 py-2'
+                                    className="border rounded px-3 py-2"
                                     placeholder="Phone"
                                 />
                                 <input
-                                    onChange={handleInputChange}
-                                    name="address1"
+                                    onChange={handleAddressChange}
+                                    name="line1"
                                     value={formData.address?.line1 || ''}
-                                    className='border rounded px-3 py-2'
+                                    className="border rounded px-3 py-2"
                                     placeholder="Address Line 1"
                                 />
                                 <input
-                                    onChange={handleInputChange}
-                                    name="address2"
+                                    onChange={handleAddressChange}
+                                    name="line2"
                                     value={formData.address?.line2 || ''}
-                                    className='border rounded px-3 py-2 mt-2'
+                                    className="border rounded px-3 py-2 mt-2"
                                     placeholder="Address Line 2"
                                 />
                             </div>
@@ -129,14 +173,14 @@ const Employee_Profile = () => {
                                     onChange={handleInputChange}
                                     name="experience"
                                     value={formData.experience || ''}
-                                    className='border rounded px-3 py-2'
+                                    className="border rounded px-3 py-2"
                                     placeholder="Experience"
                                 />
                                 <input
                                     onChange={handleInputChange}
                                     name="salary"
                                     value={formData.salary || ''}
-                                    className='border rounded px-3 py-2'
+                                    className="border rounded px-3 py-2"
                                     placeholder="Salary"
                                     type="number"
                                 />
@@ -144,14 +188,14 @@ const Employee_Profile = () => {
                                     onChange={handleInputChange}
                                     name="shift"
                                     value={formData.shift || ''}
-                                    className='border rounded px-3 py-2'
+                                    className="border rounded px-3 py-2"
                                     placeholder="Shift"
                                 />
                                 <input
                                     onChange={handleInputChange}
                                     name="education"
                                     value={formData.education || ''}
-                                    className='border rounded px-3 py-2'
+                                    className="border rounded px-3 py-2"
                                     placeholder="Education"
                                 />
                             </div>
@@ -161,11 +205,13 @@ const Employee_Profile = () => {
                             onChange={handleInputChange}
                             name="about"
                             value={formData.about || ''}
-                            className='w-full px-4 pt-2 border rounded mt-4'
+                            className="w-full px-4 pt-2 border rounded mt-4"
                             placeholder="About"
                             rows={5}
                         />
-                        <button type="submit" className='bg-black px-6 py-2 mt-4 text-white rounded-md'>Save Changes</button>
+                        <button type="submit" className="bg-black px-6 py-2 mt-4 text-white rounded-md">
+                            Save Changes
+                        </button>
                     </form>
                 ) : (
                     <div>
@@ -203,7 +249,7 @@ const Employee_Profile = () => {
                         </div>
                     </div>
                 )}
-                <button onClick={handleEditToggle} className='bg-black px-6 py-2 mt-4 text-white rounded-md'>
+                <button onClick={handleEditToggle} className="bg-black px-6 py-2 mt-4 text-white rounded-md">
                     {isEditing ? "Cancel Edit" : "Edit Profile"}
                 </button>
             </div>

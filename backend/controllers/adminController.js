@@ -234,10 +234,78 @@ const employee_Profile = async (req, res) => {
   }
 };
 
+// API to Update Employee data
+const updateEmployee = async (req, res) => {
+  try {
+    const employeeId = parseInt(req.body.id, 10);
+    if (isNaN(employeeId)) {
+      return res.json({ success: false, message: "Invalid employee ID" });
+    }
+
+    // Fetch the existing employee data
+    const existingEmployee = await prisma.employee.findUnique({
+      where: { id: employeeId },
+    });
+
+    if (!existingEmployee) {
+      return res.json({ success: false, message: "Employee not found" });
+    }
+
+    // If a new image is uploaded, delete the old one and update the image filename
+    let imageFilename = existingEmployee.image;
+    if (req.file) {
+      // Delete the old image if it exists
+      if (existingEmployee.image) {
+        fs.unlink(`uploads/${existingEmployee.image}`, (fsErr) => {
+          if (fsErr) console.error("Error deleting old image:", fsErr);
+        });
+      }
+      imageFilename = req.file.filename;
+    }
+
+    // Parsing the address JSON if updated
+    const parsedAddress = req.body.address
+      ? JSON.parse(req.body.address)
+      : existingEmployee.address;
+
+    // Update employee data with fallback to existing data if not provided
+    const updatedEmployee = await prisma.employee.update({
+      where: { id: employeeId },
+      data: {
+        firstName: req.body.firstName || existingEmployee.firstName,
+        lastName: req.body.lastName || existingEmployee.lastName,
+        gender: req.body.gender || existingEmployee.gender,
+        email: req.body.email || existingEmployee.email,
+        phone: req.body.phone || existingEmployee.phone,
+        position: req.body.position || existingEmployee.position,
+        shift: req.body.shift || existingEmployee.shift,
+        education: req.body.education || existingEmployee.education,
+        experience: req.body.experience || existingEmployee.experience,
+        salary: req.body.salary
+          ? parseFloat(req.body.salary)
+          : existingEmployee.salary,
+        address: parsedAddress,
+        about: req.body.about || existingEmployee.about,
+        image: imageFilename,
+      },
+    });
+
+    res.json({
+      success: true,
+      message: "Employee updated",
+      data: updatedEmployee,
+    });
+  } catch (error) {
+    console.error("Error updating employee:", error);
+    res.json({ success: false, message: "Error updating employee" });
+  }
+};
+
 export {
   addEmployee,
   adminDashboard,
   adminLogin,
   allEmployees,
   employee_Profile,
+  updateEmployee,
 };

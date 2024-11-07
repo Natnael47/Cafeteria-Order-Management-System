@@ -6,6 +6,7 @@ import {
   adminLogin,
   allEmployees,
   employee_Profile,
+  updateEmployee,
 } from "../controllers/adminController.js";
 import adminAuth from "../middleware/adminAuth.js";
 
@@ -32,5 +33,6 @@ adminRouter.get("/dashboard", adminAuth, adminDashboard);
 adminRouter.post("/login", adminLogin);
 adminRouter.post("/get-employees", adminAuth, allEmployees);
 adminRouter.get("/employee-profile/:empId", adminAuth, employee_Profile);
+adminRouter.post("/update-employee", adminAuth, updateEmployee);
 
 export default adminRouter;
