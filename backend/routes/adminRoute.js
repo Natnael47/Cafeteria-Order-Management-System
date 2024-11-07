@@ -33,6 +33,11 @@ adminRouter.get("/dashboard", adminAuth, adminDashboard);
 adminRouter.post("/login", adminLogin);
 adminRouter.post("/get-employees", adminAuth, allEmployees);
 adminRouter.get("/employee-profile/:empId", adminAuth, employee_Profile);
-adminRouter.post("/update-employee", adminAuth, updateEmployee);
+adminRouter.post(
+  "/update-employee",
+  adminAuth,
+  uploadImg.single("image"),
+  updateEmployee
+);
 
 export default adminRouter;

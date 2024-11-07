@@ -54,6 +54,7 @@ const Employee_Profile = () => {
     };
 
     // Save updated profile data to backend
+    // Save updated profile data to backend
     const handleSave = async (e) => {
         e.preventDefault();
 
@@ -73,6 +74,12 @@ const Employee_Profile = () => {
                 form.append("image", formData.image);
             }
 
+            // Log formData and the FormData object to inspect values
+            console.log("formData:", formData);
+            for (let pair of form.entries()) {
+                console.log(pair[0] + ": " + pair[1]);
+            }
+
             // Send POST request to update employee data
             await axios.post(`${backendUrl}/api/admin/update-employee`, form, {
                 headers: { token: token },
@@ -84,6 +91,7 @@ const Employee_Profile = () => {
             console.error("Error updating employee profile:", error);
         }
     };
+
 
     return (
         <div className="m-5 w-full">
