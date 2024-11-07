@@ -1,4 +1,5 @@
 import bcrypt from "bcryptjs";
+import fs from "fs";
 import jwt from "jsonwebtoken";
 import validator from "validator";
 
@@ -237,38 +238,54 @@ const employee_Profile = async (req, res) => {
 // API to Update Employee data
 const updateEmployee = async (req, res) => {
   try {
+    console.log(req.body);
+    console.log(req.file);
+
     const employeeId = parseInt(req.body.id, 10);
     if (isNaN(employeeId)) {
-      return res.json({ success: false, message: "Invalid employee ID" });
+      return res
+        .status(400)
+        .json({ success: false, message: "Invalid employee ID" });
     }
 
-    // Fetch the existing employee data
+    // Find the existing employee record
     const existingEmployee = await prisma.employee.findUnique({
       where: { id: employeeId },
     });
-
     if (!existingEmployee) {
-      return res.json({ success: false, message: "Employee not found" });
+      return res
+        .status(404)
+        .json({ success: false, message: "Employee not found" });
     }
 
-    // If a new image is uploaded, delete the old one and update the image filename
-    let imageFilename = existingEmployee.image;
+    // Handle image update and deletion
+    let imageFilename = existingEmployee.image; // Keep the current image by default
     if (req.file) {
-      // Delete the old image if it exists
-      if (existingEmployee.image) {
-        fs.unlink(`uploads/${existingEmployee.image}`, (fsErr) => {
-          if (fsErr) console.error("Error deleting old image:", fsErr);
-        });
+      try {
+        // If a new image is uploaded, delete the old one
+        if (existingEmployee.image) {
+          fs.unlinkSync(`uploadsEmp/${existingEmployee.image}`); // Adjust path as needed
+        }
+        imageFilename = req.file.filename; // New image filename
+      } catch (fsErr) {
+        console.error("Error deleting old image:", fsErr);
       }
-      imageFilename = req.file.filename;
     }
 
-    // Parsing the address JSON if updated
-    const parsedAddress = req.body.address
-      ? JSON.parse(req.body.address)
-      : existingEmployee.address;
+    // Parse address safely (with error handling)
+    let parsedAddress;
+    try {
+      parsedAddress = req.body.address
+        ? JSON.parse(req.body.address) // Convert address string to an object
+        : existingEmployee.address; // Keep the old address if not provided
+    } catch (parseErr) {
+      console.error("Error parsing address:", parseErr);
+      return res
+        .status(400)
+        .json({ success: false, message: "Invalid address format" });
+    }
 
-    // Update employee data with fallback to existing data if not provided
+    // Update employee data
     const updatedEmployee = await prisma.employee.update({
       where: { id: employeeId },
       data: {
@@ -286,7 +303,7 @@ const updateEmployee = async (req, res) => {
           : existingEmployee.salary,
         address: parsedAddress,
         about: req.body.about || existingEmployee.about,
-        image: imageFilename,
+        image: imageFilename, // Update image filename
       },
     });
 
@@ -297,7 +314,7 @@ const updateEmployee = async (req, res) => {
     });
   } catch (error) {
     console.error("Error updating employee:", error);
-    res.json({ success: false, message: "Error updating employee" });
+    res.status(500).json({ success: false, message: "Internal server error" });
   }
 };
 
