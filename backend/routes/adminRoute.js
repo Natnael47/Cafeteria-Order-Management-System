@@ -20,13 +20,13 @@ const storage = multer.diskStorage({
   },
 });
 
-const uploadImg = multer({ storage: storage });
+const upload = multer({ storage: storage });
 
 // Existing routes
 adminRouter.post(
   "/add-employee",
   adminAuth,
-  uploadImg.single("image"),
+  upload.single("image"),
   addEmployee
 );
 adminRouter.get("/dashboard", adminAuth, adminDashboard);
@@ -36,7 +36,7 @@ adminRouter.get("/employee-profile/:empId", adminAuth, employee_Profile);
 adminRouter.post(
   "/update-employee",
   adminAuth,
-  uploadImg.single("image"),
+  upload.single("image"),
   updateEmployee
 );
 

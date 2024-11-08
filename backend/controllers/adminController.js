@@ -264,7 +264,7 @@ const updateEmployee = async (req, res) => {
       try {
         // If a new image is uploaded, delete the old one
         if (existingEmployee.image) {
-          fs.unlinkSync(`uploadsEmp/${existingEmployee.image}`); // Adjust path as needed
+          fs.unlink(`uploadsEmp/${existingEmployee.image}`); // Adjust path as needed
         }
         imageFilename = req.file.filename; // New image filename
       } catch (fsErr) {

@@ -187,6 +187,25 @@ const Employee_Profile = () => {
                                         required
                                     />
                                 </div>
+                                <div>
+                                    <label>Address</label>
+                                    <input
+                                        type="text"
+                                        name="line1"
+                                        value={formData.address.line1 || ''}
+                                        onChange={handleAddressChange}
+                                        className="border rounded px-3 py-2 w-full mt-2"
+                                        placeholder="Address Line 1"
+                                    />
+                                    <input
+                                        type="text"
+                                        name="line2"
+                                        value={formData.address.line2 || ''}
+                                        onChange={handleAddressChange}
+                                        className="border rounded px-3 py-2 w-full mt-2"
+                                        placeholder="Address Line 2"
+                                    />
+                                </div>
                             </div>
 
                             <div className="flex flex-col gap-4 w-full lg:flex-1">
@@ -260,26 +279,6 @@ const Employee_Profile = () => {
                                     />
                                 </div>
                             </div>
-                        </div>
-
-                        <div>
-                            <label>Address</label>
-                            <input
-                                type="text"
-                                name="line1"
-                                value={formData.address.line1 || ''}
-                                onChange={handleAddressChange}
-                                className="border rounded px-3 py-2 w-full mt-2"
-                                placeholder="Address Line 1"
-                            />
-                            <input
-                                type="text"
-                                name="line2"
-                                value={formData.address.line2 || ''}
-                                onChange={handleAddressChange}
-                                className="border rounded px-3 py-2 w-full mt-2"
-                                placeholder="Address Line 2"
-                            />
                         </div>
 
                         <div className="flex gap-4 mt-4">
