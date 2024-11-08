@@ -79,10 +79,10 @@ const PlaceOrder = ({ setShowLogin }) => { // Destructure setShowLogin from prop
     useEffect(() => {
         if (!token) {
             setShowLogin(true); // Show login popup if token is missing
-            toast.error("Please log in to place an order.");
+            toast.warn("Please log in to place an order.");
             navigate("/cart"); // Redirect to cart if not signed in
         } else if (getTotalCartAmount() === 0) {
-            toast.error("Select Food to Order");
+            toast.info("Select Food to Order");
             navigate("/menu");
         }
     }, [token, getTotalCartAmount, navigate, setShowLogin]);
