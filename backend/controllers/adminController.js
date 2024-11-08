@@ -238,9 +238,6 @@ const employee_Profile = async (req, res) => {
 // API to Update Employee data
 const updateEmployee = async (req, res) => {
   try {
-    console.log(req.body);
-    console.log(req.file);
-
     const employeeId = parseInt(req.body.id, 10);
     if (isNaN(employeeId)) {
       return res
@@ -264,11 +261,17 @@ const updateEmployee = async (req, res) => {
       try {
         // If a new image is uploaded, delete the old one
         if (existingEmployee.image) {
-          fs.unlink(`uploadsEmp/${existingEmployee.image}`); // Adjust path as needed
+          fs.unlink(`uploadsEmp/${existingEmployee.image}`, (err) => {
+            if (err) {
+              console.error("Error deleting old image:", err);
+            } else {
+              console.log("Old image deleted successfully");
+            }
+          });
         }
         imageFilename = req.file.filename; // New image filename
       } catch (fsErr) {
-        console.error("Error deleting old image:", fsErr);
+        console.error("Error handling file operations:", fsErr);
       }
     }
 
