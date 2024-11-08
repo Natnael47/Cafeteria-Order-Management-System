@@ -12,7 +12,7 @@ const EmployeesList = () => {
     }, [token]);
 
     const handleEmployeeClick = (employeeId) => {
-        navigate(`/employee-profile/${employeeId}`); // Navigate to Employee_Profile page with employeeId
+        navigate(`/employee-profile/${employeeId}`);
     };
 
     return (
@@ -21,15 +21,21 @@ const EmployeesList = () => {
             <div className='w-full flex flex-wrap gap-4 pt-5 gap-y-6'>
                 {employees.map((item) => (
                     <div
-                        className='border border-indigo-200 bg-white rounded-xl max-w-56 overflow-hidden cursor-pointer group hover:scale-105 transition-all'
+                        className='border border-indigo-200 bg-white rounded-xl cursor-pointer group hover:scale-105 transition-all hover:bg-[#DDF7DF] duration-500'
+                        style={{ width: '210px', height: '320px' }} // Fixed size for uniformity
                         key={item.id}
                         onClick={() => handleEmployeeClick(item.id)}
                     >
-                        <img className='bg-indigo-50 group-hover:bg-primary transition-all duration-500' src={backendUrl + "/empIMG/" + item.image} alt="" />
+                        <img
+                            className='w-full h-[160px] object-cover bg-indigo-50 group-hover:bg-[#DDF7DF] transition-all duration-500'
+                            src={`${backendUrl}/empIMG/${item.image}`}
+                            alt=""
+                        />
+
                         <div className='p-4'>
-                            <p className='text-neutral-800 text-lg font-medium'>{item.firstName + " " + item.lastName}</p>
-                            <p className='text-zinc-600 text-sm'>{item.position}</p>
-                            <p className='text-zinc-600 text-sm'>Shift :{" " + item.shift}</p>
+                            <p className='text-neutral-800 text-lg font-medium truncate'>{item.firstName + " " + item.lastName}</p>
+                            <p className='text-zinc-600 text-sm truncate'>{item.position}</p>
+                            <p className='text-zinc-600 text-sm truncate'>Shift: {item.shift}</p>
                         </div>
                     </div>
                 ))}
