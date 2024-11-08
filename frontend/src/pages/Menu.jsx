@@ -2,11 +2,14 @@ import React, { useContext, useState } from 'react';
 import FoodItem from '../components/FoodItem';
 import { StoreContext } from '../context/StoreContext';
 
-
 const Menu = () => {
-
     const [category, setCategory] = useState("All");
     const { food_list } = useContext(StoreContext);
+
+    const handleCategoryClick = (cat) => {
+        // If the clicked category is already selected, reset to "All"
+        setCategory(prevCategory => (prevCategory === cat ? "All" : cat));
+    };
 
     return (
         <div>
@@ -25,7 +28,7 @@ const Menu = () => {
                     {["All", "Salad", "Rolls", "Deserts", "Sandwich", "Cake", "Pure Veg", "Pasta", "Noodles"].map((cat) => (
                         <p
                             key={cat}
-                            onClick={() => setCategory(cat)} // Set category on click
+                            onClick={() => handleCategoryClick(cat)} // Set category on click, or reset to "All"
                             className={`w-[94vw sm:w-auto pl-3 py-1.5 pr-16 border border-gray-300 rounded transition-all cursor-pointer ${category === cat ? 'bg-green-500 text-white' : ''}`}
                         >
                             {cat}
@@ -55,4 +58,4 @@ const Menu = () => {
     );
 };
 
-export default Menu
+export default Menu;
