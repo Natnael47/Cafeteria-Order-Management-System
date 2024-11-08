@@ -1,7 +1,11 @@
-import React from 'react';
+import React, { useContext } from 'react';
 import { assets } from '../assets/assets';
+import { StoreContext } from '../context/StoreContext';
 
 const Header = () => {
+
+    const { navigate } = useContext(StoreContext);
+
     return (
         <div
             className="h-[34vw] my-8 mx-auto relative flex bg-no-repeat bg-right bg-contain max-w-screen-xl"
@@ -14,7 +18,7 @@ const Header = () => {
                 <p className="text-lg text-gray-700 lg:text-xl">
                     Enjoy our delicious food and drinks in a warm atmosphere. Choose from a diverse menu featuring a delectable array of dishes crafted with the finest ingredients and culinary expertise.
                 </p>
-                <button className="bg-[#39db4a] text-white font-medium py-3 px-6 rounded-full text-lg transition-transform duration-300 ease-in-out mt-10 hover:scale-105 hover:bg-black">
+                <button className="bg-[#39db4a] text-white font-medium py-3 px-6 rounded-full text-lg transition-transform duration-300 ease-in-out mt-10 hover:scale-105 hover:bg-black" onClick={() => navigate("/menu")}>
                     ORDER NOW
                 </button>
             </div>
