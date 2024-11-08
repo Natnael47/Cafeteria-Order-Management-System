@@ -26,7 +26,7 @@ const Employee_Profile = () => {
         image: null,
     });
 
-    const [originalImage, setOriginalImage] = useState(null); // To track the original image before any changes
+    const [originalImage, setOriginalImage] = useState(null);
 
     useEffect(() => {
         if (employeeId && !isEditing) {
@@ -39,9 +39,9 @@ const Employee_Profile = () => {
             setFormData({
                 ...employeeProfile,
                 address: employeeProfile.address || { line1: '', line2: '' },
-                image: `${backendUrl}/empIMG/${employeeProfile.image}`
+                image: `${backendUrl}/empIMG/${employeeProfile.image}`,
             });
-            setOriginalImage(employeeProfile.image); // Save the original image for canceling changes
+            setOriginalImage(employeeProfile.image);
         }
     }, [employeeProfile]);
 
@@ -77,41 +77,62 @@ const Employee_Profile = () => {
         });
     };
 
+    const updatedEmployee = async () => {
+        const form = new FormData();
+        form.append('id', formData.id);
+        form.append('firstName', formData.firstName);
+        form.append('lastName', formData.lastName);
+        form.append('email', formData.email);
+        form.append('gender', formData.gender);
+        form.append('phone', formData.phone);
+        form.append('position', formData.position);
+        form.append('shift', formData.shift);
+        form.append('education', formData.education);
+        form.append('experience', formData.experience);
+        form.append('salary', formData.salary);
+        form.append('address', JSON.stringify(formData.address));
+        form.append('about', formData.about);
+        if (formData.image instanceof File) {
+            form.append('image', formData.image);
+        }
+
+        try {
+            const response = await axios.post(
+                `${backendUrl}/api/admin/update-employee`,
+                form,
+                {
+                    headers: {
+                        token,
+                        'Content-Type': 'multipart/form-data',
+                    },
+                }
+            );
+            if (response.data.success) {
+                toast.success('Employee profile updated successfully');
+                setIsEditing(false);
+                getEmployeeData(employeeId);
+            } else {
+                toast.error('Failed to update employee profile');
+            }
+        } catch (error) {
+            console.error('Error updating employee profile:', error);
+            toast.error('Failed to update employee profile');
+        }
+    };
+
     const handleSave = async (e) => {
         e.preventDefault();
-        try {
-            const form = new FormData();
-            Object.keys(formData).forEach((key) => {
-                if (key === "address") {
-                    form.append(key, JSON.stringify(formData[key]));
-                } else {
-                    form.append(key, formData[key]);
-                }
-
-            });
-            //console.log("Form Data being sent:", formData);
-            if (formData.image instanceof File) form.append("image", formData.image);
-
-            await axios.post(`${backendUrl}/api/admin/update-employee`, form, { headers: { token } });
-            setIsEditing(false);
-            toast.success("Employee profile updated successfully");
-            getEmployeeData(employeeId);
-        } catch (error) {
-            console.error("Error updating employee profile:", error);
-            toast.error("Failed to update employee profile");
-        }
+        await updatedEmployee();
     };
 
     const handleImageChange = (e) => {
         const file = e.target.files[0];
-        // console.log("Selected Image:", file); // Log the selected file
         setFormData((prev) => ({ ...prev, image: file }));
     };
 
-
     return (
         <div className="m-5 w-full">
-            <p className="mb-3 text-lg font-semibold">{isEditing ? "Edit Employee" : "Employee Profile"}</p>
+            <p className="mb-3 text-lg font-semibold">{isEditing ? 'Edit Employee' : 'Employee Profile'}</p>
             <div className="bg-white px-8 py-8 border rounded w-full max-w-5xl max-h-[88vh] overflow-scroll">
                 {isEditing ? (
                     <form onSubmit={handleSave} className="text-gray-600">
@@ -263,8 +284,10 @@ const Employee_Profile = () => {
                                         className="border rounded px-3 py-2 w-full"
                                     >
                                         <option value="1 Year">1 Year</option>
-                                        <option value="2 Year">2 Years</option>
-                                        <option value="3 Year">3 Years</option>
+                                        <option value="2 Years">2 Years</option>
+                                        <option value="3 Years">3 Years</option>
+                                        <option value="5 Years">5 Years</option>
+                                        <option value="10 Years">10 Years</option>
                                     </select>
                                 </div>
                                 <div>
@@ -281,13 +304,22 @@ const Employee_Profile = () => {
                             </div>
                         </div>
 
-                        <div className="flex gap-4 mt-4">
-                            <button type="button" onClick={handleCancelEdit} className="btn btn-danger">
-                                Cancel
-                            </button>
-                            <button type="submit" className="btn btn-primary">
-                                Save
-                            </button>
+                        <div className="mt-4">
+                            <label>About</label>
+                            <textarea
+                                name="about"
+                                value={formData.about}
+                                onChange={handleInputChange}
+                                rows="4"
+                                className="border rounded px-3 py-2 w-full"
+                                placeholder="Brief description"
+                                required
+                            ></textarea>
+                        </div>
+
+                        <div className="flex gap-4 mt-5">
+                            <button type="submit" className="px-5 py-2 bg-blue-600 rounded text-white">Save</button>
+                            <button onClick={handleCancelEdit} type="button" className="px-5 py-2 bg-gray-600 rounded text-white">Cancel</button>
                         </div>
                     </form>
                 ) : (
@@ -295,41 +327,33 @@ const Employee_Profile = () => {
                         <div className="flex items-center gap-4 mb-8">
                             <img
                                 className="w-16 rounded-full"
-                                src={formData.image}
+                                src={`${backendUrl}/empIMG/${formData.image}`}
                                 alt="Employee"
                             />
-                            <p className="text-lg">{`${formData.firstName} ${formData.lastName}`}</p>
+                            <h2>{formData.firstName} {formData.lastName}</h2>
+                            <button onClick={handleEditToggle} className="px-5 py-2 bg-blue-600 rounded text-white">Edit</button>
                         </div>
 
-                        <div className="flex flex-col gap-6 lg:flex-row">
+                        <div className="flex flex-col lg:flex-row gap-10">
                             <div className="flex flex-col gap-4 w-full lg:flex-1">
-                                <p><strong>Email:</strong> {formData.email}</p>
-                                <p><strong>Phone:</strong> {formData.phone}</p>
-                                <p><strong>Gender:</strong> {formData.gender}</p>
-                                <p><strong>Position:</strong> {formData.position}</p>
+                                <div><strong>Gender:</strong> {formData.gender}</div>
+                                <div><strong>Email:</strong> {formData.email}</div>
+                                <div><strong>Phone:</strong> {formData.phone}</div>
+                                <div><strong>Address:</strong> {formData.address.line1}, {formData.address.line2}</div>
                             </div>
+
                             <div className="flex flex-col gap-4 w-full lg:flex-1">
-                                <p><strong>Shift:</strong> {formData.shift}</p>
-                                <p><strong>Education:</strong> {formData.education}</p>
-                                <p><strong>Experience:</strong> {formData.experience}</p>
-                                <p><strong>Salary:</strong> ${formData.salary}</p>
+                                <div><strong>Position:</strong> {formData.position}</div>
+                                <div><strong>Shift:</strong> {formData.shift}</div>
+                                <div><strong>Education:</strong> {formData.education}</div>
+                                <div><strong>Experience:</strong> {formData.experience}</div>
+                                <div><strong>Salary:</strong> {formData.salary}</div>
                             </div>
-                        </div>
-
-                        <div>
-                            <p><strong>Address:</strong></p>
-                            <p>{formData.address.line1}</p>
-                            <p>{formData.address.line2}</p>
-                        </div>
-
-                        <div>
-                            <p><strong>About:</strong> {formData.about}</p>
                         </div>
 
                         <div className="mt-4">
-                            <button onClick={handleEditToggle} className="btn btn-primary">
-                                Edit Profile
-                            </button>
+                            <strong>About:</strong>
+                            <p>{formData.about}</p>
                         </div>
                     </div>
                 )}
