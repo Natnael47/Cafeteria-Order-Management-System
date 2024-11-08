@@ -326,12 +326,12 @@ const Employee_Profile = () => {
                     <div className="text-gray-600">
                         <div className="flex items-center gap-4 mb-8">
                             <img
-                                className="w-16 rounded-full"
-                                src={`${backendUrl}/empIMG/${formData.image}`}
+                                className="w-20 rounded-full"
+                                src={backendUrl + "/empIMG/" + employeeProfile.image}
                                 alt="Employee"
                             />
-                            <h2>{formData.firstName} {formData.lastName}</h2>
-                            <button onClick={handleEditToggle} className="px-5 py-2 bg-blue-600 rounded text-white">Edit</button>
+                            <h2 className='font-semibold text-xl'>{formData.firstName} {formData.lastName}</h2>
+
                         </div>
 
                         <div className="flex flex-col lg:flex-row gap-10">
@@ -355,6 +355,7 @@ const Employee_Profile = () => {
                             <strong>About:</strong>
                             <p>{formData.about}</p>
                         </div>
+                        <button onClick={handleEditToggle} className="px-5 py-2 mt-5 bg-blue-600 rounded text-white">Edit</button>
                     </div>
                 )}
             </div>
