@@ -1,5 +1,7 @@
 import React, { useContext } from 'react';
 import { backendUrl } from '../App';
+import CartTotal from '../components/CartTotal';
+import Title from '../components/Title';
 import { StoreContext } from '../context/StoreContext';
 
 const Cart = () => {
@@ -8,6 +10,9 @@ const Cart = () => {
     return (
         <div className='mt-[100px]'>
             <div>
+                <div className='text-2xl'>
+                    <Title text1={'CART'} text2={'ITEMS'} />
+                </div>
                 <div className="grid grid-cols-[1fr_1.5fr_1fr_1fr_1fr_0.5fr] items-center text-black font-semibold text-[max(1vw,12px)]">
                     <p>Foods</p>
                     <p>Name</p>
@@ -38,25 +43,11 @@ const Cart = () => {
             </div>
             <div className="mt-[80px] flex justify-between gap-[max(12vw,20px)] flex-col lg:flex-row">
                 <div className="flex-1 flex flex-col gap-5">
-                    <h2 className="text-2xl">Cart totals</h2>
-                    <div>
-                        <div className="flex justify-between text-gray-600">
-                            <p>Subtotal</p>
-                            <p>${getTotalCartAmount()}</p>
-                        </div>
-                        <hr className='my-2' />
-                        <div className="flex justify-between text-gray-600">
-                            <p>Delivery Fee</p>
-                            <p>${getTotalCartAmount() === 0 ? 0 : 2}</p>
-                        </div>
-                        <hr className='my-2' />
-                        <div className="flex justify-between font-bold">
-                            <b>Total</b>
-                            <b>${getTotalCartAmount() === 0 ? 0 : getTotalCartAmount() + 2}</b>
-                        </div>
+                    <div className='min-w-80'>
+                        <CartTotal />
                     </div>
 
-                    <div className='w-full'>
+                    <div className='w-full mt-2'>
                         <button className='bg-primary text-white px-16 py-3 text-sm border rounded hover:bg-black hover:text-white transition-all' onClick={() => navigate('/orders')}>PROCEED TO CHECKOUT</button>
                     </div>
 

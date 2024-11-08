@@ -12,23 +12,28 @@ const CartTotal = () => {
                 <Title text1={'CART'} text2={'TOTALS'} />
             </div>
             <div className='flex flex-col gap-2 mt-2 text-sm'>
-                <div className='flex justify-between'>
-                    <p>SubTotal</p>
-                    <p>${getTotalCartAmount()}.00</p>
+                {/* SubTotal */}
+                <div className="flex justify-between text-gray-600">
+                    <p className='text-[16px]'>Subtotal</p>
+                    <p className='text-[16px]'>${getTotalCartAmount()}</p>
                 </div>
-                <hr />
-                <div className='flex justify-between'>
-                    <p>Logistics Fee</p>
-                    <p>${getTotalCartAmount() === 0 ? 0 : 2}</p>
+                <hr className='my-2' />
+
+                {/* Delivery Fee */}
+                <div className="flex justify-between text-gray-600">
+                    <p className='text-[16px]'>Delivery Fee</p>
+                    <p className='text-[16px]'>${getTotalCartAmount() === 0 ? 0 : 2}</p>
                 </div>
-                <hr />
-                <div className='flex justify-between'>
-                    <p className='font-bold'>Total</p>
-                    <b>${getTotalCartAmount() === 0 ? 0 : getTotalCartAmount() + 2}</b>
+                <hr className='my-2' />
+
+                {/* Total */}
+                <div className="flex justify-between font-bold">
+                    <b className='text-[16px]'>Total</b>
+                    <b className='text-[16px]'>${getTotalCartAmount() === 0 ? 0 : getTotalCartAmount() + 2}</b>
                 </div>
             </div>
         </div>
-    )
-}
+    );
+};
 
-export default CartTotal
+export default CartTotal;
