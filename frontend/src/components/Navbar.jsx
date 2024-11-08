@@ -8,7 +8,7 @@ export const Navbar = ({ setShowLogin, setShowFeedback }) => {
     const { getTotalCartAmount, token, setToken, navigate, setShowSearch, getCartItems } = useContext(StoreContext);
 
     const [menu, setMenu] = useState("");
-    const [hasShadow, setHasShadow] = useState(false); // New state for shadow
+    const [hasShadow, setHasShadow] = useState(false);
 
     useEffect(() => {
         const path = location.pathname;
@@ -48,8 +48,14 @@ export const Navbar = ({ setShowLogin, setShowFeedback }) => {
         }
     };
 
+    // Scroll to the top and lock the scroll when Sign In is clicked
+    const handleSignInClick = () => {
+        window.scrollTo(0, 0);  // Scroll to the top of the page
+        setShowLogin(true);  // Show the login popup
+    };
+
     return (
-        <div className={`fixed top-0 w-full bg-[#F0F9F1] z-50 transition-shadow duration-300 ${hasShadow ? 'shadow-md' : ''} flex justify-between items-center py-5 px-4`}>
+        <div className={`fixed top-0 w-full bg-[#F0F9F1] z-50 transition-shadow duration-300 ${hasShadow ? 'shadow-md' : ''} flex justify-between items-center py-5 px-40`}>
             <Link to='/'>
                 <img src={assets.logo2} alt="Logo" className="w-[150px] md:w-[120px] lg:w-[150px]" />
             </Link>
@@ -94,7 +100,7 @@ export const Navbar = ({ setShowLogin, setShowFeedback }) => {
                 </div>
 
                 {!token ? (
-                    <button onClick={() => setShowLogin(true)} className="bg-[#39db4a] text-white text-lg font-medium py-2 px-6 rounded-full transition hover:bg-black">Sign In</button>
+                    <button onClick={handleSignInClick} className="bg-[#39db4a] text-white text-lg font-medium py-2 px-6 rounded-full transition hover:bg-black">Sign In</button>
                 ) : (
                     <div className="relative flex items-center gap-2 cursor-pointer group">
                         <img src={assets.profile_icon} alt="Profile" />

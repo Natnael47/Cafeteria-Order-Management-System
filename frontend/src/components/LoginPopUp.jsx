@@ -1,5 +1,5 @@
 import axios from 'axios';
-import React, { useContext, useState } from 'react';
+import React, { useContext, useEffect, useState } from 'react';
 import { backendUrl } from '../App';
 import { assets } from '../assets/assets';
 import { StoreContext } from '../context/StoreContext';
@@ -40,6 +40,17 @@ const LoginPopUp = ({ setShowLogin }) => {
             alert(response.data.message);
         }
     };
+
+    // Lock scroll when popup is open and restore when closed
+    useEffect(() => {
+        // Disable scrolling on body when login popup is visible
+        document.body.style.overflow = "hidden";
+
+        // Cleanup to restore scroll when the popup is closed
+        return () => {
+            document.body.style.overflow = "auto";
+        };
+    }, []); // Empty dependency array ensures this runs only once when the component mounts
 
     return (
         <div className="absolute z-10 w-full h-full bg-gray-700/90 grid place-items-center">
