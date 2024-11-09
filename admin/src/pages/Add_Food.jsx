@@ -90,7 +90,7 @@ const Add = () => {
 
                 </div>
 
-                <button type='submit' className='w-28 py-3 mt-5 bg-black px-10 text-white rounded-md hover:bg-primary text-center'>ADD</button>
+                <button type='submit' className='w-28 py-3 mt-5 bg-black px-10 text-white rounded-md hover:bg-primary text-center'>Add</button>
             </div>
 
         </form>

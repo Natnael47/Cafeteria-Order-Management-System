@@ -7,7 +7,7 @@ import { AdminContext } from '../context/AdminContext';
 
 const Employee_Profile = () => {
     const { employeeId } = useParams();
-    const { getEmployeeData, employeeProfile, token } = useContext(AdminContext);
+    const { getEmployeeData, employeeProfile, token, navigate } = useContext(AdminContext);
 
     const [isEditing, setIsEditing] = useState(false);
     const [formData, setFormData] = useState({
@@ -139,7 +139,7 @@ const Employee_Profile = () => {
                         <div className="flex items-center gap-4 mb-8">
                             <label htmlFor="emp-img">
                                 <img
-                                    className="w-16 rounded-full cursor-pointer"
+                                    className="w-20 rounded-full cursor-pointer"
                                     src={
                                         formData.image instanceof File
                                             ? URL.createObjectURL(formData.image)
@@ -154,22 +154,30 @@ const Employee_Profile = () => {
                                 id="emp-img"
                                 hidden
                             />
-                            <input
-                                onChange={handleInputChange}
-                                name="firstName"
-                                value={formData.firstName || ''}
-                                className="border rounded px-3 py-2"
-                                placeholder="First Name"
-                                required
-                            />
-                            <input
-                                onChange={handleInputChange}
-                                name="lastName"
-                                value={formData.lastName || ''}
-                                className="border rounded px-3 py-2"
-                                placeholder="Last Name"
-                                required
-                            />
+                            <div className='flex flex-col ml-5'>
+                                <label>First Name</label>
+                                <input
+                                    onChange={handleInputChange}
+                                    name="firstName"
+                                    value={formData.firstName || ''}
+                                    className="border rounded px-3 py-2"
+                                    placeholder="First Name"
+                                    required
+                                />
+                            </div>
+
+                            <div className='flex flex-col'>
+                                <label>Last Name</label>
+                                <input
+                                    onChange={handleInputChange}
+                                    name="lastName"
+                                    value={formData.lastName || ''}
+                                    className="border rounded px-3 py-2"
+                                    placeholder="Last Name"
+                                    required
+                                />
+                            </div>
+
                         </div>
 
                         <div className="flex flex-col lg:flex-row items-start gap-10">
@@ -359,6 +367,7 @@ const Employee_Profile = () => {
                     </div>
                 )}
             </div>
+            <button onClick={() => navigate('/employees-list')} className="px-5 py-2 bg-gray-400 rounded text-white ml-7 mt-3">Back</button>
         </div>
     );
 };
