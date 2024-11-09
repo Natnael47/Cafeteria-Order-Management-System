@@ -1,106 +1,120 @@
 generator client {
-  provider = "prisma-client-js"
+  provider = "prisma-client-js" // Generates Prisma Client to interact with the database
 }
 
 datasource db {
-  provider = "mysql"
-  url      = env("DATABASE_URL")
+  provider = "mysql" // Specifies MySQL as the database provider
+  url      = env("DATABASE_URL") // Loads the database URL from the environment variables
 }
 
 model User {
-  id        Int        @id @default(autoincrement())
-  firstName String     @db.VarChar(255)
-  lastName  String     @db.VarChar(255)
-  email     String     @unique @db.VarChar(255)
-  password  String     @db.VarChar(255)
-  gender    String     @default("not selected") @db.VarChar(50)
-  address   Json
-  dob       String     @default("not selected") @db.VarChar(100)
-  phone     String     @default("+251 911524856") @db.VarChar(20)
-  cartData  Json       @default("{}") // Storing cart data as JSON
-  feedbacks Feedback[] // One-to-many relationship with Feedback
-  orders    Order[] // One-to-many relationship with Order
+  id        Int        @id @default(autoincrement()) // Unique identifier for the user, auto-incremented
+  firstName String     @db.VarChar(255) // User's first name, stored as a string
+  lastName  String     @db.VarChar(255) // User's last name, stored as a string
+  email     String     @unique @db.VarChar(255) // User's email, must be unique
+  password  String     @db.VarChar(255) // User's password, stored as a string
+  gender    String     @default("not selected") @db.VarChar(50) // Gender of the user, default is "not selected"
+  address   Json // User's address stored as JSON (e.g., for flexibility in structure)
+  dob       String     @default("not selected") @db.VarChar(100) // Date of birth, default is "not selected"
+  phone     String     @default("+251 911524856") @db.VarChar(20) // User's phone number, default value is set
+  cartData  Json       @default("{}") // Stores cart data as JSON, initialized as empty
+  feedbacks Feedback[] // One-to-many relationship: A user can have multiple feedbacks
+  orders    Order[] // One-to-many relationship: A user can place multiple orders
 }
 
 model Feedback {
-  id      Int      @id @default(autoincrement())
-  userId  Int
-  comment String   @db.Text
-  rating  Float    @db.Double
-  date    DateTime @default(now())
+  id      Int      @id @default(autoincrement()) // Unique identifier for the feedback, auto-incremented
+  userId  Int // Foreign key referencing the User who gave the feedback
+  comment String   @db.Text // Feedback comment, stored as text
+  rating  Float    @db.Double // Rating given by the user, stored as a float
+  date    DateTime @default(now()) // Date when the feedback was given, default is the current timestamp
 
-  // Relation with User model
+  // Relation with User model: Each feedback is related to a specific user
   user User @relation(fields: [userId], references: [id])
 }
 
 model Employee {
-  id         Int      @id @default(autoincrement())
-  firstName  String   @db.VarChar(255)
-  lastName   String   @db.VarChar(255)
-  gender     String   @db.VarChar(50)
-  email      String   @unique @db.VarChar(255)
-  password   String   @db.VarChar(255)
-  image      String   @db.VarChar(255)
-  phone      String   @db.VarChar(20)
-  position   String   @db.VarChar(100)
-  shift      String   @db.VarChar(100)
-  education  String   @db.VarChar(255)
-  experience String   @db.VarChar(255)
-  salary     Float    @db.Float
-  address    Json // Storing address as JSON for flexibility
-  about      String   @db.Text
-  date       DateTime @db.DateTime
+  id         Int      @id @default(autoincrement()) // Unique identifier for the employee, auto-incremented
+  firstName  String   @db.VarChar(255) // Employee's first name, stored as a string
+  lastName   String   @db.VarChar(255) // Employee's last name, stored as a string
+  gender     String   @db.VarChar(50) // Gender of the employee
+  email      String   @unique @db.VarChar(255) // Employee's email, must be unique
+  password   String   @db.VarChar(255) // Employee's password
+  image      String   @db.VarChar(255) // URL or path to the employee's profile image
+  phone      String   @db.VarChar(20) // Employee's phone number
+  position   String   @db.VarChar(100) // Employee's position within the organization
+  shift      String   @db.VarChar(100) // Shift details (e.g., day or night shift)
+  education  String   @db.VarChar(255) // Employee's highest level of education
+  experience String   @db.VarChar(255) // Employee's experience in years or description
+  salary     Float    @db.Float // Employee's salary, stored as a float
+  address    Json // Employee's address stored as JSON for flexibility
+  about      String   @db.Text // Additional information about the employee
+  date       DateTime @default(now()) // Date when the employee record was created
 }
 
 model Food {
-  id          Int    @id @default(autoincrement())
-  name        String @db.VarChar(255)
-  description String @db.VarChar(255)
-  price       Float
-  image       String @db.VarChar(255)
-  category    String @db.VarChar(255)
+  id          Int    @id @default(autoincrement()) // Unique identifier for the food item, auto-incremented
+  name        String @db.VarChar(255) // Name of the food item
+  description String @db.VarChar(255) // Description of the food item
+  price       Float // Price of the food item
+  image       String @db.VarChar(255) // URL or path to the food item's image
+  category    String @db.VarChar(255) // Category the food item belongs to (e.g., dessert, main course)
 }
 
 model Order {
-  id            Int      @id @default(autoincrement())
-  userId        Int
-  items         Json
-  amount        Float
-  address       Json
-  status        String   @default("Order Placed") @db.VarChar(255)
-  paymentMethod String   @db.VarChar(255)
-  payment       Boolean  @default(false)
-  date          DateTime @default(now())
+  id            Int      @id @default(autoincrement()) // Unique identifier for the order, auto-incremented
+  userId        Int // Foreign key to the user who placed the order
+  items         Json // JSON data containing items in the order (e.g., list of food items)
+  amount        Float // Total amount for the order
+  address       Json // Delivery address stored as JSON
+  status        String   @default("Order Placed") @db.VarChar(255) // Current status of the order
+  paymentMethod String   @db.VarChar(255) // Payment method used for the order (e.g., credit card, cash)
+  payment       Boolean  @default(false) // Payment status, true if paid, false otherwise
+  date          DateTime @default(now()) // Date and time when the order was placed
 
-  // Relation with User model
+  // Relation with User model: Each order is placed by a specific user
   user User @relation(fields: [userId], references: [id])
 
-  // Relation with Payment model (One-to-Many)
+  // Relation with Payment model: An order can have multiple payments
   payments Payment[]
 }
 
 model Inventory {
-  id           Int       @id @default(autoincrement())
-  name         String    @db.VarChar(255) // Name of the item
-  category     String    @db.VarChar(100) // Category of the item (e.g., beverage, snack, dairy)
-  quantity     Int       @default(0) // Current stock quantity
-  dateReceived DateTime // Date item was received
-  dateUpdated  DateTime  @updatedAt // Automatically updates when item is modified
-  supplier     String?   @db.VarChar(255) // Supplier name, optional
-  pricePerUnit Float? // Price per unit, optional for cost tracking
+  id           Int       @id @default(autoincrement()) // Unique identifier for inventory items, auto-incremented
+  name         String    @db.VarChar(255) // Name of the inventory item
+  category     String    @db.VarChar(100) // Category the inventory item belongs to (e.g., food, beverage)
+  description  String?   @db.VarChar(500) // Optional description of the inventory item
+  quantity     Int       @default(0) // Quantity of the item in stock
+  unit         String    @db.VarChar(50) // Unit of measurement (e.g., kilograms, liters, pieces)
+  pricePerUnit Float? // Price per unit, optional
+  status       String    @db.VarChar(50) // Current status of the item (e.g., available, out of stock)
+  dateReceived DateTime // Date when the item was received in inventory
+  dateUpdated  DateTime  @updatedAt // Timestamp when the inventory was last updated
+  supplier     String?   @db.VarChar(255) // Name of the supplier, optional
   expiryDate   DateTime? // Expiry date for perishable items, optional
-  description  String?   @db.VarChar(500) // Optional description of the item
+
+  purchaseRecords InventoryPurchase[] // One-to-many relationship with InventoryPurchase
+}
+
+model InventoryPurchase {
+  id             Int       @id @default(autoincrement()) // Unique identifier for the purchase, auto-incremented
+  inventoryId    Int // Foreign key to the inventory item
+  purchaseDate   DateTime  @default(now()) // Date when the product was purchased
+  quantityBought Int // Quantity of the item bought in this purchase
+  supplier       String? // Supplier name, optional
+  cost           Float? // Total cost of this purchase, optional
+  inventory      Inventory @relation(fields: [inventoryId], references: [id]) // Relation with Inventory model
 }
 
 model Payment {
-  id            Int      @id @default(autoincrement())
+  id            Int      @id @default(autoincrement()) // Unique identifier for the payment, auto-incremented
   amount        Float // Total amount of the payment
-  method        String   @db.VarChar(255) // Payment method (e.g., Credit Card, Cash, PayPal)
-  date          DateTime @default(now()) // Date and time of the payment
+  method        String   @db.VarChar(255) // Payment method used (e.g., Credit Card, Cash)
+  date          DateTime @default(now()) // Date and time when the payment was made
   status        String   @default("Pending") @db.VarChar(100) // Status of the payment (e.g., Pending, Completed)
-  transactionId String?  @db.VarChar(255) // Optional transaction ID for tracking
-  orderId       Int // Foreign key to associate payment with an order
+  transactionId String?  @db.VarChar(255) // Optional transaction ID for tracking purposes
+  orderId       Int // Foreign key to associate the payment with an order
 
-  // Relation with Order model
+  // Relation with Order model: Each payment is associated with a specific order
   order Order @relation(fields: [orderId], references: [id])
 }

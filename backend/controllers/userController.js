@@ -38,7 +38,7 @@ const registerUser = async (req, res) => {
     const salt = await bcrypt.genSalt(10);
     const hashedPassword = await bcrypt.hash(password, salt);
 
-    // Create new user
+    // Create new user with a default address if not provided
     const newUser = await prisma.user.create({
       data: {
         firstName,
@@ -48,7 +48,11 @@ const registerUser = async (req, res) => {
         gender,
         dob,
         phone,
-        address: typeof address === "string" ? JSON.parse(address) : address,
+        address: address
+          ? typeof address === "string"
+            ? JSON.parse(address)
+            : address
+          : {},
       },
     });
 
