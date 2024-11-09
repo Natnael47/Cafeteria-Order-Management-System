@@ -63,10 +63,10 @@ model Food {
 
 model Order {
   id            Int      @id @default(autoincrement())
-  userId        Int // Foreign key for relation with User
-  items         Json // Storing items as JSON for flexibility
+  userId        Int
+  items         Json
   amount        Float
-  address       Json // Storing address as JSON for flexibility
+  address       Json
   status        String   @default("Order Placed") @db.VarChar(255)
   paymentMethod String   @db.VarChar(255)
   payment       Boolean  @default(false)
@@ -74,4 +74,33 @@ model Order {
 
   // Relation with User model
   user User @relation(fields: [userId], references: [id])
+
+  // Relation with Payment model (One-to-Many)
+  payments Payment[]
+}
+
+model Inventory {
+  id           Int       @id @default(autoincrement())
+  name         String    @db.VarChar(255) // Name of the item
+  category     String    @db.VarChar(100) // Category of the item (e.g., beverage, snack, dairy)
+  quantity     Int       @default(0) // Current stock quantity
+  dateReceived DateTime // Date item was received
+  dateUpdated  DateTime  @updatedAt // Automatically updates when item is modified
+  supplier     String?   @db.VarChar(255) // Supplier name, optional
+  pricePerUnit Float? // Price per unit, optional for cost tracking
+  expiryDate   DateTime? // Expiry date for perishable items, optional
+  description  String?   @db.VarChar(500) // Optional description of the item
+}
+
+model Payment {
+  id            Int      @id @default(autoincrement())
+  amount        Float // Total amount of the payment
+  method        String   @db.VarChar(255) // Payment method (e.g., Credit Card, Cash, PayPal)
+  date          DateTime @default(now()) // Date and time of the payment
+  status        String   @default("Pending") @db.VarChar(100) // Status of the payment (e.g., Pending, Completed)
+  transactionId String?  @db.VarChar(255) // Optional transaction ID for tracking
+  orderId       Int // Foreign key to associate payment with an order
+
+  // Relation with Order model
+  order Order @relation(fields: [orderId], references: [id])
 }
