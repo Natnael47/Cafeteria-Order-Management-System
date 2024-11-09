@@ -36,12 +36,12 @@ const SideBar = () => {
                 iToken && <ul className='text-black mt-5'>
 
                     <NavLink className={({ isActive }) => `flex items-center gap-3 py-3.5 px-3 md:px-9 md:min-w-72 cursor-pointer ${isActive ? 'bg-[#DDF7DF] border-r-4 border-primary' : ''}`} to={'/inv-dashboard'}>
-                        <img src={assets.people_icon} alt="" />
+                        <img src={assets.home_icon} alt="" />
                         <p>Dashboard</p>
                     </NavLink>
 
                     <NavLink className={({ isActive }) => `flex items-center gap-3 py-3.5 px-3 md:px-9 md:min-w-72 cursor-pointer ${isActive ? 'bg-[#DDF7DF] border-r-4 border-primary' : ''}`} to={'/inventory'}>
-                        <img src={assets.order_icon} alt="" />
+                        <img src={assets.people_icon} alt="" />
                         <p>Inventory</p>
                     </NavLink>
 
@@ -51,7 +51,7 @@ const SideBar = () => {
                     </NavLink>
 
                     <NavLink className={({ isActive }) => `flex items-center gap-3 py-3.5 px-3 md:px-9 md:min-w-72 cursor-pointer ${isActive ? 'bg-[#DDF7DF] border-r-4 border-primary' : ''}`} to={'/suppliers'}>
-                        <img src={assets.order_icon} alt="" />
+                        <img src={assets.people_icon} alt="" />
                         <p>Suppliers</p>
                     </NavLink>
 
