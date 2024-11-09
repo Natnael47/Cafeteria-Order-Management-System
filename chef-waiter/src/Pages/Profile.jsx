@@ -3,13 +3,13 @@ import { backendUrl } from '../App';
 import { AppContext } from '../Context/AppContext';
 
 const Profile = () => {
-    const { cToken, wToken, profileData, setProfileData, get_Profile_Data } = useContext(AppContext);
+    const { cToken, iToken, profileData, setProfileData, get_Profile_Data } = useContext(AppContext);
 
     useEffect(() => {
-        if (cToken || wToken) {
+        if (cToken || iToken) {
             get_Profile_Data();
         }
-    }, [cToken, wToken]); // Adding wToken as a dependency
+    }, [cToken, iToken]);
 
     return profileData && (
         <div>

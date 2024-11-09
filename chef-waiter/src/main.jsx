@@ -3,17 +3,17 @@ import { BrowserRouter } from "react-router-dom";
 import App from "./App.jsx";
 import AppContextProvider from "./Context/AppContext.jsx";
 import ChefContextProvider from "./Context/ChefContext.jsx";
-import WaiterContextProvider from "./Context/WaiterContext.jsx";
+import InventoryContextProvide from "./Context/InventoryContext.jsx";
 import "./index.css";
 
 createRoot(document.getElementById("root")).render(
   <BrowserRouter>
     <ChefContextProvider>
-      <WaiterContextProvider>
+      <InventoryContextProvide>
         <AppContextProvider>
           <App />
         </AppContextProvider>
-      </WaiterContextProvider>
+      </InventoryContextProvide>
     </ChefContextProvider>
   </BrowserRouter>
 );

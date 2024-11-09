@@ -3,7 +3,7 @@ import React, { useContext, useState } from "react";
 import { toast } from "react-toastify";
 import { backendUrl } from "../App";
 import { ChefContext } from "../Context/ChefContext";
-import { WaiterContext } from "../Context/WaiterContext";
+import { InventoryContext } from "../Context/InventoryContext";
 
 const Login = () => {
     const [state, setState] = useState("Chef");
@@ -12,7 +12,7 @@ const Login = () => {
     const [password, setPassword] = useState("");
 
     const { setCToken } = useContext(ChefContext);
-    const { setWToken } = useContext(WaiterContext);
+    const { setIToken } = useContext(InventoryContext);
 
     // State to manage password visibility
     const [showPassword, setShowPassword] = useState(false);
@@ -32,8 +32,8 @@ const Login = () => {
             } else {
                 const { data } = await axios.post(backendUrl + "/api/employee/login-barista", { email, password });
                 if (data.success) {
-                    localStorage.setItem('wToken', data.token);
-                    setWToken(data.token);
+                    localStorage.setItem('iToken', data.token);
+                    setIToken(data.token);
                 } else {
                     toast.error(data.message);
                 }
@@ -86,10 +86,10 @@ const Login = () => {
                 </button>
                 {state === "Chef" ? (
                     <p className="text-center mt-4 text-black">
-                        Waiter Login?{" "}
+                        Inventory Manager Login?{" "}
                         <span
                             className="text-blue-800 underline cursor-pointer"
-                            onClick={() => setState("Waiter")}
+                            onClick={() => setState("Inventory Manager")}
                         >
                             Click here
                         </span>

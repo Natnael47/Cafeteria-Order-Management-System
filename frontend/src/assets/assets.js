@@ -60,6 +60,7 @@ import footerlogo from "./footerlogo.png";
 import burger_image from "./hamburger.png";
 import instagram_icon from "./instagram_icon.png";
 import kare from "./kare.jpg";
+import left_arrow from "./left_arrow.svg";
 import linkedin_icon from "./linkedin_icon.png";
 import location_icon from "./location_icon.png";
 import logo2 from "./logo2.png";
@@ -71,6 +72,7 @@ import profile_icon from "./profile_icon.png";
 import rating_starts from "./rating_starts.png";
 import razorpay_logo from "./razorpay_logo.png";
 import remove_icon_red from "./remove_icon_red.png";
+import right_arrow from "./right_arrow.svg";
 import selector_icon from "./selector_icon.png";
 import simCard_icon from "./sim_icon.png";
 import stripe_logo from "./stripe_logo.png";
@@ -112,6 +114,8 @@ export const assets = {
   drop_down_icon,
   footerlogo,
   delivery_man_icon,
+  right_arrow,
+  left_arrow,
 };
 
 export const menu_list = [

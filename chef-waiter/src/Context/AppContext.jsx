@@ -3,21 +3,21 @@ import { createContext, useContext, useState } from "react";
 import { toast } from "react-toastify";
 import { backendUrl } from "../App";
 import { ChefContext } from "./ChefContext";
-import { WaiterContext } from "./WaiterContext";
+import { InventoryContext } from "./InventoryContext";
 
 export const AppContext = createContext(null);
 
 const AppContextProvider = (props) => {
 
     const { cToken } = useContext(ChefContext);
-    const { wToken } = useContext(WaiterContext);
+    const { iToken } = useContext(InventoryContext);
 
     const [profileData, setProfileData] = useState(false);
 
     const get_Profile_Data = async () => {
         try {
             // Check for tokens in localStorage
-            const token = localStorage.getItem("cToken") || localStorage.getItem("wToken");
+            const token = localStorage.getItem("cToken") || localStorage.getItem("iToken");
 
             if (!token) {
                 return toast.error("No authentication token found.");
@@ -26,7 +26,7 @@ const AppContextProvider = (props) => {
             // Set the appropriate token header
             const headers = localStorage.getItem("cToken")
                 ? { cToken: token }
-                : { wToken: token };
+                : { iToken: token };
 
             const { data } = await axios.get(backendUrl + "/api/employee/profile", { headers });
 
@@ -43,7 +43,7 @@ const AppContextProvider = (props) => {
     }
 
     const value = {
-        profileData, setProfileData, get_Profile_Data, cToken, wToken
+        profileData, setProfileData, get_Profile_Data, cToken, iToken
     }
 
     return (
