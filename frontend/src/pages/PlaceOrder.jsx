@@ -78,6 +78,7 @@ const PlaceOrder = ({ setShowLogin }) => { // Destructure setShowLogin from prop
 
     useEffect(() => {
         if (!token) {
+            window.scrollTo(0, 0);
             setShowLogin(true); // Show login popup if token is missing
             toast.warn("Please log in to place an order.");
             navigate("/cart"); // Redirect to cart if not signed in
