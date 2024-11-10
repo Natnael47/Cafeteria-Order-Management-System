@@ -8,6 +8,7 @@ import { ChefContext } from './Context/ChefContext';
 import { InventoryContext } from './Context/InventoryContext';
 import Dashboard from './Pages/Chef/Dashboard';
 import Orders from './Pages/Chef/Orders';
+import AddInventory from './Pages/Inventory_manager/AddInventory';
 import Inventory from './Pages/Inventory_manager/Inventory';
 import Inventory_Dashboard from './Pages/Inventory_manager/Inventory_Dashboard';
 import Inventory_Orders from './Pages/Inventory_manager/Inventory_Orders';
@@ -45,6 +46,7 @@ const App = () => {
           <Route path='/suppliers' element={<Suppliers />} />
           <Route path='/inv-orders' element={<Inventory_Orders />} />
           <Route path='/store' element={<Store />} />
+          <Route path='/add_inventory' element={<AddInventory />} />
         </Routes>
       </div>
     </div>

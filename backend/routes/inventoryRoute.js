@@ -23,14 +23,7 @@ const upload = multer({ storage: storage });
 inventoryRoute.post(
   "/add-inventory",
   empAuth,
-  (req, res, next) => {
-    upload.single("image")(req, res, (err) => {
-      if (err) {
-        return res.status(400).json({ success: false, message: err.message });
-      }
-      next(); // If no error, proceed to the controller
-    });
-  },
+  upload.single("image"),
   addInventory
 );
 
