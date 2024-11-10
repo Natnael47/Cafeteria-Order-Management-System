@@ -1,10 +1,13 @@
 import { PrismaClient } from "@prisma/client";
+import fs from "fs";
 
 const prisma = new PrismaClient();
 
-// Add inventory item
+// Add inventory item with image upload
 const addInventory = async (req, res) => {
   try {
+    const imageFilename = req.file ? req.file.filename : null;
+
     const inventoryItem = await prisma.inventory.create({
       data: {
         name: req.body.name,
@@ -19,6 +22,7 @@ const addInventory = async (req, res) => {
         dateReceived: new Date(req.body.dateReceived),
         supplier: req.body.supplier || null,
         expiryDate: req.body.expiryDate ? new Date(req.body.expiryDate) : null,
+        image: imageFilename,
       },
     });
     res.json({
@@ -47,7 +51,7 @@ const listInventory = async (req, res) => {
   }
 };
 
-// Remove inventory item
+// Remove inventory item and delete associated image
 const removeInventory = async (req, res) => {
   try {
     const itemId = parseInt(req.body.id, 10);
@@ -65,9 +69,17 @@ const removeInventory = async (req, res) => {
       return;
     }
 
+    // Delete inventory item from database
     await prisma.inventory.delete({
       where: { id: itemId },
     });
+
+    // Delete the associated image if it exists
+    if (item.image) {
+      fs.unlink(`uploads/${item.image}`, (fsErr) => {
+        if (fsErr) console.error("Error deleting image:", fsErr);
+      });
+    }
 
     res.json({ success: true, message: "Inventory item removed" });
   } catch (error) {
@@ -76,7 +88,7 @@ const removeInventory = async (req, res) => {
   }
 };
 
-// Update inventory item
+// Update inventory item, including image management
 const updateInventory = async (req, res) => {
   try {
     const itemId = parseInt(req.body.id, 10);
@@ -94,6 +106,18 @@ const updateInventory = async (req, res) => {
       return;
     }
 
+    // Handle image update: delete old image and set new image filename if uploaded
+    let imageFilename = existingItem.image;
+    if (req.file) {
+      if (existingItem.image) {
+        fs.unlink(`uploads/${existingItem.image}`, (fsErr) => {
+          if (fsErr) console.error("Error deleting old image:", fsErr);
+        });
+      }
+      imageFilename = req.file.filename;
+    }
+
+    // Update the inventory item in the database
     const updatedItem = await prisma.inventory.update({
       where: { id: itemId },
       data: {
@@ -116,6 +140,7 @@ const updateInventory = async (req, res) => {
         expiryDate: req.body.expiryDate
           ? new Date(req.body.expiryDate)
           : existingItem.expiryDate,
+        image: imageFilename,
       },
     });
 

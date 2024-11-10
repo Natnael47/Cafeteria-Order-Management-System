@@ -93,6 +93,7 @@ model Inventory {
   dateUpdated  DateTime  @updatedAt // Timestamp when the inventory was last updated
   supplier     String?   @db.VarChar(255) // Name of the supplier, optional
   expiryDate   DateTime? // Expiry date for perishable items, optional
+  image        String?   @db.VarChar(255) // Optional image filename for the inventory item
 
   purchaseRecords InventoryPurchase[] // One-to-many relationship with InventoryPurchase
 }
