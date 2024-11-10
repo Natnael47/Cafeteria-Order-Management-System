@@ -53,12 +53,13 @@ model Employee {
 }
 
 model Food {
-  id          Int    @id @default(autoincrement()) // Unique identifier for the food item, auto-incremented
-  name        String @db.VarChar(255) // Name of the food item
-  description String @db.VarChar(255) // Description of the food item
+  id          Int     @id @default(autoincrement()) // Unique identifier for the food item, auto-incremented
+  name        String  @db.VarChar(255) // Name of the food item
+  description String  @db.VarChar(255) // Description of the food item
   price       Float // Price of the food item
-  image       String @db.VarChar(255) // URL or path to the food item's image
-  category    String @db.VarChar(255) // Category the food item belongs to (e.g., dessert, main course)
+  image       String  @db.VarChar(255) // URL or path to the food item's image
+  category    String  @db.VarChar(255) // Category the food item belongs to (e.g., dessert, main course)
+  menuStatus  Boolean @default(true) // Indicates if the food is on the menu
 }
 
 model Order {

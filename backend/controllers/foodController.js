@@ -25,7 +25,7 @@ const addFood = async (req, res) => {
   }
 };
 
-// List all food items
+// List all food items for admin
 const listFood = async (req, res) => {
   try {
     const foods = await prisma.food.findMany({
@@ -37,6 +37,24 @@ const listFood = async (req, res) => {
   } catch (error) {
     console.error("Error retrieving food items:", error);
     res.json({ success: false, message: "Error retrieving food items" });
+  }
+};
+
+// List food items with menuStatus set to true (for displaying available menu items)
+const listMenuFood = async (req, res) => {
+  try {
+    const foods = await prisma.food.findMany({
+      where: {
+        menuStatus: true, // Only select foods where menuStatus is true
+      },
+      orderBy: {
+        id: "desc", // Optional: Sort by ID in descending order
+      },
+    });
+    res.json({ success: true, data: foods });
+  } catch (error) {
+    console.error("Error retrieving menu food items:", error);
+    res.json({ success: false, message: "Error retrieving menu food items" });
   }
 };
 
@@ -129,4 +147,4 @@ const updateFood = async (req, res) => {
   }
 };
 
-export { addFood, listFood, removeFood, updateFood };
+export { addFood, listFood, listMenuFood, removeFood, updateFood };
