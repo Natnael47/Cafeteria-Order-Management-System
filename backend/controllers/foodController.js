@@ -97,7 +97,7 @@ const removeFood = async (req, res) => {
   }
 };
 
-// Update food item
+// Update food item including toggling menuStatus
 const updateFood = async (req, res) => {
   try {
     const foodId = parseInt(req.body.id, 10);
@@ -106,7 +106,7 @@ const updateFood = async (req, res) => {
       return;
     }
 
-    // Find the food item to get the current image filename
+    // Find the food item to get the current image filename and menuStatus
     const existingFood = await prisma.food.findUnique({
       where: { id: foodId },
     });
@@ -128,7 +128,10 @@ const updateFood = async (req, res) => {
       imageFilename = req.file.filename;
     }
 
-    // Update the food item
+    // Update menuStatus based on "1" or "0" (string) value from the request
+    const menuStatus = req.body.menuStatus === "1";
+
+    // Update the food item in the database
     const updatedFood = await prisma.food.update({
       where: { id: foodId },
       data: {
@@ -137,6 +140,7 @@ const updateFood = async (req, res) => {
         price: req.body.price ? parseFloat(req.body.price) : existingFood.price,
         category: req.body.category || existingFood.category,
         image: imageFilename,
+        menuStatus: menuStatus,
       },
     });
 

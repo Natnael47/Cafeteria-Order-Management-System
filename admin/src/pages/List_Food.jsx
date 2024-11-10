@@ -20,6 +20,7 @@ const List = () => {
         price: "",
         image: "",
         description: "",
+        menuStatus: "",
     });
     const [originalFood, setOriginalFood] = useState(null);
     const [image, setImage] = useState(false);
@@ -75,6 +76,7 @@ const List = () => {
             price: "",
             image: "",
             description: "",
+            menuStatus: false,
         });
         setOriginalFood(null);
         setImage(false);
@@ -90,9 +92,10 @@ const List = () => {
     };
 
     const handleInputChange = (e) => {
-        const { name, value } = e.target;
+        const { name, value, type, checked } = e.target;
+        const newValue = type === "checkbox" ? checked : value;
         setEditFood((prevState) => {
-            const updatedFood = { ...prevState, [name]: value };
+            const updatedFood = { ...prevState, [name]: newValue };
             checkForChanges(updatedFood);
             return updatedFood;
         });
@@ -115,6 +118,7 @@ const List = () => {
         formData.append("category", editFood.category);
         formData.append("price", editFood.price);
         formData.append("description", editFood.description);
+        formData.append("menuStatus", editFood.menuStatus ? "1" : "0");
         if (editFood.image instanceof File) {
             formData.append("image", editFood.image);
         }
@@ -136,7 +140,7 @@ const List = () => {
                 cancelEdit();
             } else {
                 toast.error("Error updating food");
-                console.log(error.message);
+                console.log(response.data.message);
             }
         } catch (error) {
             console.log("Error updating food:", error.message);
@@ -177,7 +181,7 @@ const List = () => {
                     </div>
                     {list.map((item, index) => (
                         <div key={index}>
-                            <div className="grid grid-cols-[0.5fr_0.9fr_0.8fr_0.8fr_0.5fr_0.5fr] items-center gap-2 p-3 border border-black text-sm font-medium bg-white sm:grid">
+                            <div className={`grid grid-cols-[0.5fr_0.9fr_0.8fr_0.8fr_0.5fr_0.5fr] items-center gap-2 p-3 border border-black text-sm font-medium sm:grid ${item.menuStatus === false ? "bg-red-100" : "bg-white"}`}>
                                 <img
                                     src={backendUrl + "/images/" + item.image}
                                     alt=""
@@ -276,6 +280,19 @@ const List = () => {
                                                             <option value="Noodles">Noodles</option>
                                                         </select>
                                                     </div>
+                                                    <div className="mb-2">
+                                                        <label className="block text-sm font-medium mb-1">
+                                                            Menu Status
+                                                        </label>
+                                                        <input
+                                                            type="checkbox"
+                                                            name="menuStatus"
+                                                            checked={editFood.menuStatus}
+                                                            onChange={handleInputChange}
+                                                            className="ml-2 w-4 h-4"
+                                                        />
+                                                    </div>
+
                                                 </div>
 
                                                 <div className="mb-2">
@@ -314,7 +331,7 @@ const List = () => {
                                             </button>
                                             <button
                                                 onClick={updateFood}
-                                                disabled={!hasChanges} // Disable if no changes
+                                                disabled={!hasChanges}
                                                 className={`px-4 py-2 rounded ${hasChanges ? "bg-blue-500 text-white hover:bg-blue-600" : "bg-gray-300 cursor-not-allowed"}`}
                                             >
                                                 Save Changes
