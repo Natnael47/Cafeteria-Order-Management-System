@@ -29,6 +29,7 @@ app.use(express.urlencoded({ extended: true }));
 app.use("/api/food", foodRouter);
 app.use("/images", express.static("uploads"));
 app.use("/empIMG", express.static("uploadsEmp"));
+app.use("/Inv_img", express.static("upload_inv"));
 //API For USERS
 app.use("/api/user", userRouter);
 app.use("/api/cart", cartRouter);

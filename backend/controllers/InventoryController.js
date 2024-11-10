@@ -13,7 +13,7 @@ const addInventory = async (req, res) => {
         name: req.body.name,
         category: req.body.category,
         description: req.body.description || null,
-        quantity: req.body.quantity || 0,
+        quantity: parseInt(req.body.quantity, 10) || 0,
         unit: req.body.unit,
         pricePerUnit: req.body.pricePerUnit
           ? parseFloat(req.body.pricePerUnit)
@@ -22,9 +22,10 @@ const addInventory = async (req, res) => {
         dateReceived: new Date(req.body.dateReceived),
         supplier: req.body.supplier || null,
         expiryDate: req.body.expiryDate ? new Date(req.body.expiryDate) : null,
-        image: imageFilename,
+        image: imageFilename, // Save the image filename
       },
     });
+
     res.json({
       success: true,
       message: "Inventory item added",
