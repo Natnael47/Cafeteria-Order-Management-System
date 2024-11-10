@@ -7,6 +7,7 @@ import chefRouter from "./routes/chefRoute.js";
 import employeeRoute from "./routes/employeeRoute.js";
 import feedBackRoute from "./routes/feedBackRoute.js";
 import foodRouter from "./routes/foodRoute.js";
+import inventoryRoute from "./routes/inventoryRoute.js";
 import orderRouter from "./routes/orderRoute.js";
 import prismaRoute from "./routes/prismaRoute.js";
 import userRouter from "./routes/userRoute.js";
@@ -41,6 +42,8 @@ app.use("/api/chef", chefRouter);
 app.use("/api/employee", employeeRoute);
 //API For Feedback
 app.use("/api/feedback", feedBackRoute);
+//API for Inventory
+app.use("/api/inventory", inventoryRoute);
 
 //-------------------------------Test Prisma route
 app.use("/api/prisma", prismaRoute);

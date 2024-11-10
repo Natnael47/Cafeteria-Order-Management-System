@@ -1,13 +1,12 @@
 import express from "express";
 import multer from "multer";
 import {
-  addFood,
-  listFood,
-  listMenuFood,
-  removeFood,
-  updateFood,
-} from "../controllers/foodController.js";
-import adminAuth from "../middleware/adminAuth.js";
+  addInventory,
+  listInventory,
+  removeInventory,
+  updateInventory,
+} from "../controllers/InventoryController.js";
+import empAuth from "../middleware/empAuth.js";
 
 const inventoryRoute = express.Router();
 
@@ -21,13 +20,19 @@ const storage = multer.diskStorage({
 
 const upload = multer({ storage: storage });
 
-foodRouter.post("/add", adminAuth, upload.single("image"), addFood);
-
-foodRouter.get("/list", listFood);
-foodRouter.get("/list-menu", listMenuFood);
-
-foodRouter.post("/remove", adminAuth, removeFood);
-
-foodRouter.post("/update", adminAuth, upload.single("image"), updateFood);
+inventoryRoute.post(
+  "/add-inventory",
+  empAuth,
+  upload.single("image"),
+  addInventory
+);
+inventoryRoute.get("/list-inventory", empAuth, listInventory);
+inventoryRoute.post("/remove-inventory", empAuth, removeInventory);
+inventoryRoute.post(
+  "/update-inventory",
+  empAuth,
+  upload.single("image"),
+  updateInventory
+);
 
 export default inventoryRoute;
