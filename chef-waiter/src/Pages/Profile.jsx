@@ -35,12 +35,7 @@ const Profile = () => {
                     <p>SALARY : ${profileData.salary} </p>
 
                     <div>
-                        <p>Address:</p>
-                        <p>
-                            {profileData.address.line1}
-                            <br />
-                            {profileData.address.line2}
-                        </p>
+                        <p>Address:{profileData.address.line1} ,{profileData.address.line2}</p>
                     </div>
 
                 </div>
