@@ -3,13 +3,13 @@ import React, { useContext, useEffect, useRef, useState } from "react";
 import Modal from "react-modal";
 import { toast } from "react-toastify";
 import { backendUrl } from "../../App";
-import { InventoryContext } from "../../Context/InventoryContext"; // Update if necessary
-import { assets } from "../../assets/assets"; // Icons for modify and trash
+import { InventoryContext } from "../../Context/InventoryContext";
+import { assets } from "../../assets/assets";
 
 Modal.setAppElement("#root");
 
 const Inventory = () => {
-    const { iToken } = useContext(InventoryContext); // Replace with actual token context if different
+    const { iToken } = useContext(InventoryContext);
     const [inventoryList, setInventoryList] = useState([]);
     const [modalIsOpen, setModalIsOpen] = useState(false);
     const [selectedInventoryId, setSelectedInventoryId] = useState(null);
@@ -28,7 +28,6 @@ const Inventory = () => {
 
     const editRef = useRef(null);
 
-    // Fetch inventory list
     const fetchInventoryList = async () => {
         const response = await axios.get(backendUrl + "/api/inventory/list-inventory", {
             headers: { iToken },
@@ -106,6 +105,9 @@ const Inventory = () => {
         formData.append("unit", editInventory.unit);
         formData.append("pricePerUnit", editInventory.pricePerUnit);
         formData.append("status", editInventory.status);
+        if (editInventory.image instanceof File) {
+            formData.append("image", editInventory.image);
+        }
 
         try {
             const response = await axios.post(
@@ -149,7 +151,8 @@ const Inventory = () => {
             <p className="mb-3 text-lg font-semibold">All Inventory Items</p>
             <div className="bg-[#F3F4F6] rounded w-full max-w-5.3xl max-h-[88vh] overflow-scroll">
                 <div>
-                    <div className="grid grid-cols-[0.5fr_0.9fr_0.8fr_0.8fr_0.5fr_0.5fr] items-center gap-2 p-3 border border-black text-sm font-medium bg-gray-700 text-white sm:grid">
+                    <div className="grid grid-cols-[0.5fr_0.7fr_0.7fr_0.6fr_0.6fr_0.5fr_0.5fr] items-center gap-2 p-3 border border-black text-sm font-medium bg-gray-700 text-white sm:grid">
+                        <b>Image</b>
                         <b>Name</b>
                         <b>Category</b>
                         <b>Quantity</b>
@@ -159,7 +162,12 @@ const Inventory = () => {
                     </div>
                     {inventoryList.map((item, index) => (
                         <div key={index}>
-                            <div className={`grid grid-cols-[0.5fr_0.9fr_0.8fr_0.8fr_0.5fr_0.5fr] items-center gap-2 p-3 border border-black text-sm font-medium sm:grid ${item.status === "out of stock" ? "bg-red-100" : "bg-white"}`}>
+                            <div className={`grid grid-cols-[0.5fr_0.7fr_0.7fr_0.7fr_0.5fr_0.5fr_0.5fr] items-center gap-2 p-3 border border-black text-sm font-medium sm:grid ${item.status === "out of stock" ? "bg-red-100" : "bg-white"}`}>
+                                <img
+                                    src={`${backendUrl}/Inv_img/${item.image}`}
+                                    alt=""
+                                    className="w-14"
+                                />
                                 <p>{item.name}</p>
                                 <p>{item.category}</p>
                                 <p>{item.quantity} {item.unit}</p>
