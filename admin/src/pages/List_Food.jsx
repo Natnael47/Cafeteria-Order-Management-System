@@ -289,7 +289,7 @@ const List = () => {
                                                             name="menuStatus"
                                                             checked={editFood.menuStatus}
                                                             onChange={handleInputChange}
-                                                            className="ml-2 w-4 h-4"
+                                                            className="ml-2 w-5 h-5"
                                                         />
                                                     </div>
 
