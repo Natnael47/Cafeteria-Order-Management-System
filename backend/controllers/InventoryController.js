@@ -1,7 +1,23 @@
 import { PrismaClient } from "@prisma/client";
 import fs from "fs";
+import path from "path";
 
 const prisma = new PrismaClient();
+
+// Utility function to delete an image file
+const deleteImage = (imagePath) => {
+  if (fs.existsSync(imagePath)) {
+    fs.unlink(imagePath, (err) => {
+      if (err) {
+        console.error("Error deleting image:", err);
+      } else {
+        console.log("Image deleted successfully:", imagePath);
+      }
+    });
+  } else {
+    console.log("Image file not found, skipping deletion:", imagePath);
+  }
+};
 
 // Add new inventory item with optional image upload
 const addInventory = async (req, res) => {
@@ -81,9 +97,7 @@ const removeInventory = async (req, res) => {
     await prisma.inventory.delete({ where: { id: itemId } });
 
     if (item.image) {
-      fs.unlink(`upload_inv/${item.image}`, (fsErr) => {
-        if (fsErr) console.error("Error deleting image:", fsErr);
-      });
+      deleteImage(path.join("upload_inv", item.image));
     }
 
     res.json({ success: true, message: "Inventory item removed" });
@@ -119,9 +133,7 @@ const updateInventory = async (req, res) => {
     let imageFilename = existingItem.image;
     if (req.file) {
       if (existingItem.image) {
-        fs.unlink(`upload_inv/${existingItem.image}`, (fsErr) => {
-          if (fsErr) console.error("Error deleting old image:", fsErr);
-        });
+        deleteImage(path.join("upload_inv", existingItem.image));
       }
       imageFilename = req.file.filename;
     }
