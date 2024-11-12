@@ -81,7 +81,7 @@ const removeInventory = async (req, res) => {
     await prisma.inventory.delete({ where: { id: itemId } });
 
     if (item.image) {
-      fs.unlink(`Inv_img/${item.image}`, (fsErr) => {
+      fs.unlink(`upload_inv/${item.image}`, (fsErr) => {
         if (fsErr) console.error("Error deleting image:", fsErr);
       });
     }
