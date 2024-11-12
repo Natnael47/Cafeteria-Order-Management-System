@@ -119,7 +119,7 @@ const updateInventory = async (req, res) => {
     let imageFilename = existingItem.image;
     if (req.file) {
       if (existingItem.image) {
-        fs.unlink(`Inv_img/${existingItem.image}`, (fsErr) => {
+        fs.unlink(`upload_inv/${existingItem.image}`, (fsErr) => {
           if (fsErr) console.error("Error deleting old image:", fsErr);
         });
       }
