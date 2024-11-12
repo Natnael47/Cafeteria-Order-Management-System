@@ -81,7 +81,7 @@ const removeInventory = async (req, res) => {
     await prisma.inventory.delete({ where: { id: itemId } });
 
     if (item.image) {
-      fs.unlink(`uploads/${item.image}`, (fsErr) => {
+      fs.unlink(`Inv_img/${item.image}`, (fsErr) => {
         if (fsErr) console.error("Error deleting image:", fsErr);
       });
     }
@@ -119,7 +119,7 @@ const updateInventory = async (req, res) => {
     let imageFilename = existingItem.image;
     if (req.file) {
       if (existingItem.image) {
-        fs.unlink(`uploads/${existingItem.image}`, (fsErr) => {
+        fs.unlink(`Inv_img/${existingItem.image}`, (fsErr) => {
           if (fsErr) console.error("Error deleting old image:", fsErr);
         });
       }
