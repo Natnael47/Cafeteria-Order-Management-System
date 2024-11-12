@@ -14,6 +14,7 @@ const Inventory = () => {
     const [modalIsOpen, setModalIsOpen] = useState(false);
     const [selectedInventoryId, setSelectedInventoryId] = useState(null);
     const [editIndex, setEditIndex] = useState(null);
+    const [selectedIndex, setSelectedIndex] = useState(null); // New state for the details view
     const [editInventory, setEditInventory] = useState({
         name: "",
         category: "",
@@ -21,6 +22,7 @@ const Inventory = () => {
         unit: "",
         pricePerUnit: "",
         status: "",
+        image: null,
     });
     const [originalInventory, setOriginalInventory] = useState(null);
     const [hasChanges, setHasChanges] = useState(false);
@@ -28,12 +30,17 @@ const Inventory = () => {
     const editRef = useRef(null);
 
     const fetchInventoryList = async () => {
-        const response = await axios.get(backendUrl + "/api/inventory/list-inventory", {
-            headers: { iToken },
-        });
-        if (response.data.success) {
-            setInventoryList(response.data.data);
-        } else {
+        try {
+            const response = await axios.get(`${backendUrl}/api/inventory/list-inventory`, {
+                headers: { iToken },
+            });
+            if (response.data.success) {
+                setInventoryList(response.data.data);
+            } else {
+                toast.error("Error fetching inventory list");
+            }
+        } catch (error) {
+            console.error("Fetch inventory error:", error);
             toast.error("Error fetching inventory list");
         }
     };
@@ -55,6 +62,7 @@ const Inventory = () => {
             setEditInventory({ ...inventory });
             setOriginalInventory({ ...inventory });
             setEditIndex(index);
+            setSelectedIndex(null);
             setHasChanges(false);
 
             setTimeout(() => {
@@ -63,6 +71,15 @@ const Inventory = () => {
                     block: "center",
                 });
             }, 100);
+        }
+    };
+
+    const handleNameClick = (index) => {
+        if (selectedIndex === index) {
+            setSelectedIndex(null);
+        } else {
+            setSelectedIndex(index);
+            setEditIndex(null);
         }
     };
 
@@ -75,6 +92,7 @@ const Inventory = () => {
             unit: "",
             pricePerUnit: "",
             status: "",
+            image: null,
         });
         setOriginalInventory(null);
         setHasChanges(false);
@@ -93,6 +111,15 @@ const Inventory = () => {
         });
     };
 
+    const handleImageChange = (e) => {
+        const file = e.target.files[0];
+        setEditInventory((prevState) => {
+            const updatedInventory = { ...prevState, image: file };
+            checkForChanges(updatedInventory);
+            return updatedInventory;
+        });
+    };
+
     const updateInventory = async () => {
         const formData = new FormData();
         formData.append("id", editInventory.id);
@@ -102,12 +129,18 @@ const Inventory = () => {
         formData.append("unit", editInventory.unit);
         formData.append("pricePerUnit", editInventory.pricePerUnit);
         formData.append("status", editInventory.status);
+        if (editInventory.image) formData.append("image", editInventory.image);
 
         try {
             const response = await axios.post(
-                `${backendUrl}/api/inventory/update`,
+                `${backendUrl}/api/inventory/update-inventory`,
                 formData,
-                { headers: { Authorization: `Bearer ${iToken}`, "Content-Type": "multipart/form-data" } }
+                {
+                    headers: {
+                        iToken,
+                        "Content-Type": "multipart/form-data",
+                    },
+                }
             );
             if (response.data.success) {
                 toast.success("Inventory Updated");
@@ -118,20 +151,26 @@ const Inventory = () => {
             }
         } catch (error) {
             console.error("Error updating inventory:", error.message);
+            toast.error("Error updating inventory");
         }
     };
 
     const removeInventory = async () => {
-        const response = await axios.post(
-            `${backendUrl}/api/inventory/remove`,
-            { id: selectedInventoryId },
-            { headers: { Authorization: `Bearer ${iToken}` } }
-        );
-        await fetchInventoryList();
-        closeModal();
-        if (response.data.success) {
-            toast.success("Inventory Removed");
-        } else {
+        try {
+            const response = await axios.post(
+                `${backendUrl}/api/inventory/remove-inventory`,
+                { id: selectedInventoryId },
+                { headers: { iToken } }
+            );
+            await fetchInventoryList();
+            closeModal();
+            if (response.data.success) {
+                toast.success("Inventory Removed");
+            } else {
+                toast.error("Error removing inventory");
+            }
+        } catch (error) {
+            console.error("Error removing inventory:", error.message);
             toast.error("Error removing inventory");
         }
     };
@@ -160,7 +199,7 @@ const Inventory = () => {
                                 <p className={`p-1 rounded-md ${item.status === "full" || item.status === "available" ? "bg-green-500 text-white" : "bg-red-500 text-white"}`}>
                                     {item.status}
                                 </p>
-                                <p className="text-[#112F45] cursor-pointer hover:text-blue-500" onClick={() => handleEditClick(item, index)}>
+                                <p className="text-[#112F45] cursor-pointer hover:text-blue-500" onClick={() => handleNameClick(index)}>
                                     {item.name}
                                 </p>
                                 <p>{item.category}</p>
@@ -173,29 +212,90 @@ const Inventory = () => {
                                     <img src={assets.modify_icon} alt="Modify" className="w-7 ml-2 hover:scale-125 transition-transform" />
                                 </p>
                             </div>
+                            {selectedIndex === index && (
+                                <div className="p-4 border-t bg-gray-50">
+                                    <h3 className="text-lg font-semibold mb-2">{item.name}</h3>
+                                    <img
+                                        className="w-40 object-cover mb-2"
+                                        src={
+                                            item.image
+                                                ? backendUrl + "/Inv_img/" + item.image
+                                                : "placeholder.jpg"
+                                        }
+                                        alt=""
+                                    />
+                                    <p><strong>Category:</strong> {item.category}</p>
+                                    <p><strong>Quantity:</strong> {item.quantity} {item.unit}</p>
+                                    <p><strong>Price/Unit:</strong> ${item.pricePerUnit}</p>
+                                    <p><strong>Status:</strong> {item.status}</p>
+                                </div>
+                            )}
                             {editIndex === index && (
                                 <div ref={editRef} className="p-4 border-t bg-gray-50">
-                                    <img src={`${backendUrl}/Inv_img/${item.image}`} alt="" className="w-20 mb-2" />
-                                    <p>Name: {item.name}</p>
-                                    <p>Category: {item.category}</p>
-                                    <p>Quantity: {item.quantity} {item.unit}</p>
-                                    <p>Price per Unit: ${item.pricePerUnit}</p>
-                                    <p>Status: {item.status}</p>
-                                    <p>Supplier: {item.supplier}</p>
-                                    <p>Expiry Data : {item.expiryDate}</p>
-                                    <p>Description : {item.description}</p>
-                                    <p>Received : {item.dateReceived}</p>
-                                    <p>Last Updated : {item.dateUpdated}</p>
+                                    {/* Editable fields */}
+                                    {["name", "category", "quantity", "unit", "pricePerUnit", "status"].map((field, i) => (
+                                        <div key={i} className="mb-2">
+                                            <label className="block text-sm font-medium">{field.charAt(0).toUpperCase() + field.slice(1)}</label>
+                                            <input
+                                                type={field === "quantity" || field === "pricePerUnit" ? "number" : "text"}
+                                                name={field}
+                                                value={editInventory[field]}
+                                                onChange={handleInputChange}
+                                                className="border p-2 rounded w-full"
+                                            />
+                                        </div>
+                                    ))}
+                                    <div className="mb-2">
+                                        <label className="block text-sm font-medium">Image</label>
+                                        <input
+                                            type="file"
+                                            onChange={handleImageChange}
+                                            className="border p-2 rounded w-full"
+                                        />
+                                        {editInventory.image && (typeof editInventory.image === 'object' ? (
+                                            <img
+                                                className="w-40 object-cover mt-2"
+                                                src={URL.createObjectURL(editInventory.image)}
+                                                alt=""
+                                            />
+                                        ) : (
+                                            <img
+                                                className="w-40 object-cover mt-2"
+                                                src={`${backendUrl}/Inv_img/${editInventory.image}`}
+                                                alt=""
+                                            />
+                                        ))}
+                                    </div>
+                                    <div className="flex justify-end gap-4 mt-4">
+                                        <button onClick={cancelEdit} className="py-2 px-4 bg-gray-300 text-gray-700 rounded">Cancel</button>
+                                        <button onClick={updateInventory} disabled={!hasChanges} className="py-2 px-4 bg-blue-500 text-white rounded disabled:opacity-50">Save</button>
+                                    </div>
                                 </div>
                             )}
                         </div>
                     ))}
                 </div>
             </div>
-            <Modal isOpen={modalIsOpen} onRequestClose={closeModal}>
-                <h2>Confirm Deletion</h2>
-                <button onClick={removeInventory}>Confirm</button>
-                <button onClick={closeModal}>Cancel</button>
+            <Modal isOpen={modalIsOpen} onRequestClose={closeModal} contentLabel="Delete Confirmation"
+                className="bg-white p-5 rounded shadow-md max-w-md mx-auto mt-20"
+                overlayClassName="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center"
+            >
+                <h2 className="text-lg font-semibold">Confirm Delete</h2>
+                <p>Are you sure you want to delete this Inventory item?</p>
+                <div className="mt-4 flex justify-end">
+                    <button
+                        onClick={closeModal}
+                        className="bg-gray-300 px-4 py-2 rounded mr-2 hover:bg-gray-400"
+                    >
+                        Cancel
+                    </button>
+                    <button
+                        onClick={removeInventory}
+                        className="bg-red-500 text-white px-4 py-2 rounded hover:bg-red-600"
+                    >
+                        Delete
+                    </button>
+                </div>
             </Modal>
         </div>
     );
