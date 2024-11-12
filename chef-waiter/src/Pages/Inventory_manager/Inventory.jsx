@@ -23,7 +23,6 @@ const Inventory = () => {
         status: "",
     });
     const [originalInventory, setOriginalInventory] = useState(null);
-    const [image, setImage] = useState(false);
     const [hasChanges, setHasChanges] = useState(false);
 
     const editRef = useRef(null);
@@ -56,7 +55,6 @@ const Inventory = () => {
             setEditInventory({ ...inventory });
             setOriginalInventory({ ...inventory });
             setEditIndex(index);
-            setImage(false);
             setHasChanges(false);
 
             setTimeout(() => {
@@ -79,7 +77,6 @@ const Inventory = () => {
             status: "",
         });
         setOriginalInventory(null);
-        setImage(false);
         setHasChanges(false);
     };
 
@@ -105,9 +102,6 @@ const Inventory = () => {
         formData.append("unit", editInventory.unit);
         formData.append("pricePerUnit", editInventory.pricePerUnit);
         formData.append("status", editInventory.status);
-        if (editInventory.image instanceof File) {
-            formData.append("image", editInventory.image);
-        }
 
         try {
             const response = await axios.post(
@@ -151,24 +145,24 @@ const Inventory = () => {
             <p className="mb-3 text-lg font-semibold">All Inventory Items</p>
             <div className="bg-[#F3F4F6] rounded w-full max-w-5.3xl max-h-[88vh] overflow-scroll">
                 <div>
-                    <div className="grid grid-cols-[0.5fr_0.7fr_0.7fr_0.6fr_0.6fr_0.5fr_0.5fr] items-center gap-2 p-3 border border-black text-sm font-medium bg-gray-700 text-white sm:grid">
-                        <b>Image</b>
+                    <div className="grid grid-cols-[0.7fr_0.7fr_0.7fr_0.6fr_0.5fr_0.5fr_0.5fr] items-center gap-2 p-3 border text-sm font-medium bg-[#FAFAFA] text-black sm:grid">
+                        <b>Status</b>
                         <b>Name</b>
                         <b>Category</b>
                         <b>Quantity</b>
-                        <b>Price per Unit</b>
+                        <b>Price / Unit</b>
                         <b>Remove</b>
                         <b>Modify</b>
                     </div>
                     {inventoryList.map((item, index) => (
                         <div key={index}>
-                            <div className={`grid grid-cols-[0.5fr_0.7fr_0.7fr_0.7fr_0.5fr_0.5fr_0.5fr] items-center gap-2 p-3 border border-black text-sm font-medium sm:grid ${item.status === "out of stock" ? "bg-red-100" : "bg-white"}`}>
-                                <img
-                                    src={`${backendUrl}/Inv_img/${item.image}`}
-                                    alt=""
-                                    className="w-14"
-                                />
-                                <p>{item.name}</p>
+                            <div className={`grid grid-cols-[0.7fr_0.7fr_0.7fr_0.6fr_0.5fr_0.5fr_0.5fr] items-center gap-2 p-3 border text-sm font-medium sm:grid ${item.status === "out of stock" ? "bg-red-100" : "bg-white"}`}>
+                                <p className={`p-1 rounded-md ${item.status === "full" || item.status === "available" ? "bg-green-500 text-white" : "bg-red-500 text-white"}`}>
+                                    {item.status}
+                                </p>
+                                <p className="text-[#112F45] cursor-pointer hover:text-blue-500" onClick={() => handleEditClick(item, index)}>
+                                    {item.name}
+                                </p>
                                 <p>{item.category}</p>
                                 <p>{item.quantity} {item.unit}</p>
                                 <p>${item.pricePerUnit}</p>
@@ -179,6 +173,21 @@ const Inventory = () => {
                                     <img src={assets.modify_icon} alt="Modify" className="w-7 ml-2 hover:scale-125 transition-transform" />
                                 </p>
                             </div>
+                            {editIndex === index && (
+                                <div ref={editRef} className="p-4 border-t bg-gray-50">
+                                    <img src={`${backendUrl}/Inv_img/${item.image}`} alt="" className="w-20 mb-2" />
+                                    <p>Name: {item.name}</p>
+                                    <p>Category: {item.category}</p>
+                                    <p>Quantity: {item.quantity} {item.unit}</p>
+                                    <p>Price per Unit: ${item.pricePerUnit}</p>
+                                    <p>Status: {item.status}</p>
+                                    <p>Supplier: {item.supplier}</p>
+                                    <p>Expiry Data : {item.expiryDate}</p>
+                                    <p>Description : {item.description}</p>
+                                    <p>Received : {item.dateReceived}</p>
+                                    <p>Last Updated : {item.dateUpdated}</p>
+                                </div>
+                            )}
                         </div>
                     ))}
                 </div>

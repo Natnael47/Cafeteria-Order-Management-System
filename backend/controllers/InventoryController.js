@@ -3,7 +3,7 @@ import fs from "fs";
 
 const prisma = new PrismaClient();
 
-// Add inventory item with image upload
+// Add new inventory item with optional image upload
 const addInventory = async (req, res) => {
   try {
     const imageFilename = req.file ? req.file.filename : null;
@@ -22,7 +22,7 @@ const addInventory = async (req, res) => {
         dateReceived: new Date(req.body.dateReceived),
         supplier: req.body.supplier || null,
         expiryDate: req.body.expiryDate ? new Date(req.body.expiryDate) : null,
-        image: imageFilename, // Save the image filename
+        image: imageFilename,
       },
     });
 
@@ -33,49 +33,53 @@ const addInventory = async (req, res) => {
     });
   } catch (error) {
     console.error("Error adding inventory item:", error);
-    res.json({ success: false, message: "Error adding inventory item" });
+    res
+      .status(500)
+      .json({ success: false, message: "Error adding inventory item" });
   }
+};
+
+// Bulk add multiple inventory items
+const addInventoryBulk = async (req, res) => {
+  // Code to add multiple items at once
 };
 
 // List all inventory items
 const listInventory = async (req, res) => {
   try {
     const inventoryItems = await prisma.inventory.findMany({
-      orderBy: {
-        id: "desc",
-      },
+      orderBy: { id: "desc" },
     });
     res.json({ success: true, data: inventoryItems });
   } catch (error) {
     console.error("Error retrieving inventory items:", error);
-    res.json({ success: false, message: "Error retrieving inventory items" });
+    res
+      .status(500)
+      .json({ success: false, message: "Error retrieving inventory items" });
   }
 };
 
-// Remove inventory item and delete associated image
+// Remove an inventory item and delete associated image if exists
 const removeInventory = async (req, res) => {
   try {
     const itemId = parseInt(req.body.id, 10);
     if (isNaN(itemId)) {
-      res.json({ success: false, message: "Invalid inventory item ID" });
+      res
+        .status(400)
+        .json({ success: false, message: "Invalid inventory item ID" });
       return;
     }
 
-    const item = await prisma.inventory.findUnique({
-      where: { id: itemId },
-    });
-
+    const item = await prisma.inventory.findUnique({ where: { id: itemId } });
     if (!item) {
-      res.json({ success: false, message: "Inventory item not found" });
+      res
+        .status(404)
+        .json({ success: false, message: "Inventory item not found" });
       return;
     }
 
-    // Delete inventory item from database
-    await prisma.inventory.delete({
-      where: { id: itemId },
-    });
+    await prisma.inventory.delete({ where: { id: itemId } });
 
-    // Delete the associated image if it exists
     if (item.image) {
       fs.unlink(`uploads/${item.image}`, (fsErr) => {
         if (fsErr) console.error("Error deleting image:", fsErr);
@@ -85,7 +89,9 @@ const removeInventory = async (req, res) => {
     res.json({ success: true, message: "Inventory item removed" });
   } catch (error) {
     console.error("Error removing inventory item:", error);
-    res.json({ success: false, message: "Error removing inventory item" });
+    res
+      .status(500)
+      .json({ success: false, message: "Error removing inventory item" });
   }
 };
 
@@ -94,20 +100,22 @@ const updateInventory = async (req, res) => {
   try {
     const itemId = parseInt(req.body.id, 10);
     if (isNaN(itemId)) {
-      res.json({ success: false, message: "Invalid inventory item ID" });
+      res
+        .status(400)
+        .json({ success: false, message: "Invalid inventory item ID" });
       return;
     }
 
     const existingItem = await prisma.inventory.findUnique({
       where: { id: itemId },
     });
-
     if (!existingItem) {
-      res.json({ success: false, message: "Inventory item not found" });
+      res
+        .status(404)
+        .json({ success: false, message: "Inventory item not found" });
       return;
     }
 
-    // Handle image update: delete old image and set new image filename if uploaded
     let imageFilename = existingItem.image;
     if (req.file) {
       if (existingItem.image) {
@@ -118,7 +126,6 @@ const updateInventory = async (req, res) => {
       imageFilename = req.file.filename;
     }
 
-    // Update the inventory item in the database
     const updatedItem = await prisma.inventory.update({
       where: { id: itemId },
       data: {
@@ -152,8 +159,71 @@ const updateInventory = async (req, res) => {
     });
   } catch (error) {
     console.error("Error updating inventory item:", error);
-    res.json({ success: false, message: "Error updating inventory item" });
+    res
+      .status(500)
+      .json({ success: false, message: "Error updating inventory item" });
   }
 };
 
-export { addInventory, listInventory, removeInventory, updateInventory };
+// Increase quantity of an existing item
+const addStock = async (req, res) => {
+  // Increase the quantity of an existing item in inventory
+};
+
+// Request inventory item
+const requestInventoryItem = async (req, res) => {
+  // Log an inventory request
+};
+
+// Withdraw item from inventory and log the withdrawal
+const withdrawItem = async (req, res) => {
+  // Reduce stock and log withdrawal
+};
+
+// Update inventory attributes
+const updateInventoryAttributes = async (req, res) => {
+  // Update fields for a specific inventory item
+};
+
+// Generate usage report for a specified time period
+const generateUsageReport = async (req, res) => {
+  // Summarize usage of items within a time range
+};
+
+// Generate daily or monthly report
+const generateReport = async (req, res) => {
+  // Create a summarized report of inventory data
+};
+
+// Order inventory from supplier
+const orderInventory = async (req, res) => {
+  // Log order details in SupplierOrder table
+};
+
+// Check for low stock items and alert managers if necessary
+const checkInventoryThreshold = async (req, res) => {
+  // Check if any item falls below a set threshold and notify managers
+};
+
+// Log changes to inventory for auditing purposes
+const logInventoryChange = async (req, res) => {
+  // Record changes to inventory for accountability
+};
+
+// Export all functions
+export {
+  addInventory,
+  addInventoryBulk,
+  addStock,
+  checkInventoryThreshold,
+  generateReport,
+  generateUsageReport,
+  listInventory,
+  logInventoryChange,
+  orderInventory,
+  removeInventory,
+  requestInventoryItem,
+  updateInventory,
+  updateInventoryAttributes,
+  withdrawItem,
+};

@@ -95,7 +95,11 @@ model Inventory {
   expiryDate   DateTime? // Expiry date for perishable items, optional
   image        String?   @db.VarChar(255) // Optional image filename for the inventory item
 
-  purchaseRecords InventoryPurchase[] // One-to-many relationship with InventoryPurchase
+  // One-to-many relationships
+  purchaseRecords InventoryPurchase[]
+  requests        InventoryRequest[]
+  withdrawalLogs  WithdrawalLog[]
+  supplierOrders  SupplierOrder[]
 }
 
 model InventoryPurchase {
@@ -106,6 +110,35 @@ model InventoryPurchase {
   supplier       String? // Supplier name, optional
   cost           Float? // Total cost of this purchase, optional
   inventory      Inventory @relation(fields: [inventoryId], references: [id]) // Relation with Inventory model
+}
+
+model InventoryRequest {
+  id            Int       @id @default(autoincrement())
+  inventoryId   Int
+  requestedBy   String // Name or ID of the requester
+  quantity      Int // Quantity requested
+  dateRequested DateTime  @default(now())
+  status        String    @db.VarChar(50) // (e.g., pending, approved, denied)
+  inventory     Inventory @relation(fields: [inventoryId], references: [id])
+}
+
+model WithdrawalLog {
+  id            Int       @id @default(autoincrement())
+  inventoryId   Int
+  withdrawnBy   String // Person withdrawing the item
+  quantity      Int // Quantity withdrawn
+  dateWithdrawn DateTime  @default(now())
+  inventory     Inventory @relation(fields: [inventoryId], references: [id])
+}
+
+model SupplierOrder {
+  id              Int       @id @default(autoincrement())
+  inventoryId     Int
+  quantityOrdered Int
+  orderDate       DateTime  @default(now())
+  supplier        String?
+  status          String    @db.VarChar(50) // Order status (e.g., pending, completed)
+  inventory       Inventory @relation(fields: [inventoryId], references: [id])
 }
 
 model Payment {
