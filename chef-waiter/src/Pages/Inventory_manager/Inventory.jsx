@@ -32,17 +32,14 @@ const Inventory = () => {
 
     const editRef = useRef(null);
 
-    // useEffect for fetching data on mount and on focus
     useEffect(() => {
-        fetchInventoryList(); // Fetch data on component mount
-        // Optional: Refresh data when the page gains focus
+        fetchInventoryList();
         const handleFocus = () => {
             fetchInventoryList();
         };
         window.addEventListener("focus", handleFocus);
         return () => window.removeEventListener("focus", handleFocus);
-    }, []); // Empty dependency array ensures it only runs on mount
-
+    }, []);
 
     const openModal = (inventoryId) => {
         setSelectedInventoryId(inventoryId);
@@ -63,20 +60,15 @@ const Inventory = () => {
             setEditIndex(index);
             setSelectedIndex(null);
             setHasChanges(false);
-
             setTimeout(() => {
-                editRef.current?.scrollIntoView({
-                    behavior: "smooth",
-                    block: "center",
-                });
+                editRef.current?.scrollIntoView({ behavior: "smooth", block: "center" });
             }, 100);
         }
     };
 
     const handleNameClick = (index) => {
-        if (selectedIndex === index) {
-            setSelectedIndex(null);
-        } else {
+        if (selectedIndex === index) setSelectedIndex(null);
+        else {
             setSelectedIndex(index);
             setEditIndex(null);
         }
@@ -180,18 +172,76 @@ const Inventory = () => {
                             )}
                             {editIndex === index && (
                                 <div ref={editRef} className="p-4 border-t bg-gray-50">
-                                    {["name", "category", "quantity", "unit", "pricePerUnit", "status"].map((field, i) => (
-                                        <div key={i} className="mb-2">
-                                            <label className="block text-sm font-medium">{field.charAt(0).toUpperCase() + field.slice(1)}</label>
-                                            <input
-                                                type={field === "quantity" || field === "pricePerUnit" ? "number" : "text"}
-                                                name={field}
-                                                value={editInventory[field]}
-                                                onChange={handleInputChange}
-                                                className="border p-2 rounded w-full"
-                                            />
-                                        </div>
-                                    ))}
+                                    <div className="mb-2">
+                                        <label className="block text-sm font-medium">Name</label>
+                                        <input
+                                            type="text"
+                                            name="name"
+                                            value={editInventory.name}
+                                            onChange={handleInputChange}
+                                            className="border p-2 rounded w-full"
+                                        />
+                                    </div>
+                                    <div className="mb-2">
+                                        <label className="block text-sm font-medium">Category</label>
+                                        <select
+                                            name="category"
+                                            value={editInventory.category}
+                                            onChange={handleInputChange}
+                                            className="border p-2 rounded w-full"
+                                        >
+                                            <option value="Food Supplies">Food Supplies</option>
+                                            <option value="Beverages">Beverages</option>
+                                            <option value="Cleaning Supplies">Cleaning Supplies</option>
+                                            <option value="Utensils">Utensils</option>
+                                            <option value="Electronics">Electronics</option>
+                                        </select>
+                                    </div>
+                                    <div className="mb-2">
+                                        <label className="block text-sm font-medium">Quantity</label>
+                                        <input
+                                            type="number"
+                                            name="quantity"
+                                            value={editInventory.quantity}
+                                            onChange={handleInputChange}
+                                            className="border p-2 rounded w-full"
+                                        />
+                                    </div>
+                                    <div className="mb-2">
+                                        <label className="block text-sm font-medium">Unit</label>
+                                        <select
+                                            name="unit"
+                                            value={editInventory.unit}
+                                            onChange={handleInputChange}
+                                            className="border p-2 rounded w-full"
+                                        >
+                                            <option value="kg">kg</option>
+                                            <option value="liters">liters</option>
+                                            <option value="packs">packs</option>
+                                            <option value="pieces">pieces</option>
+                                            <option value="grams">grams</option>
+                                        </select>
+                                    </div>
+                                    <div className="mb-2">
+                                        <label className="block text-sm font-medium">Price per Unit</label>
+                                        <input
+                                            type="number"
+                                            name="pricePerUnit"
+                                            value={editInventory.pricePerUnit}
+                                            onChange={handleInputChange}
+                                            className="border p-2 rounded w-full"
+                                        />
+                                    </div>
+                                    <div className="mb-2">
+                                        <label className="block text-sm font-medium">Status</label>
+                                        <input
+                                            type="text"
+                                            name="status"
+                                            value={editInventory.status}
+                                            onChange={handleInputChange}
+                                            className="border p-2 rounded w-full"
+                                        />
+                                    </div>
                                     <div className="mb-2">
                                         <label className="block text-sm font-medium">Image</label>
                                         <input
@@ -223,23 +273,20 @@ const Inventory = () => {
                     ))}
                 </div>
             </div>
-            <Modal isOpen={modalIsOpen} onRequestClose={closeModal} contentLabel="Delete Confirmation"
+            <Modal
+                isOpen={modalIsOpen}
+                onRequestClose={closeModal}
+                contentLabel="Delete Confirmation"
                 className="bg-white p-5 rounded shadow-md max-w-md mx-auto mt-20"
                 overlayClassName="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center"
             >
                 <h2 className="text-lg font-semibold">Confirm Delete</h2>
                 <p>Are you sure you want to delete this Inventory item?</p>
                 <div className="mt-4 flex justify-end">
-                    <button
-                        onClick={closeModal}
-                        className="bg-gray-300 px-4 py-2 rounded mr-2 hover:bg-gray-400 transition-colors"
-                    >
+                    <button onClick={closeModal} className="bg-gray-300 px-4 py-2 rounded mr-2 hover:bg-gray-400 transition-colors">
                         Cancel
                     </button>
-                    <button
-                        onClick={handleRemoveInventory}
-                        className="bg-red-500 text-white px-4 py-2 rounded hover:bg-red-600 transition-colors"
-                    >
+                    <button onClick={handleRemoveInventory} className="bg-red-500 text-white px-4 py-2 rounded hover:bg-red-600 transition-colors">
                         Delete
                     </button>
                 </div>

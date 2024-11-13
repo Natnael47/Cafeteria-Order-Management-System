@@ -58,11 +58,15 @@ const AddInventory = () => {
                             value={data.category}
                             name="category"
                         >
-                            <option value="Electronics">Electronics</option>
-                            <option value="Furniture">Furniture</option>
-                            <option value="Stationery">Stationery</option>
+                            <option value="Beverages">Beverages</option>
+                            <option value="Snacks">Snacks</option>
+                            <option value="Dairy Products">Dairy Products</option>
+                            <option value="Produce">Produce</option>
+                            <option value="Meat & Poultry">Meat & Poultry</option>
+                            <option value="Grains">Grains</option>
+                            <option value="Condiments">Condiments</option>
                             <option value="Cleaning Supplies">Cleaning Supplies</option>
-                            <option value="Food Supplies">Food Supplies</option>
+                            <option value="Other">Other</option>
                         </select>
                     </div>
                     <div>
@@ -71,10 +75,22 @@ const AddInventory = () => {
                     </div>
                 </div>
                 <div className="flex flex-col sm:flex-row gap-2 w-full sm:gap-8 mt-3">
-
                     <div>
                         <p className="mb-2">Unit</p>
-                        <input className="w-full px-3 py-2 sm:w-[150px] border border-gray-600 rounded-md focus:border-black" onChange={onChangeHandler} value={data.unit} type='text' name='unit' placeholder='kg, pcs, etc.' required />
+                        <select
+                            className="w-full px-3 py-2 sm:w-[150px] border border-gray-600 rounded-md focus:border-black"
+                            onChange={onChangeHandler}
+                            value={data.unit}
+                            name="unit"
+                        >
+                            <option value="kg">kg</option>
+                            <option value="g">g</option>
+                            <option value="liters">liters</option>
+                            <option value="ml">ml</option>
+                            <option value="pieces">pieces</option>
+                            <option value="packs">packs</option>
+                            <option value="boxes">boxes</option>
+                        </select>
                     </div>
                     <div>
                         <p className="mb-2">Price Per Unit</p>
