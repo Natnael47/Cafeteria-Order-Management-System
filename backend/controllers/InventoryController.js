@@ -30,6 +30,7 @@ const addInventory = async (req, res) => {
         category: req.body.category,
         description: req.body.description || null,
         quantity: parseInt(req.body.quantity, 10) || 0,
+        initialQuantity: parseInt(req.body.quantity, 10) || 0, // Add initial quantity
         unit: req.body.unit,
         pricePerUnit: req.body.pricePerUnit
           ? parseFloat(req.body.pricePerUnit)
@@ -148,6 +149,10 @@ const updateInventory = async (req, res) => {
           req.body.quantity !== undefined
             ? parseInt(req.body.quantity)
             : existingItem.quantity,
+        initialQuantity:
+          req.body.initialQuantity !== undefined
+            ? parseInt(req.body.initialQuantity)
+            : existingItem.initialQuantity, // Update initial quantity
         unit: req.body.unit || existingItem.unit,
         pricePerUnit: req.body.pricePerUnit
           ? parseFloat(req.body.pricePerUnit)
@@ -222,11 +227,31 @@ const logInventoryChange = async (req, res) => {
   // Record changes to inventory for accountability
 };
 
+// Function to calculate stock left as a percentage
+const calculateStockPercentage = async (inventoryId) => {
+  try {
+    const item = await prisma.inventory.findUnique({
+      where: { id: inventoryId },
+    });
+
+    if (!item || !item.initialQuantity || item.initialQuantity === 0) {
+      throw new Error("Invalid item or initial quantity not set");
+    }
+
+    const percentageLeft = (item.quantity / item.initialQuantity) * 100;
+    return percentageLeft;
+  } catch (error) {
+    console.error("Error calculating stock percentage:", error);
+    throw error;
+  }
+};
+
 // Export all functions
 export {
   addInventory,
   addInventoryBulk,
   addStock,
+  calculateStockPercentage,
   checkInventoryThreshold,
   generateReport,
   generateUsageReport,

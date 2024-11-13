@@ -81,19 +81,20 @@ model Order {
 }
 
 model Inventory {
-  id           Int       @id @default(autoincrement()) // Unique identifier for inventory items, auto-incremented
-  name         String    @db.VarChar(255) // Name of the inventory item
-  category     String    @db.VarChar(100) // Category the inventory item belongs to (e.g., food, beverage)
-  description  String?   @db.VarChar(500) // Optional description of the inventory item
-  quantity     Int       @default(0) // Quantity of the item in stock
-  unit         String    @db.VarChar(50) // Unit of measurement (e.g., kilograms, liters, pieces)
-  pricePerUnit Float? // Price per unit, optional
-  status       String    @db.VarChar(50) // Current status of the item (e.g., available, out of stock)
-  dateReceived DateTime // Date when the item was received in inventory
-  dateUpdated  DateTime  @updatedAt // Timestamp when the inventory was last updated
-  supplier     String?   @db.VarChar(255) // Name of the supplier, optional
-  expiryDate   DateTime? // Expiry date for perishable items, optional
-  image        String?   @db.VarChar(255) // Optional image filename for the inventory item
+  id              Int       @id @default(autoincrement()) // Unique identifier for inventory items, auto-incremented
+  name            String    @db.VarChar(255) // Name of the inventory item
+  category        String    @db.VarChar(100) // Category the inventory item belongs to (e.g., food, beverage)
+  description     String?   @db.VarChar(500) // Optional description of the inventory item
+  quantity        Int       @default(0) // Quantity of the item in stock ( Remaining stock )
+  initialQuantity Int?      @default(0) // Starting quantity for percentage calculations
+  unit            String    @db.VarChar(50) // Unit of measurement (e.g., kilograms, liters, pieces)
+  pricePerUnit    Float? // Price per unit, optional
+  status          String    @db.VarChar(50) // Current status of the item (e.g., available, out of stock)
+  dateReceived    DateTime // Date when the item was received in inventory
+  dateUpdated     DateTime  @updatedAt // Timestamp when the inventory was last updated
+  supplier        String?   @db.VarChar(255) // Name of the supplier, optional
+  expiryDate      DateTime? // Expiry date for perishable items, optional
+  image           String?   @db.VarChar(255) // Optional image filename for the inventory item
 
   // One-to-many relationships
   purchaseRecords InventoryPurchase[]
