@@ -24,13 +24,19 @@ const Stock = () => {
 
     const handleAddStock = () => {
         if (stockAmount > 0) {
-            const updatedQuantity = selectedItem.quantity + parseInt(stockAmount);
-            const updatedInitialQuantity = selectedItem.initialQuantity + parseInt(stockAmount); // Update opening stock as well
-            // Pass cancelEdit function to updateInventory
+            const addedStock = parseInt(stockAmount);
+            let updatedQuantity = selectedItem.quantity + addedStock;
+            let updatedInitialQuantity = selectedItem.initialQuantity;
+
+            // Update initialQuantity only if the remaining stock is 0
+            if (selectedItem.initialQuantity - selectedItem.quantity === 0) {
+                updatedInitialQuantity = selectedItem.initialQuantity + addedStock;
+            }
+
             updateInventory(
                 { ...selectedItem, quantity: updatedQuantity, initialQuantity: updatedInitialQuantity },
                 fetchInventoryList,
-                cancelEdit // Pass cancelEdit as the third argument
+                cancelEdit
             );
         }
     };
@@ -39,11 +45,10 @@ const Stock = () => {
         if (stockAmount > 0 && selectedItem.quantity >= stockAmount) {
             const updatedQuantity = selectedItem.quantity - parseInt(stockAmount);
             const updatedInitialQuantity = selectedItem.initialQuantity; // Opening stock stays the same when taking stock out
-            // Pass cancelEdit function to updateInventory
             updateInventory(
                 { ...selectedItem, quantity: updatedQuantity, initialQuantity: updatedInitialQuantity },
                 fetchInventoryList,
-                cancelEdit // Pass cancelEdit as the third argument
+                cancelEdit
             );
         }
     };
@@ -67,74 +72,80 @@ const Stock = () => {
                     <div className="grid grid-cols-[1fr_1fr_1fr_1fr_1fr_0.5fr_0.5fr] items-center gap-2 p-3 border text-sm font-medium bg-[#FAFAFA] text-black sm:grid">
                         <b>Name</b>
                         <b>Opening Stock</b>
-                        <b>Total Stock</b>
+                        <b>Total Stock In</b>
                         <b>Total Stock Out</b>
                         <b>Remaining Stock</b>
                         <b>Stock In</b>
                         <b>Stock Out</b>
                     </div>
-                    {inventoryList.map((item, index) => (
-                        <div key={index} className="grid grid-cols-[1fr_1fr_1fr_1fr_1fr_0.5fr_0.5fr] items-center gap-2 p-3 border text-sm font-medium sm:grid bg-white">
-                            <p className="text-[#112F45]">{item.name}</p>
-                            <p>{item.initialQuantity} {item.unit}</p>
-                            <p className="text-green-600">{item.quantity} <span className="text-green-600">{item.unit}</span></p>
-                            <p className="text-red-600">{item.initialQuantity - item.quantity} <span className="text-red-600">{item.unit}</span></p>
-                            <p className="text-blue-600">{item.quantity} <span className="text-blue-600">{item.unit}</span></p>
-                            <button
-                                onClick={() => handleStockAction(item, "in")}
-                                className="text-green-600 hover:text-green-800 transition-colors"
-                            >
-                                Stock In
-                            </button>
-                            <button
-                                onClick={() => handleStockAction(item, "out")}
-                                disabled={item.quantity <= 0}
-                                className="text-red-600 hover:text-red-800 transition-colors"
-                            >
-                                Stock Out
-                            </button>
+                    {inventoryList.map((item, index) => {
+                        // Calculate the Total Stock In using the formula
+                        const totalStockOut = item.initialQuantity - item.quantity; // stock out
+                        const totalStockIn = item.quantity + totalStockOut - item.initialQuantity; // stock in
+                        //220 + (225-5) -225
+                        return (
+                            <div key={index} className="grid grid-cols-[1fr_1fr_1fr_1fr_1fr_0.3fr_0.7fr] items-center gap-2 p-3 border text-sm font-medium sm:grid bg-white">
+                                <p className="text-[#112F45]">{item.name}</p>
+                                <p>{item.initialQuantity} {item.unit}</p>
+                                <p className="text-green-600">{totalStockIn} <span className="text-green-600">{item.unit}</span></p>
+                                <p className="text-red-600">{totalStockOut} <span className="text-red-600">{item.unit}</span></p>
+                                <p className="text-blue-600">{item.quantity} <span className="text-blue-600">{item.unit}</span></p>
+                                <button
+                                    onClick={() => handleStockAction(item, "in")}
+                                    className="text-green-600 hover:text-green-800 transition-colors"
+                                >
+                                    Stock In
+                                </button>
+                                <button
+                                    onClick={() => handleStockAction(item, "out")}
+                                    disabled={item.quantity <= 0}
+                                    className="text-red-600 hover:text-red-800 transition-colors"
+                                >
+                                    Stock Out
+                                </button>
 
-                            {/* Hidden div for Stock In/Stock Out action */}
-                            {stockAction && selectedItem === item && (
-                                <div className="mt-2 p-3 bg-gray-100 rounded border">
-                                    <p className="font-semibold">{stockAction === "in" ? "Add Stock" : "Remove Stock"}</p>
-                                    <div className="flex items-center gap-2">
-                                        <input
-                                            type="number"
-                                            value={stockAmount}
-                                            onChange={handleAmountChange}
-                                            className="p-2 border rounded w-20"
-                                            min="1"
-                                        />
-                                        <span>{item.unit}</span>
-                                    </div>
-                                    <div className="mt-2 flex gap-4 justify-end">
-                                        <button
-                                            onClick={cancelEdit} // Using cancelEdit here to reset the form
-                                            className="py-2 px-4 bg-gray-300 text-gray-700 rounded hover:bg-gray-400"
-                                        >
-                                            Cancel
-                                        </button>
-                                        {stockAction === "in" ? (
+                                {/* Hidden div for Stock In/Stock Out action */}
+                                {stockAction && selectedItem === item && (
+                                    <div className="mt-2 p-3 bg-gray-100 rounded border">
+                                        <p className="font-semibold">{stockAction === "in" ? "Add Stock" : "Remove Stock"}</p>
+                                        <div className="flex items-center gap-2">
+                                            <input
+                                                type="number"
+                                                value={stockAmount}
+                                                onChange={handleAmountChange}
+                                                className="p-2 border rounded w-20"
+                                                min="1"
+                                            />
+                                            <span>{item.unit}</span>
+                                        </div>
+                                        <div className="mt-2 flex gap-4 justify-end">
                                             <button
-                                                onClick={handleAddStock}
-                                                className="py-2 px-4 bg-green-500 text-white rounded hover:bg-green-600"
+                                                onClick={cancelEdit} // Using cancelEdit here to reset the form
+                                                className="py-2 px-4 bg-gray-300 text-gray-700 rounded hover:bg-gray-400"
                                             >
-                                                Add
+                                                Cancel
                                             </button>
-                                        ) : (
-                                            <button
-                                                onClick={handleTakeStock}
-                                                className="py-2 px-4 bg-red-500 text-white rounded hover:bg-red-600"
-                                            >
-                                                Take
-                                            </button>
-                                        )}
+                                            {stockAction === "in" ? (
+                                                <button
+                                                    onClick={handleAddStock}
+                                                    className="py-2 px-4 bg-green-500 text-white rounded hover:bg-green-600"
+                                                >
+                                                    Add
+                                                </button>
+                                            ) : (
+                                                <button
+                                                    onClick={handleTakeStock}
+                                                    className="py-2 px-4 bg-red-500 text-white rounded hover:bg-red-600"
+                                                >
+                                                    Take
+                                                </button>
+                                            )}
+                                        </div>
                                     </div>
-                                </div>
-                            )}
-                        </div>
-                    ))}
+                                )}
+                            </div>
+                        );
+                    })}
                 </div>
             </div>
         </div>
