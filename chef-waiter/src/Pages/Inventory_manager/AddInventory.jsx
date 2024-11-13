@@ -1,12 +1,9 @@
-import axios from "axios";
 import React, { useContext, useState } from 'react';
-import { toast } from "react-toastify";
-import { backendUrl } from "../../App";
 import { assets } from '../../assets/assets';
 import { InventoryContext } from "../../Context/InventoryContext";
 
 const AddInventory = () => {
-    const { iToken } = useContext(InventoryContext);
+    const { iToken, addInventory } = useContext(InventoryContext);
 
     const [image, setImage] = useState(null);
     const [data, setData] = useState({
@@ -30,49 +27,7 @@ const AddInventory = () => {
 
     const onSubmitHandler = async (event) => {
         event.preventDefault();
-        const formData = new FormData();
-        formData.append("name", data.name);
-        formData.append("description", data.description);
-        formData.append("quantity", Number(data.quantity));
-        formData.append("unit", data.unit);
-        formData.append("pricePerUnit", Number(data.pricePerUnit));
-        formData.append("category", data.category);
-        formData.append("status", data.status);
-        formData.append("dateReceived", data.dateReceived);
-        formData.append("supplier", data.supplier);
-        formData.append("expiryDate", data.expiryDate);
-        if (image) formData.append("image", image);
-
-        try {
-            const response = await axios.post(`${backendUrl}/api/inventory/add-inventory`, formData, { headers: { iToken } });
-            if (response.data.success) {
-                setData({
-                    name: "",
-                    description: "",
-                    quantity: "",
-                    unit: "",
-                    pricePerUnit: "",
-                    category: "Electronics",
-                    status: "",
-                    dateReceived: "",
-                    supplier: "",
-                    expiryDate: "",
-                });
-                setImage(null);
-                toast.success("Inventory item added successfully");
-            } else {
-                toast.error(response.data.message || "Failed to add inventory item");
-            }
-        } catch (error) {
-            console.error("Error adding inventory item:", error);
-            if (error.response) {
-                toast.error(`Backend Error: ${error.response.data.message || "Failed to add inventory item"}`);
-            } else if (error.request) {
-                toast.error("Network Error: No response received from the server");
-            } else {
-                toast.error(`Error: ${error.message}`);
-            }
-        }
+        addInventory(data, image, setData, setImage);
     };
 
     return (
@@ -119,25 +74,31 @@ const AddInventory = () => {
                     </div>
                     <div>
                         <p className="mb-2">Status</p>
-                        <input className="w-full px-3 py-2 sm:w-[120px]" onChange={onChangeHandler} value={data.status} type='text' name='status' placeholder='Status' required />
+                        <input className="w-full px-3 py-2 sm:w-[120px]" onChange={onChangeHandler} value={data.status} type='text' name='status' placeholder='Available, Pending, etc.' required />
                     </div>
+                </div>
+                <div className="flex flex-col sm:flex-row gap-2 w-full sm:gap-8 mt-3">
                     <div>
                         <p className="mb-2">Date Received</p>
                         <input className="w-full px-3 py-2 sm:w-[120px]" onChange={onChangeHandler} value={data.dateReceived} type='date' name='dateReceived' required />
                     </div>
                     <div>
                         <p className="mb-2">Supplier</p>
-                        <input className="w-full px-3 py-2 sm:w-[120px]" onChange={onChangeHandler} value={data.supplier} type='text' name='supplier' placeholder='Supplier' required />
+                        <input className="w-full px-3 py-2 sm:w-[120px]" onChange={onChangeHandler} value={data.supplier} type='text' name='supplier' required />
                     </div>
                     <div>
                         <p className="mb-2">Expiry Date</p>
                         <input className="w-full px-3 py-2 sm:w-[120px]" onChange={onChangeHandler} value={data.expiryDate} type='date' name='expiryDate' required />
                     </div>
                 </div>
-                <button type='submit' className='w-28 py-3 mt-5 bg-black px-10 text-white rounded-md hover:bg-primary text-center'>Add</button>
+                <div className="flex w-full justify-center gap-3 mt-8">
+                    <button type="submit" className="px-8 py-2 rounded text-white bg-[#0b5ed7]">
+                        Submit
+                    </button>
+                </div>
             </div>
         </form>
     );
-};
+}
 
 export default AddInventory;

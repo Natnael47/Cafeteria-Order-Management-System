@@ -6,7 +6,7 @@ import { backendUrl } from "../App";
 export const InventoryContext = createContext();
 
 const InventoryContextProvide = (props) => {
-    const [iToken, setIToken] = useState(localStorage.getItem('iToken') ? localStorage.getItem('iToken') : '');
+    const [iToken, setIToken] = useState(localStorage.getItem('iToken') || '');
     const [inventoryList, setInventoryList] = useState([]);
 
     const fetchInventoryList = async () => {
@@ -80,6 +80,52 @@ const InventoryContextProvide = (props) => {
         }
     };
 
+    const addInventory = async (data, image, setData, setImage) => {
+        const formData = new FormData();
+        formData.append("name", data.name);
+        formData.append("description", data.description);
+        formData.append("quantity", Number(data.quantity));
+        formData.append("unit", data.unit);
+        formData.append("pricePerUnit", Number(data.pricePerUnit));
+        formData.append("category", data.category);
+        formData.append("status", data.status);
+        formData.append("dateReceived", data.dateReceived);
+        formData.append("supplier", data.supplier);
+        formData.append("expiryDate", data.expiryDate);
+        if (image) formData.append("image", image);
+
+        try {
+            const response = await axios.post(`${backendUrl}/api/inventory/add-inventory`, formData, { headers: { iToken } });
+            if (response.data.success) {
+                setData({
+                    name: "",
+                    description: "",
+                    quantity: "",
+                    unit: "",
+                    pricePerUnit: "",
+                    category: "Electronics",
+                    status: "",
+                    dateReceived: "",
+                    supplier: "",
+                    expiryDate: "",
+                });
+                setImage(null);
+                toast.success("Inventory item added successfully");
+            } else {
+                toast.error(response.data.message || "Failed to add inventory item");
+            }
+        } catch (error) {
+            console.error("Error adding inventory item:", error);
+            if (error.response) {
+                toast.error(`Backend Error: ${error.response.data.message || "Failed to add inventory item"}`);
+            } else if (error.request) {
+                toast.error("Network Error: No response received from the server");
+            } else {
+                toast.error(`Error: ${error.message}`);
+            }
+        }
+    };
+
     useEffect(() => {
         fetchInventoryList();
     }, [iToken]);
@@ -92,6 +138,7 @@ const InventoryContextProvide = (props) => {
         fetchInventoryList,
         updateInventory,
         removeInventory,
+        addInventory,
     };
 
     return (
