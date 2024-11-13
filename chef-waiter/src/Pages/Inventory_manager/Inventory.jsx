@@ -1,7 +1,5 @@
-import axios from "axios";
 import React, { useContext, useEffect, useRef, useState } from "react";
 import Modal from "react-modal";
-import { toast } from "react-toastify";
 import { backendUrl } from "../../App";
 import { InventoryContext } from "../../Context/InventoryContext";
 import { assets } from "../../assets/assets";
@@ -9,12 +7,17 @@ import { assets } from "../../assets/assets";
 Modal.setAppElement("#root");
 
 const Inventory = () => {
-    const { iToken } = useContext(InventoryContext);
-    const [inventoryList, setInventoryList] = useState([]);
+    const {
+        inventoryList,
+        fetchInventoryList,
+        updateInventory,
+        removeInventory,
+    } = useContext(InventoryContext);
+
     const [modalIsOpen, setModalIsOpen] = useState(false);
     const [selectedInventoryId, setSelectedInventoryId] = useState(null);
     const [editIndex, setEditIndex] = useState(null);
-    const [selectedIndex, setSelectedIndex] = useState(null); // New state for the details view
+    const [selectedIndex, setSelectedIndex] = useState(null);
     const [editInventory, setEditInventory] = useState({
         name: "",
         category: "",
@@ -29,21 +32,17 @@ const Inventory = () => {
 
     const editRef = useRef(null);
 
-    const fetchInventoryList = async () => {
-        try {
-            const response = await axios.get(`${backendUrl}/api/inventory/list-inventory`, {
-                headers: { iToken },
-            });
-            if (response.data.success) {
-                setInventoryList(response.data.data);
-            } else {
-                toast.error("Error fetching inventory list");
-            }
-        } catch (error) {
-            console.error("Fetch inventory error:", error);
-            toast.error("Error fetching inventory list");
-        }
-    };
+    // useEffect for fetching data on mount and on focus
+    useEffect(() => {
+        fetchInventoryList(); // Fetch data on component mount
+        // Optional: Refresh data when the page gains focus
+        const handleFocus = () => {
+            fetchInventoryList();
+        };
+        window.addEventListener("focus", handleFocus);
+        return () => window.removeEventListener("focus", handleFocus);
+    }, []); // Empty dependency array ensures it only runs on mount
+
 
     const openModal = (inventoryId) => {
         setSelectedInventoryId(inventoryId);
@@ -120,64 +119,13 @@ const Inventory = () => {
         });
     };
 
-    const updateInventory = async () => {
-        const formData = new FormData();
-        formData.append("id", editInventory.id);
-        formData.append("name", editInventory.name);
-        formData.append("category", editInventory.category);
-        formData.append("quantity", editInventory.quantity);
-        formData.append("unit", editInventory.unit);
-        formData.append("pricePerUnit", editInventory.pricePerUnit);
-        formData.append("status", editInventory.status);
-        if (editInventory.image) formData.append("image", editInventory.image);
-
-        try {
-            const response = await axios.post(
-                `${backendUrl}/api/inventory/update-inventory`,
-                formData,
-                {
-                    headers: {
-                        iToken,
-                        "Content-Type": "multipart/form-data",
-                    },
-                }
-            );
-            if (response.data.success) {
-                toast.success("Inventory Updated");
-                fetchInventoryList();
-                cancelEdit();
-            } else {
-                toast.error("Error updating inventory");
-            }
-        } catch (error) {
-            console.error("Error updating inventory:", error.message);
-            toast.error("Error updating inventory");
-        }
+    const handleUpdateInventory = () => {
+        updateInventory(editInventory, fetchInventoryList, cancelEdit);
     };
 
-    const removeInventory = async () => {
-        try {
-            const response = await axios.post(
-                `${backendUrl}/api/inventory/remove-inventory`,
-                { id: selectedInventoryId },
-                { headers: { iToken } }
-            );
-            await fetchInventoryList();
-            closeModal();
-            if (response.data.success) {
-                toast.success("Inventory Removed");
-            } else {
-                toast.error("Error removing inventory");
-            }
-        } catch (error) {
-            console.error("Error removing inventory:", error.message);
-            toast.error("Error removing inventory");
-        }
+    const handleRemoveInventory = () => {
+        removeInventory(selectedInventoryId, fetchInventoryList, closeModal);
     };
-
-    useEffect(() => {
-        fetchInventoryList();
-    }, []);
 
     return (
         <div className="flex flex-col m-5 w-full">
@@ -232,7 +180,6 @@ const Inventory = () => {
                             )}
                             {editIndex === index && (
                                 <div ref={editRef} className="p-4 border-t bg-gray-50">
-                                    {/* Editable fields */}
                                     {["name", "category", "quantity", "unit", "pricePerUnit", "status"].map((field, i) => (
                                         <div key={i} className="mb-2">
                                             <label className="block text-sm font-medium">{field.charAt(0).toUpperCase() + field.slice(1)}</label>
@@ -268,7 +215,7 @@ const Inventory = () => {
                                     </div>
                                     <div className="flex justify-end gap-4 mt-4">
                                         <button onClick={cancelEdit} className="py-2 px-4 bg-gray-300 text-gray-700 rounded">Cancel</button>
-                                        <button onClick={updateInventory} disabled={!hasChanges} className="py-2 px-4 bg-blue-500 text-white rounded disabled:opacity-50">Save</button>
+                                        <button onClick={handleUpdateInventory} disabled={!hasChanges} className="py-2 px-4 bg-blue-500 text-white rounded disabled:opacity-50">Save</button>
                                     </div>
                                 </div>
                             )}
@@ -285,13 +232,13 @@ const Inventory = () => {
                 <div className="mt-4 flex justify-end">
                     <button
                         onClick={closeModal}
-                        className="bg-gray-300 px-4 py-2 rounded mr-2 hover:bg-gray-400"
+                        className="bg-gray-300 px-4 py-2 rounded mr-2 hover:bg-gray-400 transition-colors"
                     >
                         Cancel
                     </button>
                     <button
-                        onClick={removeInventory}
-                        className="bg-red-500 text-white px-4 py-2 rounded hover:bg-red-600"
+                        onClick={handleRemoveInventory}
+                        className="bg-red-500 text-white px-4 py-2 rounded hover:bg-red-600 transition-colors"
                     >
                         Delete
                     </button>
