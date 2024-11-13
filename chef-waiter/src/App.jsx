@@ -13,7 +13,7 @@ import Inventory from './Pages/Inventory_manager/Inventory';
 import Inventory_Dashboard from './Pages/Inventory_manager/Inventory_Dashboard';
 import Inventory_Orders from './Pages/Inventory_manager/Inventory_Orders';
 import Reports from './Pages/Inventory_manager/Reports';
-import Store from './Pages/Inventory_manager/Store';
+import Stock from './Pages/Inventory_manager/Stock';
 import Suppliers from './Pages/Inventory_manager/Suppliers';
 import Login from './Pages/Login';
 import Profile from './Pages/Profile';
@@ -45,7 +45,7 @@ const App = () => {
           <Route path='/inv-dashboard' element={<Inventory_Dashboard />} />
           <Route path='/suppliers' element={<Suppliers />} />
           <Route path='/inv-orders' element={<Inventory_Orders />} />
-          <Route path='/store' element={<Store />} />
+          <Route path='/store' element={<Stock />} />
           <Route path='/add_inventory' element={<AddInventory />} />
         </Routes>
       </div>

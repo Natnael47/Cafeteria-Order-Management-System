@@ -34,6 +34,7 @@ const InventoryContextProvide = (props) => {
         formData.append("unit", editInventory.unit);
         formData.append("pricePerUnit", editInventory.pricePerUnit);
         formData.append("status", editInventory.status);
+        formData.append("initialQuantity", editInventory.initialQuantity); // Add this line to ensure initialQuantity is updated
         if (editInventory.image) formData.append("image", editInventory.image);
 
         try {
@@ -59,6 +60,7 @@ const InventoryContextProvide = (props) => {
             toast.error("Error updating inventory");
         }
     };
+
 
     const removeInventory = async (selectedInventoryId, fetchInventoryList, closeModal) => {
         try {
