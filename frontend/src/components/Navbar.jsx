@@ -11,6 +11,13 @@ export const Navbar = ({ setShowLogin, setShowFeedback }) => {
     const [hasShadow, setHasShadow] = useState(false);
 
     useEffect(() => {
+        // Scroll to the top only if the path is not the home page
+        if (location.pathname === "/menu" || location.pathname === "/about" || location.pathname === "/contact") {
+            window.scrollTo(0, 0);
+        }
+    }, [location.pathname]);
+
+    useEffect(() => {
         const path = location.pathname;
         if (path === "/") setMenu("home");
         else if (path === "/menu") setMenu("menu");
