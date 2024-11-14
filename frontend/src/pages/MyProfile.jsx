@@ -137,16 +137,17 @@ const MyProfile = () => {
                     {
                         isEdit ? (
                             <select
-                                className='max-w-20 bg-white border-2 border-gray-500 rounded'
+                                className='max-w-28 bg-white border-2 border-gray-500 rounded'
                                 onChange={(e) => setEditedData(prev => ({ ...prev, gender: e.target.value }))}
-                                value={editedData.gender || ''}
+                                value={editedData.gender || 'Not Selected'}
                             >
+                                <option value="Not Selected">Not Selected</option>
                                 <option value="Male">Male</option>
                                 <option value="Female">Female</option>
                                 <option value="Other">Other</option>
                             </select>
                         ) : (
-                            <p className='text-gray-400'>{userData.gender}</p>
+                            <p className='text-gray-400'>{userData.gender === 'Not Selected' ? 'Not Selected' : userData.gender}</p>
                         )
                     }
 

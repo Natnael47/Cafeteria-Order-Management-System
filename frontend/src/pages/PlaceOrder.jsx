@@ -8,7 +8,7 @@ import Title from '../components/Title';
 import { StoreContext } from '../context/StoreContext';
 
 const PlaceOrder = ({ setShowLogin }) => { // Destructure setShowLogin from props
-    const { getTotalCartAmount, token, food_list, cartItems, setCartItems, navigate } = useContext(StoreContext);
+    const { getTotalCartAmount, token, food_list, cartItems, clearCart, navigate } = useContext(StoreContext);
     const [method, setMethod] = useState('cod');
     const [data, setData] = useState({
         firstName: "",
@@ -48,7 +48,7 @@ const PlaceOrder = ({ setShowLogin }) => { // Destructure setShowLogin from prop
                 case 'cod':
                     const response = await axios.post(backendUrl + '/api/order/place', orderData, { headers: { token } });
                     if (response.data.success) {
-                        setCartItems({});
+                        clearCart();
                         navigate('/myorders');
                     } else {
                         toast.error(response.data.message);
@@ -60,7 +60,7 @@ const PlaceOrder = ({ setShowLogin }) => { // Destructure setShowLogin from prop
                     if (responseStripe.data.success) {
                         const { session_url } = responseStripe.data;
                         window.location.replace(session_url);
-                        setCartItems({});
+                        clearCart();
                         navigate('/myorders');
                     } else {
                         toast.error(responseStripe.data.message);
