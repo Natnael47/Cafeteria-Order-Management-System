@@ -12,7 +12,7 @@ export const Navbar = ({ setShowLogin, setShowFeedback }) => {
 
     useEffect(() => {
         // Scroll to the top only if the path is not the home page
-        if (location.pathname === "/menu" || location.pathname === "/about" || location.pathname === "/contact") {
+        if (location.pathname !== "/") {
             window.scrollTo(0, 0);
         }
     }, [location.pathname]);
