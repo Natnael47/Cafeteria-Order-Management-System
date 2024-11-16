@@ -108,6 +108,7 @@ model InventoryPurchase {
   inventoryId    Int // Foreign key to the inventory item
   purchaseDate   DateTime  @default(now()) // Date when the product was purchased
   quantityBought Int // Quantity of the item bought in this purchase
+  pricePerUnit   Float? // Price per unit, optional
   supplier       String? // Supplier name, optional
   cost           Float? // Total cost of this purchase, optional
   inventory      Inventory @relation(fields: [inventoryId], references: [id]) // Relation with Inventory model
