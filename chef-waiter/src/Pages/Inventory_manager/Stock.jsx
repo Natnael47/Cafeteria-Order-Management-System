@@ -1,50 +1,96 @@
+import axios from "axios";
 import React, { useContext, useEffect, useState } from "react";
+import { toast } from "react-toastify";
+import { backendUrl } from "../../App";
 import { InventoryContext } from "../../Context/InventoryContext";
 
 const Stock = () => {
-    const { inventoryList, fetchInventoryList, updateInventory } = useContext(InventoryContext);
+    const { inventoryList, fetchInventoryList, updateInventory, iToken } = useContext(InventoryContext);
 
     const [stockAction, setStockAction] = useState(null); // "in" or "out"
     const [selectedItem, setSelectedItem] = useState(null); // Item to update stock for
-    const [stockAmount, setStockAmount] = useState(0); // Amount to add or remove
+    const [formData, setFormData] = useState({
+        stockAmount: 0, // Amount of stock to add or remove
+        pricePerUnit: 0, // Price per unit when adding stock
+        supplier: "", // Supplier input
+        expiryDate: "", // Expiry date input
+        dateReceived: "", // Date received input
+    });
 
     useEffect(() => {
-        fetchInventoryList();
+        fetchInventoryList(); // Fetch inventory list on load
     }, []);
+
+    const onChangeHandler = (event) => {
+        const name = event.target.name;
+        const value = event.target.value;
+        setFormData((prevData) => ({ ...prevData, [name]: value }));
+    };
 
     const handleStockAction = (item, action) => {
         setSelectedItem(item);
         setStockAction(action); // Set action to either "in" or "out"
-        setStockAmount(0); // Reset stock amount when opening the form
+        setFormData({
+            stockAmount: 0,
+            pricePerUnit: 0,
+            supplier: "",
+            expiryDate: "",
+            dateReceived: "",
+        }); // Reset the form data
     };
 
-    const handleAmountChange = (e) => {
-        setStockAmount(e.target.value);
-    };
+    // Handle stock addition to backend
+    const onAddStockHandler = async (event) => {
+        event.preventDefault();
 
-    const handleAddStock = () => {
-        if (stockAmount > 0) {
-            const addedStock = parseInt(stockAmount);
-            let updatedQuantity = selectedItem.quantity + addedStock;
-            let updatedInitialQuantity = selectedItem.initialQuantity;
+        if (selectedItem && formData.stockAmount > 0 && formData.pricePerUnit > 0) {
+            const addedStock = parseInt(formData.stockAmount);
+            const formDataToSend = {
+                inventoryId: selectedItem.id,
+                quantity: formData.stockAmount,
+                pricePerUnit: formData.pricePerUnit,
+                supplier: formData.supplier,
+                expiryDate: formData.expiryDate,
+                dateReceived: formData.dateReceived,
+            };
 
-            // Update initialQuantity only if the remaining stock is 0
-            if (selectedItem.initialQuantity - selectedItem.quantity === 0) {
-                updatedInitialQuantity = selectedItem.initialQuantity + addedStock;
+            try {
+                const response = await axios.post(backendUrl + "/api/inventory/add-stock", formDataToSend, {
+                    headers: {
+                        'Content-Type': 'application/json', // Set content type as JSON
+                        iToken, // Add the auth token
+                    },
+                });
+
+                if (response.data.success) {
+                    // Update inventory state after successful stock addition
+                    let updatedQuantity = selectedItem.quantity + addedStock;
+                    let updatedInitialQuantity = selectedItem.initialQuantity;
+                    if (selectedItem.initialQuantity - selectedItem.quantity === 0) {
+                        updatedInitialQuantity = selectedItem.initialQuantity + addedStock;
+                    }
+                    updateInventory(
+                        { ...selectedItem, quantity: updatedQuantity, initialQuantity: updatedInitialQuantity },
+                        fetchInventoryList,
+                        cancelEdit
+                    );
+                    toast.success("Stock added successfully");
+                } else {
+                    toast.error(response.data.message || "Failed to add stock");
+                }
+            } catch (error) {
+                console.error("Error adding stock to inventory:", error);
+                toast.error(`Error: ${error.message}`);
             }
-
-            updateInventory(
-                { ...selectedItem, quantity: updatedQuantity, initialQuantity: updatedInitialQuantity },
-                fetchInventoryList,
-                cancelEdit
-            );
+        } else {
+            toast.error("Please enter a valid quantity and price per unit.");
         }
     };
 
     const handleTakeStock = () => {
-        if (stockAmount > 0 && selectedItem.quantity >= stockAmount) {
-            const updatedQuantity = selectedItem.quantity - parseInt(stockAmount);
-            const updatedInitialQuantity = selectedItem.initialQuantity; // Opening stock stays the same when taking stock out
+        if (formData.stockAmount > 0 && selectedItem.quantity >= formData.stockAmount) {
+            const updatedQuantity = selectedItem.quantity - parseInt(formData.stockAmount);
+            const updatedInitialQuantity = selectedItem.initialQuantity;
             updateInventory(
                 { ...selectedItem, quantity: updatedQuantity, initialQuantity: updatedInitialQuantity },
                 fetchInventoryList,
@@ -53,15 +99,16 @@ const Stock = () => {
         }
     };
 
-    const resetStockForm = () => {
+    const cancelEdit = () => {
         setStockAction(null);
         setSelectedItem(null);
-        setStockAmount(0);
-    };
-
-    // cancelEdit function to reset the form
-    const cancelEdit = () => {
-        resetStockForm(); // Call the reset function to clear all states
+        setFormData({
+            stockAmount: 0,
+            pricePerUnit: 0,
+            supplier: "",
+            expiryDate: "",
+            dateReceived: "",
+        });
     };
 
     return (
@@ -79,10 +126,8 @@ const Stock = () => {
                         <b>Stock Out</b>
                     </div>
                     {inventoryList.map((item, index) => {
-                        // Calculate the Total Stock In using the formula
-                        const totalStockOut = item.initialQuantity - item.quantity; // stock out
-                        const totalStockIn = item.quantity + totalStockOut - item.initialQuantity; // stock in
-                        //220 + (225-5) -225
+                        const totalStockOut = item.initialQuantity - item.quantity;
+                        const totalStockIn = item.quantity + totalStockOut - item.initialQuantity;
                         return (
                             <div key={index} className="grid grid-cols-[1fr_1fr_1fr_1fr_1fr_0.3fr_0.7fr] items-center gap-2 p-3 border text-sm font-medium sm:grid bg-white">
                                 <p className="text-[#112F45]">{item.name}</p>
@@ -104,43 +149,73 @@ const Stock = () => {
                                     Stock Out
                                 </button>
 
-                                {/* Hidden div for Stock In/Stock Out action */}
-                                {stockAction && selectedItem === item && (
+                                {stockAction === "in" && selectedItem === item && (
                                     <div className="mt-2 p-3 bg-gray-100 rounded border">
-                                        <p className="font-semibold">{stockAction === "in" ? "Add Stock" : "Remove Stock"}</p>
-                                        <div className="flex items-center gap-2">
-                                            <input
-                                                type="number"
-                                                value={stockAmount}
-                                                onChange={handleAmountChange}
-                                                className="p-2 border rounded w-20"
-                                                min="1"
-                                            />
-                                            <span>{item.unit}</span>
-                                        </div>
-                                        <div className="mt-2 flex gap-4 justify-end">
-                                            <button
-                                                onClick={cancelEdit} // Using cancelEdit here to reset the form
-                                                className="py-2 px-4 bg-gray-300 text-gray-700 rounded hover:bg-gray-400"
-                                            >
-                                                Cancel
-                                            </button>
-                                            {stockAction === "in" ? (
+                                        <p className="font-semibold">Add Stock</p>
+                                        <form onSubmit={onAddStockHandler} className="w-full">
+                                            <div className="flex items-center gap-2">
+                                                <input
+                                                    type="number"
+                                                    value={formData.stockAmount}
+                                                    onChange={onChangeHandler}
+                                                    name="stockAmount"
+                                                    className="p-2 border rounded w-20"
+                                                    min="1"
+                                                />
+                                                <span>{item.unit}</span>
+                                            </div>
+                                            <div className="flex items-center gap-2 mt-3">
+                                                <input
+                                                    type="number"
+                                                    placeholder="Price per unit"
+                                                    value={formData.pricePerUnit}
+                                                    onChange={onChangeHandler}
+                                                    name="pricePerUnit"
+                                                    className="p-2 border rounded w-32"
+                                                />
+                                                <input
+                                                    type="date"
+                                                    placeholder="Date received"
+                                                    value={formData.dateReceived}
+                                                    onChange={onChangeHandler}
+                                                    name="dateReceived"
+                                                    className="p-2 border rounded"
+                                                />
+                                            </div>
+                                            <div className="flex items-center gap-2 mt-3">
+                                                <input
+                                                    type="text"
+                                                    placeholder="Supplier"
+                                                    value={formData.supplier}
+                                                    onChange={onChangeHandler}
+                                                    name="supplier"
+                                                    className="p-2 border rounded w-32"
+                                                />
+                                                <input
+                                                    type="date"
+                                                    placeholder="Expiry date"
+                                                    value={formData.expiryDate}
+                                                    onChange={onChangeHandler}
+                                                    name="expiryDate"
+                                                    className="p-2 border rounded"
+                                                />
+                                            </div>
+                                            <div className="mt-2 flex gap-4 justify-end">
                                                 <button
-                                                    onClick={handleAddStock}
+                                                    type="button"
+                                                    onClick={cancelEdit}
+                                                    className="py-2 px-4 bg-gray-300 text-gray-700 rounded hover:bg-gray-400"
+                                                >
+                                                    Cancel
+                                                </button>
+                                                <button
+                                                    type="submit"
                                                     className="py-2 px-4 bg-green-500 text-white rounded hover:bg-green-600"
                                                 >
                                                     Add
                                                 </button>
-                                            ) : (
-                                                <button
-                                                    onClick={handleTakeStock}
-                                                    className="py-2 px-4 bg-red-500 text-white rounded hover:bg-red-600"
-                                                >
-                                                    Take
-                                                </button>
-                                            )}
-                                        </div>
+                                            </div>
+                                        </form>
                                     </div>
                                 )}
                             </div>

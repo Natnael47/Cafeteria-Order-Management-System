@@ -2,6 +2,7 @@ import express from "express";
 import multer from "multer";
 import {
   addInventory,
+  addStock,
   listInventory,
   removeInventory,
   updateInventory,
@@ -29,6 +30,7 @@ inventoryRoute.post(
 
 inventoryRoute.get("/list-inventory", empAuth, listInventory);
 inventoryRoute.post("/remove-inventory", empAuth, removeInventory);
+inventoryRoute.post("/add-stock", empAuth, addStock);
 inventoryRoute.post(
   "/update-inventory",
   empAuth,
