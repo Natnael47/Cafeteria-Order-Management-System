@@ -76,27 +76,47 @@ const listInventory = async (req, res) => {
   }
 };
 
-// Remove an inventory item and delete associated image if exists
+// Remove an inventory item and delete associated image if it exists
 const removeInventory = async (req, res) => {
   try {
     const itemId = parseInt(req.body.id, 10);
     if (isNaN(itemId)) {
-      res
+      return res
         .status(400)
         .json({ success: false, message: "Invalid inventory item ID" });
-      return;
     }
 
-    const item = await prisma.inventory.findUnique({ where: { id: itemId } });
+    // Check if item exists
+    const item = await prisma.inventory.findUnique({
+      where: { id: itemId },
+      include: {
+        purchaseRecords: true,
+        requests: true,
+        withdrawalLogs: true,
+        supplierOrders: true,
+      },
+    });
+
     if (!item) {
-      res
+      return res
         .status(404)
         .json({ success: false, message: "Inventory item not found" });
-      return;
     }
 
+    // Delete related records
+    await prisma.inventoryPurchase.deleteMany({
+      where: { inventoryId: itemId },
+    });
+    await prisma.inventoryRequest.deleteMany({
+      where: { inventoryId: itemId },
+    });
+    await prisma.withdrawalLog.deleteMany({ where: { inventoryId: itemId } });
+    await prisma.supplierOrder.deleteMany({ where: { inventoryId: itemId } });
+
+    // Delete the inventory item
     await prisma.inventory.delete({ where: { id: itemId } });
 
+    // Optional: Delete image file if exists
     if (item.image) {
       deleteImage(path.join("upload_inv", item.image));
     }

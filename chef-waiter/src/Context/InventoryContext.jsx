@@ -69,12 +69,14 @@ const InventoryContextProvide = (props) => {
                 { id: selectedInventoryId },
                 { headers: { iToken } }
             );
-            await fetchInventoryList();
-            closeModal();
+
+            // Only close the modal and fetch inventory list if the delete was successful
             if (response.data.success) {
+                await fetchInventoryList();
+                closeModal();
                 toast.success("Inventory Removed");
             } else {
-                toast.error("Error removing inventory");
+                toast.error(response.data.message || "Error removing inventory");
             }
         } catch (error) {
             console.error("Error removing inventory:", error.message);
