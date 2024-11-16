@@ -88,14 +88,8 @@ const InventoryContextProvide = (props) => {
         const formData = new FormData();
         formData.append("name", data.name);
         formData.append("description", data.description);
-        formData.append("quantity", Number(data.quantity));
         formData.append("unit", data.unit);
-        formData.append("pricePerUnit", Number(data.pricePerUnit));
         formData.append("category", data.category);
-        formData.append("status", data.status);
-        formData.append("dateReceived", data.dateReceived);
-        formData.append("supplier", data.supplier);
-        formData.append("expiryDate", data.expiryDate);
         if (image) formData.append("image", image);
 
         try {
@@ -104,14 +98,8 @@ const InventoryContextProvide = (props) => {
                 setData({
                     name: "",
                     description: "",
-                    quantity: "",
                     unit: "",
-                    pricePerUnit: "",
                     category: "Electronics",
-                    status: "",
-                    dateReceived: "",
-                    supplier: "",
-                    expiryDate: "",
                 });
                 setImage(null);
                 toast.success("Inventory item added successfully");

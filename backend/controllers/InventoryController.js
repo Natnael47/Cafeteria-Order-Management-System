@@ -29,16 +29,16 @@ const addInventory = async (req, res) => {
         name: req.body.name,
         category: req.body.category,
         description: req.body.description || null,
-        quantity: parseInt(req.body.quantity, 10) || 0,
-        initialQuantity: parseInt(req.body.quantity, 10) || 0, // Add initial quantity
+        quantity: 0,
+        initialQuantity: 0,
         unit: req.body.unit,
         pricePerUnit: req.body.pricePerUnit
           ? parseFloat(req.body.pricePerUnit)
           : null,
-        status: req.body.status,
-        dateReceived: new Date(req.body.dateReceived),
-        supplier: req.body.supplier || null,
-        expiryDate: req.body.expiryDate ? new Date(req.body.expiryDate) : null,
+        status: "empty", // Setting default status
+        dateReceived: new Date(), // Set to today's date
+        supplier: null, // Optional field
+        expiryDate: null, // Optional field
         image: imageFilename,
       },
     });
@@ -202,9 +202,47 @@ const updateInventory = async (req, res) => {
   }
 };
 
-// Increase quantity of an existing item
+// Function to increase the quantity of an existing item in inventory
 const addStock = async (req, res) => {
-  // Increase the quantity of an existing item in inventory
+  try {
+    const inventoryId = parseInt(req.body.inventoryId, 10);
+    const quantityToAdd = parseInt(req.body.quantity, 10) || 0;
+    const pricePerUnit = parseFloat(req.body.pricePerUnit) || null;
+
+    // Update inventory by increasing quantity
+    const updatedInventory = await prisma.inventory.update({
+      where: { id: inventoryId },
+      data: {
+        quantity: {
+          increment: quantityToAdd,
+        },
+        dateUpdated: new Date(),
+      },
+    });
+
+    // Save the corresponding record in InventoryPurchase
+    await prisma.inventoryPurchase.create({
+      data: {
+        inventoryId: inventoryId,
+        purchaseDate: new Date(), // Current date for this new purchase
+        quantityBought: quantityToAdd,
+        pricePerUnit: pricePerUnit, // Adding price per unit
+        supplier: req.body.supplier || updatedInventory.supplier || null,
+        cost: pricePerUnit ? pricePerUnit * quantityToAdd : null, // Calculating cost based on provided price per unit
+      },
+    });
+
+    res.json({
+      success: true,
+      message: "Inventory stock added and purchase record updated",
+      data: updatedInventory,
+    });
+  } catch (error) {
+    console.error("Error adding stock to inventory:", error);
+    res
+      .status(500)
+      .json({ success: false, message: "Error adding stock to inventory" });
+  }
 };
 
 // Request inventory item

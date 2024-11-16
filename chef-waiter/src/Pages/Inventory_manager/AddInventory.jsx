@@ -9,14 +9,8 @@ const AddInventory = () => {
     const [data, setData] = useState({
         name: "",
         description: "",
-        quantity: "",
         unit: "",
-        pricePerUnit: "",
         category: "Electronics",
-        status: "",
-        dateReceived: "",
-        supplier: "",
-        expiryDate: "",
     });
 
     const onChangeHandler = (event) => {
@@ -66,12 +60,9 @@ const AddInventory = () => {
                             <option value="Grains">Grains</option>
                             <option value="Condiments">Condiments</option>
                             <option value="Cleaning Supplies">Cleaning Supplies</option>
+                            <option value="Bakery">Bakery</option>
                             <option value="Other">Other</option>
                         </select>
-                    </div>
-                    <div>
-                        <p className="mb-2 mt-4">Quantity</p>
-                        <input className="w-full px-3 py-2 sm:w-[150px] border border-gray-600 rounded-md focus:border-black" onChange={onChangeHandler} value={data.quantity} type='number' name='quantity' placeholder='0' required />
                     </div>
                 </div>
                 <div className="flex flex-col sm:flex-row gap-2 w-full sm:gap-8 mt-3">
@@ -90,30 +81,8 @@ const AddInventory = () => {
                             <option value="pieces">pieces</option>
                             <option value="packs">packs</option>
                             <option value="boxes">boxes</option>
+                            <option value="loaves">Loaf (kg)</option>
                         </select>
-                    </div>
-                    <div>
-                        <p className="mb-2">Price Per Unit</p>
-                        <input className="w-full px-3 py-2 sm:w-[150px] border border-gray-600 rounded-md focus:border-black" onChange={onChangeHandler} value={data.pricePerUnit} type='number' name='pricePerUnit' placeholder='$' required />
-                    </div>
-                    <div>
-                        <p className="mb-2">Status</p>
-                        <input className="w-full px-3 py-2 sm:w-[150px] border border-gray-600 rounded-md focus:border-black" onChange={onChangeHandler} value={data.status} type='text' name='status' placeholder='Available, Pending, etc.' required />
-                    </div>
-                </div>
-
-                <div className="flex flex-col sm:flex-row gap-2 w-full sm:gap-8 mt-3">
-                    <div>
-                        <p className="mb-2">Date Received</p>
-                        <input className="w-full px-3 py-2 sm:w-[150px] border border-gray-600 rounded-md focus:border-black" onChange={onChangeHandler} value={data.dateReceived} type='date' name='dateReceived' required />
-                    </div>
-                    <div>
-                        <p className="mb-2">Supplier</p>
-                        <input className="w-full px-3 py-2 sm:w-[150px] border border-gray-600 rounded-md focus:border-black" onChange={onChangeHandler} value={data.supplier} type='text' name='supplier' required />
-                    </div>
-                    <div>
-                        <p className="mb-2">Expiry Date</p>
-                        <input className="w-full px-3 py-2 sm:w-[150px] border border-gray-600 rounded-md focus:border-black" onChange={onChangeHandler} value={data.expiryDate} type='date' name='expiryDate' required />
                     </div>
                 </div>
 
@@ -124,8 +93,7 @@ const AddInventory = () => {
                 </div>
             </div>
         </form>
-
     );
-}
+};
 
 export default AddInventory;
