@@ -202,29 +202,28 @@ const updateInventory = async (req, res) => {
   }
 };
 
+// Update item in inventory and Save data on Purchase request
 const addStock = async (req, res) => {
   try {
-    // Validate input data from the request body
     const inventoryId = parseInt(req.body.inventoryId, 10);
     const quantityToAdd = parseInt(req.body.quantity, 10) || 0;
-    const pricePerUnit = parseFloat(req.body.pricePerUnit) || null;
-    const supplier = req.body.supplier || null;
+    const pricePerUnit = req.body.pricePerUnit
+      ? parseFloat(req.body.pricePerUnit)
+      : null; // Default to null if not provided
+    const supplier = req.body.supplier || undefined; // Optional field
     const expiryDate = req.body.expiryDate
       ? new Date(req.body.expiryDate)
-      : null;
+      : undefined;
     const dateReceived = req.body.dateReceived
       ? new Date(req.body.dateReceived)
       : new Date();
 
-    // Check if inventoryId is valid
     if (!inventoryId || isNaN(inventoryId)) {
-      return res.status(400).json({
-        success: false,
-        message: "Invalid or missing inventoryId",
-      });
+      return res
+        .status(400)
+        .json({ success: false, message: "Invalid or missing inventoryId" });
     }
 
-    // Fetch current inventory to update initial quantity if it was previously 0
     const currentInventory = await prisma.inventory.findUnique({
       where: { id: inventoryId },
     });
@@ -236,47 +235,64 @@ const addStock = async (req, res) => {
       });
     }
 
-    // Update inventory by increasing quantity and updating other fields
+    let newStatus = currentInventory.status;
+    if (quantityToAdd > 0) {
+      newStatus =
+        currentInventory.quantity + quantityToAdd ===
+        currentInventory.initialQuantity
+          ? "full"
+          : "available";
+    } else if (currentInventory.quantity + quantityToAdd <= 0) {
+      newStatus = "empty";
+    }
+
+    // Dynamically construct the update data
+    const inventoryData = {
+      quantity: { increment: quantityToAdd },
+      status: newStatus,
+      dateReceived: dateReceived,
+      dateUpdated: new Date(),
+    };
+
+    // Conditionally add fields only if they exist in the request
+    if (pricePerUnit !== null) inventoryData.pricePerUnit = pricePerUnit;
+    if (supplier) inventoryData.supplier = supplier;
+    if (expiryDate) inventoryData.expiryDate = expiryDate;
+
+    console.log("Data being sent to Prisma update:", inventoryData);
+
     const updatedInventory = await prisma.inventory.update({
       where: { id: inventoryId },
-      data: {
-        quantity: {
-          increment: quantityToAdd,
-        },
-        initialQuantity:
-          currentInventory.initialQuantity === 0
-            ? quantityToAdd
-            : currentInventory.initialQuantity,
-        pricePerUnit: pricePerUnit,
-        dateReceived: dateReceived,
-        dateUpdated: new Date(),
-        supplier: supplier,
-        expiryDate: expiryDate,
-      },
+      data: inventoryData,
     });
 
-    // Save the corresponding record in InventoryPurchase
+    console.log("Updated Inventory:", updatedInventory);
+
+    const purchaseRecord = {
+      inventoryId,
+      purchaseDate: new Date(),
+      quantityBought: quantityToAdd,
+      pricePerUnit: pricePerUnit || currentInventory.pricePerUnit,
+      supplier: supplier || currentInventory.supplier,
+      cost: pricePerUnit ? pricePerUnit * quantityToAdd : null,
+    };
+
+    console.log("Purchase Record Data:", purchaseRecord);
+
     await prisma.inventoryPurchase.create({
-      data: {
-        inventoryId: inventoryId,
-        purchaseDate: new Date(), // Current date for this new purchase
-        quantityBought: quantityToAdd,
-        pricePerUnit: pricePerUnit, // Adding price per unit
-        supplier: supplier || updatedInventory.supplier || null,
-        cost: pricePerUnit ? pricePerUnit * quantityToAdd : null, // Calculating cost based on provided price per unit
-      },
+      data: purchaseRecord,
     });
 
     res.json({
       success: true,
-      message: "Inventory stock added and purchase record updated",
+      message: "Inventory stock added successfully",
       data: updatedInventory,
     });
   } catch (error) {
-    console.error("Error adding stock to inventory:", error);
+    console.error("Error adding stock:", error);
     res.status(500).json({
       success: false,
-      message: "Error adding stock to inventory",
+      message: "Error adding stock",
     });
   }
 };

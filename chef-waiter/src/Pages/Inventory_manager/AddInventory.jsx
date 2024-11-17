@@ -3,13 +3,13 @@ import { assets } from '../../assets/assets';
 import { InventoryContext } from "../../Context/InventoryContext";
 
 const AddInventory = () => {
-    const { iToken, addInventory } = useContext(InventoryContext);
+    const { addInventory } = useContext(InventoryContext);
 
     const [image, setImage] = useState(null);
     const [data, setData] = useState({
         name: "",
         description: "",
-        unit: "",
+        unit: "kg",
         category: "Electronics",
     });
 
