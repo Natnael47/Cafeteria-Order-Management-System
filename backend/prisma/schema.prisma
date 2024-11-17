@@ -7,154 +7,165 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
+// Employee model - Represents employees within the system
 model employee {
-  id         Int      @id @default(autoincrement())
-  firstName  String   @db.VarChar(255)
-  lastName   String   @db.VarChar(255)
-  gender     String   @db.VarChar(50)
-  email      String   @unique(map: "Employee_email_key") @db.VarChar(255)
-  password   String   @db.VarChar(255)
-  image      String   @db.VarChar(255)
-  phone      String   @db.VarChar(20)
-  position   String   @db.VarChar(100)
-  shift      String   @db.VarChar(100)
-  education  String   @db.VarChar(255)
-  experience String   @db.VarChar(255)
-  salary     Float    @db.Float
-  address    Json
-  about      String   @db.Text
-  date       DateTime @default(now())
+  id         Int      @id @default(autoincrement()) // Unique identifier for each employee
+  firstName  String   @db.VarChar(255) // Employee's first name
+  lastName   String   @db.VarChar(255) // Employee's last name
+  gender     String   @db.VarChar(50) // Employee's gender
+  email      String   @unique(map: "Employee_email_key") @db.VarChar(255) // Unique email address
+  password   String   @db.VarChar(255) // Employee's password
+  image      String   @db.VarChar(255) // URL or path to employee's profile image
+  phone      String   @db.VarChar(20) // Employee's phone number
+  position   String   @db.VarChar(100) // Job position or role
+  shift      String   @db.VarChar(100) // Work shift or hours
+  education  String   @db.VarChar(255) // Education details
+  experience String   @db.VarChar(255) // Work experience
+  salary     Float    @db.Float // Employee's salary
+  address    Json // Employee's address details in JSON format
+  about      String   @db.Text // Additional information about the employee
+  date       DateTime @default(now()) // Date of record creation
 }
 
+// User model - Represents customers or system users
+model user {
+  id        Int        @id @default(autoincrement()) // Unique identifier for each user
+  firstName String     @db.VarChar(255) // User's first name
+  lastName  String     @db.VarChar(255) // User's last name
+  email     String     @unique(map: "User_email_key") @db.VarChar(255) // Unique email address
+  password  String     @db.VarChar(255) // User's password
+  gender    String     @default("not selected") @db.VarChar(50) // User's gender with default
+  address   Json // User's address information in JSON format
+  dob       String     @default("not selected") @db.VarChar(100) // Date of birth
+  phone     String     @default("+251 911524856") @db.VarChar(20) // User's phone number
+  cartData  Json // User's shopping cart data in JSON format
+  feedback  feedback[] // Relation to feedback table
+  order     order[] // Relation to order table
+}
+
+// Feedback model - Represents user feedback
 model feedback {
-  id      Int      @id @default(autoincrement())
-  userId  Int
-  comment String   @db.Text
-  rating  Float
-  date    DateTime @default(now())
+  id      Int      @id @default(autoincrement()) // Unique identifier for each feedback
+  userId  Int // Foreign key to User table
+  comment String   @db.Text // User's feedback comment
+  rating  Float // User's rating
+  date    DateTime @default(now()) // Date when feedback was given
   user    user     @relation(fields: [userId], references: [id], map: "Feedback_userId_fkey")
 
   @@index([userId], map: "Feedback_userId_fkey")
 }
 
-model food {
-  id          Int     @id @default(autoincrement())
-  name        String  @db.VarChar(255)
-  description String  @db.VarChar(255)
-  price       Float
-  image       String  @db.VarChar(255)
-  category    String  @db.VarChar(255)
-  menuStatus  Boolean @default(true)
-}
-
-model inventory {
-  id                Int                 @id @default(autoincrement())
-  name              String              @db.VarChar(255)
-  category          String              @db.VarChar(100)
-  description       String?             @db.VarChar(500)
-  quantity          Int                 @default(0)
-  unit              String              @db.VarChar(50)
-  pricePerUnit      Float?
-  status            String?             @db.VarChar(50)
-  dateReceived      DateTime
-  dateUpdated       DateTime
-  supplier          String?             @db.VarChar(255)
-  expiryDate        DateTime?
-  image             String?             @db.VarChar(255)
-  initialQuantity   Int?                @default(0)
-  inventorypurchase inventorypurchase[]
-  inventoryrequest  inventoryrequest[]
-  supplierorder     supplierorder[]
-  withdrawallog     withdrawallog[]
-}
-
-model inventorypurchase {
-  id             Int       @id @default(autoincrement())
-  inventoryId    Int
-  purchaseDate   DateTime  @default(now())
-  quantityBought Int
-  supplier       String?
-  cost           Float?
-  pricePerUnit   Float?
-  inventory      inventory @relation(fields: [inventoryId], references: [id], map: "InventoryPurchase_inventoryId_fkey")
-
-  @@index([inventoryId], map: "InventoryPurchase_inventoryId_fkey")
-}
-
-model inventoryrequest {
-  id            Int       @id @default(autoincrement())
-  inventoryId   Int
-  requestedBy   String
-  quantity      Int
-  dateRequested DateTime  @default(now())
-  status        String    @db.VarChar(50)
-  inventory     inventory @relation(fields: [inventoryId], references: [id], map: "InventoryRequest_inventoryId_fkey")
-
-  @@index([inventoryId], map: "InventoryRequest_inventoryId_fkey")
-}
-
+// Order model - Represents user orders
 model order {
-  id            Int       @id @default(autoincrement())
-  userId        Int
-  items         Json
-  amount        Float
-  address       Json
-  status        String    @default("Order Placed") @db.VarChar(255)
-  paymentMethod String    @db.VarChar(255)
-  payment       Boolean   @default(false)
-  date          DateTime  @default(now())
+  id            Int       @id @default(autoincrement()) // Unique identifier for each order
+  userId        Int // Foreign key to User table
+  items         Json // List of items in the order (stored as JSON)
+  amount        Float // Total amount of the order
+  address       Json // Delivery address for the order (stored as JSON)
+  status        String    @default("Order Placed") @db.VarChar(255) // Order status
+  paymentMethod String    @db.VarChar(255) // Payment method used for the order
+  isPaid        Boolean   @default(false) // Indicates if payment is completed
+  date          DateTime  @default(now()) // Date when the order was placed
   user          user      @relation(fields: [userId], references: [id], map: "Order_userId_fkey")
-  payment       payment[]
+  payment       payment[] // Relation to payment table
 
   @@index([userId], map: "Order_userId_fkey")
 }
 
+// Payment model - Represents order payments
 model payment {
-  id            Int      @id @default(autoincrement())
-  amount        Float
-  method        String   @db.VarChar(255)
-  date          DateTime @default(now())
-  status        String   @default("Pending") @db.VarChar(100)
-  transactionId String?  @db.VarChar(255)
-  orderId       Int
+  id            Int      @id @default(autoincrement()) // Unique identifier for each payment
+  amount        Float // Payment amount
+  method        String   @db.VarChar(255) // Payment method (e.g., card, cash)
+  date          DateTime @default(now()) // Date when the payment was made
+  status        String   @default("Pending") @db.VarChar(100) // Payment status
+  transactionId String?  @db.VarChar(255) // Optional transaction ID
+  orderId       Int // Foreign key to Order table
   order         order    @relation(fields: [orderId], references: [id], map: "Payment_orderId_fkey")
 
   @@index([orderId], map: "Payment_orderId_fkey")
 }
 
+// Food model - Represents food items
+model food {
+  id          Int     @id @default(autoincrement()) // Unique identifier for each food item
+  name        String  @db.VarChar(255) // Name of the food item
+  description String  @db.VarChar(255) // Description of the food item
+  price       Float // Price of the food item
+  image       String  @db.VarChar(255) // URL or path to food item image
+  category    String  @db.VarChar(255) // Category of the food item (e.g., appetizer, dessert)
+  menuStatus  Boolean @default(true) // Indicates if the item is available on the menu
+}
+
+// Inventory model - Represents inventory items
+model inventory {
+  id                Int                 @id @default(autoincrement()) // Unique identifier for each inventory item
+  name              String              @db.VarChar(255) // Name of the inventory item
+  category          String              @db.VarChar(100) // Category of the inventory item
+  description       String?             @db.VarChar(500) // Optional description of the inventory item
+  quantity          Int                 @default(0) // Current quantity available
+  unit              String              @db.VarChar(50) // Unit of measurement for the item
+  pricePerUnit      Float? // Optional price per unit
+  status            String?             @db.VarChar(50) // Optional status of the inventory item
+  dateReceived      DateTime // Date when the item was received
+  dateUpdated       DateTime // Date when the item was last updated
+  supplier          String?             @db.VarChar(255) // Optional supplier name
+  expiryDate        DateTime? // Optional expiry date of the item
+  image             String?             @db.VarChar(255) // Optional image of the inventory item
+  initialQuantity   Int?                @default(0) // Initial quantity when received
+  inventorypurchase inventorypurchase[] // Relation to inventory purchase table
+  inventoryrequest  inventoryrequest[] // Relation to inventory requests
+  supplierorder     supplierorder[] // Relation to supplier orders
+  withdrawallog     withdrawallog[] // Relation to withdrawal logs
+}
+
+// Inventory Purchase model - Tracks inventory purchases
+model inventorypurchase {
+  id             Int       @id @default(autoincrement()) // Unique identifier for each purchase
+  inventoryId    Int // Foreign key to Inventory table
+  purchaseDate   DateTime  @default(now()) // Date when the purchase was made
+  quantityBought Int // Quantity bought
+  supplier       String? // Optional supplier name
+  cost           Float? // Optional cost of the purchase
+  pricePerUnit   Float? // Optional price per unit
+  inventory      inventory @relation(fields: [inventoryId], references: [id], map: "InventoryPurchase_inventoryId_fkey")
+
+  @@index([inventoryId], map: "InventoryPurchase_inventoryId_fkey")
+}
+
+// Inventory Request model - Tracks inventory requests
+model inventoryrequest {
+  id            Int       @id @default(autoincrement()) // Unique identifier for each request
+  inventoryId   Int // Foreign key to Inventory table
+  requestedBy   String // Name of the person requesting the item
+  quantity      Int // Quantity requested
+  dateRequested DateTime  @default(now()) // Date of request
+  status        String    @db.VarChar(50) // Status of the request
+  inventory     inventory @relation(fields: [inventoryId], references: [id], map: "InventoryRequest_inventoryId_fkey")
+
+  @@index([inventoryId], map: "InventoryRequest_inventoryId_fkey")
+}
+
+// Supplier Order model - Tracks supplier orders
 model supplierorder {
-  id              Int       @id @default(autoincrement())
-  inventoryId     Int
-  quantityOrdered Int
-  orderDate       DateTime  @default(now())
-  supplier        String?
-  status          String    @db.VarChar(50)
+  id              Int       @id @default(autoincrement()) // Unique identifier for each supplier order
+  inventoryId     Int // Foreign key to Inventory table
+  quantityOrdered Int // Quantity ordered
+  orderDate       DateTime  @default(now()) // Date when the order was placed
+  supplier        String? // Optional supplier name
+  status          String    @db.VarChar(50) // Status of the supplier order
   inventory       inventory @relation(fields: [inventoryId], references: [id], map: "SupplierOrder_inventoryId_fkey")
 
   @@index([inventoryId], map: "SupplierOrder_inventoryId_fkey")
 }
 
-model user {
-  id        Int        @id @default(autoincrement())
-  firstName String     @db.VarChar(255)
-  lastName  String     @db.VarChar(255)
-  email     String     @unique(map: "User_email_key") @db.VarChar(255)
-  password  String     @db.VarChar(255)
-  gender    String     @default("not selected") @db.VarChar(50)
-  address   Json
-  dob       String     @default("not selected") @db.VarChar(100)
-  phone     String     @default("+251 911524856") @db.VarChar(20)
-  cartData  Json
-  feedback  feedback[]
-  order     order[]
-}
-
+// Withdrawal Log model - Tracks inventory withdrawals
 model withdrawallog {
-  id            Int       @id @default(autoincrement())
-  inventoryId   Int
-  withdrawnBy   String
-  quantity      Int
-  dateWithdrawn DateTime  @default(now())
+  id            Int       @id @default(autoincrement()) // Unique identifier for each withdrawal log
+  inventoryId   Int // Foreign key to Inventory table
+  withdrawnBy   String // Name of the person withdrawing the item
+  quantity      Int // Quantity withdrawn
+  dateWithdrawn DateTime  @default(now()) // Date when the item was withdrawn
   inventory     inventory @relation(fields: [inventoryId], references: [id], map: "WithdrawalLog_inventoryId_fkey")
 
   @@index([inventoryId], map: "WithdrawalLog_inventoryId_fkey")

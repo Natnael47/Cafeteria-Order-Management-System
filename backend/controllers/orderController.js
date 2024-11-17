@@ -74,7 +74,7 @@ const PlaceOrder = async (req, res) => {
         address,
         amount,
         paymentMethod: "COD",
-        payment: false,
+        isPaid: false,
         date: new Date(),
         status: "Order Placed", // Set initial status to "Order Placed"
       },
@@ -105,7 +105,7 @@ const PlaceOrderStripe = async (req, res) => {
         address,
         amount,
         paymentMethod: "stripe",
-        payment: false,
+        isPaid: false,
         date: new Date(),
         status: "Order Placed", // Set initial status to "Order Placed"
       },
@@ -151,7 +151,7 @@ const verifyStripe = async (req, res) => {
     if (success === "true") {
       await prisma.order.update({
         where: { id: orderId },
-        data: { payment: true },
+        data: { isPaid: true },
       });
 
       await prisma.user.update({
