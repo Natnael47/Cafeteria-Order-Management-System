@@ -32,9 +32,7 @@ const addInventory = async (req, res) => {
         quantity: 0,
         initialQuantity: 0,
         unit: req.body.unit,
-        pricePerUnit: req.body.pricePerUnit
-          ? parseFloat(req.body.pricePerUnit)
-          : null,
+        pricePerUnit: 0,
         status: "empty", // Setting default status
         dateReceived: new Date(), // Set to today's date
         supplier: null, // Optional field
@@ -202,7 +200,7 @@ const updateInventory = async (req, res) => {
   }
 };
 
-// Update item in inventory and Save data on Purchase request
+// Add stock item
 const addStock = async (req, res) => {
   try {
     // Extracting data from the request body
@@ -233,20 +231,28 @@ const addStock = async (req, res) => {
         .json({ success: false, message: "Inventory item not found" });
     }
 
-    // Update inventory data
+    // Calculate the updated quantity
     const updatedQuantity = inventoryItem.quantity + quantity;
-    const status = updatedQuantity > 100 ? "full" : "available";
 
+    // Check if the updated quantity exceeds the initial quantity
+    let updatedInitialQuantity = inventoryItem.initialQuantity;
+
+    if (updatedQuantity > updatedInitialQuantity) {
+      // If so, update initialQuantity to match the updatedQuantity
+      updatedInitialQuantity = updatedQuantity;
+    }
+
+    // Update inventory data
     const updatedInventory = await prisma.inventory.update({
       where: { id: inventoryId },
       data: {
         quantity: updatedQuantity,
+        initialQuantity: updatedInitialQuantity, // Update the initial quantity
         pricePerUnit,
         supplier,
         expiryDate: expiryDate ? new Date(expiryDate) : null,
         dateReceived: new Date(dateReceived),
         dateUpdated: new Date(), // Update the dateUpdated to the current timestamp
-        status,
       },
     });
 
@@ -260,6 +266,9 @@ const addStock = async (req, res) => {
         pricePerUnit,
       },
     });
+
+    // Call the function to calculate and store the percentage in the status field
+    await calculateStockPercentageAndStoreInStatus(inventoryId);
 
     // Respond with success and updated inventory data
     return res.status(200).json({
@@ -322,17 +331,14 @@ const withdrawItem = async (req, res) => {
       });
     }
 
-    // Calculate new quantity and status
+    // Calculate new quantity
     const newQuantity = inventoryItem.quantity - quantity;
-    const newStatus =
-      newQuantity <= 0 ? "empty" : newQuantity <= 5 ? "low" : "available";
 
-    // Update inventory quantity and status
+    // Update inventory quantity and other fields
     const updatedInventory = await prisma.inventory.update({
       where: { id: inventoryItem.id },
       data: {
         quantity: newQuantity,
-        status: newStatus,
         dateUpdated: new Date(),
       },
     });
@@ -346,6 +352,9 @@ const withdrawItem = async (req, res) => {
         dateWithdrawn: new Date(),
       },
     });
+
+    // Call the function to calculate and store the percentage in the status field
+    await calculateStockPercentageAndStoreInStatus(inventoryId);
 
     res.json({
       success: true,
@@ -394,9 +403,11 @@ const logInventoryChange = async (req, res) => {
   // Record changes to inventory for accountability
 };
 
-// Function to calculate stock left as a percentage
-const calculateStockPercentage = async (inventoryId) => {
+// Function to calculate stock left as a percentage and store the exact percentage in the status field
+// Function to calculate stock left as a percentage and store the exact percentage in the status field
+const calculateStockPercentageAndStoreInStatus = async (inventoryId) => {
   try {
+    // Retrieve the inventory item by ID
     const item = await prisma.inventory.findUnique({
       where: { id: inventoryId },
     });
@@ -405,10 +416,31 @@ const calculateStockPercentage = async (inventoryId) => {
       throw new Error("Invalid item or initial quantity not set");
     }
 
+    // Calculate the percentage of stock left
     const percentageLeft = (item.quantity / item.initialQuantity) * 100;
-    return percentageLeft;
+
+    // Round the percentage to the nearest integer
+    const roundedPercentage = Math.round(percentageLeft);
+
+    // Log the rounded percentage for debugging
+    console.log(
+      `Inventory ID: ${inventoryId}, Percentage Left: ${roundedPercentage}%`
+    );
+
+    // Store the rounded percentage as a string in the status field
+    await prisma.inventory.update({
+      where: { id: inventoryId },
+      data: {
+        status: `${roundedPercentage}`, // Ensure status is a string like "59"
+      },
+    });
+
+    return { percentageLeft: roundedPercentage }; // Return the rounded percentage of stock left
   } catch (error) {
-    console.error("Error calculating stock percentage:", error);
+    console.error(
+      "Error calculating stock percentage and storing in status:",
+      error
+    );
     throw error;
   }
 };
@@ -418,7 +450,7 @@ export {
   addInventory,
   addInventoryBulk,
   addStock,
-  calculateStockPercentage,
+  calculateStockPercentageAndStoreInStatus,
   checkInventoryThreshold,
   generateReport,
   generateUsageReport,
