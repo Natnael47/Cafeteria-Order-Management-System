@@ -205,94 +205,74 @@ const updateInventory = async (req, res) => {
 // Update item in inventory and Save data on Purchase request
 const addStock = async (req, res) => {
   try {
-    const inventoryId = parseInt(req.body.inventoryId, 10);
-    const quantityToAdd = parseInt(req.body.quantity, 10) || 0;
-    const pricePerUnit = req.body.pricePerUnit
-      ? parseFloat(req.body.pricePerUnit)
-      : null; // Default to null if not provided
-    const supplier = req.body.supplier || undefined; // Optional field
-    const expiryDate = req.body.expiryDate
-      ? new Date(req.body.expiryDate)
-      : undefined;
-    const dateReceived = req.body.dateReceived
-      ? new Date(req.body.dateReceived)
-      : new Date();
+    // Extracting data from the request body
+    const {
+      inventoryId,
+      quantity,
+      pricePerUnit,
+      supplier,
+      expiryDate,
+      dateReceived,
+    } = req.body;
 
-    if (!inventoryId || isNaN(inventoryId)) {
+    // Input validation
+    if (!inventoryId || !quantity || !pricePerUnit || !dateReceived) {
       return res
         .status(400)
-        .json({ success: false, message: "Invalid or missing inventoryId" });
+        .json({ success: false, message: "Missing required fields" });
     }
 
-    const currentInventory = await prisma.inventory.findUnique({
+    // Fetch the inventory item by ID
+    const inventoryItem = await prisma.inventory.findUnique({
       where: { id: inventoryId },
     });
 
-    if (!currentInventory) {
-      return res.status(404).json({
-        success: false,
-        message: "Inventory item not found",
-      });
+    if (!inventoryItem) {
+      return res
+        .status(404)
+        .json({ success: false, message: "Inventory item not found" });
     }
 
-    let newStatus = currentInventory.status;
-    if (quantityToAdd > 0) {
-      newStatus =
-        currentInventory.quantity + quantityToAdd ===
-        currentInventory.initialQuantity
-          ? "full"
-          : "available";
-    } else if (currentInventory.quantity + quantityToAdd <= 0) {
-      newStatus = "empty";
-    }
-
-    // Dynamically construct the update data
-    const inventoryData = {
-      quantity: { increment: quantityToAdd },
-      status: newStatus,
-      dateReceived: dateReceived,
-      dateUpdated: new Date(),
-    };
-
-    // Conditionally add fields only if they exist in the request
-    if (pricePerUnit !== null) inventoryData.pricePerUnit = pricePerUnit;
-    if (supplier) inventoryData.supplier = supplier;
-    if (expiryDate) inventoryData.expiryDate = expiryDate;
-
-    console.log("Data being sent to Prisma update:", inventoryData);
+    // Update inventory data
+    const updatedQuantity = inventoryItem.quantity + quantity;
+    const status = updatedQuantity > 100 ? "full" : "available";
 
     const updatedInventory = await prisma.inventory.update({
       where: { id: inventoryId },
-      data: inventoryData,
+      data: {
+        quantity: updatedQuantity,
+        pricePerUnit,
+        supplier,
+        expiryDate: expiryDate ? new Date(expiryDate) : null,
+        dateReceived: new Date(dateReceived),
+        dateUpdated: new Date(), // Update the dateUpdated to the current timestamp
+        status,
+      },
     });
 
-    console.log("Updated Inventory:", updatedInventory);
-
-    const purchaseRecord = {
-      inventoryId,
-      purchaseDate: new Date(),
-      quantityBought: quantityToAdd,
-      pricePerUnit: pricePerUnit || currentInventory.pricePerUnit,
-      supplier: supplier || currentInventory.supplier,
-      cost: pricePerUnit ? pricePerUnit * quantityToAdd : null,
-    };
-
-    console.log("Purchase Record Data:", purchaseRecord);
-
-    await prisma.inventoryPurchase.create({
-      data: purchaseRecord,
+    // Save purchase details to the inventorypurchase table
+    await prisma.inventorypurchase.create({
+      data: {
+        inventoryId,
+        quantityBought: quantity,
+        supplier,
+        cost: quantity * pricePerUnit,
+        pricePerUnit,
+      },
     });
 
-    res.json({
+    // Respond with success and updated inventory data
+    return res.status(200).json({
       success: true,
-      message: "Inventory stock added successfully",
-      data: updatedInventory,
+      message: "Stock added successfully",
+      updatedInventory,
     });
   } catch (error) {
-    console.error("Error adding stock:", error);
-    res.status(500).json({
+    console.error("Error in addStock:", error);
+    return res.status(500).json({
       success: false,
-      message: "Error adding stock",
+      message: "Internal Server Error",
+      error: error.message,
     });
   }
 };
@@ -304,7 +284,84 @@ const requestInventoryItem = async (req, res) => {
 
 // Withdraw item from inventory and log the withdrawal
 const withdrawItem = async (req, res) => {
-  // Reduce stock and log withdrawal
+  try {
+    const { inventoryId, withdrawnBy, quantity } = req.body;
+
+    // Validate input
+    if (
+      !inventoryId ||
+      !withdrawnBy ||
+      !quantity ||
+      isNaN(quantity) ||
+      quantity <= 0
+    ) {
+      return res.status(400).json({
+        success: false,
+        message:
+          "Invalid input: Ensure all required fields are filled with valid data",
+      });
+    }
+
+    // Find the inventory item
+    const inventoryItem = await prisma.inventory.findUnique({
+      where: { id: parseInt(inventoryId, 10) },
+    });
+
+    if (!inventoryItem) {
+      return res.status(404).json({
+        success: false,
+        message: "Inventory item not found",
+      });
+    }
+
+    // Check if enough stock is available
+    if (inventoryItem.quantity < quantity) {
+      return res.status(400).json({
+        success: false,
+        message: "Insufficient stock available for withdrawal",
+      });
+    }
+
+    // Calculate new quantity and status
+    const newQuantity = inventoryItem.quantity - quantity;
+    const newStatus =
+      newQuantity <= 0 ? "empty" : newQuantity <= 5 ? "low" : "available";
+
+    // Update inventory quantity and status
+    const updatedInventory = await prisma.inventory.update({
+      where: { id: inventoryItem.id },
+      data: {
+        quantity: newQuantity,
+        status: newStatus,
+        dateUpdated: new Date(),
+      },
+    });
+
+    // Log the withdrawal in withdrawallog table
+    const withdrawalLog = await prisma.withdrawallog.create({
+      data: {
+        inventoryId: inventoryItem.id,
+        withdrawnBy,
+        quantity,
+        dateWithdrawn: new Date(),
+      },
+    });
+
+    res.json({
+      success: true,
+      message: "Item withdrawn successfully",
+      data: {
+        updatedInventory,
+        withdrawalLog,
+      },
+    });
+  } catch (error) {
+    console.error("Error processing withdrawal:", error);
+    res.status(500).json({
+      success: false,
+      message: "Error processing withdrawal",
+    });
+  }
 };
 
 // Update inventory attributes
