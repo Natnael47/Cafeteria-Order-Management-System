@@ -10,64 +10,78 @@ const Stock = () => {
     const [stockAction, setStockAction] = useState(null); // "in" or "out"
     const [selectedItem, setSelectedItem] = useState(null); // Item to update stock for
     const [formData, setFormData] = useState({
-        stockAmount: 0, // Amount of stock to add or remove
-        pricePerUnit: 0, // Price per unit when adding stock
-        supplier: "", // Supplier input
-        expiryDate: "", // Expiry date input
-        dateReceived: "", // Date received input
+        stockAmount: 0,
+        pricePerUnit: 0, // For stock in
+        supplier: "", // For stock in
+        expiryDate: "", // For stock in
+        dateReceived: "", // For stock in
+        withdrawnBy: "", // For stock out
+        dateWithdrawn: "", // For stock out
     });
 
     useEffect(() => {
-        fetchInventoryList(); // Fetch inventory list on load
+        fetchInventoryList(); // Fetch inventory list on component load
     }, []);
 
     const onChangeHandler = (event) => {
-        const name = event.target.name;
-        const value = event.target.value;
+        const { name, value } = event.target;
         setFormData((prevData) => ({ ...prevData, [name]: value }));
     };
 
     const handleStockAction = (item, action) => {
         setSelectedItem(item);
-        setStockAction(action); // Set action to either "in" or "out"
+        setStockAction(action); // Set to "in" or "out"
         setFormData({
             stockAmount: 0,
             pricePerUnit: 0,
             supplier: "",
             expiryDate: "",
             dateReceived: "",
-        }); // Reset the form data
+            withdrawnBy: "",
+            dateWithdrawn: "",
+        }); // Reset form data
     };
 
-    // Handle stock addition to backend
+    // Handle Stock In
     const onAddStockHandler = async (event) => {
         event.preventDefault();
 
         if (selectedItem && formData.stockAmount > 0 && formData.pricePerUnit > 0) {
             const addedStock = parseInt(formData.stockAmount);
+
+            // Ensure pricePerUnit is a number (even if it comes in as a string)
+            const pricePerUnit = parseFloat(formData.pricePerUnit);  // Convert string to number
+
+            // Ensuring the data is in the correct format as per your example
             const formDataToSend = {
                 inventoryId: selectedItem.id,
-                quantity: formData.stockAmount,
-                pricePerUnit: formData.pricePerUnit,
+                quantity: addedStock,  // Ensure quantity is the number you are adding
+                pricePerUnit: pricePerUnit,  // Ensure pricePerUnit is a number
                 supplier: formData.supplier,
-                expiryDate: formData.expiryDate,
-                dateReceived: formData.dateReceived,
+                expiryDate: formData.expiryDate,  // Expected as a string in "YYYY-MM-DD"
+                dateReceived: formData.dateReceived,  // Expected as a string in "YYYY-MM-DD"
             };
 
+            // Log the data being sent to ensure it's in the correct format
+            console.log("Sending stock-in data:", formDataToSend);
+
             try {
-                const response = await axios.post(backendUrl + "/api/inventory/add-stock", formDataToSend, {
-                    headers: {
-                        'Content-Type': 'application/json', // Set content type as JSON
-                        iToken, // Add the auth token
-                    },
-                });
+                const response = await axios.post(
+                    backendUrl + "/api/inventory/add-stock",
+                    formDataToSend,
+                    {
+                        headers: {
+                            "Content-Type": "application/json",
+                            iToken,
+                        },
+                    }
+                );
 
                 if (response.data.success) {
-                    // Update inventory state after successful stock addition
-                    let updatedQuantity = selectedItem.quantity + addedStock;
+                    const updatedQuantity = selectedItem.quantity + addedStock;
                     let updatedInitialQuantity = selectedItem.initialQuantity;
                     if (selectedItem.initialQuantity - selectedItem.quantity === 0) {
-                        updatedInitialQuantity = selectedItem.initialQuantity + addedStock;
+                        updatedInitialQuantity += addedStock;
                     }
                     updateInventory(
                         { ...selectedItem, quantity: updatedQuantity, initialQuantity: updatedInitialQuantity },
@@ -79,7 +93,7 @@ const Stock = () => {
                     toast.error(response.data.message || "Failed to add stock");
                 }
             } catch (error) {
-                console.error("Error adding stock to inventory:", error);
+                console.error("Error adding stock:", error);
                 toast.error(`Error: ${error.message}`);
             }
         } else {
@@ -87,15 +101,53 @@ const Stock = () => {
         }
     };
 
-    const handleTakeStock = () => {
-        if (formData.stockAmount > 0 && selectedItem.quantity >= formData.stockAmount) {
-            const updatedQuantity = selectedItem.quantity - parseInt(formData.stockAmount);
-            const updatedInitialQuantity = selectedItem.initialQuantity;
-            updateInventory(
-                { ...selectedItem, quantity: updatedQuantity, initialQuantity: updatedInitialQuantity },
-                fetchInventoryList,
-                cancelEdit
-            );
+    // Handle Stock Out
+    const onRemoveStockHandler = async (event) => {
+        event.preventDefault();
+
+        if (selectedItem && formData.stockAmount > 0 && formData.withdrawnBy) {
+            const removedStock = parseInt(formData.stockAmount);
+            if (removedStock > selectedItem.quantity) {
+                toast.error("Insufficient stock available.");
+                return;
+            }
+
+            const formDataToSend = {
+                inventoryId: selectedItem.id,
+                withdrawnBy: formData.withdrawnBy,
+                quantity: removedStock,
+                dateWithdrawn: formData.dateWithdrawn || new Date().toISOString(),
+            };
+
+            try {
+                const response = await axios.post(
+                    backendUrl + "/api/inventory/remove-stock",
+                    formDataToSend,
+                    {
+                        headers: {
+                            "Content-Type": "application/json",
+                            iToken,
+                        },
+                    }
+                );
+
+                if (response.data.success) {
+                    const updatedQuantity = selectedItem.quantity - removedStock;
+                    updateInventory(
+                        { ...selectedItem, quantity: updatedQuantity },
+                        fetchInventoryList,
+                        cancelEdit
+                    );
+                    toast.success("Stock removed successfully");
+                } else {
+                    toast.error(response.data.message || "Failed to remove stock");
+                }
+            } catch (error) {
+                console.error("Error removing stock:", error);
+                toast.error(`Error: ${error.message}`);
+            }
+        } else {
+            toast.error("Please enter a valid quantity and withdrawn by.");
         }
     };
 
@@ -108,6 +160,8 @@ const Stock = () => {
             supplier: "",
             expiryDate: "",
             dateReceived: "",
+            withdrawnBy: "",
+            dateWithdrawn: "",
         });
     };
 
@@ -212,7 +266,59 @@ const Stock = () => {
                                                     type="submit"
                                                     className="py-2 px-4 bg-green-500 text-white rounded hover:bg-green-600"
                                                 >
-                                                    Add
+                                                    Add Stock
+                                                </button>
+                                            </div>
+                                        </form>
+                                    </div>
+                                )}
+
+                                {stockAction === "out" && selectedItem === item && (
+                                    <div className="mt-2 p-3 bg-gray-100 rounded border">
+                                        <p className="font-semibold">Remove Stock</p>
+                                        <form onSubmit={onRemoveStockHandler} className="w-full">
+                                            <div className="flex items-center gap-2">
+                                                <input
+                                                    type="number"
+                                                    value={formData.stockAmount}
+                                                    onChange={onChangeHandler}
+                                                    name="stockAmount"
+                                                    className="p-2 border rounded w-20"
+                                                    min="1"
+                                                />
+                                                <span>{item.unit}</span>
+                                            </div>
+                                            <div className="flex items-center gap-2 mt-3">
+                                                <input
+                                                    type="text"
+                                                    placeholder="Withdrawn by"
+                                                    value={formData.withdrawnBy}
+                                                    onChange={onChangeHandler}
+                                                    name="withdrawnBy"
+                                                    className="p-2 border rounded w-64"
+                                                />
+                                                <input
+                                                    type="date"
+                                                    placeholder="Date withdrawn"
+                                                    value={formData.dateWithdrawn}
+                                                    onChange={onChangeHandler}
+                                                    name="dateWithdrawn"
+                                                    className="p-2 border rounded"
+                                                />
+                                            </div>
+                                            <div className="mt-2 flex gap-4 justify-end">
+                                                <button
+                                                    type="button"
+                                                    onClick={cancelEdit}
+                                                    className="py-2 px-4 bg-gray-300 text-gray-700 rounded hover:bg-gray-400"
+                                                >
+                                                    Cancel
+                                                </button>
+                                                <button
+                                                    type="submit"
+                                                    className="py-2 px-4 bg-red-500 text-white rounded hover:bg-red-600"
+                                                >
+                                                    Remove Stock
                                                 </button>
                                             </div>
                                         </form>
