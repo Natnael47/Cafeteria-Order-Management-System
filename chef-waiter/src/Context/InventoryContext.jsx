@@ -8,6 +8,7 @@ export const InventoryContext = createContext();
 const InventoryContextProvide = (props) => {
     const [iToken, setIToken] = useState(localStorage.getItem('iToken') || '');
     const [inventoryList, setInventoryList] = useState([]);
+    const [orderList, setOrderList] = useState([]); // State to store supplier orders
 
     const fetchInventoryList = async () => {
         try {
@@ -25,6 +26,25 @@ const InventoryContextProvide = (props) => {
         }
     };
 
+    // New function to fetch supplier orders
+    const fetchInventoryOrders = async () => {
+        try {
+            const response = await axios.get(`${backendUrl}/api/inventory/inv-orders`, {
+                headers: { iToken },
+            });
+            if (response.data.success) {
+                console.log(response.data.data);
+
+                setOrderList(response.data.data); // Update the state with fetched order data
+            } else {
+                toast.error("Error fetching inventory orders");
+            }
+        } catch (error) {
+            console.error("Fetch inventory orders error:", error);
+            toast.error("Error fetching inventory orders");
+        }
+    };
+
     const updateInventory = async (editInventory, fetchInventoryList, cancelEdit) => {
         const formData = new FormData();
         formData.append("id", editInventory.id);
@@ -34,7 +54,7 @@ const InventoryContextProvide = (props) => {
         formData.append("unit", editInventory.unit);
         formData.append("pricePerUnit", editInventory.pricePerUnit);
         formData.append("status", editInventory.status);
-        formData.append("initialQuantity", editInventory.initialQuantity); // Add this line to ensure initialQuantity is updated
+        formData.append("initialQuantity", editInventory.initialQuantity);
         if (editInventory.image) formData.append("image", editInventory.image);
 
         try {
@@ -50,7 +70,6 @@ const InventoryContextProvide = (props) => {
             );
             if (response.data.success) {
                 toast.success("Inventory Updated");
-                //console.log("Sending DATA TO UPDATE:", response.data.data);
                 fetchInventoryList();
                 cancelEdit();
             } else {
@@ -62,7 +81,6 @@ const InventoryContextProvide = (props) => {
         }
     };
 
-
     const removeInventory = async (selectedInventoryId, fetchInventoryList, closeModal) => {
         try {
             const response = await axios.post(
@@ -71,7 +89,6 @@ const InventoryContextProvide = (props) => {
                 { headers: { iToken } }
             );
 
-            // Only close the modal and fetch inventory list if the delete was successful
             if (response.data.success) {
                 await fetchInventoryList();
                 closeModal();
@@ -125,9 +142,11 @@ const InventoryContextProvide = (props) => {
         inventoryList,
         setInventoryList,
         fetchInventoryList,
+        fetchInventoryOrders, // Expose the new function
         updateInventory,
         removeInventory,
         addInventory,
+        orderList, // Expose the state for supplier orders
     };
 
     return (
