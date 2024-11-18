@@ -3,6 +3,7 @@ import multer from "multer";
 import {
   addInventory,
   addStock,
+  getSupplierOrders,
   listInventory,
   removeInventory,
   updateInventory,
@@ -33,6 +34,7 @@ inventoryRoute.get("/list-inventory", empAuth, listInventory);
 inventoryRoute.post("/remove-inventory", empAuth, removeInventory);
 inventoryRoute.post("/add-stock", empAuth, addStock);
 inventoryRoute.post("/remove-stock", empAuth, withdrawItem);
+inventoryRoute.get("/inv-orders", empAuth, getSupplierOrders);
 inventoryRoute.post(
   "/update-inventory",
   empAuth,

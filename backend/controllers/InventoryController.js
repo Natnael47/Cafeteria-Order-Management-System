@@ -357,12 +357,15 @@ const withdrawItem = async (req, res) => {
       },
     });
 
-    // Call the function to calculate and store the percentage in the status field
+    // Update the status field with the new stock percentage
     await calculateStockPercentageAndStoreInStatus(inventoryId);
+
+    // Check status and order inventory if needed
+    await orderInventory(inventoryId);
 
     res.json({
       success: true,
-      message: "Item withdrawn successfully",
+      message: "Item withdrawn successfully and inventory checked for reorder.",
       data: {
         updatedInventory,
         withdrawalLog,
@@ -392,9 +395,102 @@ const generateReport = async (req, res) => {
   // Create a summarized report of inventory data
 };
 
-// Order inventory from supplier
-const orderInventory = async (req, res) => {
-  // Log order details in SupplierOrder table
+// Order new stock automatically if inventory status is below the threshold
+const orderInventory = async (inventoryId) => {
+  try {
+    // Find the inventory item
+    const inventoryItem = await prisma.inventory.findUnique({
+      where: { id: parseInt(inventoryId, 10) },
+    });
+
+    if (!inventoryItem) {
+      console.error("Inventory item not found for ordering.");
+      return;
+    }
+
+    // Convert status to an integer
+    const status = parseInt(inventoryItem.status, 10);
+
+    if (isNaN(status)) {
+      console.error(
+        "Status is not a valid number. Cannot determine reorder necessity."
+      );
+      return;
+    }
+
+    // Check if status is below the reorder threshold
+    const reorderThreshold = 5;
+    if (status >= reorderThreshold) {
+      console.log("Stock status is sufficient, no order needed.");
+      return;
+    }
+
+    // Determine the quantity to order (e.g., replenish to 50 units)
+    const quantityToOrder =
+      inventoryItem.initialQuantity - inventoryItem.quantity;
+
+    // Create a supplier order
+    const newSupplierOrder = await prisma.supplierorder.create({
+      data: {
+        inventoryId: inventoryItem.id,
+        quantityOrdered: quantityToOrder,
+        supplier: inventoryItem.supplier || "Default Supplier",
+        status: "Pending",
+      },
+    });
+
+    console.log("Supplier order created:", newSupplierOrder);
+    return newSupplierOrder;
+  } catch (error) {
+    console.error("Error creating supplier order:", error);
+  }
+};
+
+// Fetch all supplier orders with inventory details
+const getSupplierOrders = async (req, res) => {
+  try {
+    // Query supplierorder table and include related inventory details
+    const supplierOrders = await prisma.supplierorder.findMany({
+      include: {
+        inventory: {
+          select: {
+            name: true,
+            pricePerUnit: true,
+            unit: true,
+            status: true,
+          },
+        },
+      },
+    });
+
+    // Format the response to include both supplier order and inventory details
+    const formattedOrders = supplierOrders.map((order) => ({
+      id: order.id,
+      inventoryId: order.inventoryId,
+      inventoryName: order.inventory.name,
+      quantityOrdered: order.quantityOrdered,
+      unit: order.inventory.unit,
+      pricePerUnit: order.inventory.pricePerUnit,
+      totalPrice: order.quantityOrdered * (order.inventory.pricePerUnit || 0), // Calculate total price
+      orderDate: order.orderDate,
+      supplier: order.supplier,
+      orderStatus: order.status,
+      inventoryStatus: order.inventory.status,
+    }));
+
+    // Send the data to the frontend
+    return res.status(200).json({
+      success: true,
+      message: "Supplier orders retrieved successfully",
+      data: formattedOrders,
+    });
+  } catch (error) {
+    console.error("Error retrieving supplier orders:", error);
+    return res.status(500).json({
+      success: false,
+      message: "Error retrieving supplier orders",
+    });
+  }
 };
 
 // Check for low stock items and alert managers if necessary
@@ -458,9 +554,9 @@ export {
   checkInventoryThreshold,
   generateReport,
   generateUsageReport,
+  getSupplierOrders,
   listInventory,
   logInventoryChange,
-  orderInventory,
   removeInventory,
   requestInventoryItem,
   updateInventory,
