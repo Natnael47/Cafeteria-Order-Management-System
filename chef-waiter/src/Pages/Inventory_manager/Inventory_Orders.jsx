@@ -30,7 +30,7 @@ const Inventory_Orders = () => {
                                 <p>{order.inventoryName}</p> {/* Displaying inventory name */}
                                 <p>{order.quantityOrdered} {order.unit}</p> {/* Displaying quantity */}
                                 <p>{order.unit}</p> {/* Displaying unit */}
-                                <p>${order.totalPrice}</p> {/* Displaying price per unit */}
+                                <p>ETB {order.totalPrice}</p> {/* Displaying price per unit */}
                                 <p> {order.inventoryStatus} % {order.pricePerUnit}</p> {/* Displaying order status */}
                                 <p>{new Date(order.orderDate).toLocaleDateString()}</p> {/* Displaying formatted order date */}
                             </div>

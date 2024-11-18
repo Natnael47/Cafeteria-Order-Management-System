@@ -158,10 +158,10 @@ const Stock = () => {
                 <div>
                     <div className="grid grid-cols-[1fr_1fr_1fr_1fr_1fr_0.5fr_0.5fr] items-center gap-2 p-3 border text-sm font-medium bg-[#FAFAFA] text-black sm:grid">
                         <b>Name</b>
-                        <b>Opening Stock</b>
+                        <b>Remaining Stock</b>
                         <b>Total Stock In</b>
                         <b>Total Stock Out</b>
-                        <b>Remaining Stock</b>
+                        <b>Opening Stock</b>
                         <b>Stock In</b>
                         <b>Stock Out</b>
                     </div>
@@ -171,75 +171,108 @@ const Stock = () => {
                         return (
                             <div key={index} className="grid grid-cols-[1fr_1fr_1fr_1fr_1fr_0.3fr_0.7fr] items-center gap-2 p-3 border text-sm font-medium sm:grid bg-white">
                                 <p className="text-[#112F45]">{item.name}</p>
-                                <p>{item.initialQuantity} {item.unit}</p>
+                                <p className="font-bold">{item.quantity} - {item.unit}</p>
                                 <p className="text-green-600">{totalStockIn} <span className="text-green-600">{item.unit}</span></p>
                                 <p className="text-red-600">{totalStockOut} <span className="text-red-600">{item.unit}</span></p>
-                                <p className="text-blue-600">{item.quantity} <span className="text-blue-600">{item.unit}</span></p>
+                                <p className="text-blue-600">{item.initialQuantity} <span className="text-blue-600">{item.unit}</span></p>
                                 <button
                                     onClick={() => handleStockAction(item, "in")}
-                                    className="text-green-600 hover:text-green-800 transition-colors"
+                                    className="text-green-600 hover:text-green-800 transition-colors border-2 border-green-600 rounded-md"
                                 >
                                     Stock In
                                 </button>
                                 <button
                                     onClick={() => handleStockAction(item, "out")}
                                     disabled={item.quantity <= 0}
-                                    className="text-red-600 hover:text-red-800 transition-colors"
+                                    className="text-red-600 hover:text-red-800 transition-colors border-2 border-red-600 rounded-md"
                                 >
                                     Stock Out
                                 </button>
 
                                 {stockAction === "in" && selectedItem === item && (
                                     <div className="mt-2 p-3 bg-gray-100 rounded border">
-                                        <p className="font-semibold">Add Stock</p>
+                                        <p className="font-bold text-lg">Add Stock</p>
                                         <form onSubmit={onAddStockHandler} className="w-full">
-                                            <div className="flex items-center gap-2">
-                                                <input
-                                                    type="number"
-                                                    value={formData.stockAmount}
-                                                    onChange={onChangeHandler}
-                                                    name="stockAmount"
-                                                    className="p-2 border rounded w-20"
-                                                    min="1"
-                                                />
-                                                <span>{item.unit}</span>
+                                            <div className="flex items-start gap-2">
+                                                <div>
+                                                    <label htmlFor="stockAmount" className="block text-sm font-medium">
+                                                        Amount
+                                                    </label>
+                                                    <input
+                                                        id="stockAmount"
+                                                        type="number"
+                                                        value={formData.stockAmount}
+                                                        onChange={onChangeHandler}
+                                                        name="stockAmount"
+                                                        className="p-2 border rounded w-20"
+                                                        min="1"
+                                                    />
+                                                </div>
+                                                <span className="mt-7">{item.unit}</span>
                                             </div>
+
                                             <div className="flex items-center gap-2 mt-3">
-                                                <input
-                                                    type="number"
-                                                    placeholder="Price per unit"
-                                                    value={formData.pricePerUnit}
-                                                    onChange={onChangeHandler}
-                                                    name="pricePerUnit"
-                                                    className="p-2 border rounded w-32"
-                                                />
-                                                <input
-                                                    type="date"
-                                                    placeholder="Date received"
-                                                    value={formData.dateReceived}
-                                                    onChange={onChangeHandler}
-                                                    name="dateReceived"
-                                                    className="p-2 border rounded"
-                                                />
+                                                <div>
+                                                    <label htmlFor="pricePerUnit" className="block text-sm font-medium">
+                                                        Price per Unit
+                                                    </label>
+                                                    <input
+                                                        id="pricePerUnit"
+                                                        type="number"
+                                                        placeholder="Price per unit"
+                                                        value={formData.pricePerUnit}
+                                                        onChange={onChangeHandler}
+                                                        name="pricePerUnit"
+                                                        className="p-2 border rounded w-32"
+                                                    />
+                                                </div>
+                                                <div>
+                                                    <label htmlFor="dateReceived" className="block text-sm font-medium">
+                                                        Date Received
+                                                    </label>
+                                                    <input
+                                                        id="dateReceived"
+                                                        type="date"
+                                                        placeholder="Date received"
+                                                        value={formData.dateReceived}
+                                                        onChange={onChangeHandler}
+                                                        name="dateReceived"
+                                                        className="p-2 border rounded"
+                                                    />
+                                                </div>
                                             </div>
+
                                             <div className="flex items-center gap-2 mt-3">
-                                                <input
-                                                    type="text"
-                                                    placeholder="Supplier"
-                                                    value={formData.supplier}
-                                                    onChange={onChangeHandler}
-                                                    name="supplier"
-                                                    className="p-2 border rounded w-32"
-                                                />
-                                                <input
-                                                    type="date"
-                                                    placeholder="Expiry date"
-                                                    value={formData.expiryDate}
-                                                    onChange={onChangeHandler}
-                                                    name="expiryDate"
-                                                    className="p-2 border rounded"
-                                                />
+                                                <div>
+                                                    <label htmlFor="supplier" className="block text-sm font-medium">
+                                                        Supplier
+                                                    </label>
+                                                    <input
+                                                        id="supplier"
+                                                        type="text"
+                                                        placeholder="Supplier"
+                                                        value={formData.supplier}
+                                                        onChange={onChangeHandler}
+                                                        name="supplier"
+                                                        className="p-2 border rounded w-32"
+                                                    />
+                                                </div>
+                                                <div>
+                                                    <label htmlFor="expiryDate" className="block text-sm font-medium">
+                                                        Expiry Date
+                                                    </label>
+                                                    <input
+                                                        id="expiryDate"
+                                                        type="date"
+                                                        placeholder="Expiry date"
+                                                        value={formData.expiryDate}
+                                                        onChange={onChangeHandler}
+                                                        name="expiryDate"
+                                                        className="p-2 border rounded"
+                                                    />
+                                                </div>
                                             </div>
+
                                             <div className="mt-2 flex gap-4 justify-end">
                                                 <button
                                                     type="button"
@@ -261,38 +294,58 @@ const Stock = () => {
 
                                 {stockAction === "out" && selectedItem === item && (
                                     <div className="mt-2 p-3 bg-gray-100 rounded border">
-                                        <p className="font-semibold">Remove Stock</p>
+                                        <p className="font-semibold text-lg">Remove Stock</p>
                                         <form onSubmit={onRemoveStockHandler} className="w-full">
-                                            <div className="flex items-center gap-2">
-                                                <input
-                                                    type="number"
-                                                    value={formData.stockAmount}
-                                                    onChange={onChangeHandler}
-                                                    name="stockAmount"
-                                                    className="p-2 border rounded w-20"
-                                                    min="1"
-                                                    max={selectedItem.quantity}
-                                                />
-                                                <span>{item.unit}</span>
+                                            <div className="flex items-start gap-2">
+                                                <div>
+                                                    <label htmlFor="stockAmountOut" className="block text-sm font-medium">
+                                                        Amount
+                                                    </label>
+                                                    <input
+                                                        id="stockAmountOut"
+                                                        type="number"
+                                                        value={formData.stockAmount}
+                                                        onChange={onChangeHandler}
+                                                        name="stockAmount"
+                                                        className="p-2 border rounded w-20"
+                                                        min="1"
+                                                        max={selectedItem.quantity}
+                                                    />
+                                                </div>
+                                                <span className="mt-7">{item.unit}</span>
                                             </div>
-                                            <div className="flex items-center gap-2 mt-3">
-                                                <input
-                                                    type="text"
-                                                    placeholder="Withdrawn by"
-                                                    value={formData.withdrawnBy}
-                                                    onChange={onChangeHandler}
-                                                    name="withdrawnBy"
-                                                    className="p-2 border rounded w-32"
-                                                />
-                                                <input
-                                                    type="date"
-                                                    placeholder="Date withdrawn"
-                                                    value={formData.dateWithdrawn}
-                                                    onChange={onChangeHandler}
-                                                    name="dateWithdrawn"
-                                                    className="p-2 border rounded"
-                                                />
+
+                                            <div className="flex items-start gap-2 mt-3">
+                                                <div>
+                                                    <label htmlFor="withdrawnBy" className="block text-sm font-medium">
+                                                        Withdrawn By
+                                                    </label>
+                                                    <input
+                                                        id="withdrawnBy"
+                                                        type="text"
+                                                        placeholder="Withdrawn by"
+                                                        value={formData.withdrawnBy}
+                                                        onChange={onChangeHandler}
+                                                        name="withdrawnBy"
+                                                        className="p-2 border rounded w-32"
+                                                    />
+                                                </div>
+                                                <div>
+                                                    <label htmlFor="dateWithdrawn" className="block text-sm font-medium">
+                                                        Date Withdrawn
+                                                    </label>
+                                                    <input
+                                                        id="dateWithdrawn"
+                                                        type="date"
+                                                        placeholder="Date withdrawn"
+                                                        value={formData.dateWithdrawn}
+                                                        onChange={onChangeHandler}
+                                                        name="dateWithdrawn"
+                                                        className="p-2 border rounded"
+                                                    />
+                                                </div>
                                             </div>
+
                                             <div className="mt-2 flex gap-4 justify-end">
                                                 <button
                                                     type="button"
@@ -311,6 +364,7 @@ const Stock = () => {
                                         </form>
                                     </div>
                                 )}
+
                             </div>
                         );
                     })}

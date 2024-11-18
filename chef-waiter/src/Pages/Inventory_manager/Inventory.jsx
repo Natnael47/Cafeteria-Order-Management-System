@@ -126,7 +126,7 @@ const Inventory = () => {
                 <div>
                     <div className="grid grid-cols-[0.7fr_0.7fr_0.7fr_0.6fr_0.5fr_0.5fr_0.5fr] items-center gap-2 p-3 border text-sm font-medium bg-[#FAFAFA] text-black sm:grid">
                         <b>Status</b>
-                        <b>Name</b>
+                        <b className="ml-5">Name</b>
                         <b>Category</b>
                         <b>Quantity</b>
                         <b>Price / Unit</b>
@@ -154,7 +154,7 @@ const Inventory = () => {
                                     </p>
                                 </div>
 
-                                <p className="text-[#112F45] cursor-pointer hover:text-blue-500" onClick={() => handleNameClick(index)}>
+                                <p className="text-[#112F45] cursor-pointer hover:text-blue-500 ml-5" onClick={() => handleNameClick(index)}>
                                     {item.name}
                                 </p>
                                 <p>{item.category}</p>
