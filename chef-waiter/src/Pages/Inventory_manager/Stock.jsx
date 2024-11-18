@@ -29,16 +29,20 @@ const Stock = () => {
     };
 
     const handleStockAction = (item, action) => {
+        const today = new Date();
+        const twoMonthsFromToday = new Date();
+        twoMonthsFromToday.setMonth(today.getMonth() + 2);
+
         setSelectedItem(item);
         setStockAction(action); // Set to "in" or "out"
         setFormData({
             stockAmount: 0,
-            pricePerUnit: 0,
-            supplier: "",
-            expiryDate: "",
-            dateReceived: "",
+            pricePerUnit: item.pricePerUnit || 0, // Set default pricePerUnit from the selected item
+            supplier: item.supplier || "", // Set default supplier from the selected item
+            dateReceived: today.toISOString().split("T")[0], // Default to today's date
+            expiryDate: twoMonthsFromToday.toISOString().split("T")[0], // Default to two months from today
             withdrawnBy: "",
-            dateWithdrawn: "",
+            dateWithdrawn: today.toISOString().split("T")[0], // Default to today's date
         }); // Reset form data
     };
 
