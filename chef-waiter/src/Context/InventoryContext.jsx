@@ -50,7 +50,7 @@ const InventoryContextProvide = (props) => {
             );
             if (response.data.success) {
                 toast.success("Inventory Updated");
-                //console.log(response.data.data);
+                //console.log("Sending DATA TO UPDATE:", response.data.data);
                 fetchInventoryList();
                 cancelEdit();
             } else {

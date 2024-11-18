@@ -5,7 +5,7 @@ import { backendUrl } from "../../App";
 import { InventoryContext } from "../../Context/InventoryContext";
 
 const Stock = () => {
-    const { inventoryList, fetchInventoryList, updateInventory, iToken } = useContext(InventoryContext);
+    const { inventoryList, fetchInventoryList, iToken } = useContext(InventoryContext);
 
     const [stockAction, setStockAction] = useState(null); // "in" or "out"
     const [selectedItem, setSelectedItem] = useState(null); // Item to update stock for
@@ -47,23 +47,17 @@ const Stock = () => {
         event.preventDefault();
 
         if (selectedItem && formData.stockAmount > 0 && formData.pricePerUnit > 0) {
-            const addedStock = parseInt(formData.stockAmount);
+            const addedStock = parseInt(formData.stockAmount, 10) || 0;
+            const pricePerUnit = parseFloat(formData.pricePerUnit) || 0;  // Convert string to number
 
-            // Ensure pricePerUnit is a number (even if it comes in as a string)
-            const pricePerUnit = parseFloat(formData.pricePerUnit);  // Convert string to number
-
-            // Ensuring the data is in the correct format as per your example
             const formDataToSend = {
                 inventoryId: selectedItem.id,
-                quantity: addedStock,  // Ensure quantity is the number you are adding
-                pricePerUnit: pricePerUnit,  // Ensure pricePerUnit is a number
+                quantity: addedStock,
+                pricePerUnit: pricePerUnit,
                 supplier: formData.supplier,
-                expiryDate: formData.expiryDate,  // Expected as a string in "YYYY-MM-DD"
-                dateReceived: formData.dateReceived,  // Expected as a string in "YYYY-MM-DD"
+                expiryDate: formData.expiryDate,
+                dateReceived: formData.dateReceived,
             };
-
-            // Log the data being sent to ensure it's in the correct format
-            console.log("Sending stock-in data:", formDataToSend);
 
             try {
                 const response = await axios.post(
@@ -78,17 +72,9 @@ const Stock = () => {
                 );
 
                 if (response.data.success) {
-                    const updatedQuantity = selectedItem.quantity + addedStock;
-                    let updatedInitialQuantity = selectedItem.initialQuantity;
-                    if (selectedItem.initialQuantity - selectedItem.quantity === 0) {
-                        updatedInitialQuantity += addedStock;
-                    }
-                    updateInventory(
-                        { ...selectedItem, quantity: updatedQuantity, initialQuantity: updatedInitialQuantity },
-                        fetchInventoryList,
-                        cancelEdit
-                    );
                     toast.success("Stock added successfully");
+                    fetchInventoryList(); // Refresh inventory list
+                    cancelEdit();
                 } else {
                     toast.error(response.data.message || "Failed to add stock");
                 }
@@ -132,13 +118,9 @@ const Stock = () => {
                 );
 
                 if (response.data.success) {
-                    const updatedQuantity = selectedItem.quantity - removedStock;
-                    updateInventory(
-                        { ...selectedItem, quantity: updatedQuantity },
-                        fetchInventoryList,
-                        cancelEdit
-                    );
                     toast.success("Stock removed successfully");
+                    fetchInventoryList(); // Refresh inventory list
+                    cancelEdit();
                 } else {
                     toast.error(response.data.message || "Failed to remove stock");
                 }
@@ -266,7 +248,7 @@ const Stock = () => {
                                                     type="submit"
                                                     className="py-2 px-4 bg-green-500 text-white rounded hover:bg-green-600"
                                                 >
-                                                    Add Stock
+                                                    Add
                                                 </button>
                                             </div>
                                         </form>
@@ -285,6 +267,7 @@ const Stock = () => {
                                                     name="stockAmount"
                                                     className="p-2 border rounded w-20"
                                                     min="1"
+                                                    max={selectedItem.quantity}
                                                 />
                                                 <span>{item.unit}</span>
                                             </div>
@@ -295,7 +278,7 @@ const Stock = () => {
                                                     value={formData.withdrawnBy}
                                                     onChange={onChangeHandler}
                                                     name="withdrawnBy"
-                                                    className="p-2 border rounded w-64"
+                                                    className="p-2 border rounded w-32"
                                                 />
                                                 <input
                                                     type="date"
@@ -318,7 +301,7 @@ const Stock = () => {
                                                     type="submit"
                                                     className="py-2 px-4 bg-red-500 text-white rounded hover:bg-red-600"
                                                 >
-                                                    Remove Stock
+                                                    Remove
                                                 </button>
                                             </div>
                                         </form>

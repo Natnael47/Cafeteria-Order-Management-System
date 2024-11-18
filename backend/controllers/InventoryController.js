@@ -277,7 +277,11 @@ const addStock = async (req, res) => {
       updatedInventory,
     });
   } catch (error) {
-    console.error("Error in addStock:", error);
+    console.error("Error in addStock:", error); // Existing general error log
+    console.error("Detailed error in addStock:", error); // Add detailed logging
+    if (error.meta) {
+      console.error("Error meta:", error.meta); // Prisma-specific error details, if present
+    }
     return res.status(500).json({
       success: false,
       message: "Internal Server Error",
