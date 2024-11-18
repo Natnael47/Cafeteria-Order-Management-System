@@ -136,9 +136,24 @@ const Inventory = () => {
                     {inventoryList.map((item, index) => (
                         <div key={index}>
                             <div className={`grid grid-cols-[0.7fr_0.7fr_0.7fr_0.6fr_0.5fr_0.5fr_0.5fr] items-center gap-2 p-3 border text-sm font-medium sm:grid ${item.status === "out of stock" ? "bg-red-100" : "bg-white"}`}>
-                                <p className={`p-1 rounded-md ${item.status === "full" || item.status === "available" ? "bg-green-500 text-white" : "bg-red-500 text-white"}`}>
-                                    {item.status}
-                                </p>
+                                <div className="relative w-full bg-gray-200 rounded h-8">
+                                    <div
+                                        className={`absolute top-0 left-0 h-8 rounded transition-all`}
+                                        style={{
+                                            width: `${Math.min(Number(item.status), 100)}%`,
+                                            backgroundColor:
+                                                Number(item.status) <= 30
+                                                    ? "#ef4444" // Red
+                                                    : Number(item.status) <= 60
+                                                        ? "#facc15" // Light Yellow
+                                                        : "#10b981", // Green
+                                        }}
+                                    ></div>
+                                    <p className="absolute inset-0 flex items-center justify-center text-xs font-semibold text-black">
+                                        {item.status}%
+                                    </p>
+                                </div>
+
                                 <p className="text-[#112F45] cursor-pointer hover:text-blue-500" onClick={() => handleNameClick(index)}>
                                     {item.name}
                                 </p>
