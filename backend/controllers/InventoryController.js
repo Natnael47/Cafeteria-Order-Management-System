@@ -435,7 +435,7 @@ const orderInventory = async (inventoryId) => {
         inventoryId: inventoryItem.id,
         quantityOrdered: quantityToOrder,
         supplier: inventoryItem.supplier || "Default Supplier",
-        status: "Pending",
+        status: "Sent",
       },
     });
 
