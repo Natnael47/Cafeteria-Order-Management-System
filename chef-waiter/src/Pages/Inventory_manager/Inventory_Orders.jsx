@@ -33,51 +33,44 @@ const InventoryOrders = () => {
                 />
             </div>
 
-            {/* Data Table */}
-            <div className="bg-white shadow rounded">
-                <table className="w-full text-left border-collapse">
-                    <thead>
-                        <tr className="bg-gray-100">
-                            <th className="px-4 py-2 border">Order Status</th>
-                            <th className="px-4 py-2 border">Inventory Item</th>
-                            <th className="px-4 py-2 border">Quantity</th>
-                            <th className="px-4 py-2 border">Unit</th>
-                            <th className="px-4 py-2 border">Price</th>
-                            <th className="px-4 py-2 border">Status</th>
-                            <th className="px-4 py-2 border">Order Date</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        {orderList.length > 0 ? (
-                            orderList.map((order, index) => (
-                                <tr
-                                    key={index}
-                                    className={index % 2 === 0 ? "bg-gray-50" : ""}
-                                >
-                                    <td className="px-4 py-2 border">{order.orderStatus}</td>
-                                    <td className="px-4 py-2 border">{order.inventoryName}</td>
-                                    <td className="px-4 py-2 border">
-                                        {order.quantityOrdered} {order.unit}
-                                    </td>
-                                    <td className="px-4 py-2 border">{order.unit}</td>
-                                    <td className="px-4 py-2 border">ETB {order.totalPrice}</td>
-                                    <td className="px-4 py-2 border">
-                                        {order.inventoryStatus}%
-                                    </td>
-                                    <td className="px-4 py-2 border">
-                                        {new Date(order.orderDate).toLocaleDateString()}
-                                    </td>
-                                </tr>
-                            ))
-                        ) : (
-                            <tr>
-                                <td colSpan="7" className="px-4 py-2 text-center text-gray-500">
-                                    No orders found.
-                                </td>
-                            </tr>
-                        )}
-                    </tbody>
-                </table>
+            {/* Data Grid */}
+            <div className="bg-white shadow border border-black rounded overflow-hidden">
+                {/* Header Row */}
+                <div className="grid grid-cols-[1.5fr_2fr_1fr_1fr_1fr_1fr_2fr] bg-gray-200 border-b border-black font-medium text-gray-700">
+                    <div className="px-4 py-2 border-r border-black">Order Status</div>
+                    <div className="px-4 py-2 border-r border-black">Inventory Item</div>
+                    <div className="px-4 py-2 border-r border-black">Quantity</div>
+                    <div className="px-4 py-2 border-r border-black">Unit</div>
+                    <div className="px-4 py-2 border-r border-black">Price</div>
+                    <div className="px-4 py-2 border-r border-black">Status</div>
+                    <div className="px-4 py-2">Order Date</div>
+                </div>
+
+                {/* Data Rows */}
+                {orderList.length > 0 ? (
+                    orderList.map((order, index) => (
+                        <div
+                            key={index}
+                            className={`grid grid-cols-[1.5fr_2fr_1fr_1fr_1fr_1fr_2fr] text-sm ${index % 2 === 0 ? 'bg-gray-50' : 'bg-white'} border-b border-black`}
+                        >
+                            <div className="px-4 py-2 border-r border-black">{order.orderStatus}</div>
+                            <div className="px-4 py-2 border-r border-black">{order.inventoryName}</div>
+                            <div className="px-4 py-2 border-r border-black">
+                                {order.quantityOrdered} {order.unit}
+                            </div>
+                            <div className="px-4 py-2 border-r border-black">{order.unit}</div>
+                            <div className="px-4 py-2 border-r border-black">ETB {order.totalPrice}</div>
+                            <div className="px-4 py-2 border-r border-black">
+                                {order.inventoryStatus}%
+                            </div>
+                            <div className="px-4 py-2">
+                                {new Date(order.orderDate).toLocaleDateString()}
+                            </div>
+                        </div>
+                    ))
+                ) : (
+                    <div className="text-center text-gray-500 py-4">No orders found.</div>
+                )}
             </div>
         </div>
     );
