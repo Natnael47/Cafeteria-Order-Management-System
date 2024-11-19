@@ -10,6 +10,7 @@ const ChefContextProvider = (props) => {
     const [cToken, setCToken] = useState(localStorage.getItem('cToken') ? localStorage.getItem('cToken') : '');
 
     const [profileData, setProfileData] = useState(null);
+    const [inventoryList, setInventoryList] = useState([]);
 
     const get_Profile_Data = async () => {
         try {
@@ -28,10 +29,27 @@ const ChefContextProvider = (props) => {
         }
     }
 
+    const fetchInventoryList = async () => {
+        try {
+            const response = await axios.get(`${backendUrl}/api/inventory/list-inventory`, {
+                headers: { cToken },
+            });
+            if (response.data.success) {
+                setInventoryList(response.data.data);
+            } else {
+                toast.error("Error fetching inventory list");
+            }
+        } catch (error) {
+            console.error("Fetch inventory error:", error);
+            toast.error("Error fetching inventory list");
+        }
+    };
+
 
     const value = {
         cToken, setCToken,
-        profileData, setProfileData, get_Profile_Data
+        profileData, setProfileData, get_Profile_Data,
+        inventoryList, fetchInventoryList
     }
     return (
         <ChefContext.Provider value={value}>

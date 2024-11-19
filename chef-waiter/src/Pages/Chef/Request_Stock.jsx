@@ -1,12 +1,11 @@
 import React, { useContext, useEffect, useRef, useState } from "react";
-import { InventoryContext } from "../../Context/InventoryContext";
+import { ChefContext } from "../../Context/ChefContext";
 
 const Request_Stock = () => {
     const {
         inventoryList,
         fetchInventoryList,
-        navigate
-    } = useContext(InventoryContext);
+    } = useContext(ChefContext);
 
     const [searchTerm, setSearchTerm] = useState("");
     const [selectedIndex, setSelectedIndex] = useState(null);
@@ -66,7 +65,6 @@ const Request_Stock = () => {
                 </div>
                 <button
                     className="bg-blue-500 text-white rounded px-4 py-2 hover:bg-blue-600 transition-colors w-36"
-                    onClick={() => navigate('/add_inventory')}
                 >
                     Add Item
                 </button>
@@ -85,7 +83,7 @@ const Request_Stock = () => {
                     {filteredInventoryList.map((item, index) => (
                         <div key={index}>
                             <div
-                                className={`grid grid-cols-[0.7fr_0.7fr_0.7fr_0.6fr_0.5fr_0.5fr] items-center gap-2 p-3 border text-sm font-medium sm:grid ${item.status === "out of stock" ? "bg-red-100" : "bg-white"
+                                className={`grid grid-cols-[0.7fr_0.7fr_0.7fr_0.6fr_0.3fr_0.7fr] items-center gap-2 p-3 border text-sm font-medium sm:grid ${item.status === "out of stock" ? "bg-red-100" : "bg-white"
                                     }`}
                             >
                                 <div className="relative w-full bg-gray-200 rounded h-8">
@@ -126,7 +124,7 @@ const Request_Stock = () => {
                                             className="border p-2 rounded w-full"
                                         />
                                     </div>
-                                    <div className="flex justify-end gap-4 mt-4">
+                                    <div className="flex justify-start gap-4 mt-4">
                                         <button
                                             onClick={() => setSelectedIndex(null)}
                                             className="py-2 px-4 bg-gray-300 text-gray-700 rounded"
