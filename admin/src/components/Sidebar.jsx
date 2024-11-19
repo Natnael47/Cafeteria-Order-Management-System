@@ -10,10 +10,6 @@ const Sidebar = () => {
                     <img src={assets.home_icon} alt='' />
                     <p className='hidden md:block'>Dashboard</p>
                 </NavLink>
-                <NavLink to='/add' className={({ isActive }) => `flex items-center gap-3 py-3.5 px-3 md:px-9 md:min-w-72 cursor-pointer ${isActive ? 'bg-[#DDF7DF] border-r-4 border-primary' : ''}`}>
-                    <img src={assets.add_icon} alt='' />
-                    <p className='hidden md:block'>Add Food</p>
-                </NavLink>
                 <NavLink to='/list' className={({ isActive }) => `flex items-center gap-3 py-3.5 px-3 md:px-9 md:min-w-72 cursor-pointer ${isActive ? 'bg-[#DDF7DF] border-r-4 border-primary' : ''}`}>
                     <img src={assets.order_icon} alt='' />
                     <p className='hidden md:block'>Food Items</p>

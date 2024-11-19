@@ -197,7 +197,7 @@ const List = () => {
                     />
                 </div>
                 <button
-                    className="bg-blue-500 text-white rounded px-4 py-2 hover:bg-blue-600 transition-colors w-36"
+                    className="bg-primary text-white rounded px-4 py-2 hover:bg-green-600 transition-colors w-36"
                     onClick={() => navigate('/add')}
                 >
                     Add Item

@@ -6,11 +6,9 @@ import { assets } from '../assets/assets';
 import { AdminContext } from "../context/AdminContext";
 
 const Add = () => {
-
-    const { token } = useContext(AdminContext);
+    const { token, navigate } = useContext(AdminContext);
 
     const [image, setImage] = useState(false);
-
     const [data, setData] = useState({
         name: "",
         description: "",
@@ -21,17 +19,17 @@ const Add = () => {
     const onChangeHandler = (event) => {
         const name = event.target.name;
         const value = event.target.value;
-        setData(data => ({ ...data, [name]: value }))
+        setData(data => ({ ...data, [name]: value }));
     }
 
     const onSubmitHandler = async (event) => {
         event.preventDefault();
         const formData = new FormData();
-        formData.append("name", data.name)
-        formData.append("description", data.description)
-        formData.append("price", Number(data.price))
-        formData.append("category", data.category)
-        formData.append("image", image)
+        formData.append("name", data.name);
+        formData.append("description", data.description);
+        formData.append("price", Number(data.price));
+        formData.append("category", data.category);
+        formData.append("image", image);
 
         const response = await axios.post(backendUrl + "/api/food/add", formData, { headers: { token } });
         if (response.data.success) {
@@ -40,7 +38,7 @@ const Add = () => {
                 description: "",
                 price: "",
                 category: "Salad"
-            })
+            });
             setImage(false);
             toast.success("Food added successfully");
         } else {
@@ -87,14 +85,27 @@ const Add = () => {
                         <p className="mb-2">Price</p>
                         <input className="w-full px-3 py-2 sm:w-[120px] max-h-[40px]" onChange={onChangeHandler} value={data.price} type='number' name='price' placeholder='$20' required />
                     </div>
-
                 </div>
 
-                <button type='submit' className='w-28 py-3 mt-5 bg-black px-10 text-white rounded-md hover:bg-primary text-center'>Add</button>
+                {/* Buttons at the bottom */}
+                <div className="flex gap-5 w-full mt-5">
+                    <button
+                        type='submit'
+                        className='bg-black px-4 py-3 rounded-md mr-2 hover:bg-primary text-white w-28'
+                    >
+                        Add
+                    </button>
+                    <button
+                        type="button"
+                        onClick={() => navigate('/list')}
+                        className="bg-gray-300 px-4 py-3 rounded-md mr-2 hover:bg-gray-400 w-28"
+                    >
+                        Cancel
+                    </button>
+                </div>
             </div>
-
         </form>
     )
 }
 
-export default Add
+export default Add;
