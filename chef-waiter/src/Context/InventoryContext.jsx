@@ -1,5 +1,6 @@
 import axios from "axios";
 import { createContext, useState } from "react";
+import { useNavigate } from "react-router-dom";
 import { toast } from "react-toastify";
 import { backendUrl } from "../App";
 
@@ -9,6 +10,7 @@ const InventoryContextProvide = (props) => {
     const [iToken, setIToken] = useState(localStorage.getItem('iToken') || '');
     const [inventoryList, setInventoryList] = useState([]);
     const [orderList, setOrderList] = useState([]); // State to store supplier orders
+    const navigate = useNavigate();
 
     const fetchInventoryList = async () => {
         try {
@@ -145,6 +147,7 @@ const InventoryContextProvide = (props) => {
         removeInventory,
         addInventory,
         orderList, // Expose the state for supplier orders
+        navigate,
     };
 
     return (
