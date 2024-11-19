@@ -177,18 +177,14 @@ const Inventory = () => {
                                         className={`absolute top-0 left-0 h-8 rounded transition-all`}
                                         style={{
                                             width: `${Math.min(Number(item.status), 100)}%`,
-                                            backgroundColor:
-                                                Number(item.status) <= 30
-                                                    ? "#ef4444" // Red
-                                                    : Number(item.status) <= 60
-                                                        ? "#facc15" // Light Yellow
-                                                        : "#10b981", // Green
+                                            backgroundColor: `hsl(${Number(item.status) * 1.2}, 100%, 50%)` // Smooth transition using HSL color
                                         }}
                                     ></div>
                                     <p className="absolute inset-0 flex items-center justify-center text-xs font-semibold text-black">
                                         {item.status}%
                                     </p>
                                 </div>
+
 
                                 <p className="text-[#112F45] cursor-pointer hover:text-blue-500 ml-5" onClick={() => handleNameClick(index)}>
                                     {item.name}
