@@ -151,9 +151,38 @@ const Stock = () => {
         });
     };
 
+    // Function to get the formatted date
+    const getFormattedDate = () => {
+        const today = new Date();
+        const options = { weekday: 'short', day: '2-digit', year: 'numeric' };
+        return today.toLocaleDateString('en-US', options);
+    };
+
+    const [searchTerm, setSearchTerm] = useState('');
+
+    // Filter and sort the inventory list based on the search term
+    const filteredInventoryList = inventoryList
+        .filter((item) =>
+            item.name.toLowerCase().includes(searchTerm.toLowerCase())
+        )
+        .sort((a, b) => a.name.localeCompare(b.name));
+
     return (
         <div className="flex flex-col m-5 w-full">
             <p className="mb-3 text-lg font-semibold">Stock Overview</p>
+            <div className="flex items-center justify-between mb-3">
+                <div className="flex items-center gap-4">
+                    <span className="text-gray-700">{getFormattedDate()}</span>
+                    <input
+                        type="text"
+                        placeholder="Search item name"
+                        value={searchTerm}
+                        onChange={(e) => setSearchTerm(e.target.value)}
+                        className="border border-gray-300 rounded px-3 py-1 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    />
+                </div>
+                <button className="bg-blue-500 text-white rounded px-4 py-2 hover:bg-blue-600 transition-colors w-36">Add Package</button>
+            </div>
             <div className="bg-[#F3F4F6] rounded w-full max-w-5.3xl max-h-[88vh] overflow-scroll">
                 <div>
                     <div className="grid grid-cols-[1fr_1fr_1fr_1fr_1fr_0.5fr_0.5fr] items-center gap-2 p-3 border text-sm font-medium bg-[#FAFAFA] text-black sm:grid">
@@ -165,7 +194,7 @@ const Stock = () => {
                         <b>Stock In</b>
                         <b>Stock Out</b>
                     </div>
-                    {inventoryList.map((item, index) => {
+                    {filteredInventoryList.map((item, index) => {
                         const totalStockOut = item.initialQuantity - item.quantity;
                         const totalStockIn = item.quantity + totalStockOut - item.initialQuantity;
                         return (
