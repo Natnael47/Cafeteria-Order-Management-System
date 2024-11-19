@@ -9,7 +9,7 @@ const Users = () => {
     ];
 
     return (
-        <div className="min-h-screen bg-gray-100 p-6">
+        <div className="flex flex-col m-5 w-full">
             {/* Header */}
             <div className="flex items-center justify-between mb-6">
                 <h1 className="text-2xl font-semibold text-gray-700">Users</h1>
