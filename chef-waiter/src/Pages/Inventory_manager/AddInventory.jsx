@@ -1,9 +1,11 @@
 import React, { useContext, useState } from 'react';
+import { useNavigate } from 'react-router-dom'; // Import useNavigate hook
 import { assets } from '../../assets/assets';
 import { InventoryContext } from "../../Context/InventoryContext";
 
 const AddInventory = () => {
     const { addInventory } = useContext(InventoryContext);
+    const navigate = useNavigate(); // Initialize the navigate hook
 
     const [image, setImage] = useState(null);
     const [data, setData] = useState({
@@ -21,7 +23,12 @@ const AddInventory = () => {
 
     const onSubmitHandler = async (event) => {
         event.preventDefault();
-        addInventory(data, image, setData, setImage);
+        await addInventory(data, image, setData, setImage);  // Ensure addInventory completes
+        navigate('/inventory');  // Navigate to /inventory after submission
+    };
+
+    const onCancelHandler = () => {
+        navigate('/inventory');  // Navigate to /inventory when cancel is clicked
     };
 
     return (
@@ -89,6 +96,13 @@ const AddInventory = () => {
                 <div className="flex w-full justify-start gap-3 mt-8">
                     <button type="submit" className="px-8 py-2 rounded text-white bg-[#0b5ed7]">
                         Submit
+                    </button>
+                    <button
+                        type="button"
+                        onClick={onCancelHandler}
+                        className="px-8 py-2 rounded text-white bg-gray-500 hover:bg-gray-600"
+                    >
+                        Cancel
                     </button>
                 </div>
             </div>
