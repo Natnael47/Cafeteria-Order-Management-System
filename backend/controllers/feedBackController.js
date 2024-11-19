@@ -45,11 +45,11 @@ const createFeedback = async (req, res) => {
   }
 };
 
-// Get all feedback with user information
+// Get all feedback with user information and date
 const getAllFeedback = async (req, res) => {
   try {
     const feedback = await prisma.feedback.findMany({
-      orderBy: { date: "desc" },
+      orderBy: { date: "desc" }, // Sort feedback by date in descending order
       include: {
         user: {
           select: {
@@ -60,11 +60,12 @@ const getAllFeedback = async (req, res) => {
       },
     });
 
-    // Format the feedback data to include user's name
+    // Format the feedback data to include user's name, comment, rating, and date
     const formattedFeedback = feedback.map((fb) => ({
       username: `${fb.user.firstName} ${fb.user.lastName}`,
       rating: fb.rating,
       comment: fb.comment,
+      date: fb.date.toLocaleString(), // Format the date to a readable string
     }));
 
     res.json({ success: true, feedback: formattedFeedback });
