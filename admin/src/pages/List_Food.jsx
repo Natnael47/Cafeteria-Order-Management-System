@@ -9,7 +9,7 @@ import { AdminContext } from "../context/AdminContext";
 Modal.setAppElement("#root");
 
 const List = () => {
-    const { token } = useContext(AdminContext);
+    const { token, navigate } = useContext(AdminContext);
     const [list, setList] = useState([]);
     const [modalIsOpen, setModalIsOpen] = useState(false);
     const [selectedFoodId, setSelectedFoodId] = useState(null);
@@ -166,9 +166,43 @@ const List = () => {
         fetchList();
     }, []);
 
+    const [searchTerm, setSearchTerm] = useState('');
+
+    // Function to get the formatted date
+    const getFormattedDate = () => {
+        const today = new Date();
+        const options = { weekday: 'short', day: '2-digit', year: 'numeric' };
+        return today.toLocaleDateString('en-US', options);
+    };
+
+    // Filter and sort the inventory list based on the search term
+    const filteredFoodList = list
+        .filter((item) =>
+            item.name.toLowerCase().includes(searchTerm.toLowerCase())
+        )
+        .sort((a, b) => a.name.localeCompare(b.name));
+
     return (
         <div className="flex flex-col m-5 w-full">
             <p className="mb-3 text-lg font-semibold">All Foods List</p>
+            <div className="flex items-center justify-between mb-3 max-w-5.3xl">
+                <div className="flex items-center gap-4">
+                    <span className="text-gray-700">{getFormattedDate()}</span>
+                    <input
+                        type="text"
+                        placeholder="Search item name"
+                        value={searchTerm}
+                        onChange={(e) => setSearchTerm(e.target.value)}
+                        className="border border-gray-300 rounded px-3 py-1 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    />
+                </div>
+                <button
+                    className="bg-blue-500 text-white rounded px-4 py-2 hover:bg-blue-600 transition-colors w-36"
+                    onClick={() => navigate('/add')}
+                >
+                    Add Item
+                </button>
+            </div>
             <div className="bg-[#F3F4F6] rounded w-full max-w-5.3xl max-h-[88vh] overflow-scroll">
                 <div>
                     <div className="grid grid-cols-[0.5fr_0.9fr_0.8fr_0.8fr_0.5fr_0.5fr] items-center gap-2 p-3 border border-black text-sm font-medium bg-gray-700 text-white sm:grid">
@@ -179,7 +213,7 @@ const List = () => {
                         <b>Remove</b>
                         <b>Modify</b>
                     </div>
-                    {list.map((item, index) => (
+                    {filteredFoodList.map((item, index) => (
                         <div key={index}>
                             <div className={`grid grid-cols-[0.5fr_0.9fr_0.8fr_0.8fr_0.5fr_0.5fr] items-center gap-2 p-3 border border-black text-sm font-medium sm:grid ${item.menuStatus === false ? "bg-red-100" : "bg-white"}`}>
                                 <img
