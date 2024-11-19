@@ -6,6 +6,7 @@ import {
   getSupplierOrders,
   listInventory,
   removeInventory,
+  requestInventoryItem,
   updateInventory,
   withdrawItem,
 } from "../controllers/InventoryController.js";
@@ -35,6 +36,7 @@ inventoryRoute.post("/remove-inventory", empAuth, removeInventory);
 inventoryRoute.post("/add-stock", empAuth, addStock);
 inventoryRoute.post("/remove-stock", empAuth, withdrawItem);
 inventoryRoute.get("/inv-orders", empAuth, getSupplierOrders);
+inventoryRoute.post("/inv-request", empAuth, requestInventoryItem);
 inventoryRoute.post(
   "/update-inventory",
   empAuth,

@@ -290,9 +290,73 @@ const addStock = async (req, res) => {
   }
 };
 
-// Request inventory item
+// Handle inventory item request
 const requestInventoryItem = async (req, res) => {
-  // Log an inventory request
+  try {
+    // Extracting and parsing data from the request body
+    const { inventoryId, empId, quantity } = req.body;
+
+    // Input validation
+    if (!inventoryId || !empId || !quantity) {
+      return res
+        .status(400)
+        .json({ success: false, message: "Missing required fields" });
+    }
+
+    // Convert `inventoryId` and `quantity` to integers
+    const parsedInventoryId = parseInt(inventoryId, 10);
+    const parsedQuantity = parseInt(quantity, 10);
+
+    // Check if the conversion was successful
+    if (isNaN(parsedInventoryId) || isNaN(parsedQuantity)) {
+      return res
+        .status(400)
+        .json({ success: false, message: "Invalid inventoryId or quantity" });
+    }
+
+    // Check if the inventory item exists
+    const inventoryItem = await prisma.inventory.findUnique({
+      where: { id: parsedInventoryId },
+    });
+
+    if (!inventoryItem) {
+      return res
+        .status(404)
+        .json({ success: false, message: "Inventory item not found" });
+    }
+
+    // Check if the quantity requested is available
+    if (inventoryItem.quantity < parsedQuantity) {
+      return res
+        .status(400)
+        .json({ success: false, message: "Insufficient inventory quantity" });
+    }
+
+    // Create the inventory request
+    const inventoryRequest = await prisma.inventoryrequest.create({
+      data: {
+        inventoryId: parsedInventoryId,
+        employeeId: empId,
+        quantity: parsedQuantity,
+        dateRequested: new Date(), // Current date and time
+        status: "sent", // Default status
+      },
+    });
+
+    // Respond with success and the created request data
+    return res.status(201).json({
+      success: true,
+      message: "Inventory request created successfully",
+      inventoryRequest,
+    });
+  } catch (error) {
+    console.error("Error in requestInventoryItem:", error);
+    return res.status(500).json({
+      success: false,
+      message: "Internal Server Error",
+      error: error.message,
+    });
+  }
 };
 
 // Withdraw item from inventory and log the withdrawal
