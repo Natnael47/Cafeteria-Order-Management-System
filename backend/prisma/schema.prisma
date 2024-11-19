@@ -9,22 +9,23 @@ datasource db {
 
 // Employee model - Represents employees within the system
 model employee {
-  id         Int      @id @default(autoincrement()) // Unique identifier for each employee
-  firstName  String   @db.VarChar(255) // Employee's first name
-  lastName   String   @db.VarChar(255) // Employee's last name
-  gender     String   @db.VarChar(50) // Employee's gender
-  email      String   @unique(map: "Employee_email_key") @db.VarChar(255) // Unique email address
-  password   String   @db.VarChar(255) // Employee's password
-  image      String   @db.VarChar(255) // URL or path to employee's profile image
-  phone      String   @db.VarChar(20) // Employee's phone number
-  position   String   @db.VarChar(100) // Job position or role
-  shift      String   @db.VarChar(100) // Work shift or hours
-  education  String   @db.VarChar(255) // Education details
-  experience String   @db.VarChar(255) // Work experience
-  salary     Float    @db.Float // Employee's salary
-  address    Json // Employee's address details in JSON format
-  about      String   @db.Text // Additional information about the employee
-  date       DateTime @default(now()) // Date of record creation
+  id               Int                @id @default(autoincrement()) // Unique identifier for each employee
+  firstName        String             @db.VarChar(255) // Employee's first name
+  lastName         String             @db.VarChar(255) // Employee's last name
+  gender           String             @db.VarChar(50) // Employee's gender
+  email            String             @unique(map: "Employee_email_key") @db.VarChar(255) // Unique email address
+  password         String             @db.VarChar(255) // Employee's password
+  image            String             @db.VarChar(255) // URL or path to employee's profile image
+  phone            String             @db.VarChar(20) // Employee's phone number
+  position         String             @db.VarChar(100) // Job position or role
+  shift            String             @db.VarChar(100) // Work shift or hours
+  education        String             @db.VarChar(255) // Education details
+  experience       String             @db.VarChar(255) // Work experience
+  salary           Float              @db.Float // Employee's salary
+  address          Json // Employee's address details in JSON format
+  about            String             @db.Text // Additional information about the employee
+  date             DateTime           @default(now()) // Date of record creation
+  inventoryrequest inventoryrequest[]
 }
 
 // User model - Represents customers or system users
@@ -137,13 +138,15 @@ model inventorypurchase {
 model inventoryrequest {
   id            Int       @id @default(autoincrement()) // Unique identifier for each request
   inventoryId   Int // Foreign key to Inventory table
-  requestedBy   String // Name of the person requesting the item
+  employeeId    Int // Foreign key to Employee table (added this field)
   quantity      Int // Quantity requested
   dateRequested DateTime  @default(now()) // Date of request
   status        String    @db.VarChar(50) // Status of the request
   inventory     inventory @relation(fields: [inventoryId], references: [id], map: "InventoryRequest_inventoryId_fkey")
+  employee      employee  @relation(fields: [employeeId], references: [id], map: "InventoryRequest_employeeId_fkey") // Relation to employee model
 
   @@index([inventoryId], map: "InventoryRequest_inventoryId_fkey")
+  @@index([employeeId], map: "InventoryRequest_employeeId_fkey") // Add index for employeeId
 }
 
 // Supplier Order model - Tracks supplier orders
