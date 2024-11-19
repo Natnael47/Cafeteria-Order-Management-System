@@ -1,10 +1,14 @@
+import axios from "axios";
 import React, { useContext, useEffect, useRef, useState } from "react";
+import { toast } from "react-toastify"; // Ensure you have this installed for notifications
+import { backendUrl } from "../../App";
 import { ChefContext } from "../../Context/ChefContext";
 
 const Request_Stock = () => {
     const {
         inventoryList,
         fetchInventoryList,
+        cToken
     } = useContext(ChefContext);
 
     const [searchTerm, setSearchTerm] = useState("");
@@ -33,16 +37,36 @@ const Request_Stock = () => {
         }
     };
 
-    const handleSubmitRequest = (inventoryId) => {
+    const handleSubmitRequest = async (inventoryId) => {
         if (!requestQuantity || requestQuantity <= 0) {
             setError("Please enter a valid quantity.");
             return;
         }
-        // Add your request stock logic here, e.g., send data to the backend
-        console.log(`Requesting ${requestQuantity} units for inventory ID: ${inventoryId}`);
-        setRequestQuantity("");
-        setSelectedIndex(null);
-        setError(null);
+
+        const quantity = parseInt(requestQuantity, 10) || 0;
+
+        // Create data to send to the backend (following the example format)
+        const formDataToSend = {
+            inventoryId: inventoryId, // The ID of the inventory item
+            quantity: quantity, // The quantity requested
+        };
+
+        try {
+            const response = await axios.post(
+                `${backendUrl}/api/inventory/inv-request`, formDataToSend, { headers: { cToken } });
+
+            if (response.data.success) {
+                toast.success("Inventory request submitted successfully");
+                setRequestQuantity(""); // Clear the input field
+                setSelectedIndex(null); // Reset the selected inventory item
+                fetchInventoryList(); // Refresh the inventory list after submitting the request
+            } else {
+                toast.error(response.data.message || "Failed to submit inventory request");
+            }
+        } catch (error) {
+            console.error("Error submitting inventory request:", error);
+            toast.error(`Error: ${error.message}`);
+        }
     };
 
     const filteredInventoryList = inventoryList
