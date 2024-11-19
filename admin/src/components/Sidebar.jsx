@@ -30,9 +30,9 @@ const Sidebar = () => {
                     <img src={assets.report_icon} alt='' />
                     <p className='hidden md:block'>Reports</p>
                 </NavLink>
-                <NavLink to='/user-feedback' className={({ isActive }) => `flex items-center gap-3 py-3.5 px-3 md:px-9 md:min-w-72 cursor-pointer ${isActive ? 'bg-[#DDF7DF] border-r-4 border-primary' : ''}`}>
+                <NavLink to='/users' className={({ isActive }) => `flex items-center gap-3 py-3.5 px-3 md:px-9 md:min-w-72 cursor-pointer ${isActive ? 'bg-[#DDF7DF] border-r-4 border-primary' : ''}`}>
                     <img src={assets.employee_icon} alt='' />
-                    <p className='hidden md:block'>User FeedBack</p>
+                    <p className='hidden md:block'>Users</p>
                 </NavLink>
             </div>
         </div>
@@ -40,3 +40,24 @@ const Sidebar = () => {
 }
 
 export default Sidebar
+
+// {/* Sidebar */ }
+// <div className="w-1/5 bg-green-500 text-white">
+//     <div className="p-4 font-bold text-lg">PB Fitness Store</div>
+//     <nav className="space-y-2 p-4">
+//         <button className="block w-full text-left py-2 px-4 hover:bg-green-600">Dashboard</button>
+//         <button className="block w-full text-left py-2 px-4 hover:bg-green-600">Sales</button>
+//         <button className="block w-full text-left py-2 px-4 hover:bg-green-600">Inventory</button>
+//         <div>
+//             <button className="block w-full text-left py-2 px-4 hover:bg-green-600">
+//                 Stock Control
+//             </button>
+//             <div className="ml-4 space-y-2">
+//                 <button className="block w-full text-left py-2 px-4 hover:bg-green-700">Purchase Orders</button>
+//                 <button className="block w-full text-left py-2 px-4 bg-green-700 rounded">Inventory Purchase</button>
+//                 <button className="block w-full text-left py-2 px-4 hover:bg-green-700">Stock Adjustments</button>
+//             </div>
+//         </div>
+//         <button className="block w-full text-left py-2 px-4 hover:bg-green-600">Suppliers</button>
+//     </nav>
+// </div>
