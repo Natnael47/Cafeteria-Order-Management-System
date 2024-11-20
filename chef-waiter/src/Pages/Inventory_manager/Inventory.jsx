@@ -1,8 +1,9 @@
 import React, { useContext, useEffect, useRef, useState } from "react";
 import Modal from "react-modal";
 import { backendUrl } from "../../App";
-import { InventoryContext } from "../../Context/InventoryContext";
 import { assets } from "../../assets/assets";
+import SortingDropdown from "../../Components/SortingDropdown";
+import { InventoryContext } from "../../Context/InventoryContext";
 
 Modal.setAppElement("#root");
 
@@ -129,12 +130,40 @@ const Inventory = () => {
         return today.toLocaleDateString('en-US', options);
     };
 
-    // Filter and sort the inventory list based on the search term
-    const filteredInventoryList = inventoryList
+    const [sortAttribute, setSortAttribute] = useState('name');  // Default sort by name
+    const [sortOrder, setSortOrder] = useState('ascending');     // Default ascending
+
+    useEffect(() => {
+        fetchInventoryList();
+    }, []);
+
+    // Function to handle changes in sorting
+    const handleSortChange = (attribute, order) => {
+        setSortAttribute(attribute);
+        setSortOrder(order);
+    };
+
+    const filteredAndSortedInventoryList = inventoryList
         .filter((item) =>
             item.name.toLowerCase().includes(searchTerm.toLowerCase())
         )
-        .sort((a, b) => a.name.localeCompare(b.name));
+        .sort((a, b) => {
+            let valueA = a[sortAttribute];
+            let valueB = b[sortAttribute];
+
+            // Handle numeric sorting for quantity, pricePerUnit, and status
+            if (["quantity", "pricePerUnit", "status"].includes(sortAttribute)) {
+                valueA = parseFloat(valueA);
+                valueB = parseFloat(valueB);
+            }
+
+            // Ascending/Descending sorting
+            if (sortOrder === "ascending") {
+                return valueA > valueB ? 1 : valueA < valueB ? -1 : 0;
+            } else {
+                return valueA < valueB ? 1 : valueA > valueB ? -1 : 0;
+            }
+        });
 
     return (
         <div className="flex flex-col m-5 w-full">
@@ -150,6 +179,9 @@ const Inventory = () => {
                         className="border border-gray-300 rounded px-3 py-1 focus:outline-none focus:ring-2 focus:ring-blue-500"
                     />
                 </div>
+
+                <SortingDropdown onSortChange={handleSortChange} />
+
                 <button
                     className="bg-blue-500 text-white rounded px-4 py-2 hover:bg-blue-600 transition-colors w-36"
                     onClick={() => navigate('/add_inventory')}
@@ -169,7 +201,7 @@ const Inventory = () => {
                         <b>Modify</b>
                     </div>
 
-                    {filteredInventoryList.map((item, index) => (
+                    {filteredAndSortedInventoryList.map((item, index) => (
                         <div key={index}>
                             <div className={`grid grid-cols-[0.7fr_0.7fr_0.7fr_0.6fr_0.5fr_0.5fr_0.5fr] items-center gap-2 p-3 border text-sm font-medium sm:grid ${item.status === "out of stock" ? "bg-red-100" : "bg-white"}`}>
                                 <div className="relative w-full bg-gray-200 rounded h-8">
