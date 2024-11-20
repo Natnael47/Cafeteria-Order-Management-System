@@ -1,8 +1,19 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 
 const SortingDropdown = ({ onSortChange }) => {
-    const [sortAttribute, setSortAttribute] = useState("name");
-    const [sortOrder, setSortOrder] = useState("ascending");
+    // Get sortAttribute and sortOrder from localStorage if they exist, or use defaults
+    const [sortAttribute, setSortAttribute] = useState(() => {
+        return localStorage.getItem("sortAttribute") || "name";
+    });
+    const [sortOrder, setSortOrder] = useState(() => {
+        return localStorage.getItem("sortOrder") || "ascending";
+    });
+
+    // Update localStorage whenever sortAttribute or sortOrder changes
+    useEffect(() => {
+        localStorage.setItem("sortAttribute", sortAttribute);
+        localStorage.setItem("sortOrder", sortOrder);
+    }, [sortAttribute, sortOrder]);
 
     const handleSortChange = (e) => {
         const [attribute, order] = e.target.value.split(",");
@@ -17,6 +28,7 @@ const SortingDropdown = ({ onSortChange }) => {
         { label: "Quantity", value: "quantity" },
         { label: "Price", value: "pricePerUnit" },
         { label: "Category", value: "category" },
+        { label: "Date Modified", value: "dateUpdated" },  // Make sure the key matches your data
     ];
 
     return (

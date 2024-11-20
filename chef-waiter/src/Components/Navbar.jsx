@@ -13,15 +13,26 @@ const Navbar = () => {
     const navigate = useNavigate()
 
     const logout = () => {
+        // Navigate to the homepage or login page
         navigate('/')
 
-        iToken && setIToken('')
-        iToken && localStorage.removeItem('iToken')
+        // Clear the iToken if it exists
+        if (iToken) {
+            setIToken('')
+            localStorage.removeItem('iToken')
+        }
 
-        cToken && setCToken('')
-        cToken && localStorage.removeItem('cToken')
+        // Clear the cToken if it exists
+        if (cToken) {
+            setCToken('')
+            localStorage.removeItem('cToken')
+        }
 
+        // Clear the sorting data (sortOrder and sortAttribute) from localStorage
+        localStorage.removeItem('sortAttribute')
+        localStorage.removeItem('sortOrder')
     }
+
 
     return (
         <div className='flex justify-between items-center px-4 sm:px-10 py-3 border-b-2 border-black bg-[#F1FAF2]'>

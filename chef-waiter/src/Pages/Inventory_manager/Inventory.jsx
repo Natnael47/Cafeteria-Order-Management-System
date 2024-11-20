@@ -134,13 +134,25 @@ const Inventory = () => {
     const [sortOrder, setSortOrder] = useState('ascending');     // Default ascending
 
     useEffect(() => {
+        // Retrieve the sorting state from localStorage
+        const savedSortAttribute = localStorage.getItem('sortAttribute');
+        const savedSortOrder = localStorage.getItem('sortOrder');
+
+        // If saved values exist, use them; otherwise, use the default values
+        if (savedSortAttribute && savedSortOrder) {
+            setSortAttribute(savedSortAttribute);
+            setSortOrder(savedSortOrder);
+        }
+
         fetchInventoryList();
     }, []);
 
-    // Function to handle changes in sorting
     const handleSortChange = (attribute, order) => {
         setSortAttribute(attribute);
         setSortOrder(order);
+        // Save the selected sorting state to localStorage
+        localStorage.setItem('sortAttribute', attribute);
+        localStorage.setItem('sortOrder', order);
     };
 
     const filteredAndSortedInventoryList = inventoryList
@@ -150,6 +162,12 @@ const Inventory = () => {
         .sort((a, b) => {
             let valueA = a[sortAttribute];
             let valueB = b[sortAttribute];
+
+            // If sorting by dateUpdated, convert the date strings to Date objects for proper sorting
+            if (sortAttribute === "dateUpdated") {
+                valueA = new Date(a.dateUpdated); // Convert to Date object
+                valueB = new Date(b.dateUpdated);
+            }
 
             // Handle numeric sorting for quantity, pricePerUnit, and status
             if (["quantity", "pricePerUnit", "status"].includes(sortAttribute)) {
@@ -164,6 +182,7 @@ const Inventory = () => {
                 return valueA < valueB ? 1 : valueA > valueB ? -1 : 0;
             }
         });
+
 
     return (
         <div className="flex flex-col m-5 w-full">
