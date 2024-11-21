@@ -4,7 +4,7 @@ import { StoreContext } from '../context/StoreContext';
 
 const Menu = () => {
     const [category, setCategory] = useState("All");
-    const { food_list } = useContext(StoreContext);
+    const { filteredFoodList, search } = useContext(StoreContext);
 
     const handleCategoryClick = (cat) => {
         // If the clicked category is already selected, reset to "All"
@@ -39,7 +39,7 @@ const Menu = () => {
                 {/* Display food items based on selected category */}
                 <div className="w-full grid grid-cols-auto gap-4 gap-y-6" id="food-display">
                     <div className="grid grid-cols-[repeat(auto-fill,minmax(240px,1fr))] gap-[30px] row-gap-[50px]">
-                        {food_list
+                        {filteredFoodList
                             .filter((item) => category === "All" || category === item.category) // Filter items based on category
                             .map((item, index) => (
                                 <FoodItem

@@ -1,8 +1,10 @@
 import axios from "axios";
+import Fuse from 'fuse.js';
 import { createContext, useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { toast } from "react-toastify";
 import { backendUrl } from "../App";
+
 
 export const StoreContext = createContext(null);
 
@@ -25,6 +27,71 @@ const StoreContextProvider = (props) => {
     });
     const [showSearch, setShowSearch] = useState(false);
     const navigate = useNavigate();
+
+    const fuseOptions = {
+        keys: ['name'], // Search by the 'name' field in food_list
+        threshold: 0.3, // Adjust sensitivity (lower is stricter)
+        includeScore: true,
+    };
+
+    const filteredFoodList = food_list.filter((food) =>
+        food.name.toLowerCase().includes(search.toLowerCase())
+    );
+
+    const autocompleteSuggestions = food_list.filter((food) =>
+        food.name.toLowerCase().startsWith(search.toLowerCase())
+    );
+
+    const fuse = new Fuse(food_list, fuseOptions);
+
+    // Perform fuzzy search
+    const fuzzyResults = fuse.search(search);
+
+    // Extract matching items (map Fuse results to original objects)
+    const fuzzyMatchedItems = fuzzyResults.map(result => result.item);
+
+    // Separate non-matching items
+    const nonMatchingItems = food_list.filter(
+        food => !fuzzyMatchedItems.includes(food)
+    );
+
+    // Prioritize the food list based on exact matches, starts-with matches, and fuzzy similarity
+    const prioritizedFoodList = (() => {
+        const searchLower = search.toLowerCase();
+
+        // Exact matches
+        const exactMatches = food_list.filter(
+            (food) => food.name.toLowerCase() === searchLower
+        );
+
+        // Starts-with matches (excluding exact matches)
+        const startsWithMatches = food_list.filter(
+            (food) =>
+                food.name.toLowerCase().startsWith(searchLower) &&
+                !exactMatches.includes(food)
+        );
+
+        // Fuzzy matches (excluding exact and starts-with matches)
+        const fuzzyResults = fuse.search(search);
+        const fuzzyMatchedItems = fuzzyResults
+            .map((result) => result.item)
+            .filter(
+                (food) =>
+                    !exactMatches.includes(food) &&
+                    !startsWithMatches.includes(food)
+            );
+
+        // Remaining items (not matching any criteria)
+        const remainingItems = food_list.filter(
+            (food) =>
+                !exactMatches.includes(food) &&
+                !startsWithMatches.includes(food) &&
+                !fuzzyMatchedItems.includes(food)
+        );
+
+        // Combine all lists in priority order
+        return [...exactMatches, ...startsWithMatches, ...fuzzyMatchedItems, ...remainingItems];
+    })();
 
     const fetchFoodList = async () => {
         try {
@@ -158,6 +225,8 @@ const StoreContextProvider = (props) => {
         userData,
         setUserData,
         loadUserProfileData,
+        filteredFoodList: prioritizedFoodList, // Use prioritized list
+        autocompleteSuggestions,
     };
 
     return (
