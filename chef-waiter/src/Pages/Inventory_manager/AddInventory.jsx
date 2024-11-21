@@ -50,8 +50,8 @@ const AddInventory = () => {
                     <p className="mb-2 mt-4">Description</p>
                     <textarea className="w-full max-w-[500px] max-h-[100px] px-3 py-2 border border-gray-600 rounded-md focus:border-black" onChange={onChangeHandler} value={data.description} name='description' rows="6" placeholder='Write Description Here' required />
                 </div>
-                <div className="flex flex-row sm:flex-row gap-2 w-full sm:gap-8">
-                    <div>
+                <div className="flex flex-row sm:flex-row gap-2 w-full sm:gap-8 items-start">
+                    <div className="flex flex-col">
                         <p className="mb-2 mt-4">Category</p>
                         <select
                             className="w-full max-w-[200px] px-3 py-2 border border-gray-600 rounded-md focus:border-black"
@@ -71,10 +71,8 @@ const AddInventory = () => {
                             <option value="Other">Other</option>
                         </select>
                     </div>
-                </div>
-                <div className="flex flex-col sm:flex-row gap-2 w-full sm:gap-8 mt-3">
-                    <div>
-                        <p className="mb-2">Unit</p>
+                    <div className="flex flex-col">
+                        <p className="mb-2 mt-4">Unit</p>
                         <select
                             className="w-full px-3 py-2 sm:w-[150px] border border-gray-600 rounded-md focus:border-black"
                             onChange={onChangeHandler}
@@ -92,7 +90,6 @@ const AddInventory = () => {
                         </select>
                     </div>
                 </div>
-
                 <div className="flex w-full justify-start gap-3 mt-8">
                     <button type="submit" className="px-8 py-2 rounded text-white bg-[#0b5ed7]">
                         Submit
