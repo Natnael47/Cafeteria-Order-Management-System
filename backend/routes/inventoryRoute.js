@@ -3,8 +3,10 @@ import multer from "multer";
 import {
   addInventory,
   addStock,
+  addSupplier,
   getSupplierOrders,
   listInventory,
+  listSuppliers,
   removeInventory,
   requestInventoryItem,
   updateInventory,
@@ -43,5 +45,8 @@ inventoryRoute.post(
   upload.single("image"),
   updateInventory
 );
+
+inventoryRoute.post("/add-supplier", empAuth, addSupplier);
+inventoryRoute.get("/list-suppliers", empAuth, listSuppliers);
 
 export default inventoryRoute;

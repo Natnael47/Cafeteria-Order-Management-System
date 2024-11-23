@@ -568,7 +568,6 @@ const logInventoryChange = async (req, res) => {
 };
 
 // Function to calculate stock left as a percentage and store the exact percentage in the status field
-// Function to calculate stock left as a percentage and store the exact percentage in the status field
 const calculateStockPercentageAndStoreInStatus = async (inventoryId) => {
   try {
     // Retrieve the inventory item by ID
@@ -609,17 +608,60 @@ const calculateStockPercentageAndStoreInStatus = async (inventoryId) => {
   }
 };
 
+const addSupplier = async (req, res) => {
+  try {
+    // Parse contactInfo if sent as JSON in the request body
+    const contactInfo = req.body.contactInfo
+      ? JSON.parse(req.body.contactInfo)
+      : null;
+
+    const supplier = await prisma.supplier.create({
+      data: {
+        name: req.body.name,
+        contactInfo: contactInfo, // Optional JSON data for contact information
+        status: req.body.status || "active", // Default to "active" if not provided
+      },
+    });
+
+    res.json({
+      success: true,
+      message: "Supplier added successfully",
+      data: supplier,
+    });
+  } catch (error) {
+    console.error("Error adding supplier:", error);
+    res.status(500).json({ success: false, message: "Error adding supplier" });
+  }
+};
+
+// List all suppliers
+const listSuppliers = async (req, res) => {
+  try {
+    const suppliers = await prisma.supplier.findMany({
+      orderBy: { id: "desc" }, // Sort by ID in descending order
+    });
+    res.json({ success: true, data: suppliers });
+  } catch (error) {
+    console.error("Error retrieving suppliers:", error);
+    res
+      .status(500)
+      .json({ success: false, message: "Error retrieving suppliers" });
+  }
+};
+
 // Export all functions
 export {
   addInventory,
   addInventoryBulk,
   addStock,
+  addSupplier,
   calculateStockPercentageAndStoreInStatus,
   checkInventoryThreshold,
   generateReport,
   generateUsageReport,
   getSupplierOrders,
   listInventory,
+  listSuppliers,
   logInventoryChange,
   removeInventory,
   requestInventoryItem,
