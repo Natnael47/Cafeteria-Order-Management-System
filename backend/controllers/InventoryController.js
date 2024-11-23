@@ -775,6 +775,7 @@ const ensureInventorySupplier = async (
     });
 
     console.log("New InventorySupplier record created:", newRecord);
+
     return newRecord;
   } catch (error) {
     console.error("Error ensuring inventory-supplier record:", error);
