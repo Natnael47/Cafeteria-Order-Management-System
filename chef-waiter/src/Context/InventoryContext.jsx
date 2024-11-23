@@ -199,6 +199,61 @@ const InventoryContextProvide = (props) => {
         }
     };
 
+    // Function to update a supplier
+    const updateSupplier = async (editSupplier, fetchSuppliers, cancelEdit) => {
+        const payload = {
+            id: editSupplier.id,
+            name: editSupplier.name,
+            contactInfo: JSON.stringify({
+                email: editSupplier.email,
+                phone: editSupplier.phone,
+                address: editSupplier.address,
+            }),
+            status: editSupplier.status,
+        };
+
+        try {
+            const response = await axios.post(
+                `${backendUrl}/api/inventory/update-supplier`,
+                payload,
+                { headers: { iToken } }
+            );
+
+            if (response.data.success) {
+                toast.success("Supplier updated successfully");
+                fetchSuppliers();
+                cancelEdit(); // Call to reset or close the edit form
+            } else {
+                toast.error("Error updating supplier");
+            }
+        } catch (error) {
+            console.error("Error updating supplier:", error.message);
+            toast.error("Error updating supplier");
+        }
+    };
+
+    // Function to remove a supplier
+    const removeSupplier = async (supplierId, fetchSuppliers, closeModal) => {
+        try {
+            const response = await axios.post(
+                `${backendUrl}/api/inventory/remove-supplier`,
+                { id: supplierId },
+                { headers: { iToken } }
+            );
+
+            if (response.data.success) {
+                fetchSuppliers();
+                closeModal(); // Call to close the confirmation modal
+                toast.success("Supplier removed successfully");
+            } else {
+                toast.error(response.data.message || "Error removing supplier");
+            }
+        } catch (error) {
+            console.error("Error removing supplier:", error.message);
+            toast.error("Error removing supplier");
+        }
+    };
+
     const value = {
         iToken,
         addSupplier,
@@ -214,6 +269,8 @@ const InventoryContextProvide = (props) => {
         navigate,
         fetchSuppliers,
         supplierList,
+        updateSupplier,
+        removeSupplier
     };
 
     return (

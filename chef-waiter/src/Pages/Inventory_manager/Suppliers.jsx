@@ -1,11 +1,22 @@
-import React, { useContext, useEffect, useState } from 'react';
-import { toast } from 'react-toastify';
-import { InventoryContext } from '../../Context/InventoryContext';
+import React, { useContext, useEffect, useState } from "react";
+import Modal from "react-modal";
+import { toast } from "react-toastify";
+import { InventoryContext } from "../../Context/InventoryContext";
 
 const Suppliers = () => {
-    const { supplierList, fetchSuppliers, addSupplier } = useContext(InventoryContext);
+    const {
+        supplierList,
+        fetchSuppliers,
+        addSupplier,
+        updateSupplier,
+        removeSupplier,
+    } = useContext(InventoryContext);
 
-    const [isPopupOpen, setIsPopupOpen] = useState(false); // State to manage popup visibility
+    const [isPopupOpen, setIsPopupOpen] = useState(false); // State to manage popup for adding supplier
+    const [isEditOpen, setIsEditOpen] = useState(false); // State to toggle update form
+    const [isRemoveModalOpen, setIsRemoveModalOpen] = useState(false); // State to manage removal modal
+    const [selectedSupplier, setSelectedSupplier] = useState(null); // Selected supplier for edit or delete
+
     const [newSupplierData, setNewSupplierData] = useState({
         name: "",
         email: "",
@@ -14,24 +25,56 @@ const Suppliers = () => {
         status: "active",
     });
 
+    const [editSupplierData, setEditSupplierData] = useState({
+        id: "",
+        name: "",
+        email: "",
+        phone: "",
+        address: "",
+        status: "",
+    });
+
     useEffect(() => {
         fetchSuppliers(); // Fetch suppliers when the component mounts
     }, []);
 
-    // Handle form field changes
-    const handleChange = (e) => {
+    // Handle form field changes for add/edit
+    const handleChange = (e, isEdit = false) => {
         const { name, value } = e.target;
-        setNewSupplierData({ ...newSupplierData, [name]: value });
+        const updateState = isEdit ? setEditSupplierData : setNewSupplierData;
+        updateState((prevData) => ({ ...prevData, [name]: value }));
     };
 
     // Handle adding a new supplier
     const handleAddSupplier = async () => {
         try {
             await addSupplier(newSupplierData, setNewSupplierData);
-            setIsPopupOpen(false); // Close the popup on success
-            fetchSuppliers(); // Refresh supplier list
+            setIsPopupOpen(false); // Close popup on success
+            fetchSuppliers();
         } catch (error) {
             toast.error("Failed to add supplier");
+        }
+    };
+
+    // Handle updating a supplier
+    const handleUpdateSupplier = async () => {
+        try {
+            await updateSupplier(editSupplierData, fetchSuppliers, () =>
+                setIsEditOpen(false)
+            );
+        } catch (error) {
+            toast.error("Failed to update supplier");
+        }
+    };
+
+    // Handle confirming removal
+    const confirmRemoveSupplier = async () => {
+        try {
+            await removeSupplier(selectedSupplier.id, fetchSuppliers, () =>
+                setIsRemoveModalOpen(false)
+            );
+        } catch (error) {
+            toast.error("Failed to remove supplier");
         }
     };
 
@@ -71,12 +114,14 @@ const Suppliers = () => {
             {/* Data Grid */}
             <div className="bg-white shadow border border-black rounded overflow-hidden">
                 {/* Header Row */}
-                <div className="grid grid-cols-[2fr_2fr_2fr_2fr_1fr] bg-gray-200 border-b border-black font-medium text-gray-700">
+                <div className="grid grid-cols-[2fr_2fr_2fr_2fr_1fr_1fr_1fr] bg-gray-200 border-b border-black font-medium text-gray-700">
                     <div className="px-4 py-2 border-r border-black">Supplier Name</div>
                     <div className="px-4 py-2 border-r border-black">Email</div>
                     <div className="px-4 py-2 border-r border-black">Phone</div>
                     <div className="px-4 py-2 border-r border-black">Address</div>
-                    <div className="px-4 py-2">Status</div>
+                    <div className="px-4 py-2 border-r border-black">Status</div>
+                    <div className="px-4 py-2 border-r border-black">Modify</div>
+                    <div className="px-4 py-2">Remove</div>
                 </div>
 
                 {/* Data Rows */}
@@ -84,20 +129,49 @@ const Suppliers = () => {
                     supplierList.map((supplier, index) => (
                         <div
                             key={supplier.id}
-                            className={`grid grid-cols-[2fr_2fr_2fr_2fr_1fr] text-sm ${index % 2 === 0 ? 'bg-gray-50' : 'bg-white'
+                            className={`grid grid-cols-[2fr_2fr_2fr_2fr_1fr_1fr_1fr] text-sm ${index % 2 === 0 ? "bg-gray-50" : "bg-white"
                                 } border-b border-black`}
                         >
                             <div className="px-4 py-2 border-r border-black">{supplier.name}</div>
                             <div className="px-4 py-2 border-r border-black">
-                                {supplier.contactInfo?.email || 'N/A'}
+                                {supplier.contactInfo?.email || "N/A"}
                             </div>
                             <div className="px-4 py-2 border-r border-black">
-                                {supplier.contactInfo?.phone || 'N/A'}
+                                {supplier.contactInfo?.phone || "N/A"}
                             </div>
                             <div className="px-4 py-2 border-r border-black">
-                                {supplier.contactInfo?.address || 'N/A'}
+                                {supplier.contactInfo?.address || "N/A"}
                             </div>
-                            <div className="px-4 py-2">{supplier.status}</div>
+                            <div className="px-4 py-2 border-r border-black">{supplier.status}</div>
+                            <div className="px-4 py-2 border-r border-black text-center">
+                                <button
+                                    onClick={() => {
+                                        setEditSupplierData({
+                                            id: supplier.id,
+                                            name: supplier.name,
+                                            email: supplier.contactInfo?.email || "",
+                                            phone: supplier.contactInfo?.phone || "",
+                                            address: supplier.contactInfo?.address || "",
+                                            status: supplier.status,
+                                        });
+                                        setIsEditOpen(true);
+                                    }}
+                                    className="text-blue-500"
+                                >
+                                    ✏️
+                                </button>
+                            </div>
+                            <div className="px-4 py-2 text-center">
+                                <button
+                                    onClick={() => {
+                                        setSelectedSupplier(supplier);
+                                        setIsRemoveModalOpen(true);
+                                    }}
+                                    className="text-red-500"
+                                >
+                                    🗑️
+                                </button>
+                            </div>
                         </div>
                     ))
                 ) : (
@@ -105,63 +179,164 @@ const Suppliers = () => {
                 )}
             </div>
 
-            {/* Popup for Adding Supplier */}
+            {/* Add Supplier Modal */}
             {isPopupOpen && (
-                <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-                    <div className="bg-white p-6 rounded shadow-lg w-[90%] max-w-lg">
-                        <h2 className="text-xl font-semibold text-gray-700 mb-4">
-                            Add New Supplier
-                        </h2>
-                        <div className="space-y-4">
-                            <input
-                                type="text"
-                                name="name"
-                                value={newSupplierData.name}
-                                onChange={handleChange}
-                                placeholder="Supplier Name"
-                                className="w-full border border-gray-300 rounded px-4 py-2"
-                            />
-                            <input
-                                type="email"
-                                name="email"
-                                value={newSupplierData.email}
-                                onChange={handleChange}
-                                placeholder="Email"
-                                className="w-full border border-gray-300 rounded px-4 py-2"
-                            />
-                            <input
-                                type="text"
-                                name="phone"
-                                value={newSupplierData.phone}
-                                onChange={handleChange}
-                                placeholder="Phone"
-                                className="w-full border border-gray-300 rounded px-4 py-2"
-                            />
-                            <input
-                                type="text"
-                                name="address"
-                                value={newSupplierData.address}
-                                onChange={handleChange}
-                                placeholder="Address"
-                                className="w-full border border-gray-300 rounded px-4 py-2"
-                            />
-                        </div>
-                        <div className="flex justify-end space-x-4 mt-4">
-                            <button
-                                onClick={() => setIsPopupOpen(false)}
-                                className="bg-gray-300 text-gray-700 px-4 py-2 rounded"
-                            >
-                                Cancel
-                            </button>
-                            <button
-                                onClick={handleAddSupplier}
-                                className="bg-blue-500 text-white px-4 py-2 rounded"
-                            >
-                                Add
-                            </button>
-                        </div>
+                <Modal
+                    isOpen={isPopupOpen}
+                    onRequestClose={() => setIsPopupOpen(false)}
+                    className="bg-white p-6 rounded shadow-lg w-[90%] max-w-lg mx-auto mt-20"
+                    overlayClassName="fixed inset-0 bg-black bg-opacity-50 z-50"
+                >
+                    <h2 className="text-xl font-semibold text-gray-700 mb-4">Add New Supplier</h2>
+                    {/* Form */}
+                    <input
+                        type="text"
+                        name="name"
+                        value={newSupplierData.name}
+                        onChange={handleChange}
+                        placeholder="Supplier Name"
+                        className="w-full border border-gray-300 rounded px-4 py-2 mb-2"
+                    />
+                    <input
+                        type="email"
+                        name="email"
+                        value={newSupplierData.email}
+                        onChange={handleChange}
+                        placeholder="Email"
+                        className="w-full border border-gray-300 rounded px-4 py-2 mb-2"
+                    />
+                    <input
+                        type="text"
+                        name="phone"
+                        value={newSupplierData.phone}
+                        onChange={handleChange}
+                        placeholder="Phone"
+                        className="w-full border border-gray-300 rounded px-4 py-2 mb-2"
+                    />
+                    <input
+                        type="text"
+                        name="address"
+                        value={newSupplierData.address}
+                        onChange={handleChange}
+                        placeholder="Address"
+                        className="w-full border border-gray-300 rounded px-4 py-2 mb-2"
+                    />
+                    <div className="flex justify-end space-x-4 mt-4">
+                        <button
+                            onClick={() => setIsPopupOpen(false)}
+                            className="bg-gray-300 text-gray-700 px-4 py-2 rounded"
+                        >
+                            Cancel
+                        </button>
+                        <button
+                            onClick={handleAddSupplier}
+                            className="bg-blue-500 text-white px-4 py-2 rounded"
+                        >
+                            Add
+                        </button>
                     </div>
-                </div>
+                </Modal>
+            )}
+
+            {/* Edit Supplier Modal */}
+            {isEditOpen && (
+                <Modal
+                    isOpen={isEditOpen}
+                    onRequestClose={() => setIsEditOpen(false)}
+                    className="bg-white p-6 rounded shadow-lg w-[90%] max-w-lg mx-auto mt-20"
+                    overlayClassName="fixed inset-0 bg-black bg-opacity-50 z-50"
+                >
+                    <h2 className="text-xl font-semibold text-gray-700 mb-4">Edit Supplier</h2>
+                    {/* Form */}
+                    <input
+                        type="text"
+                        name="name"
+                        value={editSupplierData.name}
+                        onChange={(e) => handleChange(e, true)}
+                        placeholder="Supplier Name"
+                        className="w-full border border-gray-300 rounded px-4 py-2 mb-2"
+                    />
+                    <input
+                        type="email"
+                        name="email"
+                        value={editSupplierData.email}
+                        onChange={(e) => handleChange(e, true)}
+                        placeholder="Email"
+                        className="w-full border border-gray-300 rounded px-4 py-2 mb-2"
+                    />
+                    <input
+                        type="text"
+                        name="phone"
+                        value={editSupplierData.phone}
+                        onChange={(e) => handleChange(e, true)}
+                        placeholder="Phone"
+                        className="w-full border border-gray-300 rounded px-4 py-2 mb-2"
+                    />
+                    <input
+                        type="text"
+                        name="address"
+                        value={editSupplierData.address}
+                        onChange={(e) => handleChange(e, true)}
+                        placeholder="Address"
+                        className="w-full border border-gray-300 rounded px-4 py-2 mb-2"
+                    />
+                    <select
+                        name="status"
+                        value={editSupplierData.status}
+                        onChange={(e) => handleChange(e, true)}
+                        className="w-full border border-gray-300 rounded px-4 py-2 mb-2"
+                    >
+                        <option value="active">Active</option>
+                        <option value="inactive">Inactive</option>
+                    </select>
+                    <div className="flex justify-end space-x-4 mt-4">
+                        <button
+                            onClick={() => setIsEditOpen(false)}
+                            className="bg-gray-300 text-gray-700 px-4 py-2 rounded"
+                        >
+                            Cancel
+                        </button>
+                        <button
+                            onClick={handleUpdateSupplier}
+                            className="bg-blue-500 text-white px-4 py-2 rounded"
+                        >
+                            Save
+                        </button>
+                    </div>
+                </Modal>
+            )}
+
+            {/* Remove Supplier Confirmation Modal */}
+            {isRemoveModalOpen && (
+                <Modal
+                    isOpen={isRemoveModalOpen}
+                    onRequestClose={() => setIsRemoveModalOpen(false)}
+                    className="bg-white p-6 rounded shadow-lg w-[90%] max-w-lg mx-auto mt-20"
+                    overlayClassName="fixed inset-0 bg-black bg-opacity-50 z-50"
+                >
+                    <h2 className="text-xl font-semibold text-gray-700 mb-4">
+                        Confirm Removal
+                    </h2>
+                    <p className="text-gray-600 mb-6">
+                        Are you sure you want to remove supplier{" "}
+                        <span className="font-semibold">{selectedSupplier?.name}</span>?
+                        This action cannot be undone.
+                    </p>
+                    <div className="flex justify-end space-x-4">
+                        <button
+                            onClick={() => setIsRemoveModalOpen(false)}
+                            className="bg-gray-300 text-gray-700 px-4 py-2 rounded"
+                        >
+                            Cancel
+                        </button>
+                        <button
+                            onClick={confirmRemoveSupplier}
+                            className="bg-red-500 text-white px-4 py-2 rounded"
+                        >
+                            Remove
+                        </button>
+                    </div>
+                </Modal>
             )}
         </div>
     );
