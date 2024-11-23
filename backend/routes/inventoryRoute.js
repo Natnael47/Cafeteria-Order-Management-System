@@ -8,8 +8,10 @@ import {
   listInventory,
   listSuppliers,
   removeInventory,
+  removeSupplier,
   requestInventoryItem,
   updateInventory,
+  updateSupplier,
   withdrawItem,
 } from "../controllers/InventoryController.js";
 import empAuth from "../middleware/empAuth.js";
@@ -48,5 +50,7 @@ inventoryRoute.post(
 
 inventoryRoute.post("/add-supplier", empAuth, addSupplier);
 inventoryRoute.get("/list-suppliers", empAuth, listSuppliers);
+inventoryRoute.post("/remove-supplier", empAuth, removeSupplier);
+inventoryRoute.post("/update-supplier", empAuth, updateSupplier);
 
 export default inventoryRoute;

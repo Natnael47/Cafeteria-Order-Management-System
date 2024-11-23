@@ -649,6 +649,86 @@ const listSuppliers = async (req, res) => {
   }
 };
 
+// Remove a supplier
+const removeSupplier = async (req, res) => {
+  try {
+    const supplierId = parseInt(req.body.id, 10);
+    if (isNaN(supplierId)) {
+      return res
+        .status(400)
+        .json({ success: false, message: "Invalid supplier ID" });
+    }
+
+    // Check if supplier exists
+    const supplier = await prisma.supplier.findUnique({
+      where: { id: supplierId },
+    });
+
+    if (!supplier) {
+      return res
+        .status(404)
+        .json({ success: false, message: "Supplier not found" });
+    }
+
+    // Delete the supplier
+    await prisma.supplier.delete({ where: { id: supplierId } });
+
+    res.json({ success: true, message: "Supplier removed successfully" });
+  } catch (error) {
+    console.error("Error removing supplier:", error);
+    res
+      .status(500)
+      .json({ success: false, message: "Error removing supplier" });
+  }
+};
+
+// Update a supplier
+const updateSupplier = async (req, res) => {
+  try {
+    const supplierId = parseInt(req.body.id, 10);
+    if (isNaN(supplierId)) {
+      return res
+        .status(400)
+        .json({ success: false, message: "Invalid supplier ID" });
+    }
+
+    const existingSupplier = await prisma.supplier.findUnique({
+      where: { id: supplierId },
+    });
+
+    if (!existingSupplier) {
+      return res
+        .status(404)
+        .json({ success: false, message: "Supplier not found" });
+    }
+
+    // Parse contactInfo if sent as JSON in the request body
+    const contactInfo = req.body.contactInfo
+      ? JSON.parse(req.body.contactInfo)
+      : existingSupplier.contactInfo;
+
+    const updatedSupplier = await prisma.supplier.update({
+      where: { id: supplierId },
+      data: {
+        name: req.body.name || existingSupplier.name,
+        contactInfo: contactInfo, // Update contact info if provided
+        status: req.body.status || existingSupplier.status, // Default to existing status
+      },
+    });
+
+    res.json({
+      success: true,
+      message: "Supplier updated successfully",
+      data: updatedSupplier,
+    });
+  } catch (error) {
+    console.error("Error updating supplier:", error);
+    res
+      .status(500)
+      .json({ success: false, message: "Error updating supplier" });
+  }
+};
+
 // Export all functions
 export {
   addInventory,
@@ -664,8 +744,10 @@ export {
   listSuppliers,
   logInventoryChange,
   removeInventory,
+  removeSupplier,
   requestInventoryItem,
   updateInventory,
   updateInventoryAttributes,
+  updateSupplier,
   withdrawItem,
 };
