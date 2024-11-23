@@ -10,6 +10,7 @@ const InventoryContextProvide = (props) => {
     const [iToken, setIToken] = useState(localStorage.getItem('iToken') || '');
     const [inventoryList, setInventoryList] = useState([]);
     const [orderList, setOrderList] = useState([]); // State to store supplier orders
+    const [supplierList, setSupplierList] = useState([]); // State to store supplier data
     const navigate = useNavigate();
 
     const fetchInventoryList = async () => {
@@ -42,6 +43,22 @@ const InventoryContextProvide = (props) => {
         } catch (error) {
             console.error("Fetch inventory orders error:", error);
             toast.error("Error fetching inventory orders");
+        }
+    };
+
+    const fetchSuppliers = async () => {
+        try {
+            const response = await axios.get(`${backendUrl}/api/inventory/list-suppliers`, {
+                headers: { iToken },
+            });
+            if (response.data.success) {
+                setSupplierList(response.data.data); // Update the state with the fetched supplier data
+            } else {
+                toast.error("Error fetching supplier list");
+            }
+        } catch (error) {
+            console.error("Fetch suppliers error:", error);
+            toast.error("Error fetching supplier list");
         }
     };
 
@@ -136,8 +153,55 @@ const InventoryContextProvide = (props) => {
         }
     };
 
+    const addSupplier = async (data, setData) => {
+        try {
+            // Prepare contactInfo as JSON string
+            const contactInfo = JSON.stringify({
+                email: data.email,
+                phone: data.phone,
+                address: data.address,
+            });
+
+            // Prepare payload for the request
+            const payload = {
+                name: data.name,
+                contactInfo: contactInfo,
+                status: data.status || "active", // Default to active if not provided
+            };
+
+            // Make the API request
+            const response = await axios.post(`${backendUrl}/api/inventory/add-supplier`, payload, {
+                headers: { iToken },
+            });
+
+            if (response.data.success) {
+                // Clear the form after successful submission
+                setData({
+                    name: "",
+                    email: "",
+                    phone: "",
+                    address: "",
+                    status: "active",
+                });
+                toast.success("Supplier added successfully");
+            } else {
+                toast.error(response.data.message || "Failed to add supplier");
+            }
+        } catch (error) {
+            console.error("Error adding supplier:", error);
+            if (error.response) {
+                toast.error(`Backend Error: ${error.response.data.message || "Failed to add supplier"}`);
+            } else if (error.request) {
+                toast.error("Network Error: No response received from the server");
+            } else {
+                toast.error(`Error: ${error.message}`);
+            }
+        }
+    };
+
     const value = {
         iToken,
+        addSupplier,
         setIToken,
         inventoryList,
         setInventoryList,
@@ -148,6 +212,8 @@ const InventoryContextProvide = (props) => {
         addInventory,
         orderList, // Expose the state for supplier orders
         navigate,
+        fetchSuppliers,
+        supplierList,
     };
 
     return (
