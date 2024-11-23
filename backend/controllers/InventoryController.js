@@ -209,12 +209,19 @@ const addStock = async (req, res) => {
       quantity,
       pricePerUnit,
       supplier,
+      supplierId,
       expiryDate,
       dateReceived,
     } = req.body;
 
     // Input validation
-    if (!inventoryId || !quantity || !pricePerUnit || !dateReceived) {
+    if (
+      !inventoryId ||
+      !quantity ||
+      !pricePerUnit ||
+      !supplierId ||
+      !dateReceived
+    ) {
       return res
         .status(400)
         .json({ success: false, message: "Missing required fields" });
@@ -255,6 +262,9 @@ const addStock = async (req, res) => {
         dateUpdated: new Date(), // Update the dateUpdated to the current timestamp
       },
     });
+
+    // Ensure inventory-supplier mapping exists
+    await ensureInventorySupplier(inventoryId, supplierId, pricePerUnit);
 
     // Save purchase details to the inventorypurchase table
     await prisma.inventorypurchase.create({
@@ -726,6 +736,49 @@ const updateSupplier = async (req, res) => {
     res
       .status(500)
       .json({ success: false, message: "Error updating supplier" });
+  }
+};
+
+// Function to ensure a unique inventory-supplier mapping
+const ensureInventorySupplier = async (
+  inventoryId,
+  supplierId,
+  pricePerUnit,
+  payment = "cash on delivery"
+) => {
+  try {
+    // Check if the inventory-supplier combination already exists
+    const existingRecord = await prisma.inventorySupplier.findUnique({
+      where: {
+        inventoryId_supplierId: {
+          // Use the composite key alias
+          inventoryId,
+          supplierId,
+        },
+      },
+    });
+
+    // If it exists, return the existing record
+    if (existingRecord) {
+      console.log("InventorySupplier record already exists:", existingRecord);
+      return existingRecord;
+    }
+
+    // If it does not exist, create a new record
+    const newRecord = await prisma.inventorySupplier.create({
+      data: {
+        inventoryId,
+        supplierId,
+        pricePerUnit,
+        payment,
+      },
+    });
+
+    console.log("New InventorySupplier record created:", newRecord);
+    return newRecord;
+  } catch (error) {
+    console.error("Error ensuring inventory-supplier record:", error);
+    throw new Error("Failed to ensure inventory-supplier mapping");
   }
 };
 

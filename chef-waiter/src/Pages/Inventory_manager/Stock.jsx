@@ -5,7 +5,8 @@ import { backendUrl } from "../../App";
 import { InventoryContext } from "../../Context/InventoryContext";
 
 const Stock = () => {
-    const { inventoryList, fetchInventoryList, iToken } = useContext(InventoryContext);
+    const { inventoryList, fetchInventoryList, iToken, supplierList,
+        fetchSuppliers } = useContext(InventoryContext);
 
     const [stockAction, setStockAction] = useState(null); // "in" or "out"
     const [selectedItem, setSelectedItem] = useState(null); // Item to update stock for
@@ -21,6 +22,7 @@ const Stock = () => {
 
     useEffect(() => {
         fetchInventoryList(); // Fetch inventory list on component load
+        fetchSuppliers(); // Fetch supplier list on component load
     }, []);
 
     const onChangeHandler = (event) => {
@@ -50,22 +52,30 @@ const Stock = () => {
     const onAddStockHandler = async (event) => {
         event.preventDefault();
 
+        if (!formData.supplierId || !formData.supplier) {
+            toast.error("Please select a valid supplier.");
+            return;
+        }
+
         if (selectedItem && formData.stockAmount > 0 && formData.pricePerUnit > 0) {
-            const addedStock = parseInt(formData.stockAmount, 10) || 0;
-            const pricePerUnit = parseFloat(formData.pricePerUnit) || 0;  // Convert string to number
+            if (!formData.supplierId || !formData.supplier) {
+                toast.error("Please select a valid supplier.");
+                return;
+            }
 
             const formDataToSend = {
                 inventoryId: selectedItem.id,
-                quantity: addedStock,
-                pricePerUnit: pricePerUnit,
-                supplier: formData.supplier,
+                quantity: parseInt(formData.stockAmount, 10),
+                pricePerUnit: parseFloat(formData.pricePerUnit),
+                supplier: formData.supplier, // Supplier name
+                supplierId: formData.supplierId, // Supplier ID
                 expiryDate: formData.expiryDate,
                 dateReceived: formData.dateReceived,
             };
 
             try {
                 const response = await axios.post(
-                    backendUrl + "/api/inventory/add-stock",
+                    `${backendUrl}/api/inventory/add-stock`,
                     formDataToSend,
                     {
                         headers: {
@@ -77,17 +87,17 @@ const Stock = () => {
 
                 if (response.data.success) {
                     toast.success("Stock added successfully");
-                    fetchInventoryList(); // Refresh inventory list
+                    fetchInventoryList();
                     cancelEdit();
                 } else {
                     toast.error(response.data.message || "Failed to add stock");
                 }
             } catch (error) {
                 console.error("Error adding stock:", error);
-                toast.error(`Error: ${error.message}`);
+                toast.error("Failed to add stock. Please try again.");
             }
         } else {
-            toast.error("Please enter a valid quantity and price per unit.");
+            toast.error("Please enter a valid quantity, price per unit, and supplier.");
         }
     };
 
@@ -320,14 +330,34 @@ const Stock = () => {
                                                     >
                                                         Supplier
                                                     </label>
-                                                    <input
+                                                    <select
                                                         id="supplier"
-                                                        type="text"
                                                         name="supplier"
-                                                        value={formData.supplier}
-                                                        onChange={onChangeHandler}
+                                                        value={formData.supplierId || ""} // Supplier ID is used as the value
+                                                        onChange={(event) => {
+                                                            const selectedSupplierId = event.target.value;
+
+                                                            // Find the selected supplier object in the supplierList
+                                                            const selectedSupplier = supplierList.find(
+                                                                (supplier) => supplier.id.toString() === selectedSupplierId
+                                                            );
+
+                                                            // Update formData with both supplierId and supplier (name)
+                                                            setFormData((prevData) => ({
+                                                                ...prevData,
+                                                                supplierId: selectedSupplier ? selectedSupplier.id : "",
+                                                                supplier: selectedSupplier ? selectedSupplier.name : "",
+                                                            }));
+                                                        }}
                                                         className="p-2 border rounded w-full"
-                                                    />
+                                                    >
+                                                        <option value="">Select a supplier</option>
+                                                        {supplierList.map((supplier) => (
+                                                            <option key={supplier.id} value={supplier.id}>
+                                                                {supplier.name}
+                                                            </option>
+                                                        ))}
+                                                    </select>
                                                 </div>
                                                 <div>
                                                     <label
