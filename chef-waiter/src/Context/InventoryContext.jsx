@@ -11,6 +11,7 @@ const InventoryContextProvide = (props) => {
     const [inventoryList, setInventoryList] = useState([]);
     const [orderList, setOrderList] = useState([]); // State to store supplier orders
     const [supplierList, setSupplierList] = useState([]); // State to store supplier data
+    const [packageList, setPackageList] = useState([]); // State to store package data
     const navigate = useNavigate();
 
     const fetchInventoryList = async () => {
@@ -29,6 +30,24 @@ const InventoryContextProvide = (props) => {
         }
     };
 
+    const fetchPackages = async () => {
+        try {
+            const response = await axios.get(`${backendUrl}/api/inventory/packages`, {
+                headers: { iToken },
+            });
+            if (response.data.success) {
+                setPackageList(response.data.data); // Update the state with fetched package data
+                console.log(response.data.data);
+
+            } else {
+                toast.error("Error fetching package list");
+            }
+        } catch (error) {
+            console.error("Fetch packages error:", error);
+            toast.error("Error fetching package list");
+        }
+    };
+
     // New function to fetch supplier orders
     const fetchInventoryOrders = async () => {
         try {
@@ -37,6 +56,7 @@ const InventoryContextProvide = (props) => {
             });
             if (response.data.success) {
                 setOrderList(response.data.data); // Update the state with fetched order data
+
             } else {
                 toast.error("Error fetching inventory orders");
             }
@@ -257,6 +277,7 @@ const InventoryContextProvide = (props) => {
     const value = {
         iToken,
         addSupplier,
+        fetchPackages, packageList,
         setIToken,
         inventoryList,
         setInventoryList,

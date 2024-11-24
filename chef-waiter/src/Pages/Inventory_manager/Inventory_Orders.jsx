@@ -6,17 +6,19 @@ import { backendUrl } from '../../App';
 import { InventoryContext } from '../../Context/InventoryContext';
 
 const InventoryOrders = () => {
-    const { orderList, fetchInventoryOrders, supplierList, fetchSuppliers, iToken } = useContext(InventoryContext);
+    const { orderList, fetchInventoryOrders, supplierList, fetchSuppliers, iToken, fetchPackages, packageList } = useContext(InventoryContext);
     const [isPopupOpen, setIsPopupOpen] = useState(false);
+    const [isPackageSelectorOpen, setIsPackageSelectorOpen] = useState(null); // Track which order to add to a package
     const [newPackageData, setNewPackageData] = useState({
         name: '',
         description: '',
-        supplierId: '', // Only supplierId will be stored and sent
+        supplierId: '',
     });
 
     useEffect(() => {
         fetchInventoryOrders();
-        fetchSuppliers(); // Fetch the suppliers list
+        fetchPackages();
+        fetchSuppliers();
     }, []);
 
     const handleChange = (e) => {
@@ -27,31 +29,23 @@ const InventoryOrders = () => {
     const handleAddPackage = async () => {
         const { name, description, supplierId } = newPackageData;
 
-        // Ensure supplierId is an integer
-        const supplierIdInt = parseInt(supplierId, 10);
-
         if (!supplierId || !name || !description) {
             toast.error('Please fill in all fields and select a valid supplier.');
             return;
         }
 
-        const packageData = {
-            name,
-            description,
-            supplierId: supplierIdInt, // Send the supplierId as an integer
-        };
-
         try {
             const response = await axios.post(
                 `${backendUrl}/api/inventory/new-package`,
-                packageData,
+                { name, description, supplierId: parseInt(supplierId, 10) },
                 { headers: { iToken } }
             );
 
             if (response.data.success) {
                 toast.success('Package added successfully');
-                fetchInventoryOrders(); // Refresh the inventory orders list
-                setIsPopupOpen(false); // Close the modal
+                fetchInventoryOrders();
+                fetchPackages();
+                setIsPopupOpen(false);
             } else {
                 toast.error(response.data.message || 'Failed to add package');
             }
@@ -61,15 +55,23 @@ const InventoryOrders = () => {
         }
     };
 
+    const isOrderInPackage = (orderId, packageList) => {
+        return packageList.some((pkg) =>
+            pkg.orders.some((order) => order.orderId === orderId)
+        );
+    };
+
+
+    const handlePackageClick = (orderId) => {
+        setIsPackageSelectorOpen(orderId);
+    };
 
     return (
         <div className="flex flex-col m-5 w-full">
-            {/* Header */}
             <div className="flex items-center justify-between mb-6">
                 <h1 className="text-2xl font-semibold text-gray-700">Inventory Orders</h1>
             </div>
 
-            {/* Search and Show */}
             <div className="flex items-center justify-between mb-4">
                 <div className="flex items-center space-x-2">
                     <label className="text-gray-700">Show</label>
@@ -95,25 +97,22 @@ const InventoryOrders = () => {
                 </div>
             </div>
 
-            {/* Data Grid */}
             <div className="bg-white shadow border border-black rounded overflow-hidden">
-                {/* Header Row */}
-                <div className="grid grid-cols-[1.5fr_2fr_1fr_1fr_1fr_1fr_2fr] bg-gray-200 border-b border-black font-medium text-gray-700">
+                <div className="grid grid-cols-[1.5fr_2fr_1fr_1fr_1fr_2fr_1fr] bg-gray-200 border-b border-black font-medium text-gray-700">
                     <div className="px-4 py-2 border-r border-black">Order Status</div>
                     <div className="px-4 py-2 border-r border-black">Inventory Item</div>
                     <div className="px-4 py-2 border-r border-black">Quantity</div>
                     <div className="px-4 py-2 border-r border-black">Unit</div>
                     <div className="px-4 py-2 border-r border-black">Price</div>
-                    <div className="px-4 py-2 border-r border-black">Status</div>
-                    <div className="px-4 py-2">Order Date</div>
+                    <div className="px-4 py-2 border-r border-black">Order Date</div>
+                    <div className="px-4 py-2">Package</div>
                 </div>
 
-                {/* Data Rows */}
                 {orderList.length > 0 ? (
                     orderList.map((order, index) => (
                         <div
                             key={index}
-                            className={`grid grid-cols-[1.5fr_2fr_1fr_1fr_1fr_1fr_2fr] text-sm ${index % 2 === 0 ? 'bg-gray-50' : 'bg-white'} border-b border-black`}
+                            className={`grid grid-cols-[1.5fr_2fr_1fr_1fr_1fr_2fr_1fr] text-sm ${index % 2 === 0 ? 'bg-gray-50' : 'bg-white'} border-b border-black`}
                         >
                             <div className="px-4 py-2 border-r border-black">{order.orderStatus}</div>
                             <div className="px-4 py-2 border-r border-black">{order.inventoryName}</div>
@@ -123,11 +122,26 @@ const InventoryOrders = () => {
                             <div className="px-4 py-2 border-r border-black">{order.unit}</div>
                             <div className="px-4 py-2 border-r border-black">ETB {order.totalPrice}</div>
                             <div className="px-4 py-2 border-r border-black">
-                                {order.inventoryStatus}%
-                            </div>
-                            <div className="px-4 py-2">
                                 {new Date(order.orderDate).toLocaleDateString()}
                             </div>
+                            <div className="px-4 py-2">
+                                {isOrderInPackage(order.id, packageList) ? (
+                                    <button
+                                        className="text-red-500"
+                                        onClick={() => console.log(`Remove Order ID ${order.id} from Package`)}
+                                    >
+                                        -
+                                    </button>
+                                ) : (
+                                    <button
+                                        className="text-green-500"
+                                        onClick={() => handlePackageClick(order.id)}
+                                    >
+                                        +
+                                    </button>
+                                )}
+                            </div>
+
                         </div>
                     ))
                 ) : (
@@ -135,7 +149,21 @@ const InventoryOrders = () => {
                 )}
             </div>
 
-            {/* Add Package Modal */}
+            {isPackageSelectorOpen && (
+                <div className="bg-gray-100 p-4 border-t border-black mt-2">
+                    <h3 className="font-semibold text-gray-700 mb-2">Select a Package</h3>
+                    {packageList.map((pkg) => (
+                        <button
+                            key={pkg.id}
+                            className="bg-blue-500 text-white px-4 py-2 rounded m-2"
+                            onClick={() => console.log(`Add Order ID ${isPackageSelectorOpen} to Package ID ${pkg.id}`)}
+                        >
+                            {pkg.name}
+                        </button>
+                    ))}
+                </div>
+            )}
+
             {isPopupOpen && (
                 <Modal
                     isOpen={isPopupOpen}
