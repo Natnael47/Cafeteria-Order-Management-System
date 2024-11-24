@@ -8,6 +8,7 @@ import {
   createPackage,
   getSupplierOrders,
   listInventory,
+  listInventoryPackages,
   listSuppliers,
   removeFromPackage,
   removeInventory,
@@ -60,5 +61,7 @@ inventoryRoute.post("/add-package", addToPackage);
 inventoryRoute.post("/remove-package", removeFromPackage);
 
 inventoryRoute.post("/new-package", empAuth, createPackage);
+
+inventoryRoute.get("/packages", listInventoryPackages);
 
 export default inventoryRoute;
