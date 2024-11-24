@@ -783,12 +783,204 @@ const ensureInventorySupplier = async (
   }
 };
 
+const newPackage = async (req, res) => {
+  try {
+    const { name, description, orderIds } = req.body;
+
+    // Validate input
+    if (
+      !name ||
+      !description ||
+      !Array.isArray(orderIds) ||
+      orderIds.length === 0
+    ) {
+      return res.status(400).json({
+        success: false,
+        message: "Name, description, and order IDs are required",
+      });
+    }
+
+    // Fetch supplier ID and inventory ID from the order IDs
+    const supplierOrders = await prisma.supplierorder.findMany({
+      where: { id: { in: orderIds } },
+      select: { supplierId: true, inventoryId: true },
+    });
+
+    // Ensure all orders have the same supplierId
+    const supplierIds = [
+      ...new Set(supplierOrders.map((order) => order.supplierId)),
+    ];
+    if (supplierIds.length !== 1) {
+      return res.status(400).json({
+        success: false,
+        message: "Orders must belong to the same supplier to create a package",
+      });
+    }
+
+    const supplierId = supplierIds[0];
+    const inventoryIds = supplierOrders.map((order) => order.inventoryId);
+
+    // Fetch inventory details to get the price per unit
+    const inventoryItems = await prisma.inventory.findMany({
+      where: { id: { in: inventoryIds } },
+      select: { id: true, pricePerUnit: true },
+    });
+
+    // If there are no inventory items, return an error
+    if (inventoryItems.length === 0) {
+      return res.status(400).json({
+        success: false,
+        message: "No inventory items found for the specified orders",
+      });
+    }
+
+    // Create the package with the first item's pricePerUnit (assuming uniform price)
+    const packageQuantity = orderIds.length; // Example: quantity equals the number of orders
+    const pricePerUnit =
+      inventoryItems.length > 0 ? inventoryItems[0].pricePerUnit : 0;
+    const totalCost = packageQuantity * pricePerUnit;
+
+    // Create new packageInventory entry with a connect operation for the inventory and create operation for inventoryPackage
+    const newPackage = await prisma.packageInventory.create({
+      data: {
+        quantity: packageQuantity, // Dynamic quantity based on order count
+        pricePerUnit: pricePerUnit, // Price per unit from inventory
+        totalCost: totalCost, // Total cost calculated dynamically
+        inventory: {
+          connect: { id: inventoryIds[0] }, // Connect the first inventory item
+        },
+        inventoryPackage: {
+          create: {
+            name: name, // Use the provided package name
+            description: description, // Use the provided package description
+            supplierId: supplierId, // Use the supplier ID from orders
+          },
+        },
+      },
+    });
+
+    return res.status(201).json({
+      success: true,
+      message: "Package created successfully",
+      package: newPackage,
+    });
+  } catch (error) {
+    console.error("Error in newPackage:", error);
+    return res.status(500).json({
+      success: false,
+      message: `Error in newPackage: ${error.message}`,
+    });
+  }
+};
+
+const addToPackage = async (req, res) => {
+  try {
+    const { packageId, orderId, quantity } = req.body;
+
+    // Validate input
+    if (!packageId || !orderId || !quantity) {
+      return res.status(400).json({
+        success: false,
+        message: "Package ID, order ID, and quantity are required",
+      });
+    }
+
+    // Fetch the existing package and its supplierId
+    const existingPackage = await prisma.inventoryPackage.findUnique({
+      where: { id: packageId },
+      select: { id: true, supplierId: true },
+    });
+
+    if (!existingPackage) {
+      return res.status(404).json({
+        success: false,
+        message: "Package not found",
+      });
+    }
+
+    // Fetch the supplierId of the order
+    const supplierOrder = await prisma.supplierorder.findUnique({
+      where: { id: orderId },
+      select: { supplierId: true },
+    });
+
+    if (!supplierOrder) {
+      return res.status(404).json({
+        success: false,
+        message: "Order not found",
+      });
+    }
+
+    // Ensure the supplierId of the order matches the package's supplierId
+    if (existingPackage.supplierId !== supplierOrder.supplierId) {
+      return res.status(400).json({
+        success: false,
+        message: "Supplier IDs do not match, cannot add to package",
+      });
+    }
+
+    // Add the order to the packageInventory with quantity
+    const packageInventoryEntry = await prisma.packageInventory.create({
+      data: {
+        inventoryPackageId: packageId,
+        orderId: orderId, // Add the order to the package
+        quantity: quantity, // Include the quantity of the order being added
+      },
+    });
+
+    return res.status(200).json({
+      success: true,
+      message: "Order added to package successfully",
+      packageInventoryEntry,
+    });
+  } catch (error) {
+    console.error("Error in addToPackage:", error);
+    return res.status(500).json({
+      success: false,
+      message: `Error in addToPackage: ${error.message}`,
+    });
+  }
+};
+
+const removeFromPackage = async (req, res) => {
+  try {
+    const { packageId, supplierOrderId } = req.body;
+
+    if (!packageId || !supplierOrderId) {
+      return res.status(400).json({
+        success: false,
+        message: "Missing required fields: packageId or supplierOrderId",
+      });
+    }
+
+    // Delete the item from the package
+    await prisma.packageInventoryItem.deleteMany({
+      where: {
+        packageId,
+        supplierOrderId,
+      },
+    });
+
+    res.status(200).json({
+      success: true,
+      message: "Item removed from package successfully",
+    });
+  } catch (error) {
+    console.error("Error in removeFromPackage:", error);
+    res.status(500).json({
+      success: false,
+      message: "Internal Server Error",
+    });
+  }
+};
+
 // Export all functions
 export {
   addInventory,
   addInventoryBulk,
   addStock,
   addSupplier,
+  addToPackage,
   calculateStockPercentageAndStoreInStatus,
   checkInventoryThreshold,
   generateReport,
@@ -797,6 +989,8 @@ export {
   listInventory,
   listSuppliers,
   logInventoryChange,
+  newPackage,
+  removeFromPackage,
   removeInventory,
   removeSupplier,
   requestInventoryItem,
