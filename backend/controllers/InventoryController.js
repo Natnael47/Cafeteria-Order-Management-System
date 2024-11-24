@@ -808,6 +808,7 @@ const addToPackage = async (req, res) => {
           inventoryId: true,
           quantityOrdered: true,
           status: true,
+          packageId: true, // Added packageId check for the order
         },
       }),
     ]);
@@ -823,6 +824,14 @@ const addToPackage = async (req, res) => {
       return res.status(404).json({
         success: false,
         message: "Order not found",
+      });
+    }
+
+    // Ensure the order is not already part of a package
+    if (supplierOrder.packageId !== null) {
+      return res.status(400).json({
+        success: false,
+        message: "Order is already part of a package",
       });
     }
 
