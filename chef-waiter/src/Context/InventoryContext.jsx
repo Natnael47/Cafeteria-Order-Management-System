@@ -37,8 +37,6 @@ const InventoryContextProvide = (props) => {
             });
             if (response.data.success) {
                 setPackageList(response.data.data); // Update the state with fetched package data
-                console.log(response.data.data);
-
             } else {
                 toast.error("Error fetching package list");
             }

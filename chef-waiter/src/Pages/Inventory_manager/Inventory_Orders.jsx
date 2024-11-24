@@ -19,7 +19,6 @@ const InventoryOrders = () => {
                 packageId,
                 orderId,
             };
-            console.log("sent firrrr :", formData);
 
             const response = await axios.post(
                 backendUrl + "/api/inventory/remove-package",
@@ -27,12 +26,10 @@ const InventoryOrders = () => {
                 { headers: { iToken } }
             );
 
-            console.log("sent sec :", formData);
-
-
             if (response.data.success) {
                 toast.success("Order removed from package successfully");
                 fetchInventoryOrders(); // Refresh the list of orders after removal
+                fetchPackages();
                 setIsConfirmationModalOpen(false); // Close the confirmation modal
             } else {
                 toast.error(response.data.message || "Failed to remove order from package");
@@ -44,7 +41,6 @@ const InventoryOrders = () => {
     };
 
     const handleRemoveOrder = (order) => {
-        console.log("Order to remove:", order);
         if (!order.packageId) {
             toast.error("Package ID is missing.");
             return;
@@ -85,6 +81,7 @@ const InventoryOrders = () => {
             if (response.data.success) {
                 toast.success("Package added to order");
                 fetchInventoryOrders(); // Refresh the list after adding the package
+                fetchPackages();
                 setIsPackageSelectorOpen(null); // Close the package selector
             } else {
                 toast.error(response.data.message || "Failed to add package");
@@ -108,9 +105,9 @@ const InventoryOrders = () => {
     });
 
     useEffect(() => {
-        fetchInventoryOrders();
-        fetchPackages();
-        fetchSuppliers();
+        fetchInventoryOrders(); // Initial data fetch
+        fetchPackages(); // Fetch packages
+        fetchSuppliers(); // Fetch suppliers
     }, []);
 
     const handleChange = (e) => {
