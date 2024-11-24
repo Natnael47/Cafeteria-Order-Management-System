@@ -218,10 +218,10 @@ const InventoryOrders = () => {
                             <div className="px-4 py-2 border-r border-black">
                                 {new Date(order.orderDate).toLocaleDateString()}
                             </div>
-                            <div className="px-4 py-2">
+                            <div className="px-4 py-2 text-center">
                                 {isOrderInPackage(order.id, packageList) ? (
                                     <button
-                                        className="text-red-500"
+                                        className="text-red-500 text-2xl"
                                         onClick={() => handleRemoveOrder(order)}  // Call handleRemoveOrder with the current order
                                     >
                                         -
@@ -229,7 +229,7 @@ const InventoryOrders = () => {
 
                                 ) : (
                                     <button
-                                        className="text-green-500"
+                                        className="text-green-500 text-2xl"
                                         onClick={() => handlePackageClick(order.id)}
                                     >
                                         +
