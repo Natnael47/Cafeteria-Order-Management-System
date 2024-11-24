@@ -55,6 +55,10 @@ const InventoryOrders = () => {
         // Open the confirmation modal
         setIsConfirmationModalOpen(true);
     };
+    const closePackageModal = () => {
+        setIsPackageSelectorOpen(null); // Close the modal
+    };
+
 
 
     const handlePackageSelection = async (packageId, orderId) => {
@@ -279,22 +283,35 @@ const InventoryOrders = () => {
             )}
 
 
-
             {isPackageSelectorOpen !== null && (
-                <div className="bg-gray-100 p-4 border-t border-black mt-2">
-                    <h3 className="font-semibold text-gray-700 mb-2">Select a Package</h3>
-                    {packageList.map((pkg) => (
+                <Modal
+                    isOpen={isPackageSelectorOpen !== null}
+                    onRequestClose={closePackageModal}
+                    className="bg-white p-6 rounded shadow-lg w-[90%] max-w-lg mx-auto mt-20"
+                    overlayClassName="fixed inset-0 bg-black bg-opacity-50 z-50"
+                >
+                    <h3 className="text-xl font-semibold text-gray-700 mb-4">Select a Package</h3>
+                    <div className="flex flex-wrap">
+                        {packageList.map((pkg) => (
+                            <button
+                                key={pkg.id}
+                                className="bg-blue-500 text-white px-4 py-2 rounded m-2"
+                                onClick={() => handlePackageSelection(pkg.id, isPackageSelectorOpen)}
+                            >
+                                {pkg.name}
+                            </button>
+                        ))}
+                    </div>
+                    <div className="flex justify-end space-x-4 mt-4">
                         <button
-                            key={pkg.id}
-                            className="bg-blue-500 text-white px-4 py-2 rounded m-2"
-                            onClick={() => handlePackageSelection(pkg.id, isPackageSelectorOpen)}
+                            onClick={closePackageModal}
+                            className="bg-gray-300 text-gray-700 px-4 py-2 rounded"
                         >
-                            {pkg.name}
+                            Cancel
                         </button>
-                    ))}
-                </div>
+                    </div>
+                </Modal>
             )}
-
 
             {isPopupOpen && (
                 <Modal
