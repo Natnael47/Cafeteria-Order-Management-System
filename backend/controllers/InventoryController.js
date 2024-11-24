@@ -35,7 +35,7 @@ const addInventory = async (req, res) => {
         pricePerUnit: 0,
         status: "empty", // Setting default status
         dateReceived: new Date(), // Set to today's date
-        supplier: null, // Optional field
+        supplierId: null, // Optional field
         expiryDate: null, // Optional field
         image: imageFilename,
       },
@@ -179,7 +179,7 @@ const updateInventory = async (req, res) => {
         dateReceived: req.body.dateReceived
           ? new Date(req.body.dateReceived)
           : existingItem.dateReceived,
-        supplier: req.body.supplier || existingItem.supplier,
+        supplierId: req.body.supplierId || existingItem.supplierId, // Update supplierId
         expiryDate: req.body.expiryDate
           ? new Date(req.body.expiryDate)
           : existingItem.expiryDate,
@@ -256,7 +256,7 @@ const addStock = async (req, res) => {
         quantity: updatedQuantity,
         initialQuantity: updatedInitialQuantity, // Update the initial quantity
         pricePerUnit,
-        supplier,
+        supplierId,
         expiryDate: expiryDate ? new Date(expiryDate) : null,
         dateReceived: new Date(dateReceived),
         dateUpdated: new Date(), // Update the dateUpdated to the current timestamp
@@ -271,7 +271,7 @@ const addStock = async (req, res) => {
       data: {
         inventoryId,
         quantityBought: quantity,
-        supplier,
+        supplierId, // Update to supplierId
         cost: quantity * pricePerUnit,
         pricePerUnit,
       },
@@ -508,7 +508,7 @@ const orderInventory = async (inventoryId) => {
       data: {
         inventoryId: inventoryItem.id,
         quantityOrdered: quantityToOrder,
-        supplier: inventoryItem.supplier || "Default Supplier",
+        supplierId: inventoryItem.supplierId, // Ensure supplierId is passed
         status: "Sent",
       },
     });
@@ -545,9 +545,9 @@ const getSupplierOrders = async (req, res) => {
       quantityOrdered: order.quantityOrdered,
       unit: order.inventory.unit,
       pricePerUnit: order.inventory.pricePerUnit,
-      totalPrice: order.quantityOrdered * (order.inventory.pricePerUnit || 0), // Calculate total price
+      totalPrice: order.quantityOrdered * (order.inventory.pricePerUnit || 0),
       orderDate: order.orderDate,
-      supplier: order.supplier,
+      supplierId: order.supplierId, // Ensure supplierId is included
       orderStatus: order.status,
       inventoryStatus: order.inventory.status,
     }));

@@ -103,40 +103,49 @@ model inventory {
   id              Int       @id @default(autoincrement()) // Unique identifier for each inventory item
   name            String    @db.VarChar(255) // Name of the inventory item
   category        String    @db.VarChar(100) // Category of the inventory item
-  description     String?   @db.VarChar(500) // Optional description of the inventory item
-  quantity        Int       @default(0) // Current quantity available
-  unit            String    @db.VarChar(50) // Unit of measurement for the item
-  pricePerUnit    Float? // Optional price per unit
-  status          String?   @db.VarChar(50) // Optional status of the inventory item
-  dateReceived    DateTime  @default(now()) // Date when the item was received
-  dateUpdated     DateTime  @default(now()) @updatedAt // Date when the item was last updated
-  expiryDate      DateTime? // Optional expiry date of the item
-  image           String?   @db.VarChar(255) // Optional image of the inventory item
-  initialQuantity Int?      @default(0) // Initial quantity when received
-  supplier        String?   @db.VarChar(255) // Optional supplier name
+  description     String?   @db.VarChar(500) // Optional description
+  quantity        Int       @default(0) // Current quantity
+  unit            String    @db.VarChar(50) // Unit of measurement
+  pricePerUnit    Float? // Price per unit
+  status          String?   @db.VarChar(50) // Optional status
+  dateReceived    DateTime  @default(now()) // Date received
+  dateUpdated     DateTime  @default(now()) @updatedAt // Date last updated
+  expiryDate      DateTime? // Optional expiry date
+  image           String?   @db.VarChar(255) // Optional image
+  initialQuantity Int?      @default(0) // Initial quantity
+  supplierId      Int? // Foreign key to supplier
+  supplier        supplier? @relation(fields: [supplierId], references: [id], map: "Inventory_supplierId_fkey") // Relation to Supplier
 
   inventorypurchase inventorypurchase[] // Relation to inventory purchases
   inventoryrequest  inventoryrequest[] // Relation to inventory requests
   supplierorder     supplierorder[] // Relation to supplier orders
   withdrawallog     withdrawallog[] // Relation to withdrawal logs
   packageInventory  packageInventory[] // Relation to inventory packages
-  suppliers         inventorySupplier[] // Relation to the junction table for supplier-inventory mapping
-
-  @@index([id])
+  inventorySupplier inventorySupplier[]
 }
 
 // Inventory Purchase model - Tracks inventory purchases
 model inventorypurchase {
-  id             Int       @id @default(autoincrement()) // Unique identifier for each purchase
-  inventoryId    Int // Foreign key to Inventory table
-  purchaseDate   DateTime  @default(now()) // Date when the purchase was made
-  quantityBought Int // Quantity bought
-  supplier       String? // Optional supplier name
-  cost           Float? // Optional cost of the purchase
-  pricePerUnit   Float? // Optional price per unit
-  inventory      inventory @relation(fields: [inventoryId], references: [id], map: "InventoryPurchase_inventoryId_fkey") // Relationship with Inventory
+  id             Int       @id @default(autoincrement())
+  inventoryId    Int
+  purchaseDate   DateTime  @default(now())
+  quantityBought Int
+  supplierId     Int? // Temporarily make this optional
+  cost           Float?
+  pricePerUnit   Float?
+  inventory      inventory @relation(fields: [inventoryId], references: [id])
+  supplier       supplier? @relation(fields: [supplierId], references: [id])
+}
 
-  @@index([inventoryId], map: "InventoryPurchase_inventoryId_fkey")
+model supplierorder {
+  id              Int       @id @default(autoincrement())
+  inventoryId     Int
+  quantityOrdered Int
+  orderDate       DateTime  @default(now())
+  supplierId      Int? // Temporarily make this optional
+  status          String
+  inventory       inventory @relation(fields: [inventoryId], references: [id])
+  supplier        supplier? @relation(fields: [supplierId], references: [id])
 }
 
 // Inventory Request model - Tracks inventory requests made by employees
@@ -163,6 +172,9 @@ model supplier {
   products          inventorySupplier[] // Relation to the junction table for supplier-inventory mapping
   inventoryPackages inventoryPackage[] // Relation to inventory packages
   dateAdded         DateTime            @default(now()) // Date when the supplier was added
+  inventory         inventory[]
+  inventorypurchase inventorypurchase[]
+  supplierorder     supplierorder[]
 }
 
 model inventorySupplier {
@@ -179,19 +191,6 @@ model inventorySupplier {
 
   // Composite Index to ensure unique supplier-inventory mapping
   @@unique([inventoryId, supplierId], map: "Unique_Inventory_Supplier")
-}
-
-// Supplier Order model - Tracks supplier orders
-model supplierorder {
-  id              Int       @id @default(autoincrement()) // Unique identifier for each supplier order
-  inventoryId     Int // Foreign key to Inventory table
-  quantityOrdered Int // Quantity ordered
-  orderDate       DateTime  @default(now()) // Date when the order was placed
-  supplier        String? // Optional supplier name
-  status          String    @db.VarChar(50) // Status of the supplier order
-  inventory       inventory @relation(fields: [inventoryId], references: [id], map: "SupplierOrder_inventoryId_fkey") // Relationship with Inventory
-
-  @@index([inventoryId], map: "SupplierOrder_inventoryId_fkey")
 }
 
 // Withdrawal Log model - Tracks inventory withdrawals
