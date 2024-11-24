@@ -785,110 +785,99 @@ const ensureInventorySupplier = async (
 
 const newPackage = async (req, res) => {
   try {
-    const { name, description, orderIds } = req.body;
+    // Extracting data from the request body
+    const { name, description, orderId } = req.body;
 
-    // Validate input
-    if (
-      !name ||
-      !description ||
-      !Array.isArray(orderIds) ||
-      orderIds.length === 0
-    ) {
+    // Input validation
+    if (!name || !description || !orderId) {
       return res.status(400).json({
         success: false,
-        message: "Name, description, and order IDs are required",
+        message: "Name, description, and order ID are required",
       });
     }
 
-    // Fetch supplier ID and inventory ID from the order IDs
-    const supplierOrders = await prisma.supplierorder.findMany({
-      where: { id: { in: orderIds } },
-      select: { supplierId: true, inventoryId: true },
+    // Fetch the order to validate its existence
+    const order = await prisma.supplierOrder.findUnique({
+      where: { id: parseInt(orderId, 10) }, // Ensure ID is parsed as an integer
     });
 
-    // Ensure all orders have the same supplierId
-    const supplierIds = [
-      ...new Set(supplierOrders.map((order) => order.supplierId)),
-    ];
-    if (supplierIds.length !== 1) {
-      return res.status(400).json({
+    if (!order) {
+      return res.status(404).json({
         success: false,
-        message: "Orders must belong to the same supplier to create a package",
+        message: "Order not found",
       });
     }
 
-    const supplierId = supplierIds[0];
-    const inventoryIds = supplierOrders.map((order) => order.inventoryId);
-
-    // Fetch inventory details to get the price per unit
-    const inventoryItems = await prisma.inventory.findMany({
-      where: { id: { in: inventoryIds } },
-      select: { id: true, pricePerUnit: true },
-    });
-
-    // If there are no inventory items, return an error
-    if (inventoryItems.length === 0) {
+    if (!order.supplierId) {
       return res.status(400).json({
         success: false,
-        message: "No inventory items found for the specified orders",
+        message: "The order does not have a valid supplier ID",
       });
     }
 
-    // Create the package with the first item's pricePerUnit (assuming uniform price)
-    const packageQuantity = orderIds.length; // Example: quantity equals the number of orders
-    const pricePerUnit =
-      inventoryItems.length > 0 ? inventoryItems[0].pricePerUnit : 0;
-    const totalCost = packageQuantity * pricePerUnit;
-
-    // Create new packageInventory entry with a connect operation for the inventory and create operation for inventoryPackage
-    const newPackage = await prisma.packageInventory.create({
+    // Create a new inventory package
+    const newPackage = await prisma.inventoryPackage.create({
       data: {
-        quantity: packageQuantity, // Dynamic quantity based on order count
-        pricePerUnit: pricePerUnit, // Price per unit from inventory
-        totalCost: totalCost, // Total cost calculated dynamically
-        inventory: {
-          connect: { id: inventoryIds[0] }, // Connect the first inventory item
-        },
-        inventoryPackage: {
-          create: {
-            name: name, // Use the provided package name
-            description: description, // Use the provided package description
-            supplierId: supplierId, // Use the supplier ID from orders
-          },
-        },
+        name,
+        description,
+        supplierId: order.supplierId,
       },
     });
 
+    if (!newPackage || !newPackage.id) {
+      return res.status(500).json({
+        success: false,
+        message: "Failed to create inventory package",
+      });
+    }
+
+    // Update the supplierOrder record with the new package ID
+    const updatedOrder = await prisma.supplierOrder.update({
+      where: { id: order.id },
+      data: {
+        packageId: newPackage.id, // Link the order to the new package
+      },
+    });
+
+    // Respond with success and created package data
     return res.status(201).json({
       success: true,
-      message: "Package created successfully",
+      message: "Package created and supplier order updated successfully",
       package: newPackage,
+      updatedOrder,
     });
   } catch (error) {
     console.error("Error in newPackage:", error);
+
+    // Handle Prisma-specific errors if applicable
+    if (error.meta) {
+      console.error("Prisma error meta:", error.meta);
+    }
+
     return res.status(500).json({
       success: false,
-      message: `Error in newPackage: ${error.message}`,
+      message: "Internal Server Error",
+      error: error.message,
     });
   }
 };
 
 const addToPackage = async (req, res) => {
   try {
-    const { packageId, orderId, quantity } = req.body;
+    const { packageId, orderId } = req.body;
 
     // Validate input
-    if (!packageId || !orderId || !quantity) {
+    if (!packageId || !orderId) {
       return res.status(400).json({
         success: false,
-        message: "Package ID, order ID, and quantity are required",
+        message: "Package ID and order ID are required",
       });
     }
 
-    // Fetch the existing package and its supplierId
+    // Fetch the existing package
     const existingPackage = await prisma.inventoryPackage.findUnique({
       where: { id: packageId },
-      select: { id: true, supplierId: true },
+      select: { supplierId: true, totalCost: true },
     });
 
     if (!existingPackage) {
@@ -898,10 +887,10 @@ const addToPackage = async (req, res) => {
       });
     }
 
-    // Fetch the supplierId of the order
+    // Fetch the order details
     const supplierOrder = await prisma.supplierorder.findUnique({
       where: { id: orderId },
-      select: { supplierId: true },
+      select: { supplierId: true, inventoryId: true, quantityOrdered: true },
     });
 
     if (!supplierOrder) {
@@ -919,19 +908,36 @@ const addToPackage = async (req, res) => {
       });
     }
 
-    // Add the order to the packageInventory with quantity
-    const packageInventoryEntry = await prisma.packageInventory.create({
+    // Add the order to the packageInventory table
+    const inventoryItem = await prisma.inventory.findUnique({
+      where: { id: supplierOrder.inventoryId },
+      select: { pricePerUnit: true },
+    });
+
+    // Update the total cost of the package
+    const newTotalCost =
+      existingPackage.totalCost +
+      inventoryItem.pricePerUnit * supplierOrder.quantityOrdered;
+
+    await prisma.inventoryPackage.update({
+      where: { id: packageId },
+      data: {
+        totalCost: newTotalCost,
+      },
+    });
+
+    // Create the packageInventory entry
+    await prisma.packageInventory.create({
       data: {
         inventoryPackageId: packageId,
-        orderId: orderId, // Add the order to the package
-        quantity: quantity, // Include the quantity of the order being added
+        inventoryId: supplierOrder.inventoryId,
+        quantity: supplierOrder.quantityOrdered,
       },
     });
 
     return res.status(200).json({
       success: true,
       message: "Order added to package successfully",
-      packageInventoryEntry,
     });
   } catch (error) {
     console.error("Error in addToPackage:", error);
@@ -944,32 +950,119 @@ const addToPackage = async (req, res) => {
 
 const removeFromPackage = async (req, res) => {
   try {
-    const { packageId, supplierOrderId } = req.body;
+    const { packageId, orderId } = req.body;
 
-    if (!packageId || !supplierOrderId) {
+    // Validate input
+    if (!packageId || !orderId) {
       return res.status(400).json({
         success: false,
-        message: "Missing required fields: packageId or supplierOrderId",
+        message: "Package ID and order ID are required",
       });
     }
 
-    // Delete the item from the package
-    await prisma.packageInventoryItem.deleteMany({
+    // Fetch the package and order details
+    const existingPackage = await prisma.inventoryPackage.findUnique({
+      where: { id: packageId },
+      select: { totalCost: true },
+    });
+
+    const supplierOrder = await prisma.supplierorder.findUnique({
+      where: { id: orderId },
+      select: { inventoryId: true, quantityOrdered: true },
+    });
+
+    if (!existingPackage || !supplierOrder) {
+      return res.status(404).json({
+        success: false,
+        message: "Package or order not found",
+      });
+    }
+
+    // Fetch the price per unit of the removed inventory item
+    const inventoryItem = await prisma.inventory.findUnique({
+      where: { id: supplierOrder.inventoryId },
+      select: { pricePerUnit: true },
+    });
+
+    // Update the total cost of the package
+    const newTotalCost =
+      existingPackage.totalCost -
+      inventoryItem.pricePerUnit * supplierOrder.quantityOrdered;
+
+    // Remove the order from packageInventory
+    await prisma.packageInventory.deleteMany({
       where: {
-        packageId,
-        supplierOrderId,
+        inventoryPackageId: packageId,
+        inventoryId: supplierOrder.inventoryId,
       },
     });
 
-    res.status(200).json({
+    // Update the package's total cost
+    await prisma.inventoryPackage.update({
+      where: { id: packageId },
+      data: { totalCost: newTotalCost },
+    });
+
+    return res.status(200).json({
       success: true,
-      message: "Item removed from package successfully",
+      message: "Order removed from package successfully",
     });
   } catch (error) {
     console.error("Error in removeFromPackage:", error);
-    res.status(500).json({
+    return res.status(500).json({
+      success: false,
+      message: `Error in removeFromPackage: ${error.message}`,
+    });
+  }
+};
+
+const createPackage = async (req, res) => {
+  try {
+    // Extract name, description, and supplierId from the request body
+    const { name, description, supplierId } = req.body;
+
+    // Input validation
+    if (!name || !description || !supplierId) {
+      return res.status(400).json({
+        success: false,
+        message: "Name, description, and supplierId are required",
+      });
+    }
+
+    // Verify that the supplier exists
+    const existingSupplier = await prisma.supplier.findUnique({
+      where: { id: supplierId },
+    });
+
+    if (!existingSupplier) {
+      return res.status(404).json({
+        success: false,
+        message: "Supplier not found",
+      });
+    }
+
+    // Create a new package
+    const newPackage = await prisma.inventoryPackage.create({
+      data: {
+        name,
+        description,
+        status: "New", // Default status
+        supplierId, // Link the package to the supplier
+      },
+    });
+
+    // Return success response
+    return res.status(201).json({
+      success: true,
+      message: "Inventory package created successfully",
+      data: newPackage,
+    });
+  } catch (error) {
+    console.error("Error creating inventory package:", error);
+    return res.status(500).json({
       success: false,
       message: "Internal Server Error",
+      error: error.message,
     });
   }
 };
@@ -983,6 +1076,7 @@ export {
   addToPackage,
   calculateStockPercentageAndStoreInStatus,
   checkInventoryThreshold,
+  createPackage,
   generateReport,
   generateUsageReport,
   getSupplierOrders,

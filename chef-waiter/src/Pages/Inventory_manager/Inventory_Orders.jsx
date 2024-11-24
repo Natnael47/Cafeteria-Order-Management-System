@@ -1,12 +1,66 @@
-import React, { useContext, useEffect } from 'react';
+import axios from 'axios';
+import React, { useContext, useEffect, useState } from 'react';
+import Modal from 'react-modal';
+import { toast } from 'react-toastify';
+import { backendUrl } from '../../App';
 import { InventoryContext } from '../../Context/InventoryContext';
 
 const InventoryOrders = () => {
-    const { orderList, fetchInventoryOrders } = useContext(InventoryContext);
+    const { orderList, fetchInventoryOrders, supplierList, fetchSuppliers, iToken } = useContext(InventoryContext);
+    const [isPopupOpen, setIsPopupOpen] = useState(false);
+    const [newPackageData, setNewPackageData] = useState({
+        name: '',
+        description: '',
+        supplierId: '', // Only supplierId will be stored and sent
+    });
 
     useEffect(() => {
         fetchInventoryOrders();
+        fetchSuppliers(); // Fetch the suppliers list
     }, []);
+
+    const handleChange = (e) => {
+        const { name, value } = e.target;
+        setNewPackageData((prevData) => ({ ...prevData, [name]: value }));
+    };
+
+    const handleAddPackage = async () => {
+        const { name, description, supplierId } = newPackageData;
+
+        // Ensure supplierId is an integer
+        const supplierIdInt = parseInt(supplierId, 10);
+
+        if (!supplierId || !name || !description) {
+            toast.error('Please fill in all fields and select a valid supplier.');
+            return;
+        }
+
+        const packageData = {
+            name,
+            description,
+            supplierId: supplierIdInt, // Send the supplierId as an integer
+        };
+
+        try {
+            const response = await axios.post(
+                `${backendUrl}/api/inventory/new-package`,
+                packageData,
+                { headers: { iToken } }
+            );
+
+            if (response.data.success) {
+                toast.success('Package added successfully');
+                fetchInventoryOrders(); // Refresh the inventory orders list
+                setIsPopupOpen(false); // Close the modal
+            } else {
+                toast.error(response.data.message || 'Failed to add package');
+            }
+        } catch (error) {
+            console.error('Error adding package:', error);
+            toast.error('Failed to add package. Please try again.');
+        }
+    };
+
 
     return (
         <div className="flex flex-col m-5 w-full">
@@ -26,11 +80,19 @@ const InventoryOrders = () => {
                     </select>
                     <label className="text-gray-700">entries</label>
                 </div>
-                <input
-                    type="text"
-                    placeholder="Search"
-                    className="border border-gray-300 rounded px-4 py-2"
-                />
+                <div className="flex items-center space-x-4">
+                    <input
+                        type="text"
+                        placeholder="Search"
+                        className="border border-gray-300 rounded px-4 py-2"
+                    />
+                    <button
+                        onClick={() => setIsPopupOpen(true)}
+                        className="bg-blue-500 text-white px-4 py-2 rounded"
+                    >
+                        New Package
+                    </button>
+                </div>
             </div>
 
             {/* Data Grid */}
@@ -72,6 +134,61 @@ const InventoryOrders = () => {
                     <div className="text-center text-gray-500 py-4">No orders found.</div>
                 )}
             </div>
+
+            {/* Add Package Modal */}
+            {isPopupOpen && (
+                <Modal
+                    isOpen={isPopupOpen}
+                    onRequestClose={() => setIsPopupOpen(false)}
+                    className="bg-white p-6 rounded shadow-lg w-[90%] max-w-lg mx-auto mt-20"
+                    overlayClassName="fixed inset-0 bg-black bg-opacity-50 z-50"
+                >
+                    <h2 className="text-xl font-semibold text-gray-700 mb-4">Add New Package</h2>
+                    <input
+                        type="text"
+                        name="name"
+                        value={newPackageData.name}
+                        onChange={handleChange}
+                        placeholder="Package Name"
+                        className="w-full border border-gray-300 rounded px-4 py-2 mb-2"
+                    />
+                    <input
+                        type="text"
+                        name="description"
+                        value={newPackageData.description}
+                        onChange={handleChange}
+                        placeholder="Description"
+                        className="w-full border border-gray-300 rounded px-4 py-2 mb-2"
+                    />
+                    <select
+                        name="supplierId"
+                        value={newPackageData.supplierId}
+                        onChange={handleChange}
+                        className="w-full border border-gray-300 rounded px-4 py-2 mb-2"
+                    >
+                        <option value="">Select Supplier</option>
+                        {supplierList.map((supplier) => (
+                            <option key={supplier.id} value={supplier.id}>
+                                {supplier.name}
+                            </option>
+                        ))}
+                    </select>
+                    <div className="flex justify-end space-x-4 mt-4">
+                        <button
+                            onClick={() => setIsPopupOpen(false)}
+                            className="bg-gray-300 text-gray-700 px-4 py-2 rounded"
+                        >
+                            Cancel
+                        </button>
+                        <button
+                            onClick={handleAddPackage}
+                            className="bg-blue-500 text-white px-4 py-2 rounded"
+                        >
+                            Add Package
+                        </button>
+                    </div>
+                </Modal>
+            )}
         </div>
     );
 };
