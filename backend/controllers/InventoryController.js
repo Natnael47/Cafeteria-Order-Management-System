@@ -520,7 +520,7 @@ const orderInventory = async (inventoryId) => {
   }
 };
 
-// Fetch all supplier orders with inventory details
+// Fetch all supplier orders with inventory details and packageId
 const getSupplierOrders = async (req, res) => {
   try {
     // Query supplierorder table and include related inventory details
@@ -537,7 +537,7 @@ const getSupplierOrders = async (req, res) => {
       },
     });
 
-    // Format the response to include both supplier order and inventory details
+    // Format the response to include both supplier order and inventory details along with packageId
     const formattedOrders = supplierOrders.map((order) => ({
       id: order.id,
       inventoryId: order.inventoryId,
@@ -550,6 +550,7 @@ const getSupplierOrders = async (req, res) => {
       supplierId: order.supplierId, // Ensure supplierId is included
       orderStatus: order.status,
       inventoryStatus: order.inventory.status,
+      packageId: order.packageId, // Include the packageId field here
     }));
 
     // Send the data to the frontend
@@ -785,9 +786,9 @@ const ensureInventorySupplier = async (
 
 const addToPackage = async (req, res) => {
   try {
-    // Extract and validate input
     const { packageId, orderId } = req.body;
 
+    // Validate that both packageId and orderId are provided
     if (!packageId || !orderId) {
       return res.status(400).json({
         success: false,
@@ -808,11 +809,12 @@ const addToPackage = async (req, res) => {
           inventoryId: true,
           quantityOrdered: true,
           status: true,
-          packageId: true, // Added packageId check for the order
+          packageId: true,
         },
       }),
     ]);
 
+    // If the package or order is not found, return an error
     if (!existingPackage) {
       return res.status(404).json({
         success: false,
@@ -835,7 +837,7 @@ const addToPackage = async (req, res) => {
       });
     }
 
-    // Validate supplierId matches
+    // Validate that supplierId matches
     if (existingPackage.supplierId !== supplierOrder.supplierId) {
       return res.status(400).json({
         success: false,
@@ -843,7 +845,7 @@ const addToPackage = async (req, res) => {
       });
     }
 
-    // Fetch pricePerUnit using inventoryId
+    // Fetch pricePerUnit for inventory item
     const inventoryItem = await prisma.inventory.findUnique({
       where: { id: supplierOrder.inventoryId },
       select: { pricePerUnit: true },
@@ -856,11 +858,10 @@ const addToPackage = async (req, res) => {
       });
     }
 
-    // Calculate the cost of the order
+    // Calculate the order cost and update the package total
     const orderCost =
       inventoryItem.pricePerUnit * supplierOrder.quantityOrdered;
 
-    // Update the package totalCost and status
     const updatedPackage = await prisma.inventoryPackage.update({
       where: { id: packageId },
       data: {
@@ -874,7 +875,7 @@ const addToPackage = async (req, res) => {
       where: { id: orderId },
       data: {
         packageId: packageId,
-        status: "Sent", // Default status for orders added to a package
+        status: "Sent",
       },
     });
 
@@ -892,7 +893,7 @@ const addToPackage = async (req, res) => {
     res.status(500).json({
       success: false,
       message: "Error adding order to package",
-      error: error.message, // Include error message for debugging
+      error: error.message,
     });
   }
 };

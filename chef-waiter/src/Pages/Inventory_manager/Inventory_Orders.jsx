@@ -9,6 +9,98 @@ const InventoryOrders = () => {
     const { orderList, fetchInventoryOrders, supplierList, fetchSuppliers, iToken, fetchPackages, packageList } = useContext(InventoryContext);
     const [isPopupOpen, setIsPopupOpen] = useState(false);
     const [isPackageSelectorOpen, setIsPackageSelectorOpen] = useState(null); // Track which order to add to a package
+    const [selectedPackageId, setSelectedPackageId] = useState(null);
+    const [isConfirmationModalOpen, setIsConfirmationModalOpen] = useState(false);
+    const [orderToRemove, setOrderToRemove] = useState(null); // Store the order to remove
+
+    const removeOrderFromPackage = async (packageId, orderId) => {
+        try {
+            const formData = {
+                packageId,
+                orderId,
+            };
+            console.log("sent firrrr :", formData);
+
+            const response = await axios.post(
+                backendUrl + "/api/inventory/remove-package",
+                formData,
+                { headers: { iToken } }
+            );
+
+            console.log("sent sec :", formData);
+
+
+            if (response.data.success) {
+                toast.success("Order removed from package successfully");
+                fetchInventoryOrders(); // Refresh the list of orders after removal
+                setIsConfirmationModalOpen(false); // Close the confirmation modal
+            } else {
+                toast.error(response.data.message || "Failed to remove order from package");
+            }
+        } catch (error) {
+            console.error("Error removing order from package:", error);
+            toast.error("An error occurred while removing the order from the package.");
+        }
+    };
+
+    const handleRemoveOrder = (order) => {
+        console.log("Order to remove:", order);
+        if (!order.packageId) {
+            toast.error("Package ID is missing.");
+            return;
+        }
+
+        // Set the packageId from the selected order
+        setOrderToRemove({
+            packageId: order.packageId, // Ensure this is correct
+            orderId: order.id,           // The order that is being removed
+        });
+
+        // Open the confirmation modal
+        setIsConfirmationModalOpen(true);
+    };
+
+
+    const handlePackageSelection = async (packageId, orderId) => {
+        try {
+            // Validate the data before sending
+            if (!packageId || !orderId) {
+                toast.error("Invalid package or order information.");
+                return;
+            }
+
+            const formDataToSend = {
+                packageId, // The package ID being selected
+                orderId,   // The order ID that we are associating with the package
+            };
+
+            // Make the API request
+            const response = await axios.post(
+                backendUrl + "/api/inventory/add-package",
+                formDataToSend,
+                { headers: { 'Content-Type': 'application/json', iToken } }
+            );
+
+            // Handle the response data
+            if (response.data.success) {
+                toast.success("Package added to order");
+                fetchInventoryOrders(); // Refresh the list after adding the package
+                setIsPackageSelectorOpen(null); // Close the package selector
+            } else {
+                toast.error(response.data.message || "Failed to add package");
+            }
+        } catch (error) {
+            // Check if the error response is from the backend (400 error)
+            if (error.response && error.response.data && error.response.data.message) {
+                // Show the backend error message in the toast
+                toast.error(error.response.data.message);
+            } else {
+                // Handle any unexpected errors (network, server, etc.)
+                toast.error("An unexpected error occurred. Please try again.");
+            }
+        }
+    };
+
     const [newPackageData, setNewPackageData] = useState({
         name: '',
         description: '',
@@ -63,7 +155,8 @@ const InventoryOrders = () => {
 
 
     const handlePackageClick = (orderId) => {
-        setIsPackageSelectorOpen(orderId);
+        setIsPackageSelectorOpen(orderId);  // Set the order ID to track which order is being modified
+        setSelectedPackageId(null);  // Reset selected package on new order
     };
 
     return (
@@ -128,10 +221,11 @@ const InventoryOrders = () => {
                                 {isOrderInPackage(order.id, packageList) ? (
                                     <button
                                         className="text-red-500"
-                                        onClick={() => console.log(`Remove Order ID ${order.id} from Package`)}
+                                        onClick={() => handleRemoveOrder(order)}  // Call handleRemoveOrder with the current order
                                     >
                                         -
                                     </button>
+
                                 ) : (
                                     <button
                                         className="text-green-500"
@@ -140,7 +234,9 @@ const InventoryOrders = () => {
                                         +
                                     </button>
                                 )}
+
                             </div>
+
 
                         </div>
                     ))
@@ -149,20 +245,59 @@ const InventoryOrders = () => {
                 )}
             </div>
 
-            {isPackageSelectorOpen && (
+            {isConfirmationModalOpen && (
+                <Modal
+                    isOpen={isConfirmationModalOpen}
+                    onRequestClose={() => setIsConfirmationModalOpen(false)}
+                    className="bg-white p-6 rounded shadow-lg w-[90%] max-w-lg mx-auto mt-20"
+                    overlayClassName="fixed inset-0 bg-black bg-opacity-50 z-50"
+                >
+                    <h2 className="text-xl font-semibold text-gray-700 mb-4">
+                        Confirm Removal
+                    </h2>
+                    <p className="mb-4">
+                        Are you sure you want to remove this order from the package?
+                    </p>
+                    <div className="flex justify-end space-x-4 mt-4">
+                        <button
+                            onClick={() => setIsConfirmationModalOpen(false)}
+                            className="bg-gray-300 text-gray-700 px-4 py-2 rounded"
+                        >
+                            Cancel
+                        </button>
+                        <button
+                            onClick={() => {
+                                if (orderToRemove) {
+                                    // Send the correct packageId and orderId to the remove function
+                                    removeOrderFromPackage(orderToRemove.packageId, orderToRemove.orderId); // Pass the correct IDs
+                                }
+                            }}
+                            className="bg-red-500 text-white px-4 py-2 rounded"
+                        >
+                            Confirm
+                        </button>
+
+                    </div>
+                </Modal>
+            )}
+
+
+
+            {isPackageSelectorOpen !== null && (
                 <div className="bg-gray-100 p-4 border-t border-black mt-2">
                     <h3 className="font-semibold text-gray-700 mb-2">Select a Package</h3>
                     {packageList.map((pkg) => (
                         <button
                             key={pkg.id}
                             className="bg-blue-500 text-white px-4 py-2 rounded m-2"
-                            onClick={() => console.log(`Add Order ID ${isPackageSelectorOpen} to Package ID ${pkg.id}`)}
+                            onClick={() => handlePackageSelection(pkg.id, isPackageSelectorOpen)}
                         >
                             {pkg.name}
                         </button>
                     ))}
                 </div>
             )}
+
 
             {isPopupOpen && (
                 <Modal
