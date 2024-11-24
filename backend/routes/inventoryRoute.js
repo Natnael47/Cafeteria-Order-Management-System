@@ -57,11 +57,11 @@ inventoryRoute.get("/list-suppliers", empAuth, listSuppliers);
 inventoryRoute.post("/remove-supplier", empAuth, removeSupplier);
 inventoryRoute.post("/update-supplier", empAuth, updateSupplier);
 
-inventoryRoute.post("/add-package", addToPackage);
-inventoryRoute.post("/remove-package", removeFromPackage);
+inventoryRoute.post("/add-package", empAuth, addToPackage);
+inventoryRoute.post("/remove-package", empAuth, removeFromPackage);
 
 inventoryRoute.post("/new-package", empAuth, createPackage);
 
-inventoryRoute.get("/packages", listInventoryPackages);
+inventoryRoute.get("/packages", empAuth, listInventoryPackages);
 
 export default inventoryRoute;
