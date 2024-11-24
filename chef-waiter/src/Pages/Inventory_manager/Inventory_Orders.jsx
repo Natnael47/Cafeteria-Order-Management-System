@@ -235,10 +235,7 @@ const InventoryOrders = () => {
                                         +
                                     </button>
                                 )}
-
                             </div>
-
-
                         </div>
                     ))
                 ) : (
