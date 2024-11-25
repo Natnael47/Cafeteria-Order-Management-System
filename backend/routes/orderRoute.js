@@ -12,7 +12,7 @@ import {
   verifyStripe,
 } from "../controllers/orderController.js";
 import adminAuth from "../middleware/adminAuth.js";
-import authUser from "../middleware/authUser.js";
+import authUser from "../middleware/userAuth.js";
 
 const orderRouter = express.Router();
 

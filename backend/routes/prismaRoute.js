@@ -29,9 +29,9 @@ import {
 } from "../Prisma Controller/PrismaUser.js";
 import { addEmployee, allEmployees } from "../Prisma Controller/prismaAdmin.js";
 import adminAuth from "../middleware/adminAuth.js";
-import authUser from "../middleware/authUser.js";
 import chefAuth from "../middleware/chefAuth.js";
 import upload from "../middleware/multer.js";
+import authUser from "../middleware/userAuth.js";
 
 const prismaRoute = express.Router();
 

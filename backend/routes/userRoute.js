@@ -5,7 +5,7 @@ import {
   registerUser,
   updateUserProfile,
 } from "../controllers/userController.js";
-import authUser from "../middleware/authUser.js";
+import authUser from "../middleware/userAuth.js";
 
 const userRouter = express.Router();
 
