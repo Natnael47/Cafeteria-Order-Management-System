@@ -5,102 +5,6 @@ import { fileURLToPath } from "url";
 
 const prisma = new PrismaClient();
 
-// Get the correct __dirname for this module
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = path.dirname(__filename);
-
-// Utility function to delete an image file
-const deleteImage = (imageName) => {
-  // Construct the correct path to the image
-  const fullPath = path.join(__dirname, "..", "upload_inv", imageName); // Navigate to upload_inv directory
-  if (fs.existsSync(fullPath)) {
-    fs.unlink(fullPath, (err) => {
-      if (err) {
-        console.error("Error deleting image:", err);
-      } else {
-        console.log("Image deleted successfully:", fullPath);
-      }
-    });
-  } else {
-    console.log("Image file not found, skipping deletion:", fullPath);
-  }
-};
-
-// Remove an inventory item and delete associated image if it exists
-const removeInventory = async (req, res) => {
-  try {
-    const itemId = parseInt(req.body.id, 10); // Ensure the ID is a number
-    if (isNaN(itemId)) {
-      return res
-        .status(400)
-        .json({ success: false, message: "Invalid inventory item ID" });
-    }
-
-    // Get the inventory item to check if it has an image
-    const inventoryItem = await prisma.inventory.findUnique({
-      where: { id: itemId },
-      select: { image: true },
-    });
-
-    if (!inventoryItem) {
-      return res
-        .status(404)
-        .json({ success: false, message: "Inventory item not found" });
-    }
-
-    // Begin transaction to delete related records
-    await prisma.$transaction(async (prisma) => {
-      // Delete related records in inventorypurchase, inventoryrequest, withdrawallog, etc.
-      await prisma.inventorypurchase.deleteMany({
-        where: { inventoryId: itemId },
-      });
-
-      await prisma.inventoryrequest.deleteMany({
-        where: { inventoryId: itemId },
-      });
-
-      await prisma.withdrawallog.deleteMany({
-        where: { inventoryId: itemId },
-      });
-
-      await prisma.supplierorder.deleteMany({
-        where: { inventoryId: itemId },
-      });
-
-      await prisma.inventorySupplier.deleteMany({
-        where: { inventoryId: itemId },
-      });
-
-      // Finally, delete the inventory item itself
-      await prisma.inventory.delete({
-        where: { id: itemId },
-      });
-
-      // If the inventory item had an image, delete the image file
-      if (inventoryItem.image) {
-        deleteImage(inventoryItem.image); // Call the deleteImage function
-      }
-    });
-
-    res.json({ success: true, message: "Inventory item removed successfully" });
-  } catch (error) {
-    console.error("Error removing inventory item:", error);
-
-    // Handle known Prisma errors
-    if (error.code === "P2003") {
-      return res.status(400).json({
-        success: false,
-        message:
-          "Cannot delete inventory item: it is still referenced by related records",
-      });
-    }
-
-    res
-      .status(500)
-      .json({ success: false, message: "Error removing inventory item" });
-  }
-};
-
 // Add new inventory item with optional image upload
 const addInventory = async (req, res) => {
   try {
@@ -495,6 +399,102 @@ const generateUsageReport = async (req, res) => {
 // Generate daily or monthly report
 const generateReport = async (req, res) => {
   // Create a summarized report of inventory data
+};
+
+// Get the correct __dirname for this module
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
+
+// Utility function to delete an image file
+const deleteImage = (imageName) => {
+  // Construct the correct path to the image
+  const fullPath = path.join(__dirname, "..", "upload_inv", imageName); // Navigate to upload_inv directory
+  if (fs.existsSync(fullPath)) {
+    fs.unlink(fullPath, (err) => {
+      if (err) {
+        console.error("Error deleting image:", err);
+      } else {
+        console.log("Image deleted successfully:", fullPath);
+      }
+    });
+  } else {
+    console.log("Image file not found, skipping deletion:", fullPath);
+  }
+};
+
+// Remove an inventory item and delete associated image if it exists
+const removeInventory = async (req, res) => {
+  try {
+    const itemId = parseInt(req.body.id, 10); // Ensure the ID is a number
+    if (isNaN(itemId)) {
+      return res
+        .status(400)
+        .json({ success: false, message: "Invalid inventory item ID" });
+    }
+
+    // Get the inventory item to check if it has an image
+    const inventoryItem = await prisma.inventory.findUnique({
+      where: { id: itemId },
+      select: { image: true },
+    });
+
+    if (!inventoryItem) {
+      return res
+        .status(404)
+        .json({ success: false, message: "Inventory item not found" });
+    }
+
+    // Begin transaction to delete related records
+    await prisma.$transaction(async (prisma) => {
+      // Delete related records in inventorypurchase, inventoryrequest, withdrawallog, etc.
+      await prisma.inventorypurchase.deleteMany({
+        where: { inventoryId: itemId },
+      });
+
+      await prisma.inventoryrequest.deleteMany({
+        where: { inventoryId: itemId },
+      });
+
+      await prisma.withdrawallog.deleteMany({
+        where: { inventoryId: itemId },
+      });
+
+      await prisma.supplierorder.deleteMany({
+        where: { inventoryId: itemId },
+      });
+
+      await prisma.inventorySupplier.deleteMany({
+        where: { inventoryId: itemId },
+      });
+
+      // Finally, delete the inventory item itself
+      await prisma.inventory.delete({
+        where: { id: itemId },
+      });
+
+      // If the inventory item had an image, delete the image file
+      if (inventoryItem.image) {
+        deleteImage(inventoryItem.image); // Call the deleteImage function
+      }
+    });
+
+    res.json({ success: true, message: "Inventory item removed successfully" });
+  } catch (error) {
+    console.error("Error removing inventory item:", error);
+
+    // Handle known Prisma errors
+    if (error.code === "P2003") {
+      return res.status(400).json({
+        success: false,
+        message:
+          "Cannot delete inventory item: it is still referenced by related records",
+      });
+    }
+
+    res
+      .status(500)
+      .json({ success: false, message: "Error removing inventory item" });
+  }
 };
 
 // Order new stock automatically if inventory status is below the threshold
