@@ -98,7 +98,6 @@ model food {
   menuStatus  Boolean @default(true) // Indicates if the item is available on the menu
 }
 
-// Inventory model - Represents inventory items
 model inventory {
   id              Int       @id @default(autoincrement()) // Unique identifier for each inventory item
   name            String    @db.VarChar(255) // Name of the inventory item
@@ -123,7 +122,6 @@ model inventory {
   inventorySupplier inventorySupplier[]
 }
 
-// Inventory Purchase model - Tracks inventory purchases
 model inventorypurchase {
   id             Int       @id @default(autoincrement())
   inventoryId    Int
@@ -132,7 +130,7 @@ model inventorypurchase {
   supplierId     Int? // Temporarily make this optional
   cost           Float?
   pricePerUnit   Float?
-  inventory      inventory @relation(fields: [inventoryId], references: [id])
+  inventory      inventory @relation(fields: [inventoryId], references: [id], onDelete: Cascade)
   supplier       supplier? @relation(fields: [supplierId], references: [id])
 }
 
@@ -144,11 +142,10 @@ model supplierorder {
   supplierId      Int? // Temporarily make this optional
   status          String
   packageId       Int? // Foreign key to Inventory Package table
-  inventory       inventory @relation(fields: [inventoryId], references: [id])
+  inventory       inventory @relation(fields: [inventoryId], references: [id], onDelete: Cascade)
   supplier        supplier? @relation(fields: [supplierId], references: [id])
 }
 
-// Inventory Request model - Tracks inventory requests made by employees
 model inventoryrequest {
   id            Int       @id @default(autoincrement()) // Unique identifier for each request
   inventoryId   Int // Foreign key to Inventory table
@@ -156,11 +153,22 @@ model inventoryrequest {
   quantity      Int // Quantity requested
   dateRequested DateTime  @default(now()) // Date of request
   status        String    @db.VarChar(50) // Status of the request
-  inventory     inventory @relation(fields: [inventoryId], references: [id], map: "InventoryRequest_inventoryId_fkey") // Relationship with Inventory
+  inventory     inventory @relation(fields: [inventoryId], references: [id], onDelete: Cascade) // Relationship with Inventory
   employee      employee  @relation(fields: [employeeId], references: [id], map: "InventoryRequest_employeeId_fkey") // Relationship with Employee
 
   @@index([inventoryId], map: "InventoryRequest_inventoryId_fkey")
   @@index([employeeId], map: "InventoryRequest_employeeId_fkey") // Index for employeeId
+}
+
+model withdrawallog {
+  id            Int       @id @default(autoincrement()) // Unique identifier for each withdrawal log
+  inventoryId   Int // Foreign key to Inventory table
+  withdrawnBy   String // Name of the person withdrawing the item
+  quantity      Int // Quantity withdrawn
+  dateWithdrawn DateTime  @default(now()) // Date when the item was withdrawn
+  inventory     inventory @relation(fields: [inventoryId], references: [id], onDelete: Cascade) // Relationship with Inventory
+
+  @@index([inventoryId], map: "WithdrawalLog_inventoryId_fkey")
 }
 
 // Supplier model - Represents suppliers
@@ -191,18 +199,6 @@ model inventorySupplier {
 
   // Composite Index to ensure unique supplier-inventory mapping
   @@unique([inventoryId, supplierId], map: "Unique_Inventory_Supplier")
-}
-
-// Withdrawal Log model - Tracks inventory withdrawals
-model withdrawallog {
-  id            Int       @id @default(autoincrement()) // Unique identifier for each withdrawal log
-  inventoryId   Int // Foreign key to Inventory table
-  withdrawnBy   String // Name of the person withdrawing the item
-  quantity      Int // Quantity withdrawn
-  dateWithdrawn DateTime  @default(now()) // Date when the item was withdrawn
-  inventory     inventory @relation(fields: [inventoryId], references: [id], map: "WithdrawalLog_inventoryId_fkey") // Relationship with Inventory
-
-  @@index([inventoryId], map: "WithdrawalLog_inventoryId_fkey")
 }
 
 // Inventory Package model - Tracks inventory packages
