@@ -40,6 +40,7 @@ const Add = () => {
                 category: "Salad"
             });
             setImage(false);
+            navigate('/list')
             toast.success("Food added successfully");
         } else {
             toast.error("Failed to add");

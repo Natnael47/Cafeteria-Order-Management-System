@@ -200,7 +200,7 @@ const List = () => {
                     className="bg-primary text-white rounded px-4 py-2 hover:bg-green-600 transition-colors w-36"
                     onClick={() => navigate('/add')}
                 >
-                    Add Item
+                    Add Food
                 </button>
             </div>
             <div className="bg-[#F3F4F6] rounded w-full max-w-5.3xl max-h-[88vh] overflow-scroll">
@@ -213,170 +213,175 @@ const List = () => {
                         <b>Remove</b>
                         <b>Modify</b>
                     </div>
-                    {filteredFoodList.map((item, index) => (
-                        <div key={index}>
-                            <div className={`grid grid-cols-[0.5fr_0.9fr_0.8fr_0.8fr_0.5fr_0.5fr] items-center gap-2 p-3 border border-black text-sm font-medium sm:grid ${item.menuStatus === false ? "bg-red-100" : "bg-white"}`}>
-                                <img
-                                    src={backendUrl + "/images/" + item.image}
-                                    alt=""
-                                    className="w-20"
-                                />
-                                <p>{item.name}</p>
-                                <p>{item.category}</p>
-                                <p>${item.price}</p>
-                                <p
-                                    onClick={() => openModal(item.id)}
-                                    className="cursor-pointer pl-1"
-                                >
+                    {filteredFoodList.length > 0 ? (
+                        filteredFoodList.map((item, index) => (
+                            <div key={index}>
+                                <div className={`grid grid-cols-[0.5fr_0.9fr_0.8fr_0.8fr_0.5fr_0.5fr] items-center gap-2 p-3 border border-black text-sm font-medium sm:grid ${item.menuStatus === false ? "bg-red-100" : "bg-white"}`}>
                                     <img
-                                        src={assets.trash_icon}
+                                        src={backendUrl + "/images/" + item.image}
                                         alt=""
-                                        className="w-7 ml-2 hover:scale-125 transition-transform"
+                                        className="w-20"
                                     />
-                                </p>
-                                <p
-                                    className="cursor-pointer pl-1"
-                                    onClick={() => handleEditClick(item, index)}
-                                >
-                                    <img
-                                        src={assets.modify_icon}
-                                        alt=""
-                                        className="w-7 ml-2 hover:scale-125 transition-transform"
-                                    />
-                                </p>
-                            </div>
+                                    <p>{item.name}</p>
+                                    <p>{item.category}</p>
+                                    <p>${item.price}</p>
+                                    <p
+                                        onClick={() => openModal(item.id)}
+                                        className="cursor-pointer pl-1"
+                                    >
+                                        <img
+                                            src={assets.trash_icon}
+                                            alt=""
+                                            className="w-7 ml-2 hover:scale-125 transition-transform"
+                                        />
+                                    </p>
+                                    <p
+                                        className="cursor-pointer pl-1"
+                                        onClick={() => handleEditClick(item, index)}
+                                    >
+                                        <img
+                                            src={assets.modify_icon}
+                                            alt=""
+                                            className="w-7 ml-2 hover:scale-125 transition-transform"
+                                        />
+                                    </p>
+                                </div>
 
-                            {editIndex === index && (
-                                <div
-                                    ref={editRef}
-                                    className="bg-white p-5 rounded shadow-md mt-2 mb-3 border-2 border-gray-600"
-                                >
-                                    <h2 className="text-lg font-semibold mb-4">Edit Food</h2>
+                                {editIndex === index && (
+                                    <div
+                                        ref={editRef}
+                                        className="bg-white p-5 rounded shadow-md mt-2 mb-3 border-2 border-gray-600"
+                                    >
+                                        <h2 className="text-lg font-semibold mb-4">Edit Food</h2>
 
-                                    <div>
-                                        <div className="flex flex-row mb-4 mt-3 gap-8">
-                                            <div className="add-img-upload flex-col">
-                                                <p className="mb-1">Upload Image</p>
-                                                <label
-                                                    htmlFor="image"
-                                                    className="flex items-center justify-center w-40 h-30 border-2 border-gray-500 rounded mb-2 cursor-pointer overflow-hidden"
-                                                >
-                                                    <img
-                                                        className="w-40 object-cover"
-                                                        src={
-                                                            image
-                                                                ? URL.createObjectURL(image)
-                                                                : backendUrl + "/images/" + editFood.image
-                                                        }
-                                                        alt=""
+                                        <div>
+                                            <div className="flex flex-row mb-4 mt-3 gap-8">
+                                                <div className="add-img-upload flex-col">
+                                                    <p className="mb-1">Upload Image</p>
+                                                    <label
+                                                        htmlFor="image"
+                                                        className="flex items-center justify-center w-40 h-30 border-2 border-gray-500 rounded mb-2 cursor-pointer overflow-hidden"
+                                                    >
+                                                        <img
+                                                            className="w-40 object-cover"
+                                                            src={
+                                                                image
+                                                                    ? URL.createObjectURL(image)
+                                                                    : backendUrl + "/images/" + editFood.image
+                                                            }
+                                                            alt=""
+                                                        />
+                                                    </label>
+                                                    <input
+                                                        onChange={handleImageChange}
+                                                        type="file"
+                                                        id="image"
+                                                        hidden
+                                                        accept="image/*"
                                                     />
+                                                </div>
+
+                                                <div className="flex flex-col">
+                                                    <div className="flex flex-row mb-4 gap-8">
+                                                        <div className="mb-2">
+                                                            <label className="block text-sm font-medium mb-1">
+                                                                Price
+                                                            </label>
+                                                            <input
+                                                                type="number"
+                                                                name="price"
+                                                                value={editFood.price}
+                                                                onChange={handleInputChange}
+                                                                className="w-full border p-2 rounded"
+                                                            />
+                                                        </div>
+                                                        <div className="mb-2">
+                                                            <label className="block text-sm font-medium mb-1">
+                                                                Category
+                                                            </label>
+                                                            <select
+                                                                name="category"
+                                                                value={editFood.category}
+                                                                onChange={handleInputChange}
+                                                                className="w-full border p-2 rounded"
+                                                            >
+                                                                <option value="Salad">Salad</option>
+                                                                <option value="Rolls">Rolls</option>
+                                                                <option value="Deserts">Deserts</option>
+                                                                <option value="Sandwich">Sandwich</option>
+                                                                <option value="Cake">Cake</option>
+                                                                <option value="Pure Veg">Pure Veg</option>
+                                                                <option value="Pasta">Pasta</option>
+                                                                <option value="Noodles">Noodles</option>
+                                                            </select>
+                                                        </div>
+                                                        <div className="mb-2">
+                                                            <label className="block text-sm font-medium mb-1">
+                                                                Menu Status
+                                                            </label>
+                                                            <input
+                                                                type="checkbox"
+                                                                name="menuStatus"
+                                                                checked={editFood.menuStatus}
+                                                                onChange={handleInputChange}
+                                                                className="ml-2 w-5 h-5"
+                                                            />
+                                                        </div>
+
+                                                    </div>
+
+                                                    <div className="mb-2">
+                                                        <label className="block text-sm font-medium mb-1">
+                                                            Name
+                                                        </label>
+                                                        <input
+                                                            type="text"
+                                                            name="name"
+                                                            value={editFood.name}
+                                                            onChange={handleInputChange}
+                                                            className="w-full border p-2 rounded"
+                                                        />
+                                                    </div>
+                                                </div>
+                                            </div>
+
+                                            <div className="mb-4">
+                                                <label className="block text-sm font-medium mb-1">
+                                                    Description
                                                 </label>
-                                                <input
-                                                    onChange={handleImageChange}
-                                                    type="file"
-                                                    id="image"
-                                                    hidden
-                                                    accept="image/*"
+                                                <textarea
+                                                    name="description"
+                                                    value={editFood.description}
+                                                    onChange={handleInputChange}
+                                                    className="w-full border p-2 rounded"
                                                 />
                                             </div>
 
-                                            <div className="flex flex-col">
-                                                <div className="flex flex-row mb-4 gap-8">
-                                                    <div className="mb-2">
-                                                        <label className="block text-sm font-medium mb-1">
-                                                            Price
-                                                        </label>
-                                                        <input
-                                                            type="number"
-                                                            name="price"
-                                                            value={editFood.price}
-                                                            onChange={handleInputChange}
-                                                            className="w-full border p-2 rounded"
-                                                        />
-                                                    </div>
-                                                    <div className="mb-2">
-                                                        <label className="block text-sm font-medium mb-1">
-                                                            Category
-                                                        </label>
-                                                        <select
-                                                            name="category"
-                                                            value={editFood.category}
-                                                            onChange={handleInputChange}
-                                                            className="w-full border p-2 rounded"
-                                                        >
-                                                            <option value="Salad">Salad</option>
-                                                            <option value="Rolls">Rolls</option>
-                                                            <option value="Deserts">Deserts</option>
-                                                            <option value="Sandwich">Sandwich</option>
-                                                            <option value="Cake">Cake</option>
-                                                            <option value="Pure Veg">Pure Veg</option>
-                                                            <option value="Pasta">Pasta</option>
-                                                            <option value="Noodles">Noodles</option>
-                                                        </select>
-                                                    </div>
-                                                    <div className="mb-2">
-                                                        <label className="block text-sm font-medium mb-1">
-                                                            Menu Status
-                                                        </label>
-                                                        <input
-                                                            type="checkbox"
-                                                            name="menuStatus"
-                                                            checked={editFood.menuStatus}
-                                                            onChange={handleInputChange}
-                                                            className="ml-2 w-5 h-5"
-                                                        />
-                                                    </div>
-
-                                                </div>
-
-                                                <div className="mb-2">
-                                                    <label className="block text-sm font-medium mb-1">
-                                                        Name
-                                                    </label>
-                                                    <input
-                                                        type="text"
-                                                        name="name"
-                                                        value={editFood.name}
-                                                        onChange={handleInputChange}
-                                                        className="w-full border p-2 rounded"
-                                                    />
-                                                </div>
+                                            <div className="flex justify-end mt-4">
+                                                <button
+                                                    onClick={cancelEdit}
+                                                    className="bg-gray-300 px-4 py-2 rounded mr-2 hover:bg-gray-400"
+                                                >
+                                                    Cancel
+                                                </button>
+                                                <button
+                                                    onClick={updateFood}
+                                                    disabled={!hasChanges}
+                                                    className={`px-4 py-2 rounded ${hasChanges ? "bg-blue-500 text-white hover:bg-blue-600" : "bg-gray-300 cursor-not-allowed"}`}
+                                                >
+                                                    Save Changes
+                                                </button>
                                             </div>
                                         </div>
-
-                                        <div className="mb-4">
-                                            <label className="block text-sm font-medium mb-1">
-                                                Description
-                                            </label>
-                                            <textarea
-                                                name="description"
-                                                value={editFood.description}
-                                                onChange={handleInputChange}
-                                                className="w-full border p-2 rounded"
-                                            />
-                                        </div>
-
-                                        <div className="flex justify-end mt-4">
-                                            <button
-                                                onClick={cancelEdit}
-                                                className="bg-gray-300 px-4 py-2 rounded mr-2 hover:bg-gray-400"
-                                            >
-                                                Cancel
-                                            </button>
-                                            <button
-                                                onClick={updateFood}
-                                                disabled={!hasChanges}
-                                                className={`px-4 py-2 rounded ${hasChanges ? "bg-blue-500 text-white hover:bg-blue-600" : "bg-gray-300 cursor-not-allowed"}`}
-                                            >
-                                                Save Changes
-                                            </button>
-                                        </div>
                                     </div>
-                                </div>
-                            )}
+                                )}
+                            </div>
+                        ))
+                    ) : (
+                        <div className="text-center py-10 text-gray-500">
+                            No foods match your search. Please try a different name.
                         </div>
-                    ))}
-
+                    )}
                     <div className="bg-gray-700 h-6 sm:grid"></div>
                 </div>
             </div>
