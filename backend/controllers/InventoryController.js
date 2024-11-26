@@ -551,8 +551,9 @@ const orderInventory = async (inventoryId) => {
 // Fetch all supplier orders with inventory details and packageId
 const getSupplierOrders = async (req, res) => {
   try {
-    // Query supplierorder table and include related inventory details
+    // Query supplierorder table where status is not "done" and include related inventory details
     const supplierOrders = await prisma.supplierorder.findMany({
+      where: { status: { not: "done" } }, // Exclude orders with status "done"
       include: {
         inventory: {
           select: {
@@ -1109,8 +1110,9 @@ const createPackage = async (req, res) => {
 // List all inventory packages along with related orders by packageId
 const listInventoryPackages = async (req, res) => {
   try {
-    // Fetch all inventory packages
+    // Fetch all inventory packages where status is not "done"
     const inventoryPackages = await prisma.inventoryPackage.findMany({
+      where: { status: { not: "done" } }, // Exclude packages with status "done"
       orderBy: { id: "desc" }, // Ordering by ID in descending order
       include: {
         supplier: true, // Include related supplier data
@@ -1280,10 +1282,22 @@ const addPackage = async (req, res) => {
       await calculateStockPercentageAndStoreInStatus(parseInt(inventoryId, 10));
     }
 
+    // Update the status of the inventoryPackage to "done"
+    await prisma.inventoryPackage.update({
+      where: { id: parseInt(packageId, 10) },
+      data: { status: "done" },
+    });
+
+    // Update the status of supplierOrder entries to "done" where packageId matches
+    await prisma.supplierorder.updateMany({
+      where: { packageId: parseInt(packageId, 10) },
+      data: { status: "done" },
+    });
+
     // Respond with success
     return res.status(200).json({
       success: true,
-      message: "Package items added successfully",
+      message: "Package items added successfully and statuses updated.",
     });
   } catch (error) {
     console.error("Error in addPackage:", error);
