@@ -1,12 +1,48 @@
-import React from 'react';
+import axios from 'axios';
+import React, { useContext, useEffect, useState } from 'react';
+import { toast } from "react-toastify";
+import { backendUrl } from "../App";
+import { AdminContext } from '../context/AdminContext';
 
 const Users = () => {
-    const usersData = [
-        { id: "USR001", name: "Tony Ken", date: "30-07-2018", feedback: "Positive", status: "Active" },
-        { id: "USR002", name: "Jon Teek", date: "30-07-2018", feedback: "Neutral", status: "Active" },
-        { id: "USR003", name: "Williams", date: "13-07-2018", feedback: "Negative", status: "Inactive" },
-        { id: "USR004", name: "Brown", date: "08-07-2018", feedback: "Positive", status: "Active" },
-    ];
+    const [usersData, setUsersData] = useState([]);
+    const { token } = useContext(AdminContext);
+
+    // Fetch the users' data from the API
+    const fetchUserList = async () => {
+        try {
+            const response = await axios.get(backendUrl + "/api/user/all-users", {
+                headers: { token }, // Pass the token in headers for authorization
+            });
+
+            if (response.data.success) {
+                setUsersData(response.data.data); // Assuming the response contains a 'data' field with the users
+            } else {
+                toast.error("Error fetching user list");
+            }
+        } catch (error) {
+            console.error("Error fetching user data:", error);
+            toast.error("An error occurred while fetching users");
+        }
+    };
+
+    // Fetch the user data on component mount
+    useEffect(() => {
+        fetchUserList();
+    }, []);
+
+    // Function to format the date
+    const formatDate = (dateString) => {
+        const date = new Date(dateString);
+
+        // Get the day, month, and year
+        const day = String(date.getDate()).padStart(2, '0'); // Ensures 2-digit day
+        const month = String(date.getMonth() + 1).padStart(2, '0'); // Get month (1-12)
+        const year = date.getFullYear(); // Get full year
+
+        // Return formatted date as DD/MM/YYYY
+        return `${day}/${month}/${year}`;
+    };
 
     return (
         <div className="flex flex-col m-5 w-full">
@@ -65,24 +101,38 @@ const Users = () => {
                         <tr className="bg-gray-100">
                             <th className="px-4 py-2 border">ID</th>
                             <th className="px-4 py-2 border">Name</th>
-                            <th className="px-4 py-2 border">Date</th>
-                            <th className="px-4 py-2 border">Feedback</th>
-                            <th className="px-4 py-2 border">Status</th>
+                            <th className="px-4 py-2 border">Email</th>
+                            <th className="px-4 py-2 border">Address</th>
+                            <th className="px-4 py-2 border">Gender</th>
+                            <th className="px-4 py-2 border">Phone</th>
+                            <th className="px-4 py-2 border">Account Created</th>
                         </tr>
                     </thead>
                     <tbody>
-                        {usersData.map((user, index) => (
-                            <tr
-                                key={user.id}
-                                className={index % 2 === 0 ? "bg-gray-50" : ""}
-                            >
-                                <td className="px-4 py-2 border">{user.id}</td>
-                                <td className="px-4 py-2 border">{user.name}</td>
-                                <td className="px-4 py-2 border">{user.date}</td>
-                                <td className="px-4 py-2 border">{user.feedback}</td>
-                                <td className="px-4 py-2 border">{user.status}</td>
+                        {usersData.length > 0 ? (
+                            usersData.map((user, index) => (
+                                <tr
+                                    key={user.id}
+                                    className={index % 2 === 0 ? "bg-gray-50" : ""}
+                                >
+                                    <td className="px-4 py-2 border">{user.id}</td>
+                                    <td className="px-4 py-2 border">{user.firstName} {user.lastName}</td>
+                                    <td className="px-4 py-2 border">{user.email}</td>
+                                    <td className="px-4 py-2 border">
+                                        {user.address && user.address.line1 && user.address.line2
+                                            ? `${user.address.line1}, ${user.address.line2}`
+                                            : "No address available"}
+                                    </td>
+                                    <td className="px-4 py-2 border">{user.gender || 'Not Selected'}</td>
+                                    <td className="px-4 py-2 border">{user.phone || 'No Phone'}</td>
+                                    <td className="px-4 py-2 border">{formatDate(user.createdAt)}</td> {/* Apply the formatDate function */}
+                                </tr>
+                            ))
+                        ) : (
+                            <tr>
+                                <td colSpan="7" className="text-center py-4">No users found</td>
                             </tr>
-                        ))}
+                        )}
                     </tbody>
                 </table>
             </div>
