@@ -7,6 +7,7 @@ import { AdminContext } from '../context/AdminContext';
 const Users = () => {
     const [usersData, setUsersData] = useState([]);
     const { token } = useContext(AdminContext);
+    const [currentView, setCurrentView] = useState("users"); // Default to 'users' view
 
     // Fetch the users' data from the API
     const fetchUserList = async () => {
@@ -34,13 +35,9 @@ const Users = () => {
     // Function to format the date
     const formatDate = (dateString) => {
         const date = new Date(dateString);
-
-        // Get the day, month, and year
-        const day = String(date.getDate()).padStart(2, '0'); // Ensures 2-digit day
-        const month = String(date.getMonth() + 1).padStart(2, '0'); // Get month (1-12)
-        const year = date.getFullYear(); // Get full year
-
-        // Return formatted date as DD/MM/YYYY
+        const day = String(date.getDate()).padStart(2, '0');
+        const month = String(date.getMonth() + 1).padStart(2, '0');
+        const year = date.getFullYear();
         return `${day}/${month}/${year}`;
     };
 
@@ -63,16 +60,24 @@ const Users = () => {
 
             {/* Tabs */}
             <div className="flex items-center space-x-4 mb-6">
-                <button className="px-4 py-2 bg-green-500 text-white rounded hover:bg-green-600">
+                <button
+                    className={`px-4 py-2 rounded ${currentView === "users" ? "bg-green-500 text-white" : "bg-gray-200 text-gray-700"} hover:bg-green-500 hover:text-white`}
+                    onClick={() => setCurrentView("users")} // Switch to 'users'
+                >
                     Users
                 </button>
                 <button
-                    className="px-4 py-2 bg-gray-200 text-gray-700 rounded hover:bg-gray-300"
-                    onClick={() => (window.location.href = "/user-feedback")}
+                    className={`px-4 py-2 rounded ${currentView === "feedback" ? "bg-green-500 text-white" : "bg-gray-200 text-gray-700"} hover:bg-green-500 hover:text-white`}
+                    onClick={() => setCurrentView("feedback")} // Switch to 'feedback'
                 >
                     Feedback
                 </button>
-                <button className="px-4 py-2 bg-gray-200 text-gray-700 rounded hover:bg-gray-300">Order</button>
+                <button
+                    className={`px-4 py-2 rounded ${currentView === "orders" ? "bg-green-500 text-white" : "bg-gray-200 text-gray-700"} hover:bg-green-500 hover:text-white`}
+                    onClick={() => setCurrentView("orders")} // Switch to 'orders'
+                >
+                    Orders
+                </button>
                 <button className="px-4 py-2 bg-gray-200 text-gray-700 rounded hover:bg-gray-300">Deleted</button>
             </div>
 
@@ -94,49 +99,63 @@ const Users = () => {
                 />
             </div>
 
+            {/* the display Div */}
             <div className="bg-[#F3F4F6] rounded w-full max-w-6xl max-h-[88vh] overflow-scroll">
-                {/* Data Table */}
-                <div className="bg-white shadow rounded">
-                    <table className="w-full text-left border-collapse">
-                        <thead>
-                            <tr className="bg-gray-100">
-                                <th className="px-4 py-2 border">ID</th>
-                                <th className="px-4 py-2 border">Name</th>
-                                <th className="px-4 py-2 border">Email</th>
-                                <th className="px-4 py-2 border">Address</th>
-                                <th className="px-4 py-2 border">Gender</th>
-                                <th className="px-4 py-2 border">Phone</th>
-                                <th className="px-4 py-2 border">Account Created</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            {usersData.length > 0 ? (
-                                usersData.map((user, index) => (
-                                    <tr
-                                        key={user.id}
-                                        className={index % 2 === 0 ? "bg-gray-50" : ""}
-                                    >
-                                        <td className="px-4 py-2 border">{user.id}</td>
-                                        <td className="px-4 py-2 border">{user.firstName} {user.lastName}</td>
-                                        <td className="px-4 py-2 border">{user.email}</td>
-                                        <td className="px-4 py-2 border">
-                                            {user.address && user.address.line1 && user.address.line2
-                                                ? `${user.address.line1}, ${user.address.line2}`
-                                                : "No address available"}
-                                        </td>
-                                        <td className="px-4 py-2 border">{user.gender || 'Not Selected'}</td>
-                                        <td className="px-4 py-2 border">{user.phone || 'No Phone'}</td>
-                                        <td className="px-4 py-2 border">{formatDate(user.createdAt)}</td> {/* Apply the formatDate function */}
-                                    </tr>
-                                ))
-                            ) : (
-                                <tr>
-                                    <td colSpan="7" className="text-center py-4">No users found</td>
+                {currentView === "users" && (
+                    <div className="bg-white shadow rounded">
+                        {/* Users Data Table */}
+                        <table className="w-full text-left border-collapse">
+                            <thead>
+                                <tr className="bg-gray-100">
+                                    <th className="px-4 py-2 border">ID</th>
+                                    <th className="px-4 py-2 border">Name</th>
+                                    <th className="px-4 py-2 border">Email</th>
+                                    <th className="px-4 py-2 border">Address</th>
+                                    <th className="px-4 py-2 border">Gender</th>
+                                    <th className="px-4 py-2 border">Phone</th>
+                                    <th className="px-4 py-2 border">Account Created</th>
                                 </tr>
-                            )}
-                        </tbody>
-                    </table>
-                </div>
+                            </thead>
+                            <tbody>
+                                {usersData.length > 0 ? (
+                                    usersData.map((user, index) => (
+                                        <tr key={user.id} className={index % 2 === 0 ? "bg-gray-50" : ""}>
+                                            <td className="px-4 py-2 border">{user.id}</td>
+                                            <td className="px-4 py-2 border">{user.firstName} {user.lastName}</td>
+                                            <td className="px-4 py-2 border">{user.email}</td>
+                                            <td className="px-4 py-2 border">
+                                                {user.address && user.address.line1 && user.address.line2
+                                                    ? `${user.address.line1}, ${user.address.line2}`
+                                                    : "No address available"}
+                                            </td>
+                                            <td className="px-4 py-2 border">{user.gender || 'Not Selected'}</td>
+                                            <td className="px-4 py-2 border">{user.phone || 'No Phone'}</td>
+                                            <td className="px-4 py-2 border">{formatDate(user.createdAt)}</td>
+                                        </tr>
+                                    ))
+                                ) : (
+                                    <tr>
+                                        <td colSpan="7" className="text-center py-4">No users found</td>
+                                    </tr>
+                                )}
+                            </tbody>
+                        </table>
+                    </div>
+                )}
+                {currentView === "feedback" && (
+                    <div className="p-5 bg-white shadow rounded">
+                        {/* Feedback Content */}
+                        <h2 className="text-lg font-semibold text-gray-700">Feedback</h2>
+                        <p className="text-gray-600 mt-2">This is where feedback content will go.</p>
+                    </div>
+                )}
+                {currentView === "orders" && (
+                    <div className="p-5 bg-white shadow rounded">
+                        {/* Orders Content */}
+                        <h2 className="text-lg font-semibold text-gray-700">Orders</h2>
+                        <p className="text-gray-600 mt-2">This is where orders content will go.</p>
+                    </div>
+                )}
             </div>
         </div>
     );
