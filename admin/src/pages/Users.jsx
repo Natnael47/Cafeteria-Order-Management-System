@@ -45,7 +45,7 @@ const Users = () => {
     };
 
     return (
-        <div className="flex flex-col m-5 w-full">
+        <div className="flex flex-col m-5 w-full max-w-6xl">
             {/* Header */}
             <div className="flex items-center justify-between mb-6">
                 <h1 className="text-2xl font-semibold text-gray-700">Users</h1>
@@ -94,47 +94,49 @@ const Users = () => {
                 />
             </div>
 
-            {/* Data Table */}
-            <div className="bg-white shadow rounded">
-                <table className="w-full text-left border-collapse">
-                    <thead>
-                        <tr className="bg-gray-100">
-                            <th className="px-4 py-2 border">ID</th>
-                            <th className="px-4 py-2 border">Name</th>
-                            <th className="px-4 py-2 border">Email</th>
-                            <th className="px-4 py-2 border">Address</th>
-                            <th className="px-4 py-2 border">Gender</th>
-                            <th className="px-4 py-2 border">Phone</th>
-                            <th className="px-4 py-2 border">Account Created</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        {usersData.length > 0 ? (
-                            usersData.map((user, index) => (
-                                <tr
-                                    key={user.id}
-                                    className={index % 2 === 0 ? "bg-gray-50" : ""}
-                                >
-                                    <td className="px-4 py-2 border">{user.id}</td>
-                                    <td className="px-4 py-2 border">{user.firstName} {user.lastName}</td>
-                                    <td className="px-4 py-2 border">{user.email}</td>
-                                    <td className="px-4 py-2 border">
-                                        {user.address && user.address.line1 && user.address.line2
-                                            ? `${user.address.line1}, ${user.address.line2}`
-                                            : "No address available"}
-                                    </td>
-                                    <td className="px-4 py-2 border">{user.gender || 'Not Selected'}</td>
-                                    <td className="px-4 py-2 border">{user.phone || 'No Phone'}</td>
-                                    <td className="px-4 py-2 border">{formatDate(user.createdAt)}</td> {/* Apply the formatDate function */}
-                                </tr>
-                            ))
-                        ) : (
-                            <tr>
-                                <td colSpan="7" className="text-center py-4">No users found</td>
+            <div className="bg-[#F3F4F6] rounded w-full max-w-6xl max-h-[88vh] overflow-scroll">
+                {/* Data Table */}
+                <div className="bg-white shadow rounded">
+                    <table className="w-full text-left border-collapse">
+                        <thead>
+                            <tr className="bg-gray-100">
+                                <th className="px-4 py-2 border">ID</th>
+                                <th className="px-4 py-2 border">Name</th>
+                                <th className="px-4 py-2 border">Email</th>
+                                <th className="px-4 py-2 border">Address</th>
+                                <th className="px-4 py-2 border">Gender</th>
+                                <th className="px-4 py-2 border">Phone</th>
+                                <th className="px-4 py-2 border">Account Created</th>
                             </tr>
-                        )}
-                    </tbody>
-                </table>
+                        </thead>
+                        <tbody>
+                            {usersData.length > 0 ? (
+                                usersData.map((user, index) => (
+                                    <tr
+                                        key={user.id}
+                                        className={index % 2 === 0 ? "bg-gray-50" : ""}
+                                    >
+                                        <td className="px-4 py-2 border">{user.id}</td>
+                                        <td className="px-4 py-2 border">{user.firstName} {user.lastName}</td>
+                                        <td className="px-4 py-2 border">{user.email}</td>
+                                        <td className="px-4 py-2 border">
+                                            {user.address && user.address.line1 && user.address.line2
+                                                ? `${user.address.line1}, ${user.address.line2}`
+                                                : "No address available"}
+                                        </td>
+                                        <td className="px-4 py-2 border">{user.gender || 'Not Selected'}</td>
+                                        <td className="px-4 py-2 border">{user.phone || 'No Phone'}</td>
+                                        <td className="px-4 py-2 border">{formatDate(user.createdAt)}</td> {/* Apply the formatDate function */}
+                                    </tr>
+                                ))
+                            ) : (
+                                <tr>
+                                    <td colSpan="7" className="text-center py-4">No users found</td>
+                                </tr>
+                            )}
+                        </tbody>
+                    </table>
+                </div>
             </div>
         </div>
     );
