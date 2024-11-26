@@ -67,6 +67,31 @@ const registerUser = async (req, res) => {
   }
 };
 
+// Login a user
+const loginUser = async (req, res) => {
+  const { email, password } = req.body;
+  try {
+    // Check if user exists
+    const user = await prisma.user.findUnique({ where: { email } });
+    if (!user) {
+      return res.json({ success: false, message: "User not found" });
+    }
+
+    // Compare password
+    const isMatch = await bcrypt.compare(password, user.password);
+    if (!isMatch) {
+      return res.json({ success: false, message: "Incorrect password" });
+    }
+
+    // Generate token
+    const token = createToken(user.id);
+    res.json({ success: true, token });
+  } catch (error) {
+    console.log("Error in loginUser:", error);
+    res.json({ success: false, message: "Error logging in" });
+  }
+};
+
 // Get user profile by ID
 const getUserProfile = async (req, res) => {
   const { userId } = req.body;
@@ -125,31 +150,6 @@ const updateUserProfile = async (req, res) => {
       success: false,
       message: "An error occurred while updating the profile",
     });
-  }
-};
-
-// Login a user
-const loginUser = async (req, res) => {
-  const { email, password } = req.body;
-  try {
-    // Check if user exists
-    const user = await prisma.user.findUnique({ where: { email } });
-    if (!user) {
-      return res.json({ success: false, message: "User not found" });
-    }
-
-    // Compare password
-    const isMatch = await bcrypt.compare(password, user.password);
-    if (!isMatch) {
-      return res.json({ success: false, message: "Incorrect password" });
-    }
-
-    // Generate token
-    const token = createToken(user.id);
-    res.json({ success: true, token });
-  } catch (error) {
-    console.log("Error in loginUser:", error);
-    res.json({ success: false, message: "Error logging in" });
   }
 };
 
