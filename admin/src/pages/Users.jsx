@@ -2,12 +2,15 @@ import axios from 'axios';
 import React, { useContext, useEffect, useState } from 'react';
 import { toast } from "react-toastify";
 import { backendUrl } from "../App";
+import { assets } from '../assets/assets';
 import { AdminContext } from '../context/AdminContext';
 
 const Users = () => {
     const [usersData, setUsersData] = useState([]);
     const { token } = useContext(AdminContext);
     const [currentView, setCurrentView] = useState("users"); // Default to 'users' view
+    const [feedbackList, setFeedbackList] = useState([]);
+    const [orders, setOrders] = useState([]);
 
     // Fetch the users' data from the API
     const fetchUserList = async () => {
@@ -29,6 +32,14 @@ const Users = () => {
 
     // Fetch the user data on component mount
     useEffect(() => {
+        // Check if there is a saved view in localStorage
+        const savedView = localStorage.getItem('currentView');
+        if (savedView) {
+            setCurrentView(savedView); // Set the saved view as the current view
+        } else {
+            setCurrentView("users"); // Default to 'users' if no saved view
+        }
+
         fetchUserList();
     }, []);
 
@@ -40,6 +51,74 @@ const Users = () => {
         const year = date.getFullYear();
         return `${day}/${month}/${year}`;
     };
+
+    // Fetch the feedback data when the component mounts
+    useEffect(() => {
+        const fetchFeedback = async () => {
+            try {
+                const response = await axios.get(`${backendUrl}/api/feedback/get-feedback`);
+                setFeedbackList(response.data.feedback); // Save feedback data to state
+                console.log(response.data.feedback);
+            } catch (error) {
+                console.error("Error fetching feedback:", error);
+            }
+        };
+
+        fetchFeedback();
+    }, []);
+
+    // Save the current view to localStorage whenever it changes
+    const handleTabChange = (view) => {
+        setCurrentView(view);
+        localStorage.setItem('currentView', view); // Save the current view to localStorage
+    };
+
+    const fetchOrder = async () => {
+        if (!token) {
+            return null;
+        }
+        try {
+            const response = await axios.post(backendUrl + "/api/order/list", {}, { headers: { token } })
+            if (response.data.success) {
+                setOrders(response.data.orders);
+                //console.log(response.data.orders);
+
+            } else {
+                toast.error(response.data.message)
+            }
+
+        } catch (error) {
+            toast.error(error.message)
+        }
+    }
+
+    const statusHandler = async (event, orderId) => {
+        try {
+            // Send a request to update the order status
+            const response = await axios.post(backendUrl + "/api/order/status", {
+                orderId,
+                status: event.target.value, // Send the selected status value
+            }, { headers: { token } });
+
+            // Check if the response indicates success
+            if (response.data.success) {
+                // Refresh the list of orders after updating the status
+                await fetchOrder(); //this must be this fetchAllOrders()
+            } else {
+                // Handle the error if the update was not successful
+                console.error("Failed to update status:", response.data.message);
+                toast.error("Failed to update status.");
+            }
+        } catch (error) {
+            // Handle any errors that occur during the request
+            console.error("Error updating status:", error);
+            toast.error("An error occurred while updating the status.");
+        }
+    };
+
+    useEffect(() => {
+        fetchOrder();
+    }, [token]);
 
     return (
         <div className="flex flex-col m-5 w-full max-w-6xl">
@@ -62,19 +141,19 @@ const Users = () => {
             <div className="flex items-center space-x-4 mb-6">
                 <button
                     className={`px-4 py-2 rounded ${currentView === "users" ? "bg-green-500 text-white" : "bg-gray-200 text-gray-700"} hover:bg-green-500 hover:text-white`}
-                    onClick={() => setCurrentView("users")} // Switch to 'users'
+                    onClick={() => handleTabChange("users")} // Switch to 'users'
                 >
                     Users
                 </button>
                 <button
                     className={`px-4 py-2 rounded ${currentView === "feedback" ? "bg-green-500 text-white" : "bg-gray-200 text-gray-700"} hover:bg-green-500 hover:text-white`}
-                    onClick={() => setCurrentView("feedback")} // Switch to 'feedback'
+                    onClick={() => handleTabChange("feedback")} // Switch to 'feedback'
                 >
                     Feedback
                 </button>
                 <button
                     className={`px-4 py-2 rounded ${currentView === "orders" ? "bg-green-500 text-white" : "bg-gray-200 text-gray-700"} hover:bg-green-500 hover:text-white`}
-                    onClick={() => setCurrentView("orders")} // Switch to 'orders'
+                    onClick={() => handleTabChange("orders")} // Switch to 'orders'
                 >
                     Orders
                 </button>
@@ -142,18 +221,126 @@ const Users = () => {
                         </table>
                     </div>
                 )}
+                {/*Feedback page*/}
                 {currentView === "feedback" && (
-                    <div className="p-5 bg-white shadow rounded">
+                    <div className="p-6 bg-white shadow rounded-lg">
                         {/* Feedback Content */}
-                        <h2 className="text-lg font-semibold text-gray-700">Feedback</h2>
-                        <p className="text-gray-600 mt-2">This is where feedback content will go.</p>
+                        <h2 className="text-2xl font-semibold text-gray-800 mb-6">Customer Feedback</h2>
+
+                        {/* Feedback List */}
+                        <div className="space-y-6">
+                            {feedbackList.length === 0 ? (
+                                <p className="text-center text-gray-600 text-lg">No feedback available.</p>
+                            ) : (
+                                feedbackList.map((feedback, index) => {
+                                    // Set background color based on rating
+                                    let bgColor = "bg-gray-100"; // Default for 0 stars
+                                    if (feedback.rating >= 4) bgColor = "bg-green-100";  // Greenish for 4-5 stars
+                                    else if (feedback.rating >= 3) bgColor = "bg-yellow-100"; // Yellow for 3 stars
+                                    else if (feedback.rating >= 2) bgColor = "bg-red-100"; // Light red for 2 stars
+                                    else if (feedback.rating >= 1) bgColor = "bg-red-200"; // Darker red for 1 star
+
+                                    return (
+                                        <div
+                                            key={index}
+                                            className={`rounded-lg p-4 shadow-md transition-all hover:shadow-lg ${bgColor}`}
+                                        >
+                                            <div className="flex items-start space-x-4">
+                                                {/* Customer Avatar */}
+                                                <img
+                                                    src="https://via.placeholder.com/50"
+                                                    alt="Customer Avatar"
+                                                    className="w-16 h-16 rounded-full object-cover"
+                                                />
+                                                <div className="flex-1">
+                                                    <div className="flex justify-between items-center mb-2">
+                                                        <h3 className="font-semibold text-gray-800 text-xl">{feedback.username}</h3>
+                                                        <p className="text-sm text-gray-500">
+                                                            {/* Format the date to the required style */}
+                                                            {new Date(feedback.date).toLocaleDateString('en-US', {
+                                                                weekday: 'long',
+                                                                year: 'numeric',
+                                                                month: 'short',
+                                                                day: 'numeric',
+                                                            })}
+                                                        </p>
+                                                    </div>
+
+                                                    {/* Feedback Comment */}
+                                                    <p className="text-base text-gray-600 mb-4">
+                                                        {feedback.comment.length > 150
+                                                            ? `${feedback.comment.slice(0, 150)}...`
+                                                            : feedback.comment}
+                                                    </p>
+
+                                                    {/* Rating */}
+                                                    <div className="flex items-center space-x-1 text-yellow-500 text-lg">
+                                                        {Array.from({ length: Math.round(feedback.rating) }).map((_, i) => (
+                                                            <span key={i}>⭐</span>
+                                                        ))}
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    );
+                                })
+                            )}
+                        </div>
                     </div>
                 )}
+
+
+
+
                 {currentView === "orders" && (
                     <div className="p-5 bg-white shadow rounded">
                         {/* Orders Content */}
                         <h2 className="text-lg font-semibold text-gray-700">Orders</h2>
-                        <p className="text-gray-600 mt-2">This is where orders content will go.</p>
+                        {/* Your Orders Table Here */}
+                        <div className='bg-[#F3F4F6]'>
+                            {
+                                orders.map((order, index) => (
+                                    <div className='grid grid-cols-1 sm:grid-cols-[0.5fr_2fr_1fr] lg:grid-cols-[0.5fr_2fr_1fr_1fr_1fr] gap-3 items-start border-2 border-black p-5 md:p-8 my-3 md:my-4 text-xs sm:text-sm text-black bg-white' key={index}>
+                                        <img className='w-16' src={assets.parcel_icon} alt="" />
+                                        <div>
+
+                                            <div>
+                                                {order.items.map((item, index) => {
+                                                    if (index === order.items.length - 1) {
+                                                        return <p className='py-0.5' key={index}> {item.name} X <span>  {item.quantity} </span></p>
+                                                    } else {
+                                                        return <p className='py-0.5' key={index}> {item.name} X <span>  {item.quantity} ,</span></p>
+                                                    }
+                                                })}
+                                            </div>
+                                            <p className='mt-3 mb-2 font-medium'>{order.address.firstName + " " + order.address.lastName}</p>
+                                            <div>
+                                                <p>{order.address.street + ","}</p>
+                                                <p>{order.address.city + ", " + order.address.state + ", " + order.address.country + ", " + order.address.zipcode}</p>
+                                            </div>
+                                            <p>{order.address.phone}</p>
+                                        </div>
+                                        <div>
+                                            <p className='text-sm sm:text-[15px]'>Items : {order.items.length}</p>
+                                            <p className='mt-3'>Method : {order.paymentMethod}</p>
+                                            <div className='flex flex-row'>
+                                                <p>Payment : </p>
+                                                <p className={order.payment ? 'text-green-500 font-semibold' : 'text-red-500 font-semibold'}>_{order.payment ? "Done" : "Pending"}</p>
+                                            </div>
+                                            <p>Date : {new Date(order.date).toLocaleDateString()}</p>
+                                        </div>
+                                        <p className='text-sm sm:text-[15px] font-bold'>${order.amount}</p>
+                                        <select onChange={(event) => statusHandler(event, order.id)} value={order.status} className='p-2 font-semibold'>
+                                            <option value="Order Placed">Order Placed</option>
+                                            <option value="Food Processing">Food Processing</option>
+                                            <option value="Shipped">Shipped</option>
+                                            <option value="Out For Delivery">Out For Delivery</option>
+                                            <option value="Delivered">Delivered</option>
+                                        </select>
+                                    </div>
+                                ))
+                            }
+                        </div>
                     </div>
                 )}
             </div>
