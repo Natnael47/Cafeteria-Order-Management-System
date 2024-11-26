@@ -1,13 +1,20 @@
 import axios from 'axios';
 import React, { useContext, useEffect, useState } from 'react';
+import Modal from "react-modal";
 import { useParams } from 'react-router-dom';
 import { toast } from 'react-toastify';
 import { backendUrl } from '../App';
 import { AdminContext } from '../context/AdminContext';
+Modal.setAppElement("#root");
 
 const Employee_Profile = () => {
     const { employeeId } = useParams();
     const { getEmployeeData, employeeProfile, token, navigate } = useContext(AdminContext);
+    const [modalIsOpen, setModalIsOpen] = useState(false);
+
+    const openModal = () => setModalIsOpen(true);
+    const closeModal = () => setModalIsOpen(false);
+
 
     const [isEditing, setIsEditing] = useState(false);
     const [formData, setFormData] = useState({
@@ -128,6 +135,27 @@ const Employee_Profile = () => {
     const handleImageChange = (e) => {
         const file = e.target.files[0];
         setFormData((prev) => ({ ...prev, image: file }));
+    };
+
+    const handleDelete = async () => {
+        try {
+            const response = await axios.post(
+                `${backendUrl}/api/employee/delete-employee`,
+                { empId: employeeId }, // Sending empId in the request body
+                {
+                    headers: { token },
+                }
+            );
+            if (response.data.success) {
+                toast.success("Employee deleted successfully");
+                navigate('/employees-list'); // Navigate back to the employee list after deletion
+            } else {
+                toast.error(response.data.message || "Failed to delete the employee");
+            }
+        } catch (error) {
+            console.error("Error deleting employee:", error);
+            toast.error("Failed to delete the employee");
+        }
     };
 
     return (
@@ -364,10 +392,36 @@ const Employee_Profile = () => {
                             <p>{formData.about}</p>
                         </div>
                         <button onClick={handleEditToggle} className="px-5 py-2 mt-5 bg-blue-600 rounded text-white">Edit</button>
+                        <button onClick={openModal} className="px-5 py-2 bg-red-600 rounded text-white">Delete</button>
                     </div>
                 )}
             </div>
             <button onClick={() => navigate('/employees-list')} className="px-5 py-2 bg-gray-400 rounded text-white ml-7 mt-3">Back</button>
+            <Modal
+                isOpen={modalIsOpen}
+                onRequestClose={closeModal}
+                contentLabel="Delete Confirmation"
+                className="bg-white p-5 rounded shadow-md max-w-md mx-auto mt-20"
+                overlayClassName="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center"
+            >
+                <h2 className="text-lg font-semibold">Confirm Delete</h2>
+                <p>Are you sure you want to delete this employee?</p>
+                <div className="mt-4 flex justify-end">
+                    <button
+                        onClick={closeModal}
+                        className="bg-gray-300 px-4 py-2 rounded mr-2 hover:bg-gray-400"
+                    >
+                        Cancel
+                    </button>
+                    <button
+                        onClick={handleDelete} // Call the delete function
+                        className="bg-red-500 text-white px-4 py-2 rounded hover:bg-red-600"
+                    >
+                        Delete
+                    </button>
+                </div>
+            </Modal>
+
         </div>
     );
 };

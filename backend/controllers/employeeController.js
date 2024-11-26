@@ -167,3 +167,41 @@ export const get_Single_Employee_Profile = async (req, res) => {
     res.status(500).json({ success: false, message: "Internal server error" });
   }
 };
+
+// API to delete employee record
+export const delete_Employee = async (req, res) => {
+  const { empId } = req.body; // Fetching empId from the request body
+
+  if (!empId || isNaN(empId)) {
+    return res
+      .status(400)
+      .json({ success: false, message: "Invalid Employee ID" });
+  }
+
+  try {
+    // Attempt to delete the employee record
+    const deletedEmployee = await prisma.employee.delete({
+      where: { id: parseInt(empId) }, // Convert empId to an integer
+    });
+
+    // If successful, return success response
+    res.json({
+      success: true,
+      message: "Employee record deleted successfully",
+      deletedEmployee,
+    });
+  } catch (error) {
+    console.error("Error deleting employee record:", error);
+
+    // Handle record not found error
+    if (error.code === "P2025") {
+      return res.status(404).json({
+        success: false,
+        message: "Employee not found",
+      });
+    }
+
+    // Handle other internal server errors
+    res.status(500).json({ success: false, message: "Internal server error" });
+  }
+};
