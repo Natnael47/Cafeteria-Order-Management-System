@@ -14,7 +14,7 @@ const MyOrders = () => {
         try {
             if (!token) return;
 
-            const response = await axios.post(`${backendUrl}/api/order/userorders`, {}, { headers: { token } });
+            const response = await axios.post(`${backendUrl}/api/order/user-orders`, {}, { headers: { token } });
             if (response.data.success) {
                 setOrders(response.data.orders.reverse());
             }
@@ -58,7 +58,10 @@ const MyOrders = () => {
                                         {order.items.length > 2 && <span>and more...</span>}
                                     </div>
                                     <p className='mt-1'>Date: <span className='text-gray-800'>{new Date(order.date).toDateString()}</span></p>
-                                    <p className='mt-1'>Payment: <span className='text-gray-800'>{order.paymentMethod}</span></p>
+                                    <p className="mt-1">
+                                        Payment: <span className="text-gray-800 font-semibold">{order.paymentMethod === "COD" ? "Cash on Delivery" : order.paymentMethod}</span>
+                                    </p>
+
                                 </div>
                             </div>
 
