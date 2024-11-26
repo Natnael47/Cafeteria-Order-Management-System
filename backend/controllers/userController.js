@@ -16,6 +16,7 @@ const createToken = (id) => {
 const registerUser = async (req, res) => {
   const { firstName, lastName, password, email, gender, dob, phone, address } =
     req.body;
+
   try {
     // Check if user already exists
     const exists = await prisma.user.findUnique({ where: { email } });
@@ -38,7 +39,7 @@ const registerUser = async (req, res) => {
     const salt = await bcrypt.genSalt(10);
     const hashedPassword = await bcrypt.hash(password, salt);
 
-    // Create new user with a default address and cartData
+    // Create a new user
     const newUser = await prisma.user.create({
       data: {
         firstName,
@@ -52,18 +53,20 @@ const registerUser = async (req, res) => {
           ? typeof address === "string"
             ? JSON.parse(address)
             : address
-          : {},
-        cartData: {}, // Default empty cartData
+          : {}, // Default empty object if address is not provided
       },
     });
 
-    // Generate token
+    // Generate a token
     const token = createToken(newUser.id);
 
     res.json({ success: true, token });
   } catch (error) {
-    console.log("Error in registerUser:", error);
-    res.json({ success: false, message: "Error during registration" });
+    console.error("Error in registerUser:", error);
+    res.status(500).json({
+      success: false,
+      message: "Error during registration",
+    });
   }
 };
 
@@ -124,15 +127,16 @@ const getUserProfile = async (req, res) => {
 // Update user profile
 const updateUserProfile = async (req, res) => {
   const { userId, firstName, lastName, gender, address, dob, phone } = req.body;
+
   try {
     // Check for missing fields
     if (!firstName || !lastName || !gender || !dob || !phone) {
       return res.json({ success: false, message: "Missing required fields" });
     }
 
-    // Update user profile in Prisma
-    await prisma.user.update({
-      where: { id: parseInt(userId) },
+    // Update the user profile
+    const updatedUser = await prisma.user.update({
+      where: { id: parseInt(userId, 10) },
       data: {
         firstName,
         lastName,
@@ -143,7 +147,11 @@ const updateUserProfile = async (req, res) => {
       },
     });
 
-    res.json({ success: true, message: "Profile updated successfully" });
+    res.json({
+      success: true,
+      message: "Profile updated successfully",
+      updatedUser,
+    });
   } catch (error) {
     console.error("Error updating profile:", error);
     res.status(500).json({
@@ -153,4 +161,35 @@ const updateUserProfile = async (req, res) => {
   }
 };
 
-export { getUserProfile, loginUser, registerUser, updateUserProfile };
+const allUsers = async (req, res) => {
+  try {
+    // Fetch all users sorted by ID in descending order
+    const users = await prisma.user.findMany({
+      orderBy: {
+        id: "desc", // Sort by ID in descending order
+      },
+      select: {
+        id: true,
+        firstName: true,
+        lastName: true,
+        email: true,
+        gender: true,
+        dob: true,
+        phone: true,
+        address: true,
+        createdAt: true, // Include creation date
+        updatedAt: true, // Include last update date
+      },
+    });
+
+    res.json({ success: true, data: users });
+  } catch (error) {
+    console.error("Error retrieving users:", error);
+    res.status(500).json({
+      success: false,
+      message: "An error occurred while retrieving users",
+    });
+  }
+};
+
+export { allUsers, getUserProfile, loginUser, registerUser, updateUserProfile };
