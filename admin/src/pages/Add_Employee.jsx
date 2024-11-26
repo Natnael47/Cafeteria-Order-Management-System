@@ -149,9 +149,38 @@ const AddEmployee = () => {
 
                     <div className='w-full lg:flex-1 flex flex-col gap-4'>
 
-                        <div className='flex-1 flex flex-col gap-1'>
-                            <p>Phone</p>
-                            <input onChange={(e) => setPhone(e.target.value)} value={phone} className='border rounded px-3 py-2' type="text" placeholder='+251' required />
+                        <div className="flex flex-col gap-1">
+                            <label htmlFor="phone-input" className="text-sm font-medium">
+                                Phone
+                            </label>
+                            <div className="flex items-center border border-gray-300 rounded-md px-2 py-1 focus-within:ring focus-within:ring-green-500">
+                                <span className="text-gray-500 font-medium text-lg">+251</span>
+                                <input
+                                    id="phone-input"
+                                    onChange={(e) => {
+                                        let value = e.target.value;
+
+                                        // Remove non-digit characters
+                                        value = value.replace(/\D/g, "");
+
+                                        // If the number starts with "0", limit to 10 digits
+                                        if (value.startsWith("0")) {
+                                            value = value.slice(1); // Remove the leading "0"
+                                        }
+
+                                        // Limit to a maximum of 9 digits (after "0" is removed if present)
+                                        value = value.slice(0, 9);
+
+                                        // Update state with the full formatted phone number
+                                        setPhone(`+251 ${value}`);
+                                    }}
+                                    value={phone.startsWith("+251") ? phone.slice(5) : phone} // Display only the local part in the input
+                                    className="flex-1 outline-none border-none text-lg pl-2"
+                                    type="text"
+                                    placeholder="912345678"
+                                    required
+                                />
+                            </div>
                         </div>
 
                         <div className='flex-1 flex flex-col gap-1'>
