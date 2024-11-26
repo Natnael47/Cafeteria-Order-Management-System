@@ -11,6 +11,7 @@ const Navbar = () => {
         navigate('/');
         token && setToken('');
         token && localStorage.removeItem('token');
+        localStorage.removeItem('currentView');
     }
 
     return (

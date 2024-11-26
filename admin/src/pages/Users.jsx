@@ -58,7 +58,7 @@ const Users = () => {
             try {
                 const response = await axios.get(`${backendUrl}/api/feedback/get-feedback`);
                 setFeedbackList(response.data.feedback); // Save feedback data to state
-                console.log(response.data.feedback);
+                //console.log(response.data.feedback);
             } catch (error) {
                 console.error("Error fetching feedback:", error);
             }
@@ -248,7 +248,7 @@ const Users = () => {
                                             <div className="flex items-start space-x-4">
                                                 {/* Customer Avatar */}
                                                 <img
-                                                    src="https://via.placeholder.com/50"
+                                                    src={assets.person}
                                                     alt="Customer Avatar"
                                                     className="w-16 h-16 rounded-full object-cover"
                                                 />
@@ -266,11 +266,9 @@ const Users = () => {
                                                         </p>
                                                     </div>
 
-                                                    {/* Feedback Comment */}
+                                                    {/* Full Feedback Comment */}
                                                     <p className="text-base text-gray-600 mb-4">
-                                                        {feedback.comment.length > 150
-                                                            ? `${feedback.comment.slice(0, 150)}...`
-                                                            : feedback.comment}
+                                                        {feedback.comment} {/* Displaying the full comment */}
                                                     </p>
 
                                                     {/* Rating */}
@@ -288,9 +286,6 @@ const Users = () => {
                         </div>
                     </div>
                 )}
-
-
-
 
                 {currentView === "orders" && (
                     <div className="p-5 bg-white shadow rounded">
