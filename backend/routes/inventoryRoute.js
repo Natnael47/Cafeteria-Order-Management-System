@@ -2,6 +2,7 @@ import express from "express";
 import multer from "multer";
 import {
   addInventory,
+  addPackage,
   addStock,
   addSupplier,
   addToPackage,
@@ -61,7 +62,7 @@ inventoryRoute.post("/add-package", empAuth, addToPackage);
 inventoryRoute.post("/remove-package", empAuth, removeFromPackage);
 
 inventoryRoute.post("/new-package", empAuth, createPackage);
-
 inventoryRoute.get("/packages", empAuth, listInventoryPackages);
+inventoryRoute.post("/stock-package", addPackage);
 
 export default inventoryRoute;

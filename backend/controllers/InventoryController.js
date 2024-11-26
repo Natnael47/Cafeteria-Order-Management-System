@@ -828,7 +828,12 @@ const addToPackage = async (req, res) => {
     const [existingPackage, supplierOrder] = await Promise.all([
       prisma.inventoryPackage.findUnique({
         where: { id: packageId },
-        select: { supplierId: true, status: true, totalCost: true },
+        select: {
+          supplierId: true,
+          status: true,
+          totalCost: true,
+          items: true,
+        },
       }),
       prisma.supplierorder.findUnique({
         where: { id: orderId },
@@ -836,6 +841,7 @@ const addToPackage = async (req, res) => {
           supplierId: true,
           inventoryId: true,
           quantityOrdered: true,
+          orderDate: true,
           status: true,
           packageId: true,
         },
@@ -873,10 +879,10 @@ const addToPackage = async (req, res) => {
       });
     }
 
-    // Fetch pricePerUnit for inventory item
+    // Fetch inventory details for the item
     const inventoryItem = await prisma.inventory.findUnique({
       where: { id: supplierOrder.inventoryId },
-      select: { pricePerUnit: true },
+      select: { pricePerUnit: true, name: true },
     });
 
     if (!inventoryItem) {
@@ -886,15 +892,29 @@ const addToPackage = async (req, res) => {
       });
     }
 
-    // Calculate the order cost and update the package total
+    // Calculate the order cost
     const orderCost =
       inventoryItem.pricePerUnit * supplierOrder.quantityOrdered;
 
+    // Prepare the order data to be added to the package's items array
+    const newItem = {
+      inventoryId: supplierOrder.inventoryId,
+      name: inventoryItem.name,
+      quantityOrdered: supplierOrder.quantityOrdered,
+      pricePerUnit: inventoryItem.pricePerUnit,
+      cost: orderCost,
+      orderDate: supplierOrder.orderDate,
+      status: supplierOrder.status,
+    };
+
+    // Update the package's items array and total cost
     const updatedPackage = await prisma.inventoryPackage.update({
       where: { id: packageId },
       data: {
         totalCost: existingPackage.totalCost + orderCost,
-        status: "Sent",
+        items: existingPackage.items
+          ? [...existingPackage.items, newItem]
+          : [newItem], // Add the new item to the items array
       },
     });
 
@@ -913,7 +933,7 @@ const addToPackage = async (req, res) => {
       data: {
         packageId,
         updatedTotalCost: updatedPackage.totalCost,
-        orderId,
+        items: updatedPackage.items,
       },
     });
   } catch (error) {
@@ -942,7 +962,7 @@ const removeFromPackage = async (req, res) => {
     const [existingPackage, supplierOrder] = await Promise.all([
       prisma.inventoryPackage.findUnique({
         where: { id: packageId },
-        select: { totalCost: true },
+        select: { totalCost: true, items: true },
       }),
       prisma.supplierorder.findUnique({
         where: { id: orderId },
@@ -975,7 +995,7 @@ const removeFromPackage = async (req, res) => {
     // Fetch the price per unit of the inventory item
     const inventoryItem = await prisma.inventory.findUnique({
       where: { id: supplierOrder.inventoryId },
-      select: { pricePerUnit: true },
+      select: { pricePerUnit: true, name: true },
     });
 
     if (!inventoryItem) {
@@ -989,10 +1009,15 @@ const removeFromPackage = async (req, res) => {
     const orderCost =
       inventoryItem.pricePerUnit * supplierOrder.quantityOrdered;
 
-    // Update the total cost of the package (subtract the order cost)
+    // Find the item in the package's items array
+    const updatedItems = existingPackage.items.filter(
+      (item) => item.inventoryId !== supplierOrder.inventoryId
+    );
+
+    // Calculate the new total cost for the package
     const newTotalCost = existingPackage.totalCost - orderCost;
 
-    // Remove the packageId from the supplier order
+    // Remove the packageId from the supplier order and update status
     await prisma.supplierorder.update({
       where: { id: orderId },
       data: {
@@ -1001,10 +1026,13 @@ const removeFromPackage = async (req, res) => {
       },
     });
 
-    // Update the package's total cost
-    await prisma.inventoryPackage.update({
+    // Update the package's total cost and items array
+    const updatedPackage = await prisma.inventoryPackage.update({
       where: { id: packageId },
-      data: { totalCost: newTotalCost },
+      data: {
+        totalCost: newTotalCost,
+        items: updatedItems, // Update the items array by removing the item
+      },
     });
 
     return res.status(200).json({
@@ -1013,6 +1041,7 @@ const removeFromPackage = async (req, res) => {
       data: {
         packageId,
         updatedTotalCost: newTotalCost,
+        items: updatedPackage.items, // Return the updated items array
         orderId,
       },
     });
@@ -1133,10 +1162,144 @@ const listInventoryPackages = async (req, res) => {
   }
 };
 
+const addPackage = async (req, res) => {
+  try {
+    const { packageId, dateReceived, expiryDate } = req.body;
+
+    // Validate required fields
+    if (!packageId || !dateReceived) {
+      return res.status(400).json({
+        success: false,
+        message: "Missing required fields: packageId and dateReceived",
+      });
+    }
+
+    // Fetch package details to get supplierId
+    const packageDetails = await prisma.inventoryPackage.findUnique({
+      where: { id: parseInt(packageId, 10) }, // Ensure packageId is an integer
+      select: { supplierId: true },
+    });
+
+    if (!packageDetails) {
+      return res.status(404).json({
+        success: false,
+        message: "Package not found",
+      });
+    }
+
+    const { supplierId } = packageDetails;
+
+    // Fetch all items in the package
+    const orderItems = await prisma.supplierorder.findMany({
+      where: { packageId: parseInt(packageId, 10) }, // Ensure packageId is an integer
+      select: {
+        inventoryId: true,
+        quantityOrdered: true,
+        status: true,
+        orderDate: true,
+      },
+    });
+
+    if (!orderItems || orderItems.length === 0) {
+      return res.status(400).json({
+        success: false,
+        message: "Package contains no inventory items",
+      });
+    }
+
+    // Group items by inventoryId and sum their quantities
+    const aggregatedItems = orderItems.reduce((acc, item) => {
+      const { inventoryId, quantityOrdered } = item;
+      const inventoryKey = parseInt(inventoryId, 10); // Ensure inventoryId is an integer
+      if (!acc[inventoryKey]) {
+        acc[inventoryKey] = { quantityOrdered: 0 };
+      }
+      acc[inventoryKey].quantityOrdered += quantityOrdered;
+      return acc;
+    }, {});
+
+    // Process each inventory item
+    for (const inventoryId of Object.keys(aggregatedItems)) {
+      const { quantityOrdered } = aggregatedItems[inventoryId];
+
+      // Fetch the inventory item details
+      const inventoryItem = await prisma.inventory.findUnique({
+        where: { id: parseInt(inventoryId, 10) }, // Ensure inventoryId is an integer
+        select: { quantity: true, pricePerUnit: true, initialQuantity: true },
+      });
+
+      if (!inventoryItem) {
+        console.warn(
+          `Inventory item with ID ${inventoryId} not found, skipping.`
+        );
+        continue;
+      }
+
+      const updatedQuantity = inventoryItem.quantity + quantityOrdered;
+
+      // Update initialQuantity if updatedQuantity equals or exceeds it
+      let updatedInitialQuantity = inventoryItem.initialQuantity;
+
+      if (updatedQuantity >= updatedInitialQuantity) {
+        updatedInitialQuantity = updatedQuantity;
+      }
+
+      // Update the inventory item
+      await prisma.inventory.update({
+        where: { id: parseInt(inventoryId, 10) },
+        data: {
+          quantity: updatedQuantity,
+          initialQuantity: updatedInitialQuantity, // Update initial quantity
+          pricePerUnit: inventoryItem.pricePerUnit,
+          supplierId,
+          expiryDate: expiryDate ? new Date(expiryDate) : null,
+          dateReceived: new Date(dateReceived),
+          dateUpdated: new Date(),
+        },
+      });
+
+      // Ensure inventory-supplier mapping exists
+      await ensureInventorySupplier(
+        parseInt(inventoryId, 10),
+        supplierId,
+        inventoryItem.pricePerUnit
+      );
+
+      // Record purchase details in the inventorypurchase table
+      await prisma.inventorypurchase.create({
+        data: {
+          inventoryId: parseInt(inventoryId, 10),
+          quantityBought: quantityOrdered,
+          supplierId,
+          cost: quantityOrdered * inventoryItem.pricePerUnit,
+          pricePerUnit: inventoryItem.pricePerUnit,
+        },
+      });
+
+      // Update stock percentage in the status field
+      await calculateStockPercentageAndStoreInStatus(parseInt(inventoryId, 10));
+    }
+
+    // Respond with success
+    return res.status(200).json({
+      success: true,
+      message: "Package items added successfully",
+    });
+  } catch (error) {
+    console.error("Error in addPackage:", error);
+    return res.status(500).json({
+      success: false,
+      message: "Internal Server Error",
+      error: error.message,
+    });
+  }
+};
+
 // Export all functions
 export {
   addInventory,
   addInventoryBulk,
+  addPackage,
   addStock,
   addSupplier,
   addToPackage,

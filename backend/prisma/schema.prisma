@@ -210,6 +210,7 @@ model inventoryPackage {
   status      String   @default("Pending") @db.VarChar(50) // Status of the package
   dateAdded   DateTime @default(now()) // Date when the package was created
   totalCost   Float? // Total cost of the package (sum of all items)
+  items       Json? // Array of items with inventoryId, quantity, pricePerUnit, etc.
   supplier    supplier @relation(fields: [supplierId], references: [id], map: "InventoryPackage_supplierId_fkey") // Relationship with Supplier
 
   @@index([supplierId], map: "InventoryPackage_supplierId_fkey")
