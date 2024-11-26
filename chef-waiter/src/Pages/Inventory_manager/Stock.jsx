@@ -5,8 +5,7 @@ import { backendUrl } from "../../App";
 import { InventoryContext } from "../../Context/InventoryContext";
 
 const Stock = () => {
-    const { inventoryList, fetchInventoryList, iToken, supplierList,
-        fetchSuppliers } = useContext(InventoryContext);
+    const { inventoryList, fetchInventoryList, iToken, supplierList, packageList, fetchPackages, fetchSuppliers } = useContext(InventoryContext);
 
     const [stockAction, setStockAction] = useState(null); // "in" or "out"
     const [selectedItem, setSelectedItem] = useState(null); // Item to update stock for
@@ -24,6 +23,10 @@ const Stock = () => {
         fetchInventoryList(); // Fetch inventory list on component load
         fetchSuppliers(); // Fetch supplier list on component load
     }, []);
+    // Use effect to fetch packages on mount
+    useEffect(() => {
+        fetchPackages(); // Fetch packages when the component mounts
+    }, [fetchPackages]);
 
     const onChangeHandler = (event) => {
         const { name, value } = event.target;
@@ -177,6 +180,69 @@ const Stock = () => {
         )
         .sort((a, b) => a.name.localeCompare(b.name));
 
+    const [isPackagePopupOpen, setIsPackagePopupOpen] = useState(false);
+    const [selectedPackage, setSelectedPackage] = useState(null);
+    const [packageForm, setPackageForm] = useState({
+        dateReceived: "",
+        expiryDate: "",
+    });
+
+
+    // Button to open the package popup
+    const handleAddPackageClick = () => {
+        setIsPackagePopupOpen(true);
+    };
+
+    // Button inside popup to close
+    const handleClosePopup = () => {
+        setIsPackagePopupOpen(false);
+    };
+
+    const handleSelectPackage = (pkg) => {
+        setSelectedPackage(pkg);  // This will store the selected package
+    };
+
+    const handlePackageFormChange = (event) => {
+        const { name, value } = event.target;
+        setPackageForm((prev) => ({ ...prev, [name]: value }));
+    };
+
+    const handlePackageSubmit = async (event) => {
+        event.preventDefault();
+        if (!selectedPackage || !packageForm.dateReceived || !packageForm.expiryDate) {
+            toast.error("Please complete all fields before submitting.");
+            return;
+        }
+
+        const payload = {
+            packageId: selectedPackage.id,
+            dateReceived: new Date(packageForm.dateReceived).toISOString(),
+            expiryDate: new Date(packageForm.expiryDate).toISOString(),
+        };
+        console.log(payload);
+
+
+        try {
+            const response = await axios.post(
+                backendUrl + "/api/inventory/stock-package", payload, { headers: { iToken } }
+            );
+            if (response.data.success) {
+                toast.success("Package stocked successfully!");
+                fetchInventoryList();
+                setIsPackagePopupOpen(false); // Close the popup
+                setSelectedPackage(null); // Reset selected package
+                setPackageForm({ dateReceived: "", expiryDate: "" }); // Reset form data
+                fetchPackages(); // Refresh the package list
+            } else {
+                toast.error(response.data.message || "Failed to stock package.");
+            }
+        } catch (error) {
+            console.error("Error stocking package:", error);
+            toast.error("An error occurred. Please try again.");
+        }
+    };
+
+
     return (
         <div className="flex flex-col m-5 w-full">
             <p className="mb-3 text-lg font-semibold">Stock Overview</p>
@@ -191,9 +257,13 @@ const Stock = () => {
                         className="border border-gray-300 rounded px-3 py-1 focus:outline-none focus:ring-2 focus:ring-blue-500"
                     />
                 </div>
-                <button className="bg-blue-500 text-white rounded px-4 py-2 hover:bg-blue-600 transition-colors w-36">
+                <button
+                    onClick={handleAddPackageClick} // Open the package popup
+                    className="bg-blue-500 text-white rounded px-4 py-2 hover:bg-blue-600"
+                >
                     Add Package
                 </button>
+
             </div>
             <div className="bg-[#F3F4F6] rounded w-full max-w-5.3xl max-h-[88vh] overflow-scroll">
                 <div>
@@ -394,6 +464,7 @@ const Stock = () => {
                                     </div>
                                 )}
 
+
                                 {/* Remove Stock Form */}
                                 {stockAction === "out" && selectedItem === item && (
                                     <div className="mt-1 mb-1 p-3 bg-gray-50 rounded border">
@@ -462,13 +533,92 @@ const Stock = () => {
                                                 <button
                                                     type="submit"
                                                     className="bg-red-500 text-white px-4 py-2 rounded"
-                                                >
-                                                    Remove
-                                                </button>
+                                                >Remove</button>
                                             </div>
                                         </form>
                                     </div>
                                 )}
+
+
+                                {isPackagePopupOpen && (
+                                    <div className="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center z-50">
+                                        <div className="bg-white p-6 rounded-md shadow-md w-1/2">
+                                            <h2 className="text-xl font-semibold mb-4">Select a Package</h2>
+                                            <div className="max-h-60 overflow-y-auto mb-4">
+                                                {packageList
+                                                    .filter((pkg) => pkg.totalCost > 0) // Exclude packages with totalCost equal to 0
+                                                    .map((pkg) => (
+                                                        <div
+                                                            key={pkg.id}
+                                                            className={`p-2 border-b cursor-pointer transition-all ${selectedPackage?.id === pkg.id
+                                                                ? "bg-blue-100" // Highlight selected package
+                                                                : "hover:bg-gray-100"
+                                                                }`}
+                                                            onClick={() => handleSelectPackage(pkg)}
+                                                        >
+                                                            {pkg.name}
+                                                        </div>
+                                                    ))}
+                                            </div>
+
+                                            {/* Cancel Option */}
+                                            <div className="flex justify-end gap-2">
+                                                <button
+                                                    type="button"
+                                                    onClick={handleClosePopup} // Close popup when canceled
+                                                    className="bg-gray-300 px-4 py-2 rounded"
+                                                >
+                                                    Cancel
+                                                </button>
+                                            </div>
+
+                                            {selectedPackage && (
+                                                <form onSubmit={handlePackageSubmit} className="mt-4">
+                                                    <div className="grid grid-cols-2 gap-4 mb-4">
+                                                        <div>
+                                                            <label className="block text-sm font-medium">Date Received</label>
+                                                            <input
+                                                                type="date"
+                                                                name="dateReceived"
+                                                                value={packageForm.dateReceived}
+                                                                onChange={handlePackageFormChange}
+                                                                className="p-2 border rounded w-full"
+                                                            />
+                                                        </div>
+                                                        <div>
+                                                            <label className="block text-sm font-medium">Expiry Date</label>
+                                                            <input
+                                                                type="date"
+                                                                name="expiryDate"
+                                                                value={packageForm.expiryDate}
+                                                                onChange={handlePackageFormChange}
+                                                                className="p-2 border rounded w-full"
+                                                            />
+                                                        </div>
+                                                    </div>
+                                                    <div className="flex justify-end gap-2">
+                                                        <button
+                                                            type="button"
+                                                            onClick={handleClosePopup} // Allow cancellation even in form
+                                                            className="bg-gray-300 px-4 py-2 rounded"
+                                                        >
+                                                            Cancel
+                                                        </button>
+                                                        <button
+                                                            type="submit"
+                                                            className="bg-green-500 text-white px-4 py-2 rounded"
+                                                        >
+                                                            Submit
+                                                        </button>
+                                                    </div>
+                                                </form>
+                                            )}
+                                        </div>
+                                    </div>
+                                )}
+
+
+
                             </div>
                         );
                     })}
@@ -476,7 +626,6 @@ const Stock = () => {
             </div>
         </div>
     );
-
 };
 
 export default Stock;
