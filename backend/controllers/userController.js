@@ -38,21 +38,22 @@ const registerUser = async (req, res) => {
     const salt = await bcrypt.genSalt(10);
     const hashedPassword = await bcrypt.hash(password, salt);
 
-    // Create new user with a default address if not provided
+    // Create new user with a default address and cartData
     const newUser = await prisma.user.create({
       data: {
         firstName,
         lastName,
         email,
         password: hashedPassword,
-        gender,
-        dob,
-        phone,
+        gender: gender || null, // Handle undefined gender
+        dob: dob || null, // Handle undefined date of birth
+        phone: phone || null, // Handle undefined phone
         address: address
           ? typeof address === "string"
             ? JSON.parse(address)
             : address
           : {},
+        cartData: {}, // Default empty cartData
       },
     });
 

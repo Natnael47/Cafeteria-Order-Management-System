@@ -32,14 +32,14 @@ model employee {
 model user {
   id        Int        @id @default(autoincrement()) // Unique identifier for each user
   firstName String     @db.VarChar(255) // User's first name
-  lastName  String     @db.VarChar(255) // User's last name
+  lastName  String?    @db.VarChar(255) // User's last name
   email     String     @unique(map: "User_email_key") @db.VarChar(255) // Unique email address
   password  String     @db.VarChar(255) // User's password
-  gender    String     @default("not selected") @db.VarChar(50) // User's gender with default
-  address   Json // User's address information in JSON format
-  dob       String     @default("not selected") @db.VarChar(100) // Date of birth
-  phone     String     @default("+251 911524856") @db.VarChar(20) // User's phone number
-  cartData  Json // User's shopping cart data in JSON format
+  gender    String?    @default("not selected") @db.VarChar(50) // User's gender with default
+  address   Json? // User's address information in JSON format
+  dob       String?    @default("not selected") @db.VarChar(100) // Date of birth
+  phone     String?    @default("+251 911524856") @db.VarChar(20) // User's phone number
+  cartData  Json? // User's shopping cart data in JSON format
   feedback  feedback[] // Relation to feedback table
   order     order[] // Relation to order table
 }
