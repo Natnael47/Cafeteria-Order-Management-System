@@ -1,15 +1,22 @@
 import axios from 'axios';
 import React, { useContext, useEffect, useState } from 'react';
+import Modal from "react-modal";
+import { toast } from 'react-toastify';
 import { backendUrl } from '../App';
 import { assets } from '../assets/assets';
 import Title from '../components/Title';
 import { StoreContext } from '../context/StoreContext';
 
+Modal.setAppElement("#root"); // Set app element for accessibility
+
 const MyOrders = () => {
     const [orders, setOrders] = useState([]);
     const [showDetails, setShowDetails] = useState({});
+    const [modalIsOpen, setModalIsOpen] = useState(false);
+    const [selectedOrderId, setSelectedOrderId] = useState(null);
     const { token } = useContext(StoreContext);
 
+    // Load order data
     const loadOrderData = async () => {
         try {
             if (!token) return;
@@ -23,12 +30,48 @@ const MyOrders = () => {
         }
     };
 
+    // Cancel order function
+    const cancelOrder = async () => {
+        try {
+            const response = await axios.post(
+                `${backendUrl}/api/order/cancel`,
+                { orderId: selectedOrderId },
+                { headers: { token } }
+            );
+
+            if (response.data.success) {
+                toast.success("Order canceled successfully.");
+                loadOrderData(); // Reload orders to reflect the updated status
+            } else {
+                alert(response.data.message || "Failed to cancel the order.");
+            }
+        } catch (error) {
+            console.error("Error canceling order:", error);
+            alert("An error occurred while canceling the order. Please try again.");
+        } finally {
+            closeModal();
+        }
+    };
+
+    // Open modal and set selected order ID
+    const openModal = (orderId) => {
+        setSelectedOrderId(orderId);
+        setModalIsOpen(true);
+    };
+
+    // Close modal
+    const closeModal = () => {
+        setModalIsOpen(false);
+        setSelectedOrderId(null);
+    };
+
     useEffect(() => {
         if (token) {
             loadOrderData();
         }
     }, [token]);
 
+    // Toggle order details visibility
     const toggleDetails = (index) => {
         setShowDetails(prevState => ({
             ...prevState,
@@ -61,7 +104,6 @@ const MyOrders = () => {
                                     <p className="mt-1">
                                         Payment: <span className="text-gray-800 font-semibold">{order.paymentMethod === "COD" ? "Cash on Delivery" : order.paymentMethod}</span>
                                     </p>
-
                                 </div>
                             </div>
 
@@ -78,7 +120,12 @@ const MyOrders = () => {
                                 <div className='flex flex-col'>
                                     <button onClick={loadOrderData} className='border border-primary px-4 py-2 text-sm font-semibold rounded-sm hover:bg-green-200'>Track Order</button>
                                     {order.status === 'Order Placed' && (
-                                        <button onClick={loadOrderData} className='border border-red-500 px-4 py-2 text-sm font-semibold rounded-sm mt-3 hover:bg-red-200'>Cancel Order</button>
+                                        <button
+                                            onClick={() => openModal(order.id)}
+                                            className='border border-red-500 px-4 py-2 text-sm font-semibold rounded-sm mt-3 hover:bg-red-200'
+                                        >
+                                            Cancel Order
+                                        </button>
                                     )}
                                     <button onClick={() => toggleDetails(index)} className='border border-blue-500 px-4 py-2 text-sm font-semibold rounded-sm mt-3 hover:bg-blue-200'>
                                         {showDetails[index] ? 'Hide' : 'Show more'}
@@ -113,6 +160,37 @@ const MyOrders = () => {
                     </div>
                 ))}
             </div>
+
+            {/* Modal for Cancel Order */}
+            <Modal
+                isOpen={modalIsOpen}
+                onRequestClose={closeModal}
+                style={{
+                    content: {
+                        top: '50%',
+                        left: '50%',
+                        right: 'auto',
+                        bottom: 'auto',
+                        marginRight: '-50%',
+                        transform: 'translate(-50%, -50%)',
+                        padding: '20px',
+                        borderRadius: '10px',
+                        width: '400px',
+                        textAlign: 'center',
+                    },
+                    overlay: {
+                        backgroundColor: 'rgba(0, 0, 0, 0.5)', // Semi-transparent black
+                        zIndex: 1000, // Ensure it appears above other content
+                    },
+                }}
+            >
+                <h2 className='font-semibold'>Cancel Order</h2>
+                <p>Are you sure you want to cancel this order?</p>
+                <div className="flex justify-between mt-4">
+                    <button onClick={cancelOrder} className="px-4 py-2 bg-red-500 text-white rounded hover:bg-red-600">Yes, Cancel</button>
+                    <button onClick={closeModal} className="px-4 py-2 bg-gray-300 rounded hover:bg-gray-400">No, Keep</button>
+                </div>
+            </Modal>
         </div>
     );
 };
