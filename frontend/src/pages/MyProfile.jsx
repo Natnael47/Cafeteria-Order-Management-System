@@ -10,9 +10,9 @@ const MyProfile = () => {
     const [editedData, setEditedData] = useState({});
 
     useEffect(() => {
-        // Set initial editable copy of user data
-        setEditedData(userData || {});
+        setEditedData({ ...userData, phone: userData.phone || '' }); // Ensures phone is initialized
     }, [userData]);
+
 
     // Function to check if there are any changes
     const hasChanges = () => {
@@ -86,16 +86,41 @@ const MyProfile = () => {
                     <p className='font-medium'>Phone:</p>
                     {
                         isEdit ? (
-                            <input
-                                className='bg-white max-w-52 border-2 border-gray-500 rounded'
-                                type='text'
-                                value={editedData.phone || ''}
-                                onChange={e => setEditedData(prev => ({ ...prev, phone: e.target.value }))}
-                            />
+                            <div className="flex flex-col gap-1">
+                                <div className="flex items-center border border-gray-300 rounded-md px-2 py-1 focus-within:ring focus-within:ring-green-500">
+                                    <span className="text-gray-500 font-medium text-lg">+251</span>
+                                    <input
+                                        id="phone-input"
+                                        className="flex-1 outline-none border-none text-lg pl-2 bg-white"
+                                        type="text"
+                                        placeholder="912345678"
+                                        value={editedData.phone?.startsWith("+251") ? editedData.phone.slice(5) : editedData.phone || ''}
+                                        onChange={(e) => {
+                                            let value = e.target.value;
+
+                                            // Remove non-digit characters
+                                            value = value.replace(/\D/g, "");
+
+                                            // If the number starts with "0", limit to 10 digits
+                                            if (value.startsWith("0")) {
+                                                value = value.slice(1); // Remove the leading "0"
+                                            }
+
+                                            // Limit to a maximum of 9 digits (after "0" is removed if present)
+                                            value = value.slice(0, 9);
+
+                                            // Update the editedData state with the full formatted phone number
+                                            setEditedData(prev => ({ ...prev, phone: `+251 ${value}` }));
+                                        }}
+                                        required
+                                    />
+                                </div>
+                            </div>
                         ) : (
                             <p className='text-blue-400'>{userData.phone}</p>
                         )
                     }
+
 
                     <p className='font-medium'>Address:</p>
                     <div className={`flex flex-col ${isEdit ? 'gap-2' : 'gap-1'}`}>

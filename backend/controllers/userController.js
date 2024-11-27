@@ -129,22 +129,36 @@ const updateUserProfile = async (req, res) => {
   const { userId, firstName, lastName, gender, address, dob, phone } = req.body;
 
   try {
-    // Check for missing fields
-    if (!firstName || !lastName || !gender || !dob || !phone) {
-      return res.json({ success: false, message: "Missing required fields" });
+    // Fetch existing user data
+    const existingUser = await prisma.user.findUnique({
+      where: { id: parseInt(userId, 10) },
+    });
+
+    if (!existingUser) {
+      return res
+        .status(404)
+        .json({ success: false, message: "User not found" });
     }
+
+    // Merge existing data with new data, prioritizing new data
+    const updatedData = {
+      firstName: firstName || existingUser.firstName,
+      lastName: lastName || existingUser.lastName,
+      gender: gender || existingUser.gender,
+      dob: dob || existingUser.dob,
+      phone: phone || existingUser.phone,
+      address:
+        address !== undefined
+          ? typeof address === "string"
+            ? JSON.parse(address)
+            : address
+          : existingUser.address, // Preserve existing address if not provided
+    };
 
     // Update the user profile
     const updatedUser = await prisma.user.update({
       where: { id: parseInt(userId, 10) },
-      data: {
-        firstName,
-        lastName,
-        gender,
-        dob,
-        phone,
-        address: typeof address === "string" ? JSON.parse(address) : address,
-      },
+      data: updatedData,
     });
 
     res.json({
