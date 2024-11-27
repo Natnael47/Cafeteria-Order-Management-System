@@ -5,6 +5,7 @@ import {
   PlaceOrderStripe,
   acceptOrder,
   allOrders,
+  cancelOrder,
   completeOrder,
   displayOrdersForChef,
   updateStatus,
@@ -24,6 +25,7 @@ orderRouter.post("/status", adminAuth, updateStatus);
 orderRouter.post("/place", authUser, PlaceOrder);
 orderRouter.post("/stripe", authUser, PlaceOrderStripe);
 orderRouter.post("/razorpay", authUser, PlaceOrderRazorpay);
+orderRouter.post("/cancel", authUser, cancelOrder);
 
 //user features
 orderRouter.post("/user-orders", authUser, userOrders);

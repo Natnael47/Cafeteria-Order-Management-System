@@ -227,9 +227,42 @@ const PlaceOrderRazorpay = async (req, res) => {
   });
 };
 
+// canceling orders before they get to chef
+const cancelOrder = async (req, res) => {
+  try {
+    const { orderId } = req.body;
+
+    if (!orderId) {
+      return res.json({
+        success: false,
+        message: "Order ID is required",
+      });
+    }
+
+    // Update the order status to "canceled"
+    const updatedOrder = await prisma.order.update({
+      where: { id: parseInt(orderId) },
+      data: { status: "Canceled" },
+    });
+
+    res.json({
+      success: true,
+      message: "Order has been canceled successfully",
+      order: updatedOrder,
+    });
+  } catch (error) {
+    console.error("Error canceling order:", error);
+    res.json({
+      success: false,
+      message: error.message,
+    });
+  }
+};
+
 export {
   acceptOrder,
   allOrders,
+  cancelOrder,
   completeOrder,
   displayOrdersForChef,
   PlaceOrder,
