@@ -40,6 +40,9 @@ const Navbar = () => {
                 <img className='w-36 sm:w-40 cursor-pointer' src={assets.logo2} alt="" />
                 <p className='border px-2.5 py-0.5 rounded-full border-black font-semibold m-4 text-black'>{cToken ? 'Chef' : 'Inventory'}</p>
             </div>
+            <div>
+                <p>notification</p>
+            </div>
             <button onClick={logout} className='bg-black text-white text-sm px-10 py-2 rounded-full font-semibold'>Logout</button>
         </div>
     )

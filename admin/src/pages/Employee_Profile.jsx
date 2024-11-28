@@ -392,7 +392,7 @@ const Employee_Profile = () => {
                             <p>{formData.about}</p>
                         </div>
                         <button onClick={handleEditToggle} className="px-5 py-2 mt-5 bg-blue-600 rounded text-white">Edit</button>
-                        <button onClick={openModal} className="px-5 py-2 bg-red-600 rounded text-white">Delete</button>
+                        <button onClick={openModal} className="px-5 py-2 bg-red-600 rounded ml-2 text-white">Delete</button>
                     </div>
                 )}
             </div>
