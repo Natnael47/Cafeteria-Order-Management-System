@@ -1,37 +1,42 @@
+import { BookUser, ChefHat, ClipboardList, House, ShoppingBasket, Users } from 'lucide-react'
 import React from 'react'
 import { NavLink } from 'react-router-dom'
 import { assets } from '../assets/assets'
 
 const Sidebar = () => {
+
+    const iconSize = 28; // Adjust this value to set the size of the icons
+    const iconColor = '#000000'; // Set your desired icon color here (e.g., dark gray)
+
     return (
         <div className='min-h-[105vh] bg-white border-r'>
             <div className='text-black mt-5'>
                 <NavLink to='/' className={({ isActive }) => `flex items-center gap-3 py-3.5 px-3 md:px-9 md:min-w-72 cursor-pointer ${isActive ? 'bg-[#DDF7DF] border-r-4 border-primary' : ''}`}>
-                    <img src={assets.home_icon} alt='' />
+                    <House size={iconSize} color={iconColor} />
                     <p className='hidden md:block'>Dashboard</p>
                 </NavLink>
                 <NavLink to='/list' className={({ isActive }) => `flex items-center gap-3 py-3.5 px-3 md:px-9 md:min-w-72 cursor-pointer ${isActive ? 'bg-[#DDF7DF] border-r-4 border-primary' : ''}`}>
-                    <img src={assets.order_icon} alt='' />
+                    <ShoppingBasket size={iconSize} color={iconColor} />
                     <p className='hidden md:block'>Food Items</p>
                 </NavLink>
                 <NavLink to='/orders' className={({ isActive }) => `flex items-center gap-3 py-3.5 px-3 md:px-9 md:min-w-72 cursor-pointer ${isActive ? 'bg-[#DDF7DF] border-r-4 border-primary' : ''}`}>
-                    <img src={assets.chef_icon} alt='' />
+                    <ChefHat size={iconSize} color={iconColor} />
                     <p className='hidden md:block'>Orders</p>
                 </NavLink>
                 <NavLink to='/add-employees' className={({ isActive }) => `flex items-center gap-3 py-3.5 px-3 md:px-9 md:min-w-72 cursor-pointer ${isActive ? 'bg-[#DDF7DF] border-r-4 border-primary' : ''}`}>
-                    <img src={assets.add_icon} alt='' />
+                    <img src={assets.add_icon} alt="" />
                     <p className='hidden md:block'>Add Employees</p>
                 </NavLink>
                 <NavLink to='/employees-list' className={({ isActive }) => `flex items-center gap-3 py-3.5 px-3 md:px-9 md:min-w-72 cursor-pointer ${isActive ? 'bg-[#DDF7DF] border-r-4 border-primary' : ''}`}>
-                    <img src={assets.employee_icon} alt='' />
+                    <BookUser size={iconSize} color={iconColor} />
                     <p className='hidden md:block'>Employee List</p>
                 </NavLink>
                 <NavLink to='/reports' className={({ isActive }) => `flex items-center gap-3 py-3.5 px-3 md:px-9 md:min-w-72 cursor-pointer ${isActive ? 'bg-[#DDF7DF] border-r-4 border-primary' : ''}`}>
-                    <img src={assets.report_icon} alt='' />
+                    <ClipboardList size={iconSize} color={iconColor} />
                     <p className='hidden md:block'>Reports</p>
                 </NavLink>
                 <NavLink to='/users' className={({ isActive }) => `flex items-center gap-3 py-3.5 px-3 md:px-9 md:min-w-72 cursor-pointer ${isActive ? 'bg-[#DDF7DF] border-r-4 border-primary' : ''}`}>
-                    <img src={assets.employee_icon} alt='' />
+                    <Users size={iconSize} color={iconColor} />
                     <p className='hidden md:block'>Users</p>
                 </NavLink>
             </div>
