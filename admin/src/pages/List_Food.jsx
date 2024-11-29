@@ -218,7 +218,7 @@ const List = () => {
                 {/* Search Bar */}
                 <input
                     type="text"
-                    placeholder="Search item name"
+                    placeholder="Filter item name"
                     value={searchTerm}
                     onChange={(e) => setSearchTerm(e.target.value)}
                     className="border border-gray-300 rounded px-4 py-2"
