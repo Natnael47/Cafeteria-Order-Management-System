@@ -183,27 +183,48 @@ const List = () => {
         .sort((a, b) => a.name.localeCompare(b.name));
 
     return (
-        <div className="flex flex-col m-5 w-full">
-            <p className="mb-3 text-lg font-semibold">All Foods List</p>
-            <div className="flex items-center justify-between mb-3 max-w-5.3xl">
-                <div className="flex items-center gap-4">
-                    <span className="text-gray-700">{getFormattedDate()}</span>
-                    <input
-                        type="text"
-                        placeholder="Search item name"
-                        value={searchTerm}
-                        onChange={(e) => setSearchTerm(e.target.value)}
-                        className="border border-gray-300 rounded px-3 py-1 focus:outline-none focus:ring-2 focus:ring-blue-500"
-                    />
+        <div className="flex flex-col m-5 max-w-6xl w-full">
+            {/* Header */}
+            <div className="flex items-center justify-between mb-6">
+                <h1 className="text-2xl font-semibold text-gray-700">Food List</h1>
+                <div className="flex items-center space-x-4">
+                    {/* New Food Button */}
+                    <button
+                        className="px-4 py-2 bg-green-500 text-white rounded hover:bg-green-600"
+                        onClick={() => navigate('/add')}
+                    >
+                        + New
+                    </button>
+                    {/* Icon Button */}
+                    <button className="p-2 bg-gray-200 rounded hover:bg-gray-300">
+                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" className="w-5 h-5">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M4 8h16M4 16h16" />
+                        </svg>
+                    </button>
                 </div>
-                <button
-                    className="bg-primary text-white rounded px-4 py-2 hover:bg-green-600 transition-colors w-36"
-                    onClick={() => navigate('/add')}
-                >
-                    Add Food
-                </button>
             </div>
-            <div className="bg-[#F3F4F6] rounded w-full max-w-5.3xl max-h-[88vh] overflow-scroll">
+
+            {/* Search and Show */}
+            <div className="flex items-center justify-between mb-4">
+                <div className="flex items-center space-x-2">
+                    <label className="text-gray-700">Show</label>
+                    <select className="border border-gray-300 rounded px-2 py-1">
+                        <option value="10">10</option>
+                        <option value="25">25</option>
+                        <option value="50">50</option>
+                    </select>
+                    <label className="text-gray-700">entries</label>
+                </div>
+                {/* Search Bar */}
+                <input
+                    type="text"
+                    placeholder="Search item name"
+                    value={searchTerm}
+                    onChange={(e) => setSearchTerm(e.target.value)}
+                    className="border border-gray-300 rounded px-4 py-2"
+                />
+            </div>
+            <div className="bg-[#F3F4F6] rounded w-full max-w-6xl max-h-[83vh] overflow-scroll">
                 <div>
                     <div className="grid grid-cols-[0.5fr_0.9fr_0.8fr_0.8fr_0.5fr_0.5fr] items-center gap-2 p-3 border border-black text-sm font-medium bg-gray-700 text-white sm:grid">
                         <b>Image</b>
