@@ -7,7 +7,7 @@ import { AdminContext } from '../context/AdminContext';
 
 const AddEmployee = () => {
 
-    const { token } = useContext(AdminContext);
+    const { token, navigate } = useContext(AdminContext);
 
     const [empImg, setEmpImg] = useState(false);
     const [firstName, setFirstName] = useState('');
@@ -73,7 +73,7 @@ const AddEmployee = () => {
                 setAddress1('');
                 setAddress2('');
                 setAbout('');
-
+                () => navigate('/employees-list')
             } else {
                 toast.error(data.message);
             }
@@ -228,7 +228,8 @@ const AddEmployee = () => {
                     <textarea onChange={(e) => setAbout(e.target.value)} value={about} className='w-full px-4 pt-2 border rounded' placeholder='Any Specialty about Employee' rows={5} required />
                 </div>
 
-                <button className='bg-black px-10 py-3 mt-4 text-white rounded-md hover:bg-primary'>Add Employee</button>
+                <button className='bg-green-400 px-10 py-3 mt-4 text-white rounded-md hover:bg-primary'>Add Employee</button>
+                <button className='bg-gray-300 px-10 py-3 mt-4 ml-3 text-gray-900 rounded-md hover:bg-gray-400' onClick={() => navigate('/employees-list')}>Cancel</button>
 
             </div>
 
