@@ -21,6 +21,7 @@ const List = () => {
         image: "",
         description: "",
         menuStatus: "",
+        prepTime: ""
     });
     const [originalFood, setOriginalFood] = useState(null);
     const [image, setImage] = useState(false);
@@ -92,7 +93,7 @@ const List = () => {
     };
 
     const handleInputChange = (e) => {
-        const { name, value, type, checked } = e.target;
+        const { name, value, type, checked, prepTime } = e.target;
         const newValue = type === "checkbox" ? checked : value;
         setEditFood((prevState) => {
             const updatedFood = { ...prevState, [name]: newValue };
@@ -119,6 +120,7 @@ const List = () => {
         formData.append("price", editFood.price);
         formData.append("description", editFood.description);
         formData.append("menuStatus", editFood.menuStatus ? "1" : "0");
+        formData.append("prepTime", editFood.prepTime);
         if (editFood.image instanceof File) {
             formData.append("image", editFood.image);
         }
@@ -346,6 +348,18 @@ const List = () => {
                                                                 checked={editFood.menuStatus}
                                                                 onChange={handleInputChange}
                                                                 className="ml-2 w-5 h-5"
+                                                            />
+                                                        </div>
+                                                        <div className="mb-2">
+                                                            <label className="block text-sm font-medium mb-1">
+                                                                Prep Time
+                                                            </label>
+                                                            <input
+                                                                type="number"
+                                                                name="prepTime"
+                                                                value={editFood.prepTime}
+                                                                onChange={handleInputChange}
+                                                                className="w-full border p-2 rounded"
                                                             />
                                                         </div>
 

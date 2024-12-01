@@ -13,7 +13,8 @@ const Add = () => {
         name: "",
         description: "",
         price: "",
-        category: "Salad"
+        category: "Salad",
+        prepTime: "",
     });
 
     const onChangeHandler = (event) => {
@@ -29,6 +30,7 @@ const Add = () => {
         formData.append("description", data.description);
         formData.append("price", Number(data.price));
         formData.append("category", data.category);
+        formData.append("prepTime", data.prepTime); // Added prepTime to formData
         formData.append("image", image);
 
         const response = await axios.post(backendUrl + "/api/food/add", formData, { headers: { token } });
@@ -37,10 +39,11 @@ const Add = () => {
                 name: "",
                 description: "",
                 price: "",
-                category: "Salad"
+                category: "Salad",
+                prepTime: "",
             });
             setImage(false);
-            navigate('/list')
+            navigate('/list');
             toast.success("Food added successfully");
         } else {
             toast.error("Failed to add");
@@ -85,6 +88,12 @@ const Add = () => {
                     <div>
                         <p className="mb-2">Price</p>
                         <input className="w-full px-3 py-2 sm:w-[120px] max-h-[40px]" onChange={onChangeHandler} value={data.price} type='number' name='price' placeholder='$20' required />
+                    </div>
+
+                    {/* Prep Time Input */}
+                    <div>
+                        <p className="mb-2">Prep Time (in minutes)</p>
+                        <input className="w-full px-3 py-2 sm:w-[120px] max-h-[40px]" onChange={onChangeHandler} value={data.prepTime} type='number' name='prepTime' placeholder='30' />
                     </div>
                 </div>
 
