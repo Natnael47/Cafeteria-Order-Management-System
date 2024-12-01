@@ -24,6 +24,8 @@ const MyOrders = () => {
             const response = await axios.post(`${backendUrl}/api/order/user-orders`, {}, { headers: { token } });
             if (response.data.success) {
                 setOrders(response.data.orders.reverse());
+                console.log(response.data.orders);
+
             }
         } catch (error) {
             console.error("Error loading orders:", error);
@@ -150,7 +152,19 @@ const MyOrders = () => {
                                                     {item.quantity} {item.name}{item.quantity > 1 ? "'s" : ""}
                                                 </p>
                                                 <p>Price: ${item.price * item.quantity}</p>
-                                                <p>Status: {item.status}</p>
+                                                <p className='font-semibold'>
+                                                    Cooking Status:_
+                                                    <span
+                                                        className={`${order.orderItem.find(orderItem => orderItem.foodId === item.id)?.cookingStatus === 'Done'
+                                                            ? 'text-green-600'
+                                                            : 'text-red-600'
+                                                            }`}
+                                                    >
+                                                        {order.orderItem.find(orderItem => orderItem.foodId === item.id)?.cookingStatus || 'Not Available'}
+                                                    </span>
+                                                </p>
+
+
                                             </div>
                                         </div>
                                     ))}

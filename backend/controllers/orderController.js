@@ -314,17 +314,27 @@ const allOrders = async (req, res) => {
   }
 };
 
-// Fetch user orders for frontend
+// Fetch user orders with cooking status for frontend
 const userOrders = async (req, res) => {
   try {
     const { userId } = req.body;
+
+    // Fetch orders along with their associated order items
     const orders = await prisma.order.findMany({
       where: { userId },
+      include: {
+        orderItem: {
+          select: {
+            foodId: true,
+            cookingStatus: true,
+          },
+        },
+      },
     });
 
     res.json({ success: true, orders });
   } catch (error) {
-    console.log(error);
+    console.error("Error fetching user orders:", error);
     res.json({ success: false, message: error.message });
   }
 };
