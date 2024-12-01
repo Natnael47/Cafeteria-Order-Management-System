@@ -107,6 +107,7 @@ const StoreContextProvider = (props) => {
         }
     };
 
+
     const addToCart = async (itemId) => {
         const id = Number(itemId);
         setCartItems((prev) => {

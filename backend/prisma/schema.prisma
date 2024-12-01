@@ -60,44 +60,85 @@ model feedback {
 
 // Order model - Represents user orders
 model order {
-  id            Int       @id @default(autoincrement()) // Unique identifier for each order
-  userId        Int // Foreign key to User table
-  items         Json // List of items in the order (stored as JSON)
-  amount        Float // Total amount of the order
-  address       Json // Delivery address for the order (stored as JSON)
-  status        String    @default("Order Placed") @db.VarChar(255) // Order status
-  paymentMethod String    @db.VarChar(255) // Payment method used for the order
-  isPaid        Boolean   @default(false) // Indicates if payment is completed
-  date          DateTime  @default(now()) // Date when the order was placed
-  user          user      @relation(fields: [userId], references: [id], map: "Order_userId_fkey")
-  payment       payment[] // Relation to payment table
+  id                      Int       @id @default(autoincrement()) // Unique identifier for each order
+  userId                  Int // Foreign key to User table
+  items                   Json // List of items in the order (stored as JSON)
+  amount                  Float // Total amount of the order
+  address                 Json // Delivery address for the order (stored as JSON)
+  status                  String    @default("Order Placed") @db.VarChar(255) // Order status
+  paymentMethod           String    @db.VarChar(255) // Payment method used for the order
+  isPaid                  Boolean   @default(false) // Indicates if payment is completed
+  priority                String    @default("Normal") @db.VarChar(50) // Priority of the order ("Normal", "High", "Urgent")
+  date                    DateTime  @default(now()) // Date when the order was placed
+  totalPrepTime           Int       @default(0) // Preparation time in minutes
+  estimatedCompletionTime DateTime? // Calculated completion time for the order
+  chefId                  Int? // Foreign key to Employee (Chef) table
+
+  user      user        @relation(fields: [userId], references: [id], map: "Order_userId_fkey")
+  payment   payment[] // Relation to payment table
+  orderItem orderItem[]
+  orderLog  orderLog[]
 
   @@index([userId], map: "Order_userId_fkey")
+}
+
+model orderItem {
+  id            Int       @id @default(autoincrement())
+  orderId       Int // Foreign key to the order table
+  foodId        Int // Foreign key to the food table
+  quantity      Int // Quantity of the food item
+  price         Float // Price of the food item at the time of order
+  cookingStatus String    @default("Not Started") // Cooking status of the item
+  startedAt     DateTime? // When cooking started
+  completedAt   DateTime? // When cooking was completed
+
+  order order @relation(fields: [orderId], references: [id], onDelete: Cascade)
+  food  food  @relation(fields: [foodId], references: [id], onDelete: Cascade)
 }
 
 // Payment model - Represents order payments
 model payment {
   id            Int      @id @default(autoincrement()) // Unique identifier for each payment
-  amount        Float // Payment amount
+  amount        Float // Payment amount before discounts and taxes
+  discount      Float    @default(0) // Discount applied to the order
+  tax           Float    @default(0) // Tax applied to the order
+  totalAmount   Float // Final amount after tax and discount
   method        String   @db.VarChar(255) // Payment method (e.g., card, cash)
   date          DateTime @default(now()) // Date when the payment was made
   status        String   @default("Pending") @db.VarChar(100) // Payment status
   transactionId String?  @db.VarChar(255) // Optional transaction ID
   orderId       Int // Foreign key to Order table
-  order         order    @relation(fields: [orderId], references: [id], map: "Payment_orderId_fkey")
+
+  order order @relation(fields: [orderId], references: [id], map: "Payment_orderId_fkey")
 
   @@index([orderId], map: "Payment_orderId_fkey")
 }
 
+// New OrderLog model for activity logging
+model orderLog {
+  id         Int      @id @default(autoincrement()) // Unique identifier for each log entry
+  orderId    Int // Foreign key to the Order table
+  status     String   @db.VarChar(255) // Status change (e.g., "Order Placed", "Cooking", "Completed")
+  updatedBy  String   @db.VarChar(255) // The person or system making the change
+  changeTime DateTime @default(now()) // Timestamp of the change
+  comments   String?  @db.Text // Optional comments or additional details
+
+  order order @relation(fields: [orderId], references: [id], onDelete: Cascade)
+
+  @@index([orderId], map: "OrderLog_orderId_fkey")
+}
+
 // Food model - Represents food items
 model food {
-  id          Int     @id @default(autoincrement()) // Unique identifier for each food item
-  name        String  @db.VarChar(255) // Name of the food item
-  description String  @db.VarChar(255) // Description of the food item
+  id          Int         @id @default(autoincrement()) // Unique identifier for each food item
+  name        String      @db.VarChar(255) // Name of the food item
+  description String      @db.VarChar(255) // Description of the food item
   price       Float // Price of the food item
-  image       String  @db.VarChar(255) // URL or path to food item image
-  category    String  @db.VarChar(255) // Category of the food item (e.g., appetizer, dessert)
-  menuStatus  Boolean @default(true) // Indicates if the item is available on the menu
+  image       String      @db.VarChar(255) // URL or path to food item image
+  category    String      @db.VarChar(255) // Category of the food item (e.g., appetizer, dessert)
+  menuStatus  Boolean     @default(true) // Indicates if the item is available on the menu
+  prepTime    Int         @default(0) // Preparation time in minutes
+  orderItem   orderItem[]
 }
 
 model inventory {

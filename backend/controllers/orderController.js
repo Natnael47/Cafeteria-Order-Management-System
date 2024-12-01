@@ -31,14 +31,32 @@ const displayOrdersForChef = async (req, res) => {
 // Function for chef to accept an order and start preparing it
 const acceptOrder = async (req, res) => {
   try {
-    const { orderId } = req.body;
+    const { orderId, chefId } = req.body; // chefId is passed from the frontend
 
-    await prisma.order.update({
+    // First, update the order's status to 'preparing' and assign the chef
+    const updatedOrder = await prisma.order.update({
       where: { id: orderId },
-      data: { status: "preparing" },
+      data: {
+        status: "preparing",
+        chefId: chefId, // Set chef ID (cafe ID)
+        estimatedCompletionTime: new Date(Date.now() + 60 * 60 * 1000), // Example: adding 1 hour for estimated time
+      },
     });
 
-    res.json({ success: true, message: "Order accepted, preparing" });
+    // Update each orderItem with 'cookingStatus' and 'startedAt'
+    await prisma.orderItem.updateMany({
+      where: { orderId: orderId },
+      data: {
+        cookingStatus: "Preparing",
+        startedAt: new Date(),
+      },
+    });
+
+    res.json({
+      success: true,
+      message: "Order accepted and preparing started",
+      data: updatedOrder,
+    });
   } catch (error) {
     console.log(error);
     res.json({ success: false, message: error.message });
@@ -67,27 +85,89 @@ const PlaceOrder = async (req, res) => {
   try {
     const { userId, items, amount, address } = req.body;
 
+    // Validate and calculate the total prepTime from all items in the order
+    const totalPrepTimeInMinutes = items.reduce((total, item) => {
+      // Make sure prepTime is valid (convert to number if necessary)
+      const prepTime = parseInt(item.prepTime, 10);
+      return total + (isNaN(prepTime) ? 0 : prepTime); // Sum up prepTimes, default to 0 if invalid
+    }, 0);
+
+    // Get the current time (this will be the "start time" for the new order)
+    const currentTime = new Date();
+
+    // Find all "Order Placed" orders before the current order (to calculate the estimated completion time)
+    const previousOrders = await prisma.order.findMany({
+      where: {
+        status: "Order Placed",
+        date: {
+          lt: currentTime, // Orders placed before the current order
+        },
+      },
+      include: {
+        orderItem: {
+          include: {
+            food: true, // Ensure the food data is included for each order item
+          },
+        },
+      },
+    });
+
+    // Calculate the total prep time of all previous orders
+    let totalPreviousOrdersPrepTime = 0;
+    previousOrders.forEach((order) => {
+      order.orderItem.forEach((item) => {
+        if (item.food && item.food.prepTime) {
+          totalPreviousOrdersPrepTime += item.food.prepTime; // Add up prepTime for each item
+        }
+      });
+    });
+
+    // Estimate the completion time by adding the total prep time of previous orders and the current one
+    const totalTimeInMinutes =
+      totalPreviousOrdersPrepTime + totalPrepTimeInMinutes;
+    const estimatedCompletionTime = new Date(
+      currentTime.getTime() + totalTimeInMinutes * 60000
+    ); // Convert minutes to milliseconds
+
+    // Create the order in the database
     const newOrder = await prisma.order.create({
       data: {
         userId,
         items,
         address,
         amount,
-        paymentMethod: "COD",
+        paymentMethod: "COD", // Cash on Delivery
         isPaid: false,
-        date: new Date(),
-        status: "Order Placed", // Set initial status to "Order Placed"
+        date: currentTime,
+        status: "Order Placed", // Initial status
+        estimatedCompletionTime, // Set the estimated completion time
+        totalPrepTime: totalPrepTimeInMinutes, // Save the total prep time in minutes
       },
     });
 
+    // Insert items into the orderItem table
+    const orderItems = items.map((item) => ({
+      orderId: newOrder.id, // Link the item to the new order
+      foodId: item.id, // Link the item to the food table
+      quantity: item.quantity,
+      price: item.price, // Price from the frontend item data
+      cookingStatus: "Not Started", // Default cooking status
+    }));
+
+    // Add orderItems to the database
+    await prisma.orderItem.createMany({
+      data: orderItems,
+    });
+
+    // Clear the user's cart after placing an order
     await prisma.user.update({
       where: { id: userId },
-      data: { cartData: {} },
+      data: { cartData: {} }, // Clear the user's cart after placing an order
     });
 
     res.json({ success: true, message: "Order Placed successfully" });
   } catch (error) {
-    console.log(error);
+    console.error(error);
     res.json({ success: false, message: "Error placing order" });
   }
 };
