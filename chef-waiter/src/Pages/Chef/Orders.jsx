@@ -4,36 +4,37 @@ import { assets } from "../../../../admin/src/assets/assets";
 import { backendUrl } from "../../App";
 import { ChefContext } from "../../Context/ChefContext";
 
+// Updated ChefOrders Component
 const ChefOrders = () => {
     const [orders, setOrders] = useState([]); // List of all orders
     const [currentOrderItems, setCurrentOrderItems] = useState([]); // Items of the current accepted order
     const [currentOrderId, setCurrentOrderId] = useState(null); // ID of the current accepted order
     const { cToken } = useContext(ChefContext);
 
-    // Fetch orders from the API
-    useEffect(() => {
-        const fetchOrders = async () => {
-            try {
-                const response = await axios.get(`${backendUrl}/api/order/chef-orders`, {
-                    headers: { cToken },
-                });
-                if (response.data.success) {
-                    setOrders(response.data.orders);
-                } else {
-                    console.error("Failed to fetch orders.");
-                }
-            } catch (error) {
-                console.error("Error fetching orders:", error.message);
+    // Define fetchOrders function outside of useEffect
+    const fetchOrders = async () => {
+        try {
+            const response = await axios.get(`${backendUrl}/api/order/chef-orders`, {
+                headers: { cToken },
+            });
+            if (response.data.success) {
+                setOrders(response.data.orders);
+            } else {
+                console.error("Failed to fetch orders.");
             }
-        };
+        } catch (error) {
+            console.error("Error fetching orders:", error.message);
+        }
+    };
 
+    // Fetch orders when component mounts
+    useEffect(() => {
         fetchOrders();
     }, [cToken]);
 
     // Accept the order and fetch its items
     const acceptOrder = async (orderId) => {
         try {
-            // Accept the order
             const response = await axios.post(
                 `${backendUrl}/api/order/accept`,
                 { orderId },
@@ -41,18 +42,15 @@ const ChefOrders = () => {
             );
 
             if (response.data.success) {
-                // Fetch the order items for the accepted order
                 const itemsResponse = await axios.post(
                     `${backendUrl}/api/order/order-items`,
                     { orderId },
                     { headers: { cToken } }
                 );
-                console.log(itemsResponse.data);
-
 
                 if (itemsResponse.data.success) {
                     setCurrentOrderItems(itemsResponse.data.items);
-                    setCurrentOrderId(orderId); // Set current order ID to indicate we're viewing this order
+                    setCurrentOrderId(orderId);
                 } else {
                     console.error("Failed to fetch order items.");
                 }
@@ -75,7 +73,11 @@ const ChefOrders = () => {
 
             if (response.data.success) {
                 setCurrentOrderItems((prevItems) =>
-                    prevItems.filter((item) => item.id !== itemId) // Remove the item after it's marked as completed
+                    prevItems.map((item) =>
+                        item.id === itemId
+                            ? { ...item, cookingStatus: "Done", completedAt: new Date() }
+                            : item
+                    )
                 );
             } else {
                 console.error("Failed to complete order item.");
@@ -85,32 +87,11 @@ const ChefOrders = () => {
         }
     };
 
-    // Complete the entire order
-    const completeOrder = async () => {
-        try {
-            const response = await axios.post(
-                `${backendUrl}/api/order/complete`,
-                { orderId: currentOrderId },
-                { headers: { cToken } }
-            );
-
-            if (response.data.success) {
-                setCurrentOrderItems([]); // Reset the order items after completing the order
-                setCurrentOrderId(null); // Reset the current order ID
-                // Fetch the updated list of orders
-                const ordersResponse = await axios.get(`${backendUrl}/api/order/chef-orders`, {
-                    headers: { cToken },
-                });
-
-                if (ordersResponse.data.success) {
-                    setOrders(ordersResponse.data.orders);
-                }
-            } else {
-                console.error("Failed to complete the order.");
-            }
-        } catch (error) {
-            console.error("Error completing the order:", error.message);
-        }
+    // Go back to the orders list and refresh orders
+    const completeOrder = () => {
+        setCurrentOrderItems([]);
+        setCurrentOrderId(null);
+        fetchOrders(); // Refresh the orders
     };
 
     return (
@@ -130,12 +111,18 @@ const ChefOrders = () => {
                                         <p className="text-sm">{item.description}</p>
                                         <p>Quantity: {item.quantity}</p>
                                     </div>
-                                    <button
-                                        onClick={() => completeItem(item.id)}
-                                        className="p-2 bg-green-500 text-white font-semibold rounded"
-                                    >
-                                        Done
-                                    </button>
+                                    {item.cookingStatus === "Done" ? (
+                                        <div className="p-2 text-green-500 font-semibold flex items-center">
+                                            <span>✔️ Completed</span>
+                                        </div>
+                                    ) : (
+                                        <button
+                                            onClick={() => completeItem(item.id)}
+                                            className="p-2 bg-green-500 text-white font-semibold rounded"
+                                        >
+                                            Done
+                                        </button>
+                                    )}
                                 </div>
                             ))
                         ) : (
@@ -236,3 +223,4 @@ const ChefOrders = () => {
 };
 
 export default ChefOrders;
+
