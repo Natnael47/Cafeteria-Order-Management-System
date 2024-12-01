@@ -31,14 +31,14 @@ const displayOrdersForChef = async (req, res) => {
 // Function for chef to accept an order and start preparing it
 const acceptOrder = async (req, res) => {
   try {
-    const { orderId, chefId } = req.body; // chefId is passed from the frontend
+    const { orderId, empId } = req.body; // chefId is passed from the frontend
 
     // First, update the order's status to 'preparing' and assign the chef
     const updatedOrder = await prisma.order.update({
       where: { id: orderId },
       data: {
         status: "preparing",
-        chefId: chefId, // Set chef ID (cafe ID)
+        chefId: empId, // Set chef ID (cafe ID)
         estimatedCompletionTime: new Date(Date.now() + 60 * 60 * 1000), // Example: adding 1 hour for estimated time
       },
     });
@@ -339,12 +339,65 @@ const cancelOrder = async (req, res) => {
   }
 };
 
+// Function to fetch order items for a specific order
+const getOrderItemsForChef = async (req, res) => {
+  try {
+    const { orderId } = req.body;
+
+    if (!orderId) {
+      return res.json({
+        success: false,
+        message: "Order ID is required",
+      });
+    }
+
+    // Fetch order items for the given order ID
+    const orderItems = await prisma.orderItem.findMany({
+      where: { orderId: parseInt(orderId) },
+      include: {
+        food: true, // Include food details
+      },
+    });
+
+    if (!orderItems.length) {
+      return res.json({
+        success: false,
+        message: "No items found for this order",
+      });
+    }
+
+    // Format the response with food item details and cooking status
+    const formattedOrderItems = orderItems.map((item) => ({
+      id: item.id,
+      foodName: item.food.name,
+      description: item.food.description,
+      price: item.price,
+      quantity: item.quantity,
+      cookingStatus: item.cookingStatus,
+      startedAt: item.startedAt,
+      completedAt: item.completedAt,
+    }));
+
+    res.json({
+      success: true,
+      items: formattedOrderItems,
+    });
+  } catch (error) {
+    console.error("Error fetching order items:", error);
+    res.json({
+      success: false,
+      message: error.message,
+    });
+  }
+};
+
 export {
   acceptOrder,
   allOrders,
   cancelOrder,
   completeOrder,
   displayOrdersForChef,
+  getOrderItemsForChef,
   PlaceOrder,
   PlaceOrderRazorpay,
   PlaceOrderStripe,
