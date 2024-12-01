@@ -15,6 +15,7 @@ const addFood = async (req, res) => {
         price: parseFloat(req.body.price),
         category: req.body.category,
         image: imageFilename,
+        prepTime: req.body.prepTime ? parseInt(req.body.prepTime) : 0, // Added prepTime
       },
     });
 
@@ -128,6 +129,10 @@ const updateFood = async (req, res) => {
       imageFilename = req.file.filename;
     }
 
+    const PrepTime = req.body.prepTime
+      ? parseInt(req.body.prepTime, 10)
+      : existingFood.prepTime;
+
     // Update menuStatus based on "1" or "0" (string) value from the request
     const menuStatus = req.body.menuStatus === "1";
 
@@ -141,6 +146,7 @@ const updateFood = async (req, res) => {
         category: req.body.category || existingFood.category,
         image: imageFilename,
         menuStatus: menuStatus,
+        prepTime: PrepTime,
       },
     });
 
