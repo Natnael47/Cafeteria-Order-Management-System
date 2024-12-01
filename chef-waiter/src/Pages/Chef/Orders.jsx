@@ -9,6 +9,8 @@ const ChefOrders = () => {
     const [orders, setOrders] = useState([]); // List of all orders
     const [currentOrderItems, setCurrentOrderItems] = useState([]); // Items of the current accepted order
     const [currentOrderId, setCurrentOrderId] = useState(null); // ID of the current accepted order
+    const [timeLeft, setTimeLeft] = useState(null); // Time left for the current order in seconds
+
     const { cToken } = useContext(ChefContext);
 
     // Define fetchOrders function outside of useEffect
@@ -49,6 +51,8 @@ const ChefOrders = () => {
                 );
 
                 if (itemsResponse.data.success) {
+                    const acceptedOrder = orders.find(order => order.id === orderId); // Find the accepted order
+                    setTimeLeft(acceptedOrder.totalPrepTime * 60); // Convert minutes to seconds
                     setCurrentOrderItems(itemsResponse.data.items);
                     setCurrentOrderId(orderId);
                 } else {
@@ -61,6 +65,20 @@ const ChefOrders = () => {
             console.error("Error accepting order:", error.message);
         }
     };
+
+    useEffect(() => {
+        let timer;
+        if (timeLeft > 0) {
+            timer = setInterval(() => {
+                setTimeLeft((prev) => prev - 1);
+            }, 1000);
+        } else if (timeLeft === 0) {
+            clearInterval(timer);
+        }
+
+        return () => clearInterval(timer); // Cleanup on component unmount or timer reset
+    }, [timeLeft]);
+
 
     // Mark an order item as completed
     const completeItem = async (itemId) => {
@@ -91,6 +109,7 @@ const ChefOrders = () => {
     const completeOrder = () => {
         setCurrentOrderItems([]);
         setCurrentOrderId(null);
+        setTimeLeft(null); // Reset timer
         fetchOrders(); // Refresh the orders
     };
 
@@ -98,6 +117,22 @@ const ChefOrders = () => {
         <div className="m-5 w-full">
             {currentOrderId ? (
                 <div>
+                    {/* Countdown Timer */}
+                    {timeLeft !== null && (
+                        <div className="text-center p-4 bg-yellow-100 text-lg font-bold mb-4">
+                            {timeLeft >= 3600
+                                ? `Time Remaining: ${Math.floor(timeLeft / 3600)}:${String(
+                                    Math.floor((timeLeft % 3600) / 60)
+                                ).padStart(2, '0')}:${String(timeLeft % 60).padStart(2, '0')} `
+                                : `Time Remaining: ${Math.floor(timeLeft / 60)}:${String(
+                                    timeLeft % 60
+                                ).padStart(2, '0')} `}
+                        </div>
+                    )}
+
+
+
+                    {/* Order Items Section */}
                     <p className="text-lg font-semibold">Order Items</p>
                     <div className="bg-[#F3F4F6] rounded w-full max-w-5.3xl max-h-[88vh] overflow-scroll">
                         {currentOrderItems.length > 0 ? (
@@ -131,11 +166,16 @@ const ChefOrders = () => {
                         <div className="text-center mt-4">
                             <button
                                 onClick={completeOrder}
-                                className="p-2 bg-blue-500 text-white font-semibold rounded"
+                                className={`p-2 font-semibold rounded ${currentOrderItems.every((item) => item.cookingStatus === "Done")
+                                    ? "bg-blue-500 text-white"
+                                    : "bg-gray-400 text-gray-700 cursor-not-allowed"
+                                    }`}
+                                disabled={!currentOrderItems.every((item) => item.cookingStatus === "Done")}
                             >
                                 Complete Order
                             </button>
                         </div>
+
                     </div>
                 </div>
             ) : (
