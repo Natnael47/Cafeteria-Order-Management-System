@@ -6,7 +6,7 @@ import {
   acceptOrder,
   allOrders,
   cancelOrder,
-  completeOrder,
+  completeOrderItem,
   displayOrdersForChef,
   getOrderItemsForChef,
   updateStatus,
@@ -36,7 +36,7 @@ orderRouter.post("/user-orders", authUser, userOrders);
 orderRouter.post("/verifyStripe", authUser, verifyStripe);
 
 // chef features
-orderRouter.post("/complete", completeOrder);
+orderRouter.post("/complete", empAuth, completeOrderItem);
 orderRouter.post("/accept", empAuth, acceptOrder);
 orderRouter.get("/chef-orders", empAuth, displayOrdersForChef);
 orderRouter.post("/order-items", empAuth, getOrderItemsForChef);

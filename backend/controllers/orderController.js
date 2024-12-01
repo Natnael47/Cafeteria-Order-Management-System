@@ -63,20 +63,71 @@ const acceptOrder = async (req, res) => {
   }
 };
 
-// Function for chef to mark an order as ready
-const completeOrder = async (req, res) => {
+// Function to update order item status and possibly complete the order
+const completeOrderItem = async (req, res) => {
   try {
-    const { orderId } = req.body;
+    const { itemId } = req.body;
 
-    await prisma.order.update({
-      where: { id: orderId },
-      data: { status: "ready" },
+    if (!itemId) {
+      return res.json({
+        success: false,
+        message: "Item ID is required",
+      });
+    }
+
+    // Find the order item by ID
+    const orderItem = await prisma.orderItem.findUnique({
+      where: { id: itemId },
     });
 
-    res.json({ success: true, message: "Order ready for delivery" });
+    if (!orderItem) {
+      return res.json({
+        success: false,
+        message: "Order item not found",
+      });
+    }
+
+    const { orderId } = orderItem;
+
+    // Update the cooking status and complete time of the order item
+    await prisma.orderItem.update({
+      where: { id: itemId },
+      data: {
+        cookingStatus: "Done",
+        completedAt: new Date(),
+      },
+    });
+
+    // Check if there are any other items in the same order still being prepared
+    const remainingItems = await prisma.orderItem.findMany({
+      where: {
+        orderId,
+        cookingStatus: {
+          not: "Done", // Find items not yet marked as "Done"
+        },
+      },
+    });
+
+    if (remainingItems.length === 0) {
+      // If all items are done, mark the order as complete
+      await prisma.order.update({
+        where: { id: orderId },
+        data: {
+          status: "Complete",
+        },
+      });
+    }
+
+    res.json({
+      success: true,
+      message: "Order item updated successfully",
+    });
   } catch (error) {
-    console.log(error);
-    res.json({ success: false, message: error.message });
+    console.error("Error updating order item status:", error);
+    res.json({
+      success: false,
+      message: error.message,
+    });
   }
 };
 
@@ -395,7 +446,7 @@ export {
   acceptOrder,
   allOrders,
   cancelOrder,
-  completeOrder,
+  completeOrderItem,
   displayOrdersForChef,
   getOrderItemsForChef,
   PlaceOrder,
