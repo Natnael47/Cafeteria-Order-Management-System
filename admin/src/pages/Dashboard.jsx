@@ -1,4 +1,5 @@
 import axios from 'axios';
+import { ListOrdered, Salad, ShoppingBag, SquareUser, Users } from 'lucide-react';
 import React, { useContext, useEffect, useState } from 'react';
 import { toast } from "react-toastify";
 import { backendUrl } from '../App';
@@ -10,6 +11,9 @@ const Dashboard = () => {
     const { token } = useContext(AdminContext);
 
     const [dashData, setDashData] = useState({ users: 0, employees: 0, orders: 0, latestOrders: [] });
+
+    const iconSize = 62; // Adjust this value to set the size of the icons
+    const iconColor = '#000000'; // Set your desired icon color here (e.g., dark gray)
 
     const getDashData = async () => {
         try {
@@ -36,7 +40,7 @@ const Dashboard = () => {
                 <div className='flex flex-row gap-3'>
 
                     <div className='flex items-center gap-2 bg-white p-4 min-w-52 border-2 rounded-md border-gray-100 cursor-pointer hover:scale-105 transition-all'>
-                        <img className='w-14' src={assets.patients_icon} alt="" />
+                        <SquareUser size={iconSize} color={iconColor} />
                         <div>
                             <p className='text-xl font-semibold text-gray-600'>{dashData.users}</p>
                             <p className='text-gray-400'>Customers</p>
@@ -44,7 +48,7 @@ const Dashboard = () => {
                     </div>
 
                     <div className='flex items-center gap-2 bg-white p-4 min-w-52 rounded-md border-2 border-gray-100 cursor-pointer hover:scale-105 transition-all'>
-                        <img className='w-14' src={assets.order_icon} alt="" />
+                        <ShoppingBag size={iconSize} color={iconColor} />
                         <div>
                             <p className='text-xl font-semibold text-gray-600'>{dashData.totalOrders}</p>
                             <p className='text-gray-400'>Orders</p>
@@ -52,7 +56,7 @@ const Dashboard = () => {
                     </div>
 
                     <div className='flex items-center gap-2 bg-white p-4 min-w-52 rounded-md border-2 border-gray-100 cursor-pointer hover:scale-105 transition-all'>
-                        <img className='w-14' src={assets.people_icon} alt="" />
+                        <Users size={iconSize} color={iconColor} />
                         <div>
                             <p className='text-xl font-semibold text-gray-600'>{dashData.employees}</p>
                             <p className='text-gray-400'>Employees</p>
@@ -60,7 +64,7 @@ const Dashboard = () => {
                     </div>
 
                     <div className='flex items-center gap-2 bg-white p-4 min-w-52 rounded-md border-2 border-gray-100 cursor-pointer hover:scale-105 transition-all'>
-                        <img className='w-14' src={assets.picnic_icon} alt="" />
+                        <Salad size={iconSize} color={iconColor} />
                         <div>
                             <p className='text-xl font-semibold text-gray-600'>{dashData.totalFoods}</p>
                             <p className='text-gray-400'>Foods</p>
@@ -71,7 +75,7 @@ const Dashboard = () => {
 
                 <div className='bg-white w-full'>
                     <div className='flex items-center gap-2.5 px-4 py-4 mt-7 rounded-t border-2 border-black'>
-                        <img src={assets.order_icon} alt="" />
+                        <ListOrdered />
                         <p className='font-semibold'>Latest Orders</p>
                     </div>
                     <div className='pt-4 border-2 border-black'>
