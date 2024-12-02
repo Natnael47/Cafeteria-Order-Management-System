@@ -10,7 +10,7 @@ const LoginPopUp = ({ setShowLogin }) => {
 
     const [data, setData] = useState({
         firstName: "",
-        lastName: "",
+        gender: "",
         email: "",
         password: ""
     });
@@ -72,16 +72,19 @@ const LoginPopUp = ({ setShowLogin }) => {
                                 required
                                 className="border border-gray-500 p-2 rounded-md focus:outline-none mb-2"
                             />
-                            <label htmlFor="lastName" className="text-gray-600 mb-2 font-semibold">Last Name</label>
-                            <input
-                                name="lastName"
+                            <label htmlFor="gender" className="text-gray-600 mb-2 font-semibold">Gender</label>
+                            <select
+                                name="gender"
                                 onChange={onChangeHandler}
-                                value={data.lastName}
-                                type="text"
-                                placeholder="Last Name"
+                                value={data.gender}
                                 required
                                 className="border border-gray-500 p-2 rounded-md focus:outline-none mb-2"
-                            />
+                            >
+                                <option value="" disabled>Select Gender</option>
+                                <option value="male">Male</option>
+                                <option value="female">Female</option>
+                                <option value="other">Other</option>
+                            </select>
                         </>
                     )}
                     <label htmlFor="email" className="text-gray-600 mb-2 font-semibold">Email</label>

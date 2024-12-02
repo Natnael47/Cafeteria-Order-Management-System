@@ -3,7 +3,7 @@ import { Link, useLocation } from "react-router-dom";
 import { assets } from "../assets/assets";
 import { StoreContext } from "../context/StoreContext";
 
-export const Navbar = ({ setShowLogin, setShowFeedback }) => {
+export const Navbar = ({ setShowFeedback }) => {
     const location = useLocation();
     const { getTotalCartAmount, token, setToken, navigate, setShowSearch, getCartItems } = useContext(StoreContext);
 
@@ -11,7 +11,6 @@ export const Navbar = ({ setShowLogin, setShowFeedback }) => {
     const [hasShadow, setHasShadow] = useState(false);
 
     useEffect(() => {
-        // Scroll to the top only if the path is not the home page
         if (location.pathname !== "/") {
             window.scrollTo(0, 0);
         }
@@ -27,7 +26,6 @@ export const Navbar = ({ setShowLogin, setShowFeedback }) => {
     }, [location.pathname]);
 
     useEffect(() => {
-        // Event listener to toggle shadow on scroll
         const handleScroll = () => {
             if (window.scrollY > 50) {
                 setHasShadow(true);
@@ -55,10 +53,8 @@ export const Navbar = ({ setShowLogin, setShowFeedback }) => {
         }
     };
 
-    // Scroll to the top and lock the scroll when Sign In is clicked
     const handleSignInClick = () => {
-        window.scrollTo(0, 0);  // Scroll to the top of the page
-        setShowLogin(true);  // Show the login popup
+        navigate('/login'); // Navigate to login page
     };
 
     return (
