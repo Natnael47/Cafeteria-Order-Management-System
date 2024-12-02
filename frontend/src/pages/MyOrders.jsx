@@ -15,6 +15,10 @@ const MyOrders = () => {
     const [modalIsOpen, setModalIsOpen] = useState(false);
     const [selectedOrderId, setSelectedOrderId] = useState(null);
     const [currentTab, setCurrentTab] = useState("all");
+    const [countdowns, setCountdowns] = useState({});
+    const [loading, setLoading] = useState(true);
+
+
 
     const { token } = useContext(StoreContext);
 
@@ -28,16 +32,64 @@ const MyOrders = () => {
         try {
             if (!token) return;
 
+            setLoading(true); // Set loading to true before data fetch
             const response = await axios.post(`${backendUrl}/api/order/user-orders`, {}, { headers: { token } });
-            if (response.data.success) {
-                setOrders(response.data.orders.reverse());
-                console.log(response.data.orders);
 
+            if (response.data.success) {
+                const orders = response.data.orders.reverse();
+                const countdownTimers = { ...countdowns };
+
+                orders.forEach(order => {
+                    if (order.status.toLowerCase() === "preparing" && order.totalPrepTime && !countdowns[order.id]) {
+                        countdownTimers[order.id] = order.totalPrepTime * 60; // Convert minutes to seconds
+                    }
+                    order.viewed = order.viewed || false; // Ensure viewed flag is initialized
+                    order.notificationDot = !order.viewed; // Set notification dot for unseen orders
+                });
+
+                setOrders(orders);
+                setCountdowns(countdownTimers);
             }
         } catch (error) {
             console.error("Error loading orders:", error);
+        } finally {
+            setLoading(false); // Set loading to false after data is loaded
         }
     };
+
+
+
+    useEffect(() => {
+        const timer = setInterval(() => {
+            setCountdowns(prevCountdowns => {
+                const updatedCountdowns = { ...prevCountdowns };
+                Object.keys(updatedCountdowns).forEach(orderId => {
+                    if (updatedCountdowns[orderId] > 0) {
+                        updatedCountdowns[orderId] -= 1;
+                    }
+                });
+                return updatedCountdowns;
+            });
+
+            if (!loading) { // Ensure this logic only runs after initial loading
+                setOrders(prevOrders =>
+                    prevOrders.map(order => {
+                        if (order.status.toLowerCase() === "preparing" && !order.notificationDot) {
+                            order.notificationDot = !order.viewed; // Set notification dot for unseen preparing orders
+                        }
+                        if (order.status.toLowerCase() === "complete" && order.notificationDot) {
+                            order.notificationDot = false; // Remove notification dot for completed orders
+                        }
+                        return order;
+                    })
+                );
+            }
+        }, 1000);
+
+        return () => clearInterval(timer); // Cleanup on unmount
+    }, [loading]); // Depend on loading to delay notification updates
+
+
 
     // Cancel order function
     const cancelOrder = async () => {
@@ -82,11 +134,22 @@ const MyOrders = () => {
 
     // Toggle order details visibility
     const toggleDetails = (index) => {
+        const order = orders[index];
+
+        // Mark the order as viewed when the user clicks to see the details
+        if (!order.viewed) {
+            order.viewed = true; // Set the order as viewed
+            order.notificationDot = false; // Remove the notification dot
+            setOrders([...orders]); // Update the orders state to trigger a re-render
+        }
+
         setShowDetails(prevState => ({
             ...prevState,
             [index]: !prevState[index]
         }));
     };
+
+
 
     return (
         <div className='border-t pt-16'>
@@ -101,17 +164,25 @@ const MyOrders = () => {
                         All
                     </button>
                     <button
-                        className={`px-4 py-2 rounded ${currentTab === "preparing" ? "bg-green-500 text-white" : "bg-gray-200 text-gray-700"} hover:bg-green-500 hover:text-white`}
+                        className={`relative px-4 py-2 rounded ${currentTab === "preparing" ? "bg-green-500 text-white" : "bg-gray-200 text-gray-700"} hover:bg-green-500 hover:text-white`}
                         onClick={() => setCurrentTab("preparing")}
                     >
                         Preparing
+                        {!loading && orders.some(order => order.status.toLowerCase() === "preparing" && order.notificationDot) && (
+                            <span className="absolute top-0 right-0 w-2 h-2 rounded-full bg-red-600"></span>
+                        )}
                     </button>
                     <button
-                        className={`px-4 py-2 rounded ${currentTab === "complete" ? "bg-green-500 text-white" : "bg-gray-200 text-gray-700"} hover:bg-green-500 hover:text-white`}
+                        className={`relative px-4 py-2 rounded ${currentTab === "complete" ? "bg-green-500 text-white" : "bg-gray-200 text-gray-700"} hover:bg-green-500 hover:text-white`}
                         onClick={() => setCurrentTab("complete")}
                     >
                         Complete
+                        {!loading && orders.some(order => order.status.toLowerCase() === "complete" && order.notificationDot) && (
+                            <span className="absolute top-0 right-0 w-2 h-2 rounded-full bg-red-600"></span>
+                        )}
                     </button>
+
+
                     <button
                         className={`px-4 py-2 rounded ${currentTab === "canceled" ? "bg-green-500 text-white" : "bg-gray-200 text-gray-700"} hover:bg-green-500 hover:text-white`}
                         onClick={() => setCurrentTab("canceled")}
@@ -119,6 +190,7 @@ const MyOrders = () => {
                         Canceled
                     </button>
                 </div>
+
             </div>
 
             <div>
@@ -172,6 +244,17 @@ const MyOrders = () => {
 
                         {showDetails[index] && (
                             <div className="mt-2 pt-4 space-y-4">
+                                {order.status.toLowerCase() === "preparing" && countdowns[order.id] !== undefined && (
+                                    <div className="text-center p-4 bg-green-300 text-lg font-bold">
+                                        {countdowns[order.id] >= 3600
+                                            ? `Time Remaining: ${Math.floor(countdowns[order.id] / 3600)}:${String(
+                                                Math.floor((countdowns[order.id] % 3600) / 60)
+                                            ).padStart(2, '0')}:${String(countdowns[order.id] % 60).padStart(2, '0')}`
+                                            : `Time Remaining: ${Math.floor(countdowns[order.id] / 60)}:${String(
+                                                countdowns[order.id] % 60
+                                            ).padStart(2, '0')}`}
+                                    </div>
+                                )}
                                 <h3 className='font-semibold'>Order Details</h3>
                                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                                     {order.items.map((item, idx) => (
