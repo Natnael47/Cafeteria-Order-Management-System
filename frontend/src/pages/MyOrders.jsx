@@ -14,7 +14,14 @@ const MyOrders = () => {
     const [showDetails, setShowDetails] = useState({});
     const [modalIsOpen, setModalIsOpen] = useState(false);
     const [selectedOrderId, setSelectedOrderId] = useState(null);
+    const [currentTab, setCurrentTab] = useState("all");
+
     const { token } = useContext(StoreContext);
+
+    const getFilteredOrders = () => {
+        if (currentTab === "all") return orders;
+        return orders.filter(order => order.status.toLowerCase() === currentTab);
+    };
 
     // Load order data
     const loadOrderData = async () => {
@@ -85,10 +92,37 @@ const MyOrders = () => {
         <div className='border-t pt-16'>
             <div className='text-2xl'>
                 <Title text1='MY' text2='ORDERS' />
+                {/* Tabs */}
+                <div className="flex items-center space-x-4 mb-6">
+                    <button
+                        className={`px-4 py-2 rounded ${currentTab === "all" ? "bg-green-500 text-white" : "bg-gray-200 text-gray-700"} hover:bg-green-500 hover:text-white`}
+                        onClick={() => setCurrentTab("all")}
+                    >
+                        All
+                    </button>
+                    <button
+                        className={`px-4 py-2 rounded ${currentTab === "preparing" ? "bg-green-500 text-white" : "bg-gray-200 text-gray-700"} hover:bg-green-500 hover:text-white`}
+                        onClick={() => setCurrentTab("preparing")}
+                    >
+                        Preparing
+                    </button>
+                    <button
+                        className={`px-4 py-2 rounded ${currentTab === "complete" ? "bg-green-500 text-white" : "bg-gray-200 text-gray-700"} hover:bg-green-500 hover:text-white`}
+                        onClick={() => setCurrentTab("complete")}
+                    >
+                        Complete
+                    </button>
+                    <button
+                        className={`px-4 py-2 rounded ${currentTab === "canceled" ? "bg-green-500 text-white" : "bg-gray-200 text-gray-700"} hover:bg-green-500 hover:text-white`}
+                        onClick={() => setCurrentTab("canceled")}
+                    >
+                        Canceled
+                    </button>
+                </div>
             </div>
 
             <div>
-                {orders.map((order, index) => (
+                {getFilteredOrders().map((order, index) => (
                     <div key={index} className="py-4 border-t border-b border-gray-600 text-black flex flex-col gap-4 hover:bg-green-50">
                         <div className='flex flex-col md:flex-row md:items-center md:justify-between gap-4'>
                             <div className='flex items-start gap-5 text-sm'>
