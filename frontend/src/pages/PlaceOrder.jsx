@@ -48,8 +48,8 @@ const PlaceOrder = () => {
                     email: userData.email || '',
                     phone: userData.phone || '',
                     address: {
-                        neighborhood: userData.address?.neighborhood || '',
-                        landmark: userData.address?.landmark || '',
+                        neighborhood: userData.address?.line1 || '',
+                        landmark: userData.address?.line2 || '',
                     },
                 });
                 setLoaded(true); // Mark data as loaded
