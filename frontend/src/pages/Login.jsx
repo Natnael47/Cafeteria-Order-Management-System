@@ -1,11 +1,17 @@
 import axios from 'axios';
 import React, { useContext, useState } from 'react';
-import { backendUrl } from '../App'; // Ensure this is correctly imported
+import { useLocation, useNavigate } from 'react-router-dom'; // Import useLocation
+import { backendUrl } from '../App';
 import { StoreContext } from '../context/StoreContext';
 
 const Login = ({ setShowLogin }) => {
     const [currState, setCurrState] = useState("Login");
-    const { setToken, navigate } = useContext(StoreContext);
+    const { setToken } = useContext(StoreContext);
+    const navigate = useNavigate();
+    const location = useLocation(); // Get the current location
+
+    // Get the redirectTo URL from the query parameters
+    const redirectTo = new URLSearchParams(location.search).get('redirectTo') || '/'; // Default to '/' if not available
 
     const [data, setData] = useState({
         firstName: "",
@@ -14,8 +20,6 @@ const Login = ({ setShowLogin }) => {
         password: ""
     });
 
-
-    // State to manage password visibility
     const [showPassword, setShowPassword] = useState(false);
 
     const onChangeHandler = (event) => {
@@ -30,7 +34,6 @@ const Login = ({ setShowLogin }) => {
         }
     };
 
-
     const onLogin = async (event) => {
         event.preventDefault();
         let url = `${backendUrl}/api/user/`;
@@ -44,7 +47,8 @@ const Login = ({ setShowLogin }) => {
                 setToken(response.data.token);
                 localStorage.setItem("token", response.data.token);
                 if (setShowLogin) setShowLogin(false);
-                navigate('/');
+
+                navigate(redirectTo);
             } else {
                 alert(response.data.message);
             }
@@ -66,22 +70,20 @@ const Login = ({ setShowLogin }) => {
                 <p>Please {currState === 'Sign Up' ? "Sign up" : "Log in"} to order food.</p>
 
                 {currState === "Sign Up" && (
-                    <>
-                        <div className="w-full">
-                            <label htmlFor="fullName" className="text-gray-600 mb-2 font-semibold">
-                                Full Name
-                            </label>
-                            <input
-                                name="fullName"
-                                onChange={onChangeHandler}
-                                value={data.fullName}
-                                type="text"
-                                placeholder="Full Name"
-                                required
-                                className="border border-zinc-300 rounded w-full p-2 mt-1"
-                            />
-                        </div>
-                    </>
+                    <div className="w-full">
+                        <label htmlFor="fullName" className="text-gray-600 mb-2 font-semibold">
+                            Full Name
+                        </label>
+                        <input
+                            name="fullName"
+                            onChange={onChangeHandler}
+                            value={data.fullName}
+                            type="text"
+                            placeholder="Full Name"
+                            required
+                            className="border border-zinc-300 rounded w-full p-2 mt-1"
+                        />
+                    </div>
                 )}
 
                 <div className="w-full">
