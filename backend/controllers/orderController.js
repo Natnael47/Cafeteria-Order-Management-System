@@ -138,18 +138,19 @@ const PlaceOrder = async (req, res) => {
 
     // Validate and calculate the total prepTime from all items in the order
     const totalPrepTimeInMinutes = items.reduce((total, item) => {
-      // Make sure prepTime is valid (convert to number if necessary)
       const prepTime = parseInt(item.prepTime, 10);
-      return total + (isNaN(prepTime) ? 0 : prepTime); // Sum up prepTimes, default to 0 if invalid
+      return total + (isNaN(prepTime) ? 0 : prepTime);
     }, 0);
 
-    // Get the current time (this will be the "start time" for the new order)
+    // Get the current time
     const currentTime = new Date();
 
-    // Find all "Order Placed" orders before the current order (to calculate the estimated completion time)
+    // Find all "Order Placed" and "Preparing" orders before the current order
     const previousOrders = await prisma.order.findMany({
       where: {
-        status: "Order Placed",
+        status: {
+          in: ["Order Placed", "Preparing"], // Include both statuses
+        },
         date: {
           lt: currentTime, // Orders placed before the current order
         },
@@ -168,7 +169,7 @@ const PlaceOrder = async (req, res) => {
     previousOrders.forEach((order) => {
       order.orderItem.forEach((item) => {
         if (item.food && item.food.prepTime) {
-          totalPreviousOrdersPrepTime += item.food.prepTime; // Add up prepTime for each item
+          totalPreviousOrdersPrepTime += parseInt(item.food.prepTime, 10) || 0;
         }
       });
     });
@@ -187,10 +188,10 @@ const PlaceOrder = async (req, res) => {
         items,
         address,
         amount,
-        paymentMethod: "COD", // Cash on Delivery
+        paymentMethod: "COD",
         isPaid: false,
         date: currentTime,
-        status: "Order Placed", // Initial status
+        status: "Order Placed",
         estimatedCompletionTime, // Set the estimated completion time
         totalPrepTime: totalPrepTimeInMinutes, // Save the total prep time in minutes
       },
@@ -198,14 +199,13 @@ const PlaceOrder = async (req, res) => {
 
     // Insert items into the orderItem table
     const orderItems = items.map((item) => ({
-      orderId: newOrder.id, // Link the item to the new order
-      foodId: item.id, // Link the item to the food table
+      orderId: newOrder.id,
+      foodId: item.id,
       quantity: item.quantity,
-      price: item.price, // Price from the frontend item data
+      price: item.price,
       cookingStatus: "Not Started", // Default cooking status
     }));
 
-    // Add orderItems to the database
     await prisma.orderItem.createMany({
       data: orderItems,
     });
@@ -213,7 +213,7 @@ const PlaceOrder = async (req, res) => {
     // Clear the user's cart after placing an order
     await prisma.user.update({
       where: { id: userId },
-      data: { cartData: {} }, // Clear the user's cart after placing an order
+      data: { cartData: {} },
     });
 
     res.json({ success: true, message: "Order Placed successfully" });
