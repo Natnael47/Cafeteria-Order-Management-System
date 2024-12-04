@@ -1,3 +1,4 @@
+import { Pencil, Trash2 } from 'lucide-react';
 import React, { useContext, useEffect, useState } from "react";
 import Modal from "react-modal";
 import { toast } from "react-toastify";
@@ -144,33 +145,23 @@ const Suppliers = () => {
                             </div>
                             <div className="px-4 py-2 border-r border-black">{supplier.status}</div>
                             <div className="px-4 py-2 border-r border-black text-center">
-                                <button
-                                    onClick={() => {
-                                        setEditSupplierData({
-                                            id: supplier.id,
-                                            name: supplier.name,
-                                            email: supplier.contactInfo?.email || "",
-                                            phone: supplier.contactInfo?.phone || "",
-                                            address: supplier.contactInfo?.address || "",
-                                            status: supplier.status,
-                                        });
-                                        setIsEditOpen(true);
-                                    }}
-                                    className="text-blue-500"
-                                >
-                                    ✏️
-                                </button>
+                                <Pencil onClick={() => {
+                                    setEditSupplierData({
+                                        id: supplier.id,
+                                        name: supplier.name,
+                                        email: supplier.contactInfo?.email || "",
+                                        phone: supplier.contactInfo?.phone || "",
+                                        address: supplier.contactInfo?.address || "",
+                                        status: supplier.status,
+                                    });
+                                    setIsEditOpen(true);
+                                }} />
                             </div>
                             <div className="px-4 py-2 text-center">
-                                <button
-                                    onClick={() => {
-                                        setSelectedSupplier(supplier);
-                                        setIsRemoveModalOpen(true);
-                                    }}
-                                    className="text-red-500"
-                                >
-                                    🗑️
-                                </button>
+                                <Trash2 onClick={() => {
+                                    setSelectedSupplier(supplier);
+                                    setIsRemoveModalOpen(true);
+                                }} />
                             </div>
                         </div>
                     ))
