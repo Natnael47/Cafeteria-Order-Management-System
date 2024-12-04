@@ -1,3 +1,4 @@
+import { Search } from 'lucide-react';
 import React, { useContext, useEffect, useState } from "react";
 import { Link, useLocation } from "react-router-dom";
 import { assets } from "../assets/assets";
@@ -92,7 +93,7 @@ export const Navbar = ({ setShowFeedback }) => {
                 </Link>
             </ul>
             <div className="flex items-center gap-10 md:gap-8">
-                <img onClick={() => setShowSearch(true)} src={assets.search_icon} alt="Search" className="w-[30px] md:w-[22px] lg:w-[20px] cursor-pointer" />
+                <Search size={28} onClick={() => setShowSearch(true)} className='cursor-pointer' />
                 <div className="relative flex items-center gap-[30px]">
                     <Link to='/cart' className="relative">
                         <img src={assets.cart_icon} alt="Cart" className="cursor-pointer w-8" />
