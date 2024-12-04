@@ -294,7 +294,7 @@ const Stock = () => {
                                                 backgroundColor: `hsl(${(item.quantity / item.initialQuantity) * 120}, 100%, 50%)`,
                                             }}
                                         ></div>
-                                        <p className="absolute inset-0 flex items-center justify-center text-xs font-semibold text-black">
+                                        <p className="absolute inset-0 flex items-center justify-center text-sm font-semibold text-black">
                                             {item.quantity === 0
                                                 ? "Out of Stock"
                                                 : `${((item.quantity / item.initialQuantity) * 100).toFixed(0)}%`}

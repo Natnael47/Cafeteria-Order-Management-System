@@ -235,7 +235,7 @@ const Inventory = () => {
                                             backgroundColor: `hsl(${Number(item.status) * 1.2}, 100%, 50%)` // Smooth transition using HSL color
                                         }}
                                     ></div>
-                                    <p className="absolute inset-0 flex items-center justify-center text-xl font-semibold text-black">
+                                    <p className="absolute inset-0 flex items-center justify-center text-sm font-semibold text-black">
                                         {item.status}%
                                     </p>
                                 </div>
