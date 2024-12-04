@@ -265,7 +265,7 @@ const Stock = () => {
                 </button>
 
             </div>
-            <div className="bg-[#F3F4F6] rounded w-full max-w-5.3xl max-h-[88vh] overflow-scroll">
+            <div className="bg-[#F3F4F6] rounded w-full max-w-5.3xl max-h-[83vh] overflow-scroll">
                 <div>
                     <div className="grid grid-cols-[1fr_1fr_1fr_1fr_1fr_0.5fr_0.5fr] items-center gap-2 p-3 border text-sm font-medium bg-[#FAFAFA] text-black sm:grid">
                         <b>Status</b>
@@ -541,7 +541,7 @@ const Stock = () => {
 
 
                                 {isPackagePopupOpen && (
-                                    <div className="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center z-50">
+                                    <div className="fixed inset-0 bg-gray-50 bg-opacity-20 flex justify-center items-center z-50">
                                         <div className="bg-white p-6 rounded-md shadow-md w-1/2">
                                             <h2 className="text-xl font-semibold mb-4">Select a Package</h2>
                                             <div className="max-h-60 overflow-y-auto mb-4">
@@ -616,8 +616,6 @@ const Stock = () => {
                                         </div>
                                     </div>
                                 )}
-
-
 
                             </div>
                         );
