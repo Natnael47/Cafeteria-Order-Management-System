@@ -31,15 +31,16 @@ const PlaceOrder = () => {
     const [loaded, setLoaded] = useState(false); // Added to track initial data loading
 
     useEffect(() => {
+        const savedCart = JSON.parse(localStorage.getItem('cartItems')) || cartItems;
+
         if (!token) {
             toast.warn("Please log in to place an order.");
-            navigate(`/login?redirectTo=${encodeURIComponent(window.location.pathname)}`); // This is correct
-        } else if (getTotalCartAmount() === 0) {
+            navigate(`/login?redirectTo=${encodeURIComponent('/place-order')}`);
+        } else if (!savedCart || Object.keys(savedCart).length === 0) {
             toast.info("Select Food to Order.");
             navigate("/menu");
-        }
-        else {
-            // Preload user information
+        } else {
+            // Preload user data
             loadUserProfileData();
             if (!loaded) {
                 setData({
@@ -52,10 +53,10 @@ const PlaceOrder = () => {
                         landmark: userData.address?.line2 || '',
                     },
                 });
-                setLoaded(true); // Mark data as loaded
+                setLoaded(true);
             }
         }
-    }, [token, userData, loadUserProfileData, navigate, loaded, getTotalCartAmount]);
+    }, [token, cartItems, userData, loadUserProfileData, navigate, loaded]);
 
 
     const onChangeHandler = (event) => {
@@ -83,10 +84,18 @@ const PlaceOrder = () => {
                 }));
 
             const orderData = {
-                address: data.address,
+                address: {
+                    line1: data.address.neighborhood,  // Map neighborhood to line1
+                    line2: data.address.landmark,      // Map landmark to line2
+                    firstName: data.firstName,         // Include firstName in address
+                    lastName: data.lastName,           // Include lastName in address
+                    email: data.email,                 // Include email in address
+                    phone: data.phone.startsWith('+251') ? data.phone : `+251${data.phone}`,  // Ensure phone is in correct format
+                },
                 items: orderItems,
-                amount: getTotalCartAmount() + 2, // Adding delivery fee
+                amount: getTotalCartAmount() + 2,  // Adding delivery fee
             };
+
 
             let response;
             if (method === 'cod') {
@@ -156,11 +165,12 @@ const PlaceOrder = () => {
                         className="flex-1 outline-none border-none text-lg pl-2 bg-white"
                         name="phone"
                         onChange={onChangeHandler}
-                        value={data.phone.startsWith('+251') ? data.phone.slice(5) : data.phone}
+                        value={data.phone}
                         type="text"
                         placeholder="Phone number"
                         required
                     />
+
                 </div>
                 <input
                     className="border border-gray-300 rounded py-1.5 px-3.5 w-full"
