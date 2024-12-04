@@ -135,12 +135,10 @@ const updateInventory = async (req, res) => {
 // Add stock item
 const addStock = async (req, res) => {
   try {
-    // Extracting data from the request body
     const {
       inventoryId,
       quantity,
       pricePerUnit,
-      supplier,
       supplierId,
       expiryDate,
       dateReceived,
@@ -159,7 +157,7 @@ const addStock = async (req, res) => {
         .json({ success: false, message: "Missing required fields" });
     }
 
-    // Fetch the inventory item by ID
+    // Fetch the inventory item
     const inventoryItem = await prisma.inventory.findUnique({
       where: { id: inventoryId },
     });
@@ -170,64 +168,58 @@ const addStock = async (req, res) => {
         .json({ success: false, message: "Inventory item not found" });
     }
 
-    // Calculate the updated quantity
+    // Generate a unique batch number
+    let batchNumber;
+    do {
+      batchNumber = `BATCH-#${Math.floor(100000 + Math.random() * 900000)}`; // Generate "Batch-#XXXXXX"
+      const existingBatch = await prisma.stockBatch.findUnique({
+        where: { batchNumber },
+      });
+      if (!existingBatch) break; // Ensure uniqueness
+    } while (true);
+
+    // Create a new batch in the StockBatch table
+    const newBatch = await prisma.stockBatch.create({
+      data: {
+        batchNumber,
+        inventoryId,
+        supplierId,
+        purchaseDate: new Date(dateReceived),
+        quantityBought: quantity,
+        pricePerUnit,
+        expiryDate: expiryDate ? new Date(expiryDate) : null,
+        quantityRemaining: quantity,
+      },
+    });
+
+    // Update total quantity in the Inventory table
     const updatedQuantity = inventoryItem.quantity + quantity;
+    const updatedInitialQuantity =
+      updatedQuantity > inventoryItem.initialQuantity
+        ? updatedQuantity
+        : inventoryItem.initialQuantity;
 
-    // Check if the updated quantity exceeds the initial quantity
-    let updatedInitialQuantity = inventoryItem.initialQuantity;
-
-    if (updatedQuantity > updatedInitialQuantity) {
-      // If so, update initialQuantity to match the updatedQuantity
-      updatedInitialQuantity = updatedQuantity;
-    }
-
-    // Update inventory data
     const updatedInventory = await prisma.inventory.update({
       where: { id: inventoryId },
       data: {
         quantity: updatedQuantity,
-        initialQuantity: updatedInitialQuantity, // Update the initial quantity
-        pricePerUnit,
-        supplierId,
-        expiryDate: expiryDate ? new Date(expiryDate) : null,
-        dateReceived: new Date(dateReceived),
-        dateUpdated: new Date(), // Update the dateUpdated to the current timestamp
+        initialQuantity: updatedInitialQuantity, // Update initialQuantity if needed
+        dateUpdated: new Date(),
       },
     });
 
-    // Ensure inventory-supplier mapping exists
-    await ensureInventorySupplier(inventoryId, supplierId, pricePerUnit);
-
-    // Save purchase details to the inventorypurchase table
-    await prisma.inventorypurchase.create({
-      data: {
-        inventoryId,
-        quantityBought: quantity,
-        supplierId, // Update to supplierId
-        cost: quantity * pricePerUnit,
-        pricePerUnit,
-      },
-    });
-
-    // Call the function to calculate and store the percentage in the status field
-    await calculateStockPercentageAndStoreInStatus(inventoryId);
-
-    // Respond with success and updated inventory data
+    // Respond with success
     return res.status(200).json({
       success: true,
       message: "Stock added successfully",
+      newBatch,
       updatedInventory,
     });
   } catch (error) {
-    console.error("Error in addStock:", error); // Existing general error log
-    console.error("Detailed error in addStock:", error); // Add detailed logging
-    if (error.meta) {
-      console.error("Error meta:", error.meta); // Prisma-specific error details, if present
-    }
+    console.error("Error in addStock:", error);
     return res.status(500).json({
       success: false,
       message: "Internal Server Error",
-      error: error.message,
     });
   }
 };
@@ -306,7 +298,7 @@ const withdrawItem = async (req, res) => {
   try {
     const { inventoryId, withdrawnBy, quantity } = req.body;
 
-    // Validate input
+    // Input validation
     if (
       !inventoryId ||
       !withdrawnBy ||
@@ -316,14 +308,13 @@ const withdrawItem = async (req, res) => {
     ) {
       return res.status(400).json({
         success: false,
-        message:
-          "Invalid input: Ensure all required fields are filled with valid data",
+        message: "Invalid input: Ensure all required fields are valid",
       });
     }
 
-    // Find the inventory item
+    // Find inventory item
     const inventoryItem = await prisma.inventory.findUnique({
-      where: { id: parseInt(inventoryId, 10) },
+      where: { id: inventoryId },
     });
 
     if (!inventoryItem) {
@@ -333,7 +324,6 @@ const withdrawItem = async (req, res) => {
       });
     }
 
-    // Check if enough stock is available
     if (inventoryItem.quantity < quantity) {
       return res.status(400).json({
         success: false,
@@ -341,41 +331,72 @@ const withdrawItem = async (req, res) => {
       });
     }
 
-    // Calculate new quantity
-    const newQuantity = inventoryItem.quantity - quantity;
+    let remainingQuantity = quantity;
+    const batchesToUpdate = [];
 
-    // Update inventory quantity and other fields
+    // Fetch oldest batches with remaining stock
+    const stockBatches = await prisma.stockBatch.findMany({
+      where: {
+        inventoryId,
+        quantityRemaining: { gt: 0 },
+      },
+      orderBy: { purchaseDate: "asc" }, // FIFO: Oldest batches first
+    });
+
+    for (const batch of stockBatches) {
+      if (remainingQuantity <= 0) break;
+
+      const deductQuantity = Math.min(
+        batch.quantityRemaining,
+        remainingQuantity
+      );
+      remainingQuantity -= deductQuantity;
+
+      batchesToUpdate.push({
+        id: batch.id,
+        quantityRemaining: batch.quantityRemaining - deductQuantity,
+      });
+    }
+
+    if (remainingQuantity > 0) {
+      return res.status(400).json({
+        success: false,
+        message: "Not enough stock available to fulfill the withdrawal",
+      });
+    }
+
+    // Update the affected batches
+    for (const batch of batchesToUpdate) {
+      await prisma.stockBatch.update({
+        where: { id: batch.id },
+        data: { quantityRemaining: batch.quantityRemaining },
+      });
+    }
+
+    // Update inventory total quantity
     const updatedInventory = await prisma.inventory.update({
-      where: { id: inventoryItem.id },
+      where: { id: inventoryId },
       data: {
-        quantity: newQuantity,
+        quantity: inventoryItem.quantity - quantity,
         dateUpdated: new Date(),
       },
     });
 
-    // Log the withdrawal in withdrawallog table
+    // Log the withdrawal
     const withdrawalLog = await prisma.withdrawallog.create({
       data: {
-        inventoryId: inventoryItem.id,
+        inventoryId,
         withdrawnBy,
         quantity,
         dateWithdrawn: new Date(),
       },
     });
 
-    // Update the status field with the new stock percentage
-    await calculateStockPercentageAndStoreInStatus(inventoryId);
-
-    // Check status and order inventory if needed
-    await orderInventory(inventoryId);
-
     res.json({
       success: true,
-      message: "Item withdrawn successfully and inventory checked for reorder.",
-      data: {
-        updatedInventory,
-        withdrawalLog,
-      },
+      message: "Item withdrawn successfully",
+      updatedInventory,
+      withdrawalLog,
     });
   } catch (error) {
     console.error("Error processing withdrawal:", error);

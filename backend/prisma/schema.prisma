@@ -163,6 +163,7 @@ model inventory {
   supplierorder     supplierorder[] // Relation to supplier orders
   withdrawallog     withdrawallog[] // Relation to withdrawal logs
   inventorySupplier inventorySupplier[]
+  StockBatch        StockBatch[]
 }
 
 model inventorypurchase {
@@ -175,6 +176,22 @@ model inventorypurchase {
   pricePerUnit   Float?
   inventory      inventory @relation(fields: [inventoryId], references: [id], onDelete: Cascade)
   supplier       supplier? @relation(fields: [supplierId], references: [id])
+}
+
+model StockBatch {
+  id                Int       @id @default(autoincrement())
+  batchNumber       String    @unique @db.VarChar(50) // Unique identifier for the batch
+  inventoryId       Int // Foreign key to Inventory
+  supplierId        Int? // Foreign key to Supplier
+  purchaseDate      DateTime  @default(now()) // Date the stock was purchased
+  quantityBought    Int // Total quantity purchased in this batch
+  pricePerUnit      Float // Cost per unit for this batch
+  expiryDate        DateTime? // Optional expiry date for this batch
+  quantityRemaining Int // Quantity left in this batch
+  inventory         inventory @relation(fields: [inventoryId], references: [id], onDelete: Cascade) // Link to Inventory
+  supplier          supplier? @relation(fields: [supplierId], references: [id]) // Link to Supplier
+
+  @@index([inventoryId], map: "StockBatch_inventoryId_fkey")
 }
 
 model supplierorder {
@@ -226,6 +243,7 @@ model supplier {
   inventory         inventory[]
   inventorypurchase inventorypurchase[]
   supplierorder     supplierorder[]
+  StockBatch        StockBatch[]
 }
 
 model inventorySupplier {
