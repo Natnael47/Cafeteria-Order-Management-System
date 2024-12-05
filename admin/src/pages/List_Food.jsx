@@ -1,9 +1,9 @@
 import axios from "axios";
+import { Pencil, Trash2 } from "lucide-react";
 import React, { useContext, useEffect, useRef, useState } from "react";
 import Modal from "react-modal";
 import { toast } from "react-toastify";
 import { backendUrl } from "../App";
-import { assets } from "../assets/assets";
 import { AdminContext } from "../context/AdminContext";
 
 Modal.setAppElement("#root");
@@ -248,26 +248,8 @@ const List = () => {
                                     <p>{item.name}</p>
                                     <p>{item.category}</p>
                                     <p>${item.price}</p>
-                                    <p
-                                        onClick={() => openModal(item.id)}
-                                        className="cursor-pointer pl-1"
-                                    >
-                                        <img
-                                            src={assets.trash_icon}
-                                            alt=""
-                                            className="w-7 ml-2 hover:scale-125 transition-transform"
-                                        />
-                                    </p>
-                                    <p
-                                        className="cursor-pointer pl-1"
-                                        onClick={() => handleEditClick(item, index)}
-                                    >
-                                        <img
-                                            src={assets.modify_icon}
-                                            alt=""
-                                            className="w-7 ml-2 hover:scale-125 transition-transform"
-                                        />
-                                    </p>
+                                    <Trash2 size={28} onClick={() => openModal(item.id)} className="cursor-pointer pl-1" />
+                                    <Pencil size={28} className="cursor-pointer pl-1" onClick={() => handleEditClick(item, index)} />
                                 </div>
 
                                 {editIndex === index && (
