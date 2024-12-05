@@ -179,7 +179,7 @@ const Users = () => {
             </div>
 
             {/* the display Div */}
-            <div className="bg-[#F3F4F6] rounded w-full max-w-6xl max-h-[88vh] overflow-scroll">
+            <div className="bg-[#F3F4F6] rounded w-full max-w-6xl max-h-[90vh] overflow-scroll">
                 {currentView === "users" && (
                     <div className="bg-white shadow rounded">
                         {/* Users Data Table */}
