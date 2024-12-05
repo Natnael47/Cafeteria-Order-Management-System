@@ -121,7 +121,7 @@ const Users = () => {
     }, [token]);
 
     return (
-        <div className="flex flex-col m-5 w-full max-w-6xl max-h-[90vh]">
+        <div className="flex flex-col m-5 w-full max-w-6xl max-h-[100vh]">
             {/* Header */}
             <div className="flex items-center justify-between mb-6">
                 <h1 className="text-2xl font-semibold text-gray-700">Customer</h1>
@@ -288,7 +288,7 @@ const Users = () => {
                 )}
 
                 {currentView === "orders" && (
-                    <div className="p-5 bg-white shadow rounded">
+                    <div className="p-5 bg-white shadow rounded w-full max-w-6.3xl max-h-[90vh] overflow-scroll">
                         {/* Orders Content */}
                         <h2 className="text-lg font-semibold text-gray-700">Orders</h2>
                         {/* Your Orders Table Here */}
