@@ -70,7 +70,7 @@ const Orders = () => {
 
     return (
         <div className='m-5 w-full'>
-            <p className="text-lg font-semibold">ORDER PAGE</p>
+            <h1 className="text-3xl font-bold text-gray-800">Orders</h1>
 
             <div className='bg-[#F3F4F6] rounded w-full max-w-5.3xl max-h-[90vh] overflow-scroll'>
 

@@ -16,7 +16,7 @@ const Dashboard = () => {
 
     return (
         <div className='m-5 w-full'>
-            <p className="mb-3 text-lg font-semibold">DashBoard</p>
+            <h1 className="text-3xl font-bold text-gray-800">DashBoard</h1>
             <div className='bg-[#F3F4F6] w-full max-w-4xl max-h-[88vh] overflow-scroll'>
                 <div className='flex flex-row gap-3'>
 

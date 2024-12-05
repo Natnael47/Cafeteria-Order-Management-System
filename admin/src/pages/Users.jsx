@@ -124,7 +124,7 @@ const Users = () => {
         <div className="flex flex-col m-5 w-full max-w-6xl max-h-[100vh]">
             {/* Header */}
             <div className="flex items-center justify-between mb-6">
-                <h1 className="text-2xl font-semibold text-gray-700">Customer</h1>
+                <h1 className="text-3xl font-bold text-gray-800">Customer</h1>
                 <div className="flex items-center space-x-4">
                     <button className="px-4 py-2 bg-green-500 text-white rounded hover:bg-green-600">
                         + New

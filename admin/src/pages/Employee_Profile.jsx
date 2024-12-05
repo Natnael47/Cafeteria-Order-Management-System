@@ -98,14 +98,14 @@ const Employee_Profile = () => {
 
     return (
         <div className="m-5 w-full">
-            <p className="mb-3 text-lg font-semibold">{isEditing ? 'Edit Employee' : 'Employee Profile'}</p>
-            <div className="bg-white px-8 py-8 border rounded w-full max-w-5xl max-h-[88vh] overflow-scroll">
+            <h1 className="text-3xl font-bold text-gray-800 mb-5">{isEditing ? 'Edit Employee' : 'Employee Profile'}</h1>
+            <div className="bg-white shadow-lg px-8 py-8 border rounded-lg w-full max-w-6xl max-h-[78vh] overflow-y-scroll">
                 {isEditing ? (
                     <form onSubmit={handleSave} className="text-gray-600">
-                        <div className="flex items-center gap-4 mb-8">
+                        <div className="flex items-center gap-6 mb-8">
                             <label htmlFor="emp-img">
                                 <img
-                                    className="w-20 rounded-full cursor-pointer"
+                                    className="w-24 h-24 rounded-full object-cover cursor-pointer border-2 border-indigo-400 hover:border-indigo-600 transition-all"
                                     src={
                                         formData.image instanceof File
                                             ? URL.createObjectURL(formData.image)
@@ -120,76 +120,75 @@ const Employee_Profile = () => {
                                 id="emp-img"
                                 hidden
                             />
-                            <div className='flex flex-col ml-5'>
-                                <label>First Name</label>
+                            <div className='flex flex-col'>
+                                <label className="text-sm font-semibold text-gray-700">First Name</label>
                                 <input
                                     onChange={handleInputChange}
                                     name="firstName"
                                     value={formData.firstName || ''}
-                                    className="border rounded px-3 py-2"
+                                    className="border rounded-lg px-3 py-2 focus:ring-2 focus:ring-indigo-500"
                                     placeholder="First Name"
                                     required
                                 />
                             </div>
 
                             <div className='flex flex-col'>
-                                <label>Last Name</label>
+                                <label className="text-sm font-semibold text-gray-700">Last Name</label>
                                 <input
                                     onChange={handleInputChange}
                                     name="lastName"
                                     value={formData.lastName || ''}
-                                    className="border rounded px-3 py-2"
+                                    className="border rounded-lg px-3 py-2 focus:ring-2 focus:ring-indigo-500"
                                     placeholder="Last Name"
                                     required
                                 />
                             </div>
-
                         </div>
 
-                        <div className="flex flex-col lg:flex-row items-start gap-10">
-                            <div className="flex flex-col gap-4 w-full lg:flex-1">
+                        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                            <div className="flex flex-col gap-4">
                                 <div>
-                                    <label>Gender</label>
+                                    <label className="text-sm font-semibold text-gray-700">Gender</label>
                                     <select
                                         name="gender"
                                         value={formData.gender}
                                         onChange={handleInputChange}
-                                        className="border rounded px-3 py-2 w-full"
+                                        className="border rounded-lg px-3 py-2 focus:ring-2 focus:ring-indigo-500 w-full"
                                     >
                                         <option value="Male">Male</option>
                                         <option value="Female">Female</option>
                                     </select>
                                 </div>
                                 <div>
-                                    <label>Email</label>
+                                    <label className="text-sm font-semibold text-gray-700">Email</label>
                                     <input
                                         type="email"
                                         name="email"
                                         value={formData.email}
                                         onChange={handleInputChange}
-                                        className="border rounded px-3 py-2 w-full"
+                                        className="border rounded-lg px-3 py-2 focus:ring-2 focus:ring-indigo-500 w-full"
                                         required
                                     />
                                 </div>
                                 <div>
-                                    <label>Phone</label>
+                                    <label className="text-sm font-semibold text-gray-700">Phone</label>
                                     <input
                                         type="text"
                                         name="phone"
                                         value={formData.phone}
                                         onChange={handleInputChange}
-                                        className="border rounded px-3 py-2 w-full"
+                                        className="border rounded-lg px-3 py-2 focus:ring-2 focus:ring-indigo-500 w-full"
                                         required
                                     />
                                 </div>
                                 <div>
-                                    <label>Address</label>
+                                    <label className="text-sm font-semibold text-gray-700">Address</label>
                                     <input
                                         type="text"
                                         name="line1"
                                         value={formData.address.line1 || ''}
                                         onChange={handleAddressChange}
-                                        className="border rounded px-3 py-2 w-full mt-2"
+                                        className="border rounded-lg px-3 py-2 focus:ring-2 focus:ring-indigo-500 w-full mt-2"
                                         placeholder="Address Line 1"
                                     />
                                     <input
@@ -197,20 +196,20 @@ const Employee_Profile = () => {
                                         name="line2"
                                         value={formData.address.line2 || ''}
                                         onChange={handleAddressChange}
-                                        className="border rounded px-3 py-2 w-full mt-2"
+                                        className="border rounded-lg px-3 py-2 focus:ring-2 focus:ring-indigo-500 w-full mt-2"
                                         placeholder="Address Line 2"
                                     />
                                 </div>
                             </div>
 
-                            <div className="flex flex-col gap-4 w-full lg:flex-1">
+                            <div className="flex flex-col gap-4">
                                 <div>
-                                    <label>Position</label>
+                                    <label className="text-sm font-semibold text-gray-700">Position</label>
                                     <select
                                         name="position"
                                         value={formData.position}
                                         onChange={handleInputChange}
-                                        className="border rounded px-3 py-2 w-full"
+                                        className="border rounded-lg px-3 py-2 focus:ring-2 focus:ring-indigo-500 w-full"
                                     >
                                         <option value="Executive Chef">Executive Chef</option>
                                         <option value="Pastry Chef">Pastry Chef</option>
@@ -224,12 +223,12 @@ const Employee_Profile = () => {
                                     </select>
                                 </div>
                                 <div>
-                                    <label>Shift</label>
+                                    <label className="text-sm font-semibold text-gray-700">Shift</label>
                                     <select
                                         name="shift"
                                         value={formData.shift}
                                         onChange={handleInputChange}
-                                        className="border rounded px-3 py-2 w-full"
+                                        className="border rounded-lg px-3 py-2 focus:ring-2 focus:ring-indigo-500 w-full"
                                     >
                                         <option value="Opening Shift">Opening Shift</option>
                                         <option value="Midday Shift">Midday Shift</option>
@@ -239,23 +238,23 @@ const Employee_Profile = () => {
                                     </select>
                                 </div>
                                 <div>
-                                    <label>Education</label>
+                                    <label className="text-sm font-semibold text-gray-700">Education</label>
                                     <input
                                         type="text"
                                         name="education"
                                         value={formData.education}
                                         onChange={handleInputChange}
-                                        className="border rounded px-3 py-2 w-full"
+                                        className="border rounded-lg px-3 py-2 focus:ring-2 focus:ring-indigo-500 w-full"
                                         required
                                     />
                                 </div>
                                 <div>
-                                    <label>Experience</label>
+                                    <label className="text-sm font-semibold text-gray-700">Experience</label>
                                     <select
                                         name="experience"
                                         value={formData.experience}
                                         onChange={handleInputChange}
-                                        className="border rounded px-3 py-2 w-full"
+                                        className="border rounded-lg px-3 py-2 focus:ring-2 focus:ring-indigo-500 w-full"
                                     >
                                         <option value="1 Year">1 Year</option>
                                         <option value="2 Years">2 Years</option>
@@ -265,73 +264,98 @@ const Employee_Profile = () => {
                                     </select>
                                 </div>
                                 <div>
-                                    <label>Salary</label>
+                                    <label className="text-sm font-semibold text-gray-700">Salary</label>
                                     <input
                                         type="number"
                                         name="salary"
                                         value={formData.salary}
                                         onChange={handleInputChange}
-                                        className="border rounded px-3 py-2 w-full"
+                                        className="border rounded-lg px-3 py-2 focus:ring-2 focus:ring-indigo-500 w-full"
                                         required
                                     />
                                 </div>
                             </div>
                         </div>
 
-                        <div className="mt-4">
-                            <label>About</label>
+                        <div className="mt-6">
+                            <label className="text-sm font-semibold text-gray-700">About</label>
                             <textarea
                                 name="about"
                                 value={formData.about}
                                 onChange={handleInputChange}
                                 rows="4"
-                                className="border rounded px-3 py-2 w-full"
+                                className="border rounded-lg px-3 py-2 focus:ring-2 focus:ring-indigo-500 w-full"
                                 placeholder="Brief description"
                                 required
                             ></textarea>
                         </div>
 
-                        <div className="flex gap-4 mt-5">
-                            <button type="submit" className="px-5 py-2 bg-blue-600 rounded text-white">Save</button>
-                            <button onClick={handleCancelEdit} type="button" className="px-5 py-2 bg-gray-600 rounded text-white">Cancel</button>
+                        <div className="flex gap-4 mt-6">
+                            <button type="submit" className="px-5 py-2 bg-indigo-600 text-white rounded hover:bg-indigo-700">
+                                Save
+                            </button>
+                            <button onClick={handleCancelEdit} type="button" className="px-5 py-2 bg-gray-400 text-white rounded hover:bg-gray-500">
+                                Cancel
+                            </button>
                         </div>
                     </form>
                 ) : (
-                    <div className="text-gray-600">
-                        <div className="flex items-center gap-4 mb-8">
+                    <div className="max-w-6xl bg-white rounded-lg p-6">
+                        {/* Profile Picture and Basic Details */}
+                        <div className="flex flex-col items-start">
                             <img
-                                className="w-20 rounded-full"
-                                src={backendUrl + "/empIMG/" + employeeProfile.image}
-                                alt="Employee"
+                                className=" items-start w-32 h-32 rounded-full border-4 border-indigo-500 object-cover"
+                                src={`${backendUrl}/empIMG/${employeeProfile.image}`}
+                                alt={`${formData.firstName}'s profile`}
                             />
-                            <h2 className='font-semibold text-xl'>{formData.firstName} {formData.lastName}</h2>
-
+                            <h1 className="text-2xl font-bold mt-4 text-gray-800">
+                                {formData.firstName} {formData.lastName}
+                            </h1>
+                            <p className="text-gray-500 mt-1 text-lg">{formData.position} - {formData.shift}</p>
                         </div>
 
-                        <div className="flex flex-col lg:flex-row gap-10">
-                            <div className="flex flex-col gap-4 w-full lg:flex-1">
-                                <div><strong>Gender:</strong> {formData.gender}</div>
-                                <div><strong>Email:</strong> {formData.email}</div>
-                                <div><strong>Phone:</strong> {formData.phone}</div>
-                                <div><strong>Address:</strong> {formData.address.line1}, {formData.address.line2}</div>
+                        {/* Employee Details Grid */}
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mt-6">
+                            {/* About Section */}
+                            <div className="bg-gray-100 p-4 rounded-lg shadow-inner">
+                                <h2 className="text-lg font-semibold text-gray-800">About</h2>
+                                <p className="text-gray-700 mt-2"><strong>Education:</strong> {formData.education}</p>
+                                <p className="text-gray-700"><strong>Phone:</strong> {formData.phone}</p>
                             </div>
 
-                            <div className="flex flex-col gap-4 w-full lg:flex-1">
-                                <div><strong>Position:</strong> {formData.position}</div>
-                                <div><strong>Shift:</strong> {formData.shift}</div>
-                                <div><strong>Education:</strong> {formData.education}</div>
-                                <div><strong>Experience:</strong> {formData.experience}</div>
-                                <div><strong>Salary:</strong> {formData.salary}</div>
+                            {/* Experience and Salary Section */}
+                            <div className="bg-gray-100 p-4 rounded-lg shadow-inner">
+                                <h2 className="text-lg font-semibold text-gray-800">Details</h2>
+                                <p className="text-gray-700"><strong>Experience:</strong> {formData.experience}</p>
+                                <p className="text-gray-700 text-xl font-bold mt-2"><strong>Salary:</strong> ${formData.salary}</p>
                             </div>
                         </div>
 
-                        <div className="mt-4">
-                            <strong>About:</strong>
-                            <p>{formData.about}</p>
+                        {/* Address Section */}
+                        <div className="bg-gray-100 p-4 rounded-lg shadow-inner mt-6">
+                            <h2 className="text-lg font-semibold text-gray-800">Address</h2>
+                            <p className="text-gray-700 mt-2">
+                                {formData.address.line1}, {formData.address.line2}
+                            </p>
                         </div>
-                        <button onClick={handleEditToggle} className="px-5 py-2 mt-5 bg-blue-600 rounded text-white">Edit</button>
-                        <button onClick={openModal} className="px-5 py-2 bg-red-600 rounded ml-2 text-white">Delete</button>
+
+                        {/* Buttons */}
+                        <div className="flex justify-center mt-6 gap-4">
+                            <button
+                                onClick={handleEditToggle}
+                                className="px-5 py-2 bg-blue-600 text-white rounded shadow hover:bg-blue-700 transition"
+                            >
+                                Edit
+                            </button>
+                            <button
+                                onClick={openModal}
+                                className="px-5 py-2 bg-red-600 text-white rounded shadow hover:bg-red-700 transition"
+                            >
+                                Delete
+                            </button>
+                        </div>
                     </div>
+
                 )}
             </div>
             <button onClick={() => navigate('/employees-list')} className="px-5 py-2 bg-gray-400 rounded text-white ml-7 mt-3">Back</button>

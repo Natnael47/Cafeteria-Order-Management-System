@@ -188,7 +188,7 @@ const List = () => {
         <div className="flex flex-col m-5 max-w-6xl w-full">
             {/* Header */}
             <div className="flex items-center justify-between mb-6">
-                <h1 className="text-2xl font-semibold text-gray-700">Food List</h1>
+                <h1 className="text-3xl font-bold text-gray-800">Food List</h1>
                 <div className="flex items-center space-x-4">
                     {/* New Food Button */}
                     <button
