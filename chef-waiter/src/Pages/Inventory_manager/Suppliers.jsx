@@ -17,6 +17,12 @@ const Suppliers = () => {
     const [isEditOpen, setIsEditOpen] = useState(false); // State to toggle update form
     const [isRemoveModalOpen, setIsRemoveModalOpen] = useState(false); // State to manage removal modal
     const [selectedSupplier, setSelectedSupplier] = useState(null); // Selected supplier for edit or delete
+    const [entriesPerPage, setEntriesPerPage] = useState(0); // Default to showing all entries
+
+    const handleEntriesChange = (e) => {
+        setEntriesPerPage(parseInt(e.target.value, 10)); // Update the state with the selected value
+    };
+    const displayedSuppliers = entriesPerPage === 0 ? supplierList : supplierList.slice(0, entriesPerPage);
 
     const [newSupplierData, setNewSupplierData] = useState({
         name: "",
@@ -90,7 +96,13 @@ const Suppliers = () => {
             <div className="flex items-center justify-between mb-4">
                 <div className="flex items-center space-x-2">
                     <label className="text-gray-700">Show</label>
-                    <select className="border border-gray-300 rounded px-2 py-1">
+                    <select
+                        className="border border-gray-300 rounded px-2 py-1"
+                        value={entriesPerPage}
+                        onChange={(e) => setEntriesPerPage(parseInt(e.target.value, 10))}
+                    >
+                        <option value="0">All</option> {/* Option to show all entries */}
+                        <option value="5">5</option>
                         <option value="10">10</option>
                         <option value="25">25</option>
                         <option value="50">50</option>
@@ -126,8 +138,8 @@ const Suppliers = () => {
                 </div>
 
                 {/* Data Rows */}
-                {supplierList.length > 0 ? (
-                    supplierList.map((supplier, index) => (
+                {displayedSuppliers.length > 0 ? (
+                    displayedSuppliers.map((supplier, index) => (
                         <div
                             key={supplier.id}
                             className={`grid grid-cols-[2fr_2fr_2fr_2fr_1fr_1fr_1fr] text-sm ${index % 2 === 0 ? "bg-gray-50" : "bg-white"
