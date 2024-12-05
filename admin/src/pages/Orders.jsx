@@ -72,7 +72,7 @@ const Orders = () => {
         <div className='m-5 w-full'>
             <p className="text-lg font-semibold">ORDER PAGE</p>
 
-            <div className='bg-[#F3F4F6] rounded w-full max-w-5.3xl max-h-[88vh] overflow-scroll'>
+            <div className='bg-[#F3F4F6] rounded w-full max-w-5.3xl max-h-[90vh] overflow-scroll'>
 
                 <div className='bg-[#F3F4F6]'>
                     {

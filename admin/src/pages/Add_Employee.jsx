@@ -73,7 +73,7 @@ const AddEmployee = () => {
                 setAddress1('');
                 setAddress2('');
                 setAbout('');
-                () => navigate('/employees-list')
+                navigate('/employees-list');
             } else {
                 toast.error(data.message);
             }
