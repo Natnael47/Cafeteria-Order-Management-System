@@ -51,6 +51,55 @@ const AdminContextProvider = (props) => {
         [token] // Add token as a dependency
     );
 
+    const updateEmployeeData = async (formData, employeeId) => {
+        const form = new FormData();
+        Object.keys(formData).forEach(key => {
+            if (key === 'address') {
+                form.append('address', JSON.stringify(formData[key]));
+            } else if (key === 'image' && formData[key] instanceof File) {
+                form.append('image', formData[key]);
+            } else {
+                form.append(key, formData[key]);
+            }
+        });
+
+        try {
+            const response = await axios.post(
+                `${backendUrl}/api/admin/update-employee`,
+                form,
+                { headers: { token, 'Content-Type': 'multipart/form-data' } }
+            );
+            if (response.data.success) {
+                toast.success('Employee profile updated successfully');
+                await getEmployeeData(employeeId); // Refresh employee data
+            } else {
+                toast.error('Failed to update employee profile');
+            }
+        } catch (error) {
+            console.error('Error updating employee profile:', error);
+            toast.error('Failed to update employee profile');
+        }
+    };
+
+    const deleteEmployee = async (employeeId) => {
+        try {
+            const response = await axios.post(
+                `${backendUrl}/api/employee/delete-employee`,
+                { empId: employeeId },
+                { headers: { token } }
+            );
+            if (response.data.success) {
+                toast.success("Employee deleted successfully");
+                navigate('/employees-list');
+            } else {
+                toast.error(response.data.message || "Failed to delete the employee");
+            }
+        } catch (error) {
+            console.error("Error deleting employee:", error);
+            toast.error("Failed to delete the employee");
+        }
+    };
+
     const value = {
         token,
         setToken,
@@ -59,7 +108,10 @@ const AdminContextProvider = (props) => {
         getAllEmployees,
         employeeProfile,
         getEmployeeData,
+        updateEmployeeData,
+        deleteEmployee,
     };
+
 
     return (
         <AdminContext.Provider value={value}>

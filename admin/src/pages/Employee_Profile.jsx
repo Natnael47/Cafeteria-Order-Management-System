@@ -1,20 +1,17 @@
-import axios from 'axios';
 import React, { useContext, useEffect, useState } from 'react';
 import Modal from "react-modal";
 import { useParams } from 'react-router-dom';
-import { toast } from 'react-toastify';
 import { backendUrl } from '../App';
 import { AdminContext } from '../context/AdminContext';
 Modal.setAppElement("#root");
 
 const Employee_Profile = () => {
     const { employeeId } = useParams();
-    const { getEmployeeData, employeeProfile, token, navigate } = useContext(AdminContext);
+    const { getEmployeeData, employeeProfile, navigate, updateEmployeeData, deleteEmployee } = useContext(AdminContext);
     const [modalIsOpen, setModalIsOpen] = useState(false);
 
     const openModal = () => setModalIsOpen(true);
     const closeModal = () => setModalIsOpen(false);
-
 
     const [isEditing, setIsEditing] = useState(false);
     const [formData, setFormData] = useState({
@@ -84,52 +81,10 @@ const Employee_Profile = () => {
         });
     };
 
-    const updatedEmployee = async () => {
-        const form = new FormData();
-        form.append('id', formData.id);
-        form.append('firstName', formData.firstName);
-        form.append('lastName', formData.lastName);
-        form.append('email', formData.email);
-        form.append('gender', formData.gender);
-        form.append('phone', formData.phone);
-        form.append('position', formData.position);
-        form.append('shift', formData.shift);
-        form.append('education', formData.education);
-        form.append('experience', formData.experience);
-        form.append('salary', formData.salary);
-        form.append('address', JSON.stringify(formData.address));
-        form.append('about', formData.about);
-        if (formData.image instanceof File) {
-            form.append('image', formData.image);
-        }
-
-        try {
-            const response = await axios.post(
-                `${backendUrl}/api/admin/update-employee`,
-                form,
-                {
-                    headers: {
-                        token,
-                        'Content-Type': 'multipart/form-data',
-                    },
-                }
-            );
-            if (response.data.success) {
-                toast.success('Employee profile updated successfully');
-                setIsEditing(false);
-                getEmployeeData(employeeId);
-            } else {
-                toast.error('Failed to update employee profile');
-            }
-        } catch (error) {
-            console.error('Error updating employee profile:', error);
-            toast.error('Failed to update employee profile');
-        }
-    };
-
     const handleSave = async (e) => {
         e.preventDefault();
-        await updatedEmployee();
+        await updateEmployeeData(formData, employeeId);
+        setIsEditing(false); // Exit edit mode
     };
 
     const handleImageChange = (e) => {
@@ -138,24 +93,7 @@ const Employee_Profile = () => {
     };
 
     const handleDelete = async () => {
-        try {
-            const response = await axios.post(
-                `${backendUrl}/api/employee/delete-employee`,
-                { empId: employeeId }, // Sending empId in the request body
-                {
-                    headers: { token },
-                }
-            );
-            if (response.data.success) {
-                toast.success("Employee deleted successfully");
-                navigate('/employees-list'); // Navigate back to the employee list after deletion
-            } else {
-                toast.error(response.data.message || "Failed to delete the employee");
-            }
-        } catch (error) {
-            console.error("Error deleting employee:", error);
-            toast.error("Failed to delete the employee");
-        }
+        await deleteEmployee(employeeId); // Call the context function
     };
 
     return (
