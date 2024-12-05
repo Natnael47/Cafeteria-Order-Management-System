@@ -12,6 +12,12 @@ const AdminContextProvider = (props) => {
     const [token, setToken] = useState(localStorage.getItem('token') || '');
     const [employees, setEmployees] = useState([]);
     const [employeeProfile, setEmployeeProfile] = useState({}); // Initialize as an object
+    const [dashboardData, setDashData] = useState({
+        users: 0,
+        employees: 0,
+        orders: 0,
+        latestOrders: [],
+    });
 
     const getAllEmployees = async () => {
         try {
@@ -100,6 +106,19 @@ const AdminContextProvider = (props) => {
         }
     };
 
+    const getDashData = async () => {
+        try {
+            const response = await axios.get(backendUrl + "/api/admin/dashboard", { headers: { token } });
+            if (response.data.success) {
+                setDashData(response.data.data);
+            } else {
+                toast.error("Error fetching dashboard data");
+            }
+        } catch (error) {
+            toast.error(error.message);
+        }
+    };
+
     const value = {
         token,
         setToken,
@@ -110,8 +129,9 @@ const AdminContextProvider = (props) => {
         getEmployeeData,
         updateEmployeeData,
         deleteEmployee,
+        dashboardData,
+        getDashData,
     };
-
 
     return (
         <AdminContext.Provider value={value}>

@@ -1,37 +1,18 @@
-import axios from 'axios';
 import { ListOrdered, Salad, ShoppingBag, SquareUser, Users } from 'lucide-react';
-import React, { useContext, useEffect, useState } from 'react';
-import { toast } from "react-toastify";
-import { backendUrl } from '../App';
+import React, { useContext, useEffect } from 'react';
 import { assets } from '../assets/assets';
 import { AdminContext } from '../context/AdminContext';
 
 const Dashboard = () => {
 
-    const { token } = useContext(AdminContext);
+    const { dashboardData: dashData, getDashData } = useContext(AdminContext);
 
-    const [dashData, setDashData] = useState({ users: 0, employees: 0, orders: 0, latestOrders: [] });
+    useEffect(() => {
+        getDashData();
+    }, [getDashData]);
 
     const iconSize = 62; // Adjust this value to set the size of the icons
     const iconColor = '#000000'; // Set your desired icon color here (e.g., dark gray)
-
-    const getDashData = async () => {
-        try {
-            const response = await axios.get(backendUrl + "/api/admin/dashboard", { headers: { token } });
-            if (response.data.success) {
-                setDashData(response.data.data)
-                //console.log(response.data.data);
-            } else {
-                toast.error("error");
-            }
-        } catch (error) {
-            toast.error(error.message)
-        }
-    }
-
-    useEffect(() => {
-        getDashData()
-    }, [])
 
     return (
         <div className='m-5 w-full'>
