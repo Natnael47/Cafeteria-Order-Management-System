@@ -121,8 +121,8 @@ const Suppliers = () => {
                     <div className="px-4 py-2 border-r border-black">Phone</div>
                     <div className="px-4 py-2 border-r border-black">Address</div>
                     <div className="px-4 py-2 border-r border-black">Status</div>
-                    <div className="px-4 py-2 border-r border-black">Modify</div>
-                    <div className="px-4 py-2">Remove</div>
+                    <div className="px-4 py-2 border-r border-black text-center">Modify</div>
+                    <div className="px-4 py-2 text-center">Remove</div>
                 </div>
 
                 {/* Data Rows */}
@@ -144,7 +144,7 @@ const Suppliers = () => {
                                 {supplier.contactInfo?.address || "N/A"}
                             </div>
                             <div className="px-4 py-2 border-r border-black">{supplier.status}</div>
-                            <div className="px-4 py-2 border-r border-black text-center">
+                            <div className="px-4 py-2 border-r border-black text-center flex justify-center items-center">
                                 <Pencil onClick={() => {
                                     setEditSupplierData({
                                         id: supplier.id,
@@ -157,7 +157,7 @@ const Suppliers = () => {
                                     setIsEditOpen(true);
                                 }} />
                             </div>
-                            <div className="px-4 py-2 text-center">
+                            <div className="px-4 py-2 text-center flex justify-center items-center">
                                 <Trash2 onClick={() => {
                                     setSelectedSupplier(supplier);
                                     setIsRemoveModalOpen(true);

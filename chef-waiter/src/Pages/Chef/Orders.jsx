@@ -1,6 +1,6 @@
 import axios from "axios";
+import { ChefHat } from 'lucide-react';
 import React, { useContext, useEffect, useState } from "react";
-import { assets } from "../../../../admin/src/assets/assets";
 import { backendUrl } from "../../App";
 import { ChefContext } from "../../Context/ChefContext";
 
@@ -54,6 +54,8 @@ const ChefOrders = () => {
                     const acceptedOrder = orders.find(order => order.id === orderId); // Find the accepted order
                     setTimeLeft(acceptedOrder.totalPrepTime * 60); // Convert minutes to seconds
                     setCurrentOrderItems(itemsResponse.data.items);
+                    console.log(itemsResponse.data.items);
+
                     setCurrentOrderId(orderId);
                 } else {
                     console.error("Failed to fetch order items.");
@@ -188,15 +190,11 @@ const ChefOrders = () => {
                                     className="grid grid-cols-1 sm:grid-cols-[0.5fr_2fr_1fr_1fr] gap-3 items-start border-2 border-black p-5 md:p-8 my-3 md:my-4 text-xs sm:text-sm text-black bg-white"
                                     key={order.id}
                                 >
-                                    <img
-                                        className="w-16"
-                                        src={assets.chef_icon}
-                                        alt="Chef Icon"
-                                    />
+                                    <ChefHat size={60} />
                                     <div>
                                         <div>
                                             {order.items.map((item, index) => (
-                                                <p className="py-0.5" key={index}>
+                                                <p className="py-0.5 text-2xl" key={index}>
                                                     {item.name} X <span>{item.quantity}</span>
                                                 </p>
                                             ))}
@@ -206,15 +204,6 @@ const ChefOrders = () => {
                                         </p>
                                         <div>
                                             <p>{order.address.street + ","}</p>
-                                            <p>
-                                                {order.address.city +
-                                                    ", " +
-                                                    order.address.state +
-                                                    ", " +
-                                                    order.address.country +
-                                                    ", " +
-                                                    order.address.zipcode}
-                                            </p>
                                         </div>
                                         <p>{order.address.phone}</p>
                                     </div>

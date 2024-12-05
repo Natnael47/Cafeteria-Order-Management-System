@@ -1,4 +1,5 @@
 import axios from 'axios';
+import { Minus, Plus } from 'lucide-react';
 import React, { useContext, useEffect, useState } from 'react';
 import Modal from 'react-modal';
 import { toast } from 'react-toastify';
@@ -199,7 +200,7 @@ const InventoryOrders = () => {
                     <div className="px-4 py-2 border-r border-black">Unit</div>
                     <div className="px-4 py-2 border-r border-black">Price</div>
                     <div className="px-4 py-2 border-r border-black">Order Date</div>
-                    <div className="px-4 py-2">Package</div>
+                    <div className="px-4 py-2 text-center">Package</div>
                 </div>
 
                 {orderList.length > 0 ? (
@@ -218,22 +219,11 @@ const InventoryOrders = () => {
                             <div className="px-4 py-2 border-r border-black">
                                 {new Date(order.orderDate).toLocaleDateString()}
                             </div>
-                            <div className="px-4 py-2 text-center">
+                            <div className="px-4 py-2 text-center flex justify-center items-center ">
                                 {isOrderInPackage(order.id, packageList) ? (
-                                    <button
-                                        className="text-red-500 text-2xl"
-                                        onClick={() => handleRemoveOrder(order)}  // Call handleRemoveOrder with the current order
-                                    >
-                                        -
-                                    </button>
-
+                                    <Minus className="text-red-500 text-2xl" onClick={() => handleRemoveOrder(order)} />
                                 ) : (
-                                    <button
-                                        className="text-green-500 text-2xl"
-                                        onClick={() => handlePackageClick(order.id)}
-                                    >
-                                        +
-                                    </button>
+                                    < Plus className="text-green-500 text-2xl" onClick={() => handlePackageClick(order.id)} />
                                 )}
                             </div>
                         </div>
