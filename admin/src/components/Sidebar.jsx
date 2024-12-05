@@ -30,7 +30,7 @@ const Sidebar = () => {
                 <NavLink
                     to="/"
                     className={({ isActive }) =>
-                        `flex items-center gap-3 py-3.5 px-3 md:px-9 md:min-w-72 cursor-pointer transform transition-transform duration-300 ease-in-out ${isActive ? 'bg-[#22C55E] scale-95 border-r-4 rounded-md border-[#22C55E]' : ''}`
+                        `flex items-center gap-3 py-3.5 px-3 md:px-9 md:min-w-72 cursor-pointer transform transition-transform duration-300 ease-in-out ${isActive ? 'bg-[#22C55E] scale-95 border-r-4 rounded-md shadow-lg border-[#22C55E]' : ''}`
                     }
                 >
                     {({ isActive }) => (
@@ -52,7 +52,7 @@ const Sidebar = () => {
                 <NavLink
                     to="/list"
                     className={({ isActive }) =>
-                        `flex items-center gap-3 py-3.5 px-3 md:px-9 md:min-w-72 cursor-pointer transform transition-transform duration-300 ease-in-out ${isActive ? 'bg-[#22C55E] scale-95 border-r-4 rounded-md border-primary' : ''}`
+                        `flex items-center gap-3 py-3.5 px-3 md:px-9 md:min-w-72 cursor-pointer transform transition-transform duration-300 ease-in-out ${isActive ? 'bg-[#22C55E] scale-95 border-r-4 rounded-md shadow-lg border-[#22C55E]' : ''}`
                     }
                 >
                     {({ isActive }) => (
@@ -74,7 +74,7 @@ const Sidebar = () => {
                 <NavLink
                     to="/orders"
                     className={({ isActive }) =>
-                        `flex items-center gap-3 py-3.5 px-3 md:px-9 md:min-w-72 cursor-pointer transform transition-transform duration-300 ease-in-out ${isActive ? 'bg-[#22C55E] scale-95 border-r-4 rounded-md border-primary' : ''}`
+                        `flex items-center gap-3 py-3.5 px-3 md:px-9 md:min-w-72 cursor-pointer transform transition-transform duration-300 ease-in-out ${isActive ? 'bg-[#22C55E] scale-95 border-r-4 rounded-md shadow-lg border-[#22C55E]' : ''}`
                     }
                 >
                     {({ isActive }) => (
@@ -96,7 +96,7 @@ const Sidebar = () => {
                 <NavLink
                     to="/employees-list"
                     className={({ isActive }) =>
-                        `flex items-center gap-3 py-3.5 px-3 md:px-9 md:min-w-72 cursor-pointer transform transition-transform duration-300 ease-in-out ${isActive ? 'bg-[#22C55E] scale-95 border-r-4 rounded-md border-primary' : ''}`
+                        `flex items-center gap-3 py-3.5 px-3 md:px-9 md:min-w-72 cursor-pointer transform transition-transform duration-300 ease-in-out ${isActive ? 'bg-[#22C55E] scale-95 border-r-4 rounded-md shadow-lg border-[#22C55E]' : ''}`
                     }
                 >
                     {({ isActive }) => (
@@ -118,7 +118,7 @@ const Sidebar = () => {
                 <NavLink
                     to="/reports"
                     className={({ isActive }) =>
-                        `flex items-center gap-3 py-3.5 px-3 md:px-9 md:min-w-72 cursor-pointer transform transition-transform duration-300 ease-in-out ${isActive ? 'bg-[#22C55E] scale-95 border-r-4 rounded-md border-primary' : ''}`
+                        `flex items-center gap-3 py-3.5 px-3 md:px-9 md:min-w-72 cursor-pointer transform transition-transform duration-300 ease-in-out ${isActive ? 'bg-[#22C55E] scale-95 border-r-4 rounded-md shadow-lg border-[#22C55E]' : ''}`
                     }
                 >
                     {({ isActive }) => (
@@ -140,7 +140,7 @@ const Sidebar = () => {
                 <NavLink
                     to="/users"
                     className={({ isActive }) =>
-                        `flex items-center gap-3 py-3.5 px-3 md:px-9 md:min-w-72 cursor-pointer transform transition-transform duration-300 ease-in-out ${isActive ? 'bg-[#22C55E] scale-95 border-r-4 rounded-md border-primary' : ''}`
+                        `flex items-center gap-3 py-3.5 px-3 md:px-9 md:min-w-72 cursor-pointer transform transition-transform duration-300 ease-in-out ${isActive ? 'bg-[#22C55E] scale-95 border-r-4 rounded-md shadow-lg border-[#22C55E]' : ''}`
                     }
                 >
                     {({ isActive }) => (
