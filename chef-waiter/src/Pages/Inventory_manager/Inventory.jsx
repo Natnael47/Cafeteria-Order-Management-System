@@ -185,99 +185,182 @@ const Inventory = () => {
 
 
     return (
-        <div className="flex flex-col m-5 w-full">
-            <p className="mb-3 text-lg font-semibold">All Inventory Items</p>
-            <div className="flex items-center justify-between mb-3">
-                <div className="flex items-center gap-4">
-                    <span className="text-gray-700">{getFormattedDate()}</span>
-                    <input
-                        type="text"
-                        placeholder="Search item name"
-                        value={searchTerm}
-                        onChange={(e) => setSearchTerm(e.target.value)}
-                        className="border border-gray-300 rounded px-3 py-1 focus:outline-none focus:ring-2 focus:ring-blue-500"
-                    />
+        <div className="flex flex-col m-5 w-full max-w-6.5xl">
+            {/* Header */}
+            <div className="flex flex-col space-y-2 mb-4">
+                {/* Top Section: Title and Buttons */}
+                <div className="flex items-center justify-between h-[10vh]">
+                    <h1 className="text-2xl sm:text-3xl font-extrabold text-gray-800">Inventory Items</h1>
+                    <div className="flex items-center space-x-3">
+                        {/* New Inventory Button */}
+                        <button
+                            className="px-4 py-2 bg-green-600 text-white font-medium rounded-md shadow-sm hover:bg-green-700 transition"
+                            onClick={() => navigate('/add_inventory')}
+                        >
+                            + New
+                        </button>
+                        {/* Icon Button */}
+                        <button className="p-2 bg-gray-100 text-gray-700 rounded-md shadow-sm hover:bg-gray-200 transition">
+                            <svg
+                                xmlns="http://www.w3.org/2000/svg"
+                                fill="none"
+                                viewBox="0 0 24 24"
+                                stroke="currentColor"
+                                className="w-5 h-5"
+                            >
+                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M4 8h16M4 16h16" />
+                            </svg>
+                        </button>
+                    </div>
                 </div>
 
-                <SortingDropdown onSortChange={handleSortChange} />
-
-                <button
-                    className="bg-blue-500 text-white rounded px-4 py-2 hover:bg-blue-600 transition-colors w-36"
-                    onClick={() => navigate('/add_inventory')}
-                >
-                    Add Item
-                </button>
-            </div>
-            <div className="bg-[#F3F4F6] rounded w-full max-w-5.3xl max-h-[82vh] overflow-scroll">
-                <div>
-                    <div className="grid grid-cols-[0.4fr_0.8fr_0.7fr_0.6fr_0.5fr_0.5fr_0.5fr] items-center gap-2 p-3 border text-sm font-medium bg-[#FAFAFA] text-black sm:grid">
-                        <b>Name</b>
-                        <b>Status</b>
-                        <b className="ml-2">Quantity</b>
-                        <b>Category</b>
-                        <b>Price / Unit</b>
-                        <b>Remove</b>
-                        <b>Modify</b>
+                {/* Middle Section: Search and Entries */}
+                <div className="flex items-center justify-between">
+                    {/* Entries Dropdown */}
+                    <div className="flex items-center space-x-2 text-sm">
+                        <label className="font-medium text-gray-700">Show</label>
+                        <select className="border border-gray-300 rounded px-3 py-1.5 focus:ring focus:ring-gray-200">
+                            <option value="10">10</option>
+                            <option value="25">25</option>
+                            <option value="50">50</option>
+                        </select>
+                        <label className="font-medium text-gray-700">entries</label>
+                    </div>
+                    {/* Sorting  & search */}
+                    <div className="flex items-center justify-end gap-5">
+                        <SortingDropdown onSortChange={handleSortChange} />
+                        {/* Search Bar */}
+                        <input
+                            type="text"
+                            placeholder="Search by item name"
+                            value={searchTerm}
+                            onChange={(e) => setSearchTerm(e.target.value)}
+                            className="border border-gray-300 rounded px-4 py-2 w-full sm:w-64 shadow-sm focus:ring focus:ring-gray-200"
+                        />
                     </div>
 
-                    {filteredAndSortedInventoryList.map((item, index) => (
-                        <div key={index}>
-                            <div className={`grid grid-cols-[0.4fr_0.8fr_0.7fr_0.6fr_0.5fr_0.5fr_0.5fr] items-center gap-2 p-3 border text-sm font-medium sm:grid ${item.status === "out of stock" ? "bg-red-100" : "bg-white"}`}>
+                </div>
+            </div>
 
-                                <p className="text-[#112F45] cursor-pointer hover:text-blue-500 hover:font-bold" onClick={() => handleNameClick(index)}>
-                                    {item.name}
+
+            <div className="bg-[#F3F4F6] rounded-lg w-full max-h-[82vh] overflow-y-auto shadow-lg">
+                {/* Header */}
+                <div className="grid grid-cols-[0.4fr_0.8fr_0.7fr_0.6fr_0.5fr_0.5fr_0.5fr] items-center gap-4 p-4 border-b bg-[#FAFAFA] text-sm font-semibold text-gray-800">
+                    <b>Name</b>
+                    <b>Status</b>
+                    <b className="ml-2">Quantity</b>
+                    <b>Category</b>
+                    <b>Price / Unit</b>
+                    <b>Remove</b>
+                    <b>Modify</b>
+                </div>
+
+                {/* Inventory Items */}
+                {filteredAndSortedInventoryList.map((item, index) => (
+                    <div key={index} className="border-b last:border-none">
+                        {/* Item Row */}
+                        <div
+                            className={`grid grid-cols-[0.4fr_0.8fr_0.7fr_0.6fr_0.5fr_0.5fr_0.5fr] items-center gap-4 p-4 text-sm font-medium ${item.status === "out of stock" ? "bg-red-100" : "bg-white"
+                                }`}
+                        >
+                            <p
+                                className="text-[#112F45] cursor-pointer hover:text-blue-500 hover:font-bold truncate"
+                                onClick={() => handleNameClick(index)}
+                            >
+                                {item.name}
+                            </p>
+                            <div className="relative w-[150px] bg-gray-200 rounded-full h-8 overflow-hidden">
+                                <div
+                                    className="absolute top-0 left-0 h-8 rounded-full transition-all"
+                                    style={{
+                                        width: `${Math.min(Number(item.status), 100)}%`,
+                                        backgroundColor: `hsl(${Number(item.status) * 1.2}, 100%, 50%)`,
+                                    }}
+                                ></div>
+                                <p className="absolute inset-0 flex items-center justify-center text-xs font-semibold text-black">
+                                    {item.status}%
                                 </p>
-                                <div className="relative w-[200px] bg-gray-200 rounded h-8">
-                                    <div
-                                        className={`absolute top-0 left-0 h-8 rounded transition-all`}
-                                        style={{
-                                            width: `${Math.min(Number(item.status), 100)}%`,
-                                            backgroundColor: `hsl(${Number(item.status) * 1.2}, 100%, 50%)` // Smooth transition using HSL color
-                                        }}
-                                    ></div>
-                                    <p className="absolute inset-0 flex items-center justify-center text-sm font-semibold text-black">
-                                        {item.status}%
+                            </div>
+                            <p className="ml-2">{item.quantity} {item.unit}</p>
+                            <p className="truncate">{item.category}</p>
+                            <p>${item.pricePerUnit}</p>
+                            <Trash2
+                                onClick={() => openModal(item.id)}
+                                className="cursor-pointer text-red-500 hover:text-red-700"
+                                size={20}
+                            />
+                            <Pencil
+                                className="cursor-pointer text-blue-500 hover:text-blue-700"
+                                onClick={() => handleEditClick(item, index)}
+                                size={20}
+                            />
+                        </div>
+
+                        {/* Selected Item Details */}
+                        {selectedIndex === index && (
+                            <div className="p-6 border-t bg-white shadow-md rounded-lg mt-4 flex items-center gap-6">
+                                {/* Item Image */}
+                                <div className="w-40 h-40 flex-shrink-0">
+                                    <img
+                                        className="w-full h-full object-cover rounded-lg border border-gray-200"
+                                        src={item.image ? `${backendUrl}/Inv_img/${item.image}` : "placeholder.jpg"}
+                                        alt={item.name}
+                                    />
+                                </div>
+
+                                {/* Item Details */}
+                                <div className="flex-grow space-y-2 text-gray-700">
+                                    <h3 className="text-xl font-bold text-gray-800 mb-4">{item.name}</h3>
+                                    <p className="text-sm flex">
+                                        <span className="w-32 font-semibold text-gray-800">Category:</span>
+                                        <span>{item.category}</span>
+                                    </p>
+                                    <p className="text-sm flex">
+                                        <span className="w-32 font-semibold text-gray-800">Quantity:</span>
+                                        <span>
+                                            {item.quantity} {item.unit}
+                                        </span>
+                                    </p>
+                                    <p className="text-sm flex">
+                                        <span className="w-32 font-semibold text-gray-800">Price/Unit:</span>
+                                        <span>${item.pricePerUnit}</span>
+                                    </p>
+                                    <p className="text-sm flex">
+                                        <span className="w-32 font-semibold text-gray-800">Status:</span>
+                                        <span
+                                            className={`px-2 py-1 rounded-full text-sm font-medium ${item.status === "out of stock"
+                                                ? "bg-red-100 text-red-700"
+                                                : "bg-green-100 text-green-700"
+                                                }`}
+                                        >
+                                            {item.status}
+                                        </span>
                                     </p>
                                 </div>
-                                <p className="ml-2">{item.quantity} {item.unit}</p>
-                                <p>{item.category}</p>
-                                <p>${item.pricePerUnit}</p>
-                                <Trash2 onClick={() => openModal(item.id)} className="cursor-pointer pl-1" size={28} />
-                                <Pencil className="cursor-pointer pl-1" onClick={() => handleEditClick(item, index)} size={28} />
                             </div>
-                            {selectedIndex === index && (
-                                <div className="p-4 border-t bg-gray-50">
-                                    <h3 className="text-lg font-semibold mb-2">{item.name}</h3>
-                                    <img
-                                        className="w-40 object-cover mb-2"
-                                        src={item.image ? backendUrl + "/Inv_img/" + item.image : "placeholder.jpg"}
-                                        alt=""
-                                    />
-                                    <p><strong>Category:</strong> {item.category}</p>
-                                    <p><strong>Quantity:</strong> {item.quantity} {item.unit}</p>
-                                    <p><strong>Price/Unit:</strong> ${item.pricePerUnit}</p>
-                                    <p><strong>Status:</strong> {item.status}</p>
-                                </div>
-                            )}
-                            {editIndex === index && (
-                                <div ref={editRef} className="p-4 border-t bg-gray-50">
-                                    <div className="mb-2">
-                                        <label className="block text-sm font-medium">Name</label>
+                        )}
+
+                        {/* Edit Section */}
+                        {editIndex === index && (
+                            <div ref={editRef} className="p-4 border-t bg-gray-50">
+                                <div className="grid gap-4">
+                                    <div>
+                                        <label className="block text-sm font-medium mb-1">Name</label>
                                         <input
                                             type="text"
                                             name="name"
                                             value={editInventory.name}
                                             onChange={handleInputChange}
-                                            className="border p-2 rounded w-full"
+                                            className="border border-gray-300 rounded-lg p-2 w-full"
                                         />
                                     </div>
-                                    <div className="mb-2">
-                                        <label className="block text-sm font-medium">Category</label>
+                                    <div>
+                                        <label className="block text-sm font-medium mb-1">Category</label>
                                         <select
                                             name="category"
                                             value={editInventory.category}
                                             onChange={handleInputChange}
-                                            className="border p-2 rounded w-full"
+                                            className="border border-gray-300 rounded-lg p-2 w-full"
                                         >
                                             <option value="Food Supplies">Food Supplies</option>
                                             <option value="Beverages">Beverages</option>
@@ -286,23 +369,23 @@ const Inventory = () => {
                                             <option value="Electronics">Electronics</option>
                                         </select>
                                     </div>
-                                    <div className="mb-2">
-                                        <label className="block text-sm font-medium">Quantity</label>
+                                    <div>
+                                        <label className="block text-sm font-medium mb-1">Quantity</label>
                                         <input
                                             type="number"
                                             name="quantity"
                                             value={editInventory.quantity}
                                             onChange={handleInputChange}
-                                            className="border p-2 rounded w-full"
+                                            className="border border-gray-300 rounded-lg p-2 w-full"
                                         />
                                     </div>
-                                    <div className="mb-2">
-                                        <label className="block text-sm font-medium">Unit</label>
+                                    <div>
+                                        <label className="block text-sm font-medium mb-1">Unit</label>
                                         <select
                                             name="unit"
                                             value={editInventory.unit}
                                             onChange={handleInputChange}
-                                            className="border p-2 rounded w-full"
+                                            className="border border-gray-300 rounded-lg p-2 w-full"
                                         >
                                             <option value="kg">kg</option>
                                             <option value="liters">liters</option>
@@ -311,56 +394,57 @@ const Inventory = () => {
                                             <option value="grams">grams</option>
                                         </select>
                                     </div>
-                                    <div className="mb-2">
-                                        <label className="block text-sm font-medium">Price per Unit</label>
+                                    <div>
+                                        <label className="block text-sm font-medium mb-1">Price per Unit</label>
                                         <input
                                             type="number"
                                             name="pricePerUnit"
                                             value={editInventory.pricePerUnit}
                                             onChange={handleInputChange}
-                                            className="border p-2 rounded w-full"
+                                            className="border border-gray-300 rounded-lg p-2 w-full"
                                         />
                                     </div>
-                                    <div className="mb-2">
-                                        <label className="block text-sm font-medium">Status</label>
-                                        <input
-                                            type="text"
-                                            name="status"
-                                            value={editInventory.status}
-                                            onChange={handleInputChange}
-                                            className="border p-2 rounded w-full"
-                                        />
-                                    </div>
-                                    <div className="mb-2">
-                                        <label className="block text-sm font-medium">Image</label>
+                                    <div>
+                                        <label className="block text-sm font-medium mb-1">Image</label>
                                         <input
                                             type="file"
                                             onChange={handleImageChange}
-                                            className="border p-2 rounded w-full"
+                                            className="border border-gray-300 rounded-lg p-2 w-full"
                                         />
-                                        {editInventory.image && (typeof editInventory.image === 'object' ? (
+                                        {editInventory.image && (typeof editInventory.image === "object" ? (
                                             <img
-                                                className="w-40 object-cover mt-2"
+                                                className="w-32 h-32 object-cover mt-2 rounded"
                                                 src={URL.createObjectURL(editInventory.image)}
                                                 alt=""
                                             />
                                         ) : (
                                             <img
-                                                className="w-40 object-cover mt-2"
+                                                className="w-32 h-32 object-cover mt-2 rounded"
                                                 src={`${backendUrl}/Inv_img/${editInventory.image}`}
                                                 alt=""
                                             />
                                         ))}
                                     </div>
-                                    <div className="flex justify-end gap-4 mt-4">
-                                        <button onClick={cancelEdit} className="py-2 px-4 bg-gray-300 text-gray-700 rounded">Cancel</button>
-                                        <button onClick={handleUpdateInventory} disabled={!hasChanges} className="py-2 px-4 bg-blue-500 text-white rounded disabled:opacity-50">Save</button>
-                                    </div>
                                 </div>
-                            )}
-                        </div>
-                    ))}
-                </div>
+                                <div className="flex justify-end gap-4 mt-4">
+                                    <button
+                                        onClick={cancelEdit}
+                                        className="py-2 px-4 bg-gray-300 text-gray-700 rounded-lg hover:bg-gray-400 transition"
+                                    >
+                                        Cancel
+                                    </button>
+                                    <button
+                                        onClick={handleUpdateInventory}
+                                        disabled={!hasChanges}
+                                        className="py-2 px-4 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition disabled:opacity-50"
+                                    >
+                                        Save
+                                    </button>
+                                </div>
+                            </div>
+                        )}
+                    </div>
+                ))}
             </div>
             <Modal
                 isOpen={modalIsOpen}

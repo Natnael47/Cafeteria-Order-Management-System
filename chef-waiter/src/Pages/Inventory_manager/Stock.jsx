@@ -244,7 +244,7 @@ const Stock = () => {
 
 
     return (
-        <div className="flex flex-col m-5 w-full">
+        <div className="flex flex-col m-5 w-full max-w-6.5xl">
             <p className="mb-3 text-lg font-semibold">Stock Overview</p>
             <div className="flex items-center justify-between mb-3">
                 <div className="flex items-center gap-4">
@@ -265,7 +265,7 @@ const Stock = () => {
                 </button>
 
             </div>
-            <div className="bg-[#F3F4F6] rounded w-full max-w-5.3xl max-h-[83vh] overflow-scroll">
+            <div className="bg-[#F3F4F6] rounded w-full max-h-[83vh] overflow-scroll">
                 <div>
                     <div className="grid grid-cols-[1fr_1fr_1fr_1fr_1fr_0.5fr_0.5fr] items-center gap-2 p-3 border text-sm font-medium bg-[#FAFAFA] text-black sm:grid">
                         <b>Status</b>

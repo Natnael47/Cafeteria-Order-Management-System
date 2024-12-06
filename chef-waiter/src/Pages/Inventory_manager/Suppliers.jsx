@@ -86,7 +86,7 @@ const Suppliers = () => {
     };
 
     return (
-        <div className="flex flex-col m-5 w-full">
+        <div className="flex flex-col m-5 w-full max-w-6.5xl">
             {/* Header */}
             <div className="flex items-center justify-between mb-6">
                 <h1 className="text-2xl font-semibold text-gray-700">Suppliers</h1>
@@ -125,16 +125,16 @@ const Suppliers = () => {
             </div>
 
             {/* Data Grid */}
-            <div className="bg-white shadow border border-black rounded overflow-hidden">
+            <div className="bg-white shadow-lg border border-gray-300 rounded-lg overflow-hidden">
                 {/* Header Row */}
-                <div className="grid grid-cols-[2fr_2fr_2fr_2fr_1fr_1fr_1fr] bg-gray-200 border-b border-black font-medium text-gray-700">
-                    <div className="px-4 py-2 border-r border-black">Supplier Name</div>
-                    <div className="px-4 py-2 border-r border-black">Email</div>
-                    <div className="px-4 py-2 border-r border-black">Phone</div>
-                    <div className="px-4 py-2 border-r border-black">Address</div>
-                    <div className="px-4 py-2 border-r border-black">Status</div>
-                    <div className="px-4 py-2 border-r border-black text-center">Modify</div>
-                    <div className="px-4 py-2 text-center">Remove</div>
+                <div className="grid grid-cols-[2fr_2fr_2fr_2fr_1fr_1fr_1fr] bg-gray-100 border-b border-gray-300 font-semibold text-gray-800">
+                    <div className="px-6 py-3 border-r border-gray-300 text-left">Supplier Name</div>
+                    <div className="px-6 py-3 border-r border-gray-300 text-left">Email</div>
+                    <div className="px-6 py-3 border-r border-gray-300 text-left">Phone</div>
+                    <div className="px-6 py-3 border-r border-gray-300 text-left">Address</div>
+                    <div className="px-6 py-3 border-r border-gray-300 text-center">Status</div>
+                    <div className="px-6 py-3 border-r border-gray-300 text-center">Modify</div>
+                    <div className="px-6 py-3 text-center">Remove</div>
                 </div>
 
                 {/* Data Rows */}
@@ -143,42 +143,57 @@ const Suppliers = () => {
                         <div
                             key={supplier.id}
                             className={`grid grid-cols-[2fr_2fr_2fr_2fr_1fr_1fr_1fr] text-sm ${index % 2 === 0 ? "bg-gray-50" : "bg-white"
-                                } border-b border-black`}
+                                } border-b border-gray-300`}
                         >
-                            <div className="px-4 py-2 border-r border-black">{supplier.name}</div>
-                            <div className="px-4 py-2 border-r border-black">
-                                {supplier.contactInfo?.email || "N/A"}
+                            <div className="px-6 py-3 border-r border-gray-300">{supplier.name}</div>
+                            <div className="px-6 py-3 border-r border-gray-300">
+                                {supplier.contactInfo?.email || <span className="italic text-gray-500">N/A</span>}
                             </div>
-                            <div className="px-4 py-2 border-r border-black">
-                                {supplier.contactInfo?.phone || "N/A"}
+                            <div className="px-6 py-3 border-r border-gray-300">
+                                {supplier.contactInfo?.phone || <span className="italic text-gray-500">N/A</span>}
                             </div>
-                            <div className="px-4 py-2 border-r border-black">
-                                {supplier.contactInfo?.address || "N/A"}
+                            <div className="px-6 py-3 border-r border-gray-300">
+                                {supplier.contactInfo?.address || <span className="italic text-gray-500">N/A</span>}
                             </div>
-                            <div className="px-4 py-2 border-r border-black">{supplier.status}</div>
-                            <div className="px-4 py-2 border-r border-black text-center flex justify-center items-center">
-                                <Pencil onClick={() => {
-                                    setEditSupplierData({
-                                        id: supplier.id,
-                                        name: supplier.name,
-                                        email: supplier.contactInfo?.email || "",
-                                        phone: supplier.contactInfo?.phone || "",
-                                        address: supplier.contactInfo?.address || "",
-                                        status: supplier.status,
-                                    });
-                                    setIsEditOpen(true);
-                                }} />
+                            <div className="px-6 py-3 border-r border-gray-300 text-center">
+                                <span
+                                    className={`px-2 py-1 rounded-full text-xs ${supplier.status === "active"
+                                        ? "bg-green-100 text-green-800"
+                                        : "bg-red-100 text-red-800"
+                                        }`}
+                                >
+                                    {supplier.status}
+                                </span>
                             </div>
-                            <div className="px-4 py-2 text-center flex justify-center items-center">
-                                <Trash2 onClick={() => {
-                                    setSelectedSupplier(supplier);
-                                    setIsRemoveModalOpen(true);
-                                }} />
+                            <div className="px-6 py-3 border-r border-gray-300 text-center flex justify-center items-center">
+                                <Pencil
+                                    className="text-blue-500 cursor-pointer hover:text-blue-700"
+                                    onClick={() => {
+                                        setEditSupplierData({
+                                            id: supplier.id,
+                                            name: supplier.name,
+                                            email: supplier.contactInfo?.email || "",
+                                            phone: supplier.contactInfo?.phone || "",
+                                            address: supplier.contactInfo?.address || "",
+                                            status: supplier.status,
+                                        });
+                                        setIsEditOpen(true);
+                                    }}
+                                />
+                            </div>
+                            <div className="px-6 py-3 text-center flex justify-center items-center">
+                                <Trash2
+                                    className="text-red-500 cursor-pointer hover:text-red-700"
+                                    onClick={() => {
+                                        setSelectedSupplier(supplier);
+                                        setIsRemoveModalOpen(true);
+                                    }}
+                                />
                             </div>
                         </div>
                     ))
                 ) : (
-                    <div className="text-center text-gray-500 py-4">No suppliers found.</div>
+                    <div className="text-center text-gray-500 py-6 italic">No suppliers found.</div>
                 )}
             </div>
 
@@ -187,55 +202,60 @@ const Suppliers = () => {
                 <Modal
                     isOpen={isPopupOpen}
                     onRequestClose={() => setIsPopupOpen(false)}
-                    className="bg-white p-6 rounded shadow-lg w-[90%] max-w-lg mx-auto mt-20"
-                    overlayClassName="fixed inset-0 bg-black bg-opacity-50 z-50"
+                    className="bg-white p-8 rounded-lg shadow-xl w-[90%] max-w-lg mx-auto mt-20 animate-fadeIn"
+                    overlayClassName="fixed inset-0 bg-black bg-opacity-60 z-50 flex items-center justify-center"
                 >
-                    <h2 className="text-xl font-semibold text-gray-700 mb-4">Add New Supplier</h2>
+                    <h2 className="text-2xl font-bold text-gray-800 mb-6 text-center">Add New Supplier</h2>
+
                     {/* Form */}
-                    <input
-                        type="text"
-                        name="name"
-                        value={newSupplierData.name}
-                        onChange={handleChange}
-                        placeholder="Supplier Name"
-                        className="w-full border border-gray-300 rounded px-4 py-2 mb-2"
-                    />
-                    <input
-                        type="email"
-                        name="email"
-                        value={newSupplierData.email}
-                        onChange={handleChange}
-                        placeholder="Email"
-                        className="w-full border border-gray-300 rounded px-4 py-2 mb-2"
-                    />
-                    <input
-                        type="text"
-                        name="phone"
-                        value={newSupplierData.phone}
-                        onChange={handleChange}
-                        placeholder="Phone"
-                        className="w-full border border-gray-300 rounded px-4 py-2 mb-2"
-                    />
-                    <input
-                        type="text"
-                        name="address"
-                        value={newSupplierData.address}
-                        onChange={handleChange}
-                        placeholder="Address"
-                        className="w-full border border-gray-300 rounded px-4 py-2 mb-2"
-                    />
-                    <div className="flex justify-end space-x-4 mt-4">
+                    <div className="space-y-4">
+                        <input
+                            type="text"
+                            name="name"
+                            value={newSupplierData.name}
+                            onChange={handleChange}
+                            placeholder="Supplier Name"
+                            className="w-full border border-gray-300 rounded-lg px-4 py-3 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                        />
+                        <input
+                            type="email"
+                            name="email"
+                            value={newSupplierData.email}
+                            onChange={handleChange}
+                            placeholder="Email"
+                            className="w-full border border-gray-300 rounded-lg px-4 py-3 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                        />
+                        <input
+                            type="text"
+                            name="phone"
+                            value={newSupplierData.phone}
+                            onChange={handleChange}
+                            placeholder="Phone"
+                            className="w-full border border-gray-300 rounded-lg px-4 py-3 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                        />
+                        <input
+                            type="text"
+                            name="address"
+                            value={newSupplierData.address}
+                            onChange={handleChange}
+                            placeholder="Address"
+                            className="w-full border border-gray-300 rounded-lg px-4 py-3 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                        />
+                    </div>
+
+                    {/* Action Buttons */}
+                    <div className="flex justify-end space-x-4 mt-6">
                         <button
                             onClick={() => setIsPopupOpen(false)}
-                            className="bg-gray-300 text-gray-700 px-4 py-2 rounded"
+                            className="bg-gray-200 text-gray-700 px-5 py-2 rounded-lg hover:bg-gray-300 transition"
                         >
                             Cancel
                         </button>
                         <button
                             onClick={handleAddSupplier}
-                            className="bg-blue-500 text-white px-4 py-2 rounded"
+                            className="bg-blue-600 text-white px-5 py-2 rounded-lg hover:bg-blue-700 transition"
                         >
-                            Add
+                            Add Supplier
                         </button>
                     </div>
                 </Modal>
@@ -246,64 +266,99 @@ const Suppliers = () => {
                 <Modal
                     isOpen={isEditOpen}
                     onRequestClose={() => setIsEditOpen(false)}
-                    className="bg-white p-6 rounded shadow-lg w-[90%] max-w-lg mx-auto mt-20"
-                    overlayClassName="fixed inset-0 bg-black bg-opacity-50 z-50"
+                    className="bg-white p-8 rounded-lg shadow-xl w-[90%] max-w-lg mx-auto mt-20 animate-fadeIn"
+                    overlayClassName="fixed inset-0 bg-black bg-opacity-60 z-50 flex items-center justify-center"
                 >
-                    <h2 className="text-xl font-semibold text-gray-700 mb-4">Edit Supplier</h2>
+                    <h2 className="text-2xl font-bold text-gray-800 mb-6 text-center">Edit Supplier</h2>
+
                     {/* Form */}
-                    <input
-                        type="text"
-                        name="name"
-                        value={editSupplierData.name}
-                        onChange={(e) => handleChange(e, true)}
-                        placeholder="Supplier Name"
-                        className="w-full border border-gray-300 rounded px-4 py-2 mb-2"
-                    />
-                    <input
-                        type="email"
-                        name="email"
-                        value={editSupplierData.email}
-                        onChange={(e) => handleChange(e, true)}
-                        placeholder="Email"
-                        className="w-full border border-gray-300 rounded px-4 py-2 mb-2"
-                    />
-                    <input
-                        type="text"
-                        name="phone"
-                        value={editSupplierData.phone}
-                        onChange={(e) => handleChange(e, true)}
-                        placeholder="Phone"
-                        className="w-full border border-gray-300 rounded px-4 py-2 mb-2"
-                    />
-                    <input
-                        type="text"
-                        name="address"
-                        value={editSupplierData.address}
-                        onChange={(e) => handleChange(e, true)}
-                        placeholder="Address"
-                        className="w-full border border-gray-300 rounded px-4 py-2 mb-2"
-                    />
-                    <select
-                        name="status"
-                        value={editSupplierData.status}
-                        onChange={(e) => handleChange(e, true)}
-                        className="w-full border border-gray-300 rounded px-4 py-2 mb-2"
-                    >
-                        <option value="active">Active</option>
-                        <option value="inactive">Inactive</option>
-                    </select>
-                    <div className="flex justify-end space-x-4 mt-4">
+                    <div className="space-y-4">
+                        <div>
+                            <label htmlFor="name" className="block text-sm font-medium text-gray-600 mb-1">
+                                Supplier Name
+                            </label>
+                            <input
+                                id="name"
+                                type="text"
+                                name="name"
+                                value={editSupplierData.name}
+                                onChange={(e) => handleChange(e, true)}
+                                className="w-full border border-gray-300 rounded-lg px-4 py-3 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                            />
+                        </div>
+
+                        <div>
+                            <label htmlFor="email" className="block text-sm font-medium text-gray-600 mb-1">
+                                Email
+                            </label>
+                            <input
+                                id="email"
+                                type="email"
+                                name="email"
+                                value={editSupplierData.email}
+                                onChange={(e) => handleChange(e, true)}
+                                className="w-full border border-gray-300 rounded-lg px-4 py-3 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                            />
+                        </div>
+
+                        <div>
+                            <label htmlFor="phone" className="block text-sm font-medium text-gray-600 mb-1">
+                                Phone
+                            </label>
+                            <input
+                                id="phone"
+                                type="text"
+                                name="phone"
+                                value={editSupplierData.phone}
+                                onChange={(e) => handleChange(e, true)}
+                                className="w-full border border-gray-300 rounded-lg px-4 py-3 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                            />
+                        </div>
+
+                        <div>
+                            <label htmlFor="address" className="block text-sm font-medium text-gray-600 mb-1">
+                                Address
+                            </label>
+                            <input
+                                id="address"
+                                type="text"
+                                name="address"
+                                value={editSupplierData.address}
+                                onChange={(e) => handleChange(e, true)}
+                                className="w-full border border-gray-300 rounded-lg px-4 py-3 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                            />
+                        </div>
+
+                        <div>
+                            <label htmlFor="status" className="block text-sm font-medium text-gray-600 mb-1">
+                                Status
+                            </label>
+                            <select
+                                id="status"
+                                name="status"
+                                value={editSupplierData.status}
+                                onChange={(e) => handleChange(e, true)}
+                                className="w-full border border-gray-300 rounded-lg px-4 py-3 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                            >
+                                <option value="active">Active</option>
+                                <option value="inactive">Inactive</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    {/* Action Buttons */}
+                    <div className="flex justify-end space-x-4 mt-6">
                         <button
                             onClick={() => setIsEditOpen(false)}
-                            className="bg-gray-300 text-gray-700 px-4 py-2 rounded"
+                            className="bg-gray-200 text-gray-700 px-5 py-2 rounded-lg hover:bg-gray-300 transition"
                         >
                             Cancel
                         </button>
                         <button
                             onClick={handleUpdateSupplier}
-                            className="bg-blue-500 text-white px-4 py-2 rounded"
+                            className="bg-blue-600 text-white px-5 py-2 rounded-lg hover:bg-blue-700 transition"
                         >
-                            Save
+                            Save Changes
                         </button>
                     </div>
                 </Modal>
