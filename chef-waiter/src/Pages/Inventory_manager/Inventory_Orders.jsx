@@ -394,11 +394,13 @@ const InventoryOrders = () => {
                             <option value="" disabled>
                                 Select Supplier
                             </option>
-                            {supplierList.map((supplier) => (
-                                <option key={supplier.id} value={supplier.id}>
-                                    {supplier.name}
-                                </option>
-                            ))}
+                            {supplierList
+                                .filter((supplier) => supplier.status === "active") // Filter active suppliers
+                                .map((supplier) => (
+                                    <option key={supplier.id} value={supplier.id}>
+                                        {supplier.name}
+                                    </option>
+                                ))}
                         </select>
                     </div>
                     <div className="flex justify-end space-x-4 mt-6">

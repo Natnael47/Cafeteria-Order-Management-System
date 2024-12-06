@@ -469,11 +469,13 @@ const Stock = () => {
                                                         className="mt-1 p-2 border border-gray-300 rounded w-full focus:outline-none focus:ring-2 focus:ring-green-400 focus:border-green-400"
                                                     >
                                                         <option value="">Select a supplier</option>
-                                                        {supplierList.map((supplier) => (
-                                                            <option key={supplier.id} value={supplier.id}>
-                                                                {supplier.name}
-                                                            </option>
-                                                        ))}
+                                                        {supplierList
+                                                            .filter((supplier) => supplier.status === "active") // Filter active suppliers
+                                                            .map((supplier) => (
+                                                                <option key={supplier.id} value={supplier.id}>
+                                                                    {supplier.name}
+                                                                </option>
+                                                            ))}
                                                     </select>
                                                 </div>
 

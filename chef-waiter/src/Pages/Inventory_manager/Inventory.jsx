@@ -267,16 +267,16 @@ const Inventory = () => {
                             >
                                 {item.name}
                             </p>
-                            <div className="relative w-[150px] bg-gray-200 rounded-full h-8 overflow-hidden">
+                            <div className="relative w-[170px] bg-gray-200 rounded-full h-8 overflow-hidden">
                                 <div
                                     className="absolute top-0 left-0 h-8 rounded-full transition-all"
                                     style={{
                                         width: `${Math.min(Number(item.status), 100)}%`,
-                                        backgroundColor: `hsl(${Number(item.status) * 1.2}, 100%, 50%)`,
+                                        backgroundColor: `hsl(${Math.min(Number(item.status), 100) * 1.2}, 100%, 50%)`,
                                     }}
                                 ></div>
                                 <p className="absolute inset-0 flex items-center justify-center text-xs font-semibold text-black">
-                                    {item.status}%
+                                    {item.status}% {/* Display the current status percentage */}
                                 </p>
                             </div>
                             <p className="ml-2">{item.quantity} {item.unit}</p>
@@ -296,7 +296,7 @@ const Inventory = () => {
 
                         {/* Selected Item Details */}
                         {selectedIndex === index && (
-                            <div className="p-6 border-t bg-white shadow-md rounded-lg mt-4 flex items-center gap-6">
+                            <div className="p-6 border-t bg-white shadow-md rounded-lg mt-2 mb-2 flex items-center gap-6">
                                 {/* Item Image */}
                                 <div className="w-40 h-40 flex-shrink-0">
                                     <img
@@ -310,21 +310,21 @@ const Inventory = () => {
                                 <div className="flex-grow space-y-2 text-gray-700">
                                     <h3 className="text-xl font-bold text-gray-800 mb-4">{item.name}</h3>
                                     <p className="text-sm flex">
-                                        <span className="w-32 font-semibold text-gray-800">Category:</span>
+                                        <span className="w-28 font-semibold text-gray-800">Category:</span>
                                         <span>{item.category}</span>
                                     </p>
                                     <p className="text-sm flex">
-                                        <span className="w-32 font-semibold text-gray-800">Quantity:</span>
+                                        <span className="w-28 font-semibold text-gray-800">Quantity:</span>
                                         <span>
                                             {item.quantity} {item.unit}
                                         </span>
                                     </p>
                                     <p className="text-sm flex">
-                                        <span className="w-32 font-semibold text-gray-800">Price/Unit:</span>
+                                        <span className="w-28 font-semibold text-gray-800">Price/Unit:</span>
                                         <span>${item.pricePerUnit}</span>
                                     </p>
                                     <p className="text-sm flex">
-                                        <span className="w-32 font-semibold text-gray-800">Status:</span>
+                                        <span className="w-28 font-semibold text-gray-800">Status:</span>
                                         <span
                                             className={`px-2 py-1 rounded-full text-sm font-medium ${item.status === "out of stock"
                                                 ? "bg-red-100 text-red-700"
