@@ -62,7 +62,7 @@ const EmployeesList = () => {
                         />
                         {/* Employee Info */}
                         <div className="p-4">
-                            <h2 className="text-lg font-semibold text-gray-800 truncate group-hover:text-indigo-600">
+                            <h2 className="text-lg font-semibold text-gray-800 truncate group-hover:text-[#22C55E]">
                                 {item.firstName} {item.lastName}
                             </h2>
                             <p className="text-sm text-gray-600 truncate">{item.position}</p>

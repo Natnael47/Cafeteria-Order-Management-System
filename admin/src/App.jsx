@@ -14,7 +14,6 @@ import List from './pages/List_Food';
 import Login from './pages/Login';
 import Orders from './pages/Orders';
 import Reports from './pages/Reports';
-import User_Feedback from './pages/User_Feedback';
 import Users from './pages/Users';
 
 export const backendUrl = import.meta.env.VITE_BACKEND_URL;
@@ -34,7 +33,6 @@ const App = () => {
           <Route path='/list' element={<List />} />
           <Route path='/orders' element={<Orders />} />
           <Route path='/reports' element={<Reports />} />
-          <Route path='/user-feedback' element={<User_Feedback />} />
           <Route path='/users' element={<Users />} />
           <Route path='/add-employees' element={<AddEmployee />} />
           <Route path='/employees-list' element={<EmployeesList />} />
