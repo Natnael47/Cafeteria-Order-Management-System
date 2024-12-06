@@ -154,77 +154,79 @@ const Suppliers = () => {
                 </div>
             </div>
 
-            {/* Data Grid */}
-            <div className="bg-white shadow-lg border border-gray-300 rounded-lg overflow-hidden">
-                {/* Header Row */}
-                <div className="grid grid-cols-[2fr_2fr_2fr_2fr_1fr_1fr_1fr] bg-gray-100 border-b border-gray-300 font-semibold text-gray-800">
-                    <div className="px-6 py-3 border-r border-gray-300 text-left">Supplier Name</div>
-                    <div className="px-6 py-3 border-r border-gray-300 text-left">Email</div>
-                    <div className="px-6 py-3 border-r border-gray-300 text-left">Phone</div>
-                    <div className="px-6 py-3 border-r border-gray-300 text-left">Address</div>
-                    <div className="px-6 py-3 border-r border-gray-300 text-center">Status</div>
-                    <div className="px-6 py-3 border-r border-gray-300 text-center">Modify</div>
-                    <div className="px-6 py-3 text-center">Remove</div>
-                </div>
+            <div className="bg-gray-100 rounded-lg w-full max-w-full max-h-[77vh] overflow-scroll shadow-lg">
+                {/* Data Grid */}
+                <div className="bg-white shadow-lg border border-gray-300 rounded-lg overflow-hidden">
+                    {/* Header Row */}
+                    <div className="grid grid-cols-[2fr_2fr_2fr_2fr_1fr_1fr_1fr] bg-gray-100 border-b border-gray-300 font-semibold text-gray-800">
+                        <div className="px-6 py-3 border-r border-gray-300 text-left">Supplier Name</div>
+                        <div className="px-6 py-3 border-r border-gray-300 text-left">Email</div>
+                        <div className="px-6 py-3 border-r border-gray-300 text-left">Phone</div>
+                        <div className="px-6 py-3 border-r border-gray-300 text-left">Address</div>
+                        <div className="px-6 py-3 border-r border-gray-300 text-center">Status</div>
+                        <div className="px-6 py-3 border-r border-gray-300 text-center">Modify</div>
+                        <div className="px-6 py-3 text-center">Remove</div>
+                    </div>
 
-                {/* Data Rows */}
-                {displayedSuppliers.length > 0 ? (
-                    displayedSuppliers.map((supplier, index) => (
-                        <div
-                            key={supplier.id}
-                            className={`grid grid-cols-[2fr_2fr_2fr_2fr_1fr_1fr_1fr] text-sm ${index % 2 === 0 ? "bg-gray-50" : "bg-white"
-                                } border-b border-gray-300 hover:bg-blue-50`}
-                        >
-                            <div className="px-6 py-3 border-r border-gray-300">{supplier.name}</div>
-                            <div className="px-6 py-3 border-r border-gray-300">
-                                {supplier.contactInfo?.email || <span className="italic text-gray-500">N/A</span>}
+                    {/* Data Rows */}
+                    {displayedSuppliers.length > 0 ? (
+                        displayedSuppliers.map((supplier, index) => (
+                            <div
+                                key={supplier.id}
+                                className={`grid grid-cols-[2fr_2fr_2fr_2fr_1fr_1fr_1fr] text-sm ${index % 2 === 0 ? "bg-gray-50" : "bg-white"
+                                    } border-b border-gray-300 hover:bg-blue-50`}
+                            >
+                                <div className="px-6 py-3 border-r border-gray-300">{supplier.name}</div>
+                                <div className="px-6 py-3 border-r border-gray-300">
+                                    {supplier.contactInfo?.email || <span className="italic text-gray-500">N/A</span>}
+                                </div>
+                                <div className="px-6 py-3 border-r border-gray-300">
+                                    {supplier.contactInfo?.phone || <span className="italic text-gray-500">N/A</span>}
+                                </div>
+                                <div className="px-6 py-3 border-r border-gray-300">
+                                    {supplier.contactInfo?.address || <span className="italic text-gray-500">N/A</span>}
+                                </div>
+                                <div className="px-6 py-3 border-r border-gray-300 text-center">
+                                    <span
+                                        className={`px-2 py-1 rounded-full text-xs ${supplier.status === "active"
+                                            ? "bg-green-100 text-green-800"
+                                            : "bg-red-100 text-red-800"
+                                            }`}
+                                    >
+                                        {supplier.status}
+                                    </span>
+                                </div>
+                                <div className="px-6 py-3 border-r border-gray-300 text-center flex justify-center items-center">
+                                    <Pencil
+                                        className="text-blue-500 cursor-pointer hover:text-blue-700"
+                                        onClick={() => {
+                                            setEditSupplierData({
+                                                id: supplier.id,
+                                                name: supplier.name,
+                                                email: supplier.contactInfo?.email || "",
+                                                phone: supplier.contactInfo?.phone || "",
+                                                address: supplier.contactInfo?.address || "",
+                                                status: supplier.status,
+                                            });
+                                            setIsEditOpen(true);
+                                        }}
+                                    />
+                                </div>
+                                <div className="px-6 py-3 text-center flex justify-center items-center">
+                                    <Trash2
+                                        className="text-red-500 cursor-pointer hover:text-red-700"
+                                        onClick={() => {
+                                            setSelectedSupplier(supplier);
+                                            setIsRemoveModalOpen(true);
+                                        }}
+                                    />
+                                </div>
                             </div>
-                            <div className="px-6 py-3 border-r border-gray-300">
-                                {supplier.contactInfo?.phone || <span className="italic text-gray-500">N/A</span>}
-                            </div>
-                            <div className="px-6 py-3 border-r border-gray-300">
-                                {supplier.contactInfo?.address || <span className="italic text-gray-500">N/A</span>}
-                            </div>
-                            <div className="px-6 py-3 border-r border-gray-300 text-center">
-                                <span
-                                    className={`px-2 py-1 rounded-full text-xs ${supplier.status === "active"
-                                        ? "bg-green-100 text-green-800"
-                                        : "bg-red-100 text-red-800"
-                                        }`}
-                                >
-                                    {supplier.status}
-                                </span>
-                            </div>
-                            <div className="px-6 py-3 border-r border-gray-300 text-center flex justify-center items-center">
-                                <Pencil
-                                    className="text-blue-500 cursor-pointer hover:text-blue-700"
-                                    onClick={() => {
-                                        setEditSupplierData({
-                                            id: supplier.id,
-                                            name: supplier.name,
-                                            email: supplier.contactInfo?.email || "",
-                                            phone: supplier.contactInfo?.phone || "",
-                                            address: supplier.contactInfo?.address || "",
-                                            status: supplier.status,
-                                        });
-                                        setIsEditOpen(true);
-                                    }}
-                                />
-                            </div>
-                            <div className="px-6 py-3 text-center flex justify-center items-center">
-                                <Trash2
-                                    className="text-red-500 cursor-pointer hover:text-red-700"
-                                    onClick={() => {
-                                        setSelectedSupplier(supplier);
-                                        setIsRemoveModalOpen(true);
-                                    }}
-                                />
-                            </div>
-                        </div>
-                    ))
-                ) : (
-                    <div className="text-center text-gray-500 py-6 italic">No suppliers found.</div>
-                )}
+                        ))
+                    ) : (
+                        <div className="text-center text-gray-500 py-6 italic">No suppliers found.</div>
+                    )}
+                </div>
             </div>
 
             {/* Add Supplier Modal */}
