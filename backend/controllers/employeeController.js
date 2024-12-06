@@ -1,5 +1,6 @@
 import { PrismaClient } from "@prisma/client";
 import bcrypt from "bcryptjs";
+import fs from "fs";
 import jwt from "jsonwebtoken";
 
 const prisma = new PrismaClient();
@@ -179,7 +180,30 @@ export const delete_Employee = async (req, res) => {
   }
 
   try {
-    // Attempt to delete the employee record
+    // Find the employee record first to get the image filename
+    const existingEmployee = await prisma.employee.findUnique({
+      where: { id: parseInt(empId) }, // Fetch employee by ID
+    });
+
+    if (!existingEmployee) {
+      return res.status(404).json({
+        success: false,
+        message: "Employee not found",
+      });
+    }
+
+    // Delete the employee's image file if it exists
+    if (existingEmployee.image) {
+      fs.unlink(`uploadsEmp/${existingEmployee.image}`, (err) => {
+        if (err) {
+          console.error("Error deleting employee image:", err);
+        } else {
+          console.log("Employee image deleted successfully");
+        }
+      });
+    }
+
+    // Attempt to delete the employee record from the database
     const deletedEmployee = await prisma.employee.delete({
       where: { id: parseInt(empId) }, // Convert empId to an integer
     });
@@ -187,7 +211,7 @@ export const delete_Employee = async (req, res) => {
     // If successful, return success response
     res.json({
       success: true,
-      message: "Employee record deleted successfully",
+      message: "Employee record and image deleted successfully",
       deletedEmployee,
     });
   } catch (error) {

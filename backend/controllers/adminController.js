@@ -265,7 +265,7 @@ const updateEmployee = async (req, res) => {
             if (err) {
               console.error("Error deleting old image:", err);
             } else {
-              console.log("Old image deleted successfully");
+              console.log("Old image is deleted successfully");
             }
           });
         }
