@@ -1,5 +1,5 @@
 import axios from "axios";
-import { ChefHat } from 'lucide-react';
+import { Check, ChefHat, CookingPot, Timer, Utensils } from 'lucide-react';
 import React, { useContext, useEffect, useState } from "react";
 import { backendUrl } from "../../App";
 import { ChefContext } from "../../Context/ChefContext";
@@ -116,12 +116,13 @@ const ChefOrders = () => {
     };
 
     return (
-        <div className="m-5 w-full">
+        <div className="m-5 w-full max-w-6.5xl">
             {currentOrderId ? (
                 <div>
                     {/* Countdown Timer */}
                     {timeLeft !== null && (
-                        <div className="text-center p-4 bg-yellow-100 text-lg font-bold mb-4">
+                        <div className="text-center py-3 px-6 mb-5 bg-yellow-200 text-yellow-800 font-bold text-lg rounded shadow-md flex items-center justify-center">
+                            <span className="text-2xl mr-2"><Timer /></span>
                             {timeLeft >= 3600
                                 ? `Time Remaining: ${Math.floor(timeLeft / 3600)}:${String(
                                     Math.floor((timeLeft % 3600) / 60)
@@ -132,117 +133,119 @@ const ChefOrders = () => {
                         </div>
                     )}
 
-
-
                     {/* Order Items Section */}
-                    <p className="text-lg font-semibold">Order Items</p>
-                    <div className="bg-[#F3F4F6] rounded w-full max-w-5.3xl max-h-[88vh] overflow-scroll">
+                    <h2 className="text-2xl font-semibold text-gray-800 mb-4">Order Items</h2>
+                    <div className="bg-gray-100 rounded-lg p-5 shadow-lg max-h-[85vh] overflow-y-auto">
                         {currentOrderItems.length > 0 ? (
                             currentOrderItems.map((item) => (
                                 <div
                                     key={item.id}
-                                    className="flex justify-between items-center border-2 border-black p-4 my-2 bg-white"
+                                    className="flex justify-between items-center border rounded-lg p-4 my-3 bg-white shadow-sm hover:shadow-md transition-shadow"
                                 >
                                     <div>
-                                        <p className="font-semibold">{item.foodName}</p>
-                                        <p className="text-sm">{item.description}</p>
-                                        <p>Quantity: {item.quantity}</p>
+                                        <p className="font-semibold text-lg text-gray-800 flex items-center">
+                                            <span className="mr-2 text-green-600">
+                                                <Utensils />
+                                            </span>
+                                            {item.foodName}
+                                        </p>
+                                        <p className="text-sm text-gray-600">{item.description}</p>
+                                        <p className="font-medium text-gray-700 mt-1">Quantity: {item.quantity}</p>
                                     </div>
                                     {item.cookingStatus === "Done" ? (
-                                        <div className="p-2 text-green-500 font-semibold flex items-center">
-                                            <span>✔️ Completed</span>
+                                        <div className="p-2 text-green-600 font-semibold flex items-center">
+                                            <span className="text-2xl mr-2"><Check /></span> Completed
                                         </div>
                                     ) : (
                                         <button
                                             onClick={() => completeItem(item.id)}
-                                            className="p-2 bg-green-500 text-white font-semibold rounded"
+                                            className="p-2 bg-green-500 text-white font-semibold rounded-lg hover:bg-green-600 transition flex items-center"
                                         >
-                                            Done
+                                            <span className="mr-2"><Check /></span> Done
                                         </button>
                                     )}
                                 </div>
                             ))
                         ) : (
-                            <p>No order items found.</p>
+                            <p className="text-center text-gray-700">No order items found.</p>
                         )}
-                        <div className="text-center mt-4">
+                        <div className="text-center mt-6">
                             <button
                                 onClick={completeOrder}
-                                className={`p-2 font-semibold rounded ${currentOrderItems.every((item) => item.cookingStatus === "Done")
-                                    ? "bg-blue-500 text-white"
-                                    : "bg-gray-400 text-gray-700 cursor-not-allowed"
+                                className={`p-3 font-semibold rounded-lg shadow-md transition flex items-center justify-center ${currentOrderItems.every((item) => item.cookingStatus === "Done")
+                                    ? "bg-blue-500 text-white hover:bg-blue-600"
+                                    : "bg-gray-300 text-gray-500 cursor-not-allowed"
                                     }`}
                                 disabled={!currentOrderItems.every((item) => item.cookingStatus === "Done")}
                             >
-                                Complete Order
+                                <span className="mr-2"></span> Complete Order
                             </button>
                         </div>
-
                     </div>
                 </div>
             ) : (
                 <div>
-                    <p className="text-lg font-semibold">NEW ORDERS</p>
-                    <div className="bg-[#F3F4F6] rounded w-full max-w-5.3xl max-h-[88vh] overflow-scroll">
+                    <h2 className="text-2xl font-semibold text-gray-800 mb-4">New Orders</h2>
+                    <div className="bg-gray-100 rounded-lg p-5 shadow-lg max-h-[85vh] overflow-y-auto">
                         {orders.length > 0 ? (
                             orders.map((order) => (
                                 <div
-                                    className="grid grid-cols-1 sm:grid-cols-[0.5fr_2fr_1fr_1fr] gap-3 items-start border-2 border-black p-5 md:p-8 my-3 md:my-4 text-xs sm:text-sm text-black bg-white"
                                     key={order.id}
+                                    className="grid grid-cols-1 sm:grid-cols-[0.5fr_2fr_1fr_1fr] gap-4 items-start border rounded-lg p-5 my-4 bg-white shadow-sm hover:shadow-md transition-shadow"
                                 >
-                                    <ChefHat size={60} />
+                                    <div className="text-yellow-500 flex justify-center items-center">
+                                        <ChefHat size={60} />
+                                    </div>
                                     <div>
                                         <div>
                                             {order.items.map((item, index) => (
-                                                <p className="py-0.5 text-2xl" key={index}>
-                                                    {item.name} X <span>{item.quantity}</span>
+                                                <p className="text-lg font-medium text-gray-800 mb-1 flex items-center" key={index}>
+                                                    <span className="mr-2 text-blue-500"><CookingPot /></span>
+                                                    {item.name}
+                                                    <span className="mx-2 text-gray-500">x</span>
+                                                    <span className="font-semibold">{item.quantity}</span>
                                                 </p>
                                             ))}
                                         </div>
-                                        <p className="mt-3 mb-2 font-medium">
-                                            {order.address.firstName + " " + order.address.lastName}
+                                        <p className="mt-3 font-medium text-gray-700">
+                                            {order.address.firstName} {order.address.lastName}
                                         </p>
-                                        <div>
-                                            <p>{order.address.street + ","}</p>
-                                        </div>
-                                        <p>{order.address.phone}</p>
+                                        <p className="text-gray-600">{order.address.street},</p>
+                                        <p className="text-gray-600">{order.address.phone}</p>
                                     </div>
                                     <div>
-                                        <p className="text-sm sm:text-[15px]">
-                                            Items: {order.items.length}
-                                        </p>
-                                        <p className="mt-3">Method: {order.paymentMethod}</p>
-                                        <div className="flex flex-row">
-                                            <p>Payment: </p>
+                                        <p className="font-medium text-gray-700">Items: {order.items.length}</p>
+                                        <p className="mt-3 text-gray-600">Method: {order.paymentMethod}</p>
+                                        <div className="flex items-center gap-2">
+                                            <p>Payment:</p>
                                             <p
-                                                className={
-                                                    order.payment
-                                                        ? "text-green-500 font-semibold"
-                                                        : "text-red-500 font-semibold"
-                                                }
+                                                className={`font-semibold ${order.payment
+                                                    ? "text-green-500"
+                                                    : "text-red-500"
+                                                    }`}
                                             >
                                                 {order.payment ? "Done" : "Pending"}
                                             </p>
                                         </div>
-                                        <p>Date: {new Date(order.date).toLocaleDateString()}</p>
+                                        <p className="text-gray-600">Date: {new Date(order.date).toLocaleDateString()}</p>
                                     </div>
                                     <div className="flex items-center">
                                         <button
                                             type="button"
                                             onClick={() => acceptOrder(order.id)}
                                             disabled={!!currentOrderId}
-                                            className={`p-2 text-white font-semibold ${currentOrderId
-                                                ? "bg-gray-400"
-                                                : "bg-blue-500 hover:bg-blue-700"
+                                            className={`p-3 text-white font-semibold rounded-lg shadow-md transition flex items-center justify-center ${currentOrderId
+                                                ? "bg-gray-400 cursor-not-allowed"
+                                                : "bg-blue-500 hover:bg-blue-600"
                                                 }`}
                                         >
-                                            Accept Order
+                                            <span className="mr-2"></span> Accept Order
                                         </button>
                                     </div>
                                 </div>
                             ))
                         ) : (
-                            <p>No orders to display.</p>
+                            <p className="text-center text-gray-700">No orders to display.</p>
                         )}
                     </div>
                 </div>

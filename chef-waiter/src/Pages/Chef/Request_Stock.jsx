@@ -74,99 +74,105 @@ const Request_Stock = () => {
         .sort((a, b) => a.name.localeCompare(b.name));
 
     return (
-        <div className="flex flex-col m-5 w-full">
-            <p className="mb-3 text-lg font-semibold">Request Inventory Stock</p>
-            <div className="flex items-center justify-between mb-3">
+        <div className="flex flex-col m-5 w-full max-w-6.5xl">
+            {/* Header Section */}
+            <p className="mb-4 text-xl font-bold text-gray-800">Request Inventory Stock</p>
+
+            {/* Search and Add Button */}
+            <div className="flex items-center justify-between mb-4">
                 <div className="flex items-center gap-4">
-                    <span className="text-gray-700">{getFormattedDate()}</span>
+                    <span className="text-gray-600 font-medium">{getFormattedDate()}</span>
                     <input
                         type="text"
                         placeholder="Search item name"
                         value={searchTerm}
                         onChange={(e) => setSearchTerm(e.target.value)}
-                        className="border border-gray-300 rounded px-3 py-1 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                        className="border border-gray-300 rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500 transition"
                     />
                 </div>
                 <button
-                    className="bg-blue-500 text-white rounded px-4 py-2 hover:bg-blue-600 transition-colors w-36"
+                    className="bg-blue-600 text-white rounded-lg px-6 py-2 hover:bg-blue-700 transition w-40 shadow-md"
                 >
                     Add Item
                 </button>
             </div>
-            <div className="bg-[#F3F4F6] rounded w-full max-w-5.3xl max-h-[88vh] overflow-scroll">
-                <div>
-                    <div className="grid grid-cols-[0.7fr_0.7fr_0.7fr_0.6fr_0.5fr_0.5fr] items-center gap-2 p-3 border text-sm font-medium bg-[#FAFAFA] text-black sm:grid">
-                        <b>Status</b>
-                        <b className="ml-5">Name</b>
-                        <b>Category</b>
-                        <b>Quantity</b>
-                        <b>Price / Unit</b>
-                        <b>Request</b>
-                    </div>
 
-                    {filteredInventoryList.map((item, index) => (
-                        <div key={index}>
-                            <div
-                                className={`grid grid-cols-[0.7fr_0.7fr_0.7fr_0.6fr_0.3fr_0.7fr] items-center gap-2 p-3 border text-sm font-medium sm:grid ${item.status === "out of stock" ? "bg-red-100" : "bg-white"
-                                    }`}
-                            >
-                                <div className="relative w-full bg-gray-200 rounded h-8">
-                                    <div
-                                        className={`absolute top-0 left-0 h-8 rounded transition-all`}
-                                        style={{
-                                            width: `${Math.min(Number(item.status), 100)}%`,
-                                            backgroundColor: `hsl(${Number(item.status) * 1.2}, 100%, 50%)`
-                                        }}
-                                    ></div>
-                                    <p className="absolute inset-0 flex items-center justify-center text-xs font-semibold text-black">
-                                        {item.status}%
-                                    </p>
-                                </div>
-                                <p className="text-[#112F45] ml-5">{item.name}</p>
-                                <p>{item.category}</p>
-                                <p>
-                                    {item.quantity} {item.unit}
-                                </p>
-                                <p>${item.pricePerUnit}</p>
-                                <button
-                                    className="text-blue-500 hover:text-blue-700 font-semibold cursor-pointer"
-                                    onClick={() => handleRequestClick(index)}
-                                >
-                                    Request More
-                                </button>
-                            </div>
-                            {selectedIndex === index && (
-                                <div ref={requestRef} className="p-4 border-t bg-gray-50">
-                                    <h3 className="text-lg font-semibold mb-2">Request Inventory Stock</h3>
-                                    {error && <p className="text-red-500 text-sm mb-2">{error}</p>}
-                                    <div className="mb-2">
-                                        <label className="block text-sm font-medium">Quantity</label>
-                                        <input
-                                            type="number"
-                                            value={requestQuantity}
-                                            onChange={(e) => setRequestQuantity(e.target.value)}
-                                            className="border p-2 rounded w-full"
-                                        />
-                                    </div>
-                                    <div className="flex justify-start gap-4 mt-4">
-                                        <button
-                                            onClick={() => setSelectedIndex(null)}
-                                            className="py-2 px-4 bg-gray-300 text-gray-700 rounded"
-                                        >
-                                            Cancel
-                                        </button>
-                                        <button
-                                            onClick={() => handleSubmitRequest(item.id)}
-                                            className="py-2 px-4 bg-blue-500 text-white rounded"
-                                        >
-                                            Submit
-                                        </button>
-                                    </div>
-                                </div>
-                            )}
-                        </div>
-                    ))}
+            {/* Inventory List Section */}
+            <div className="bg-gray-100 rounded-lg w-full max-h-[80vh] overflow-auto shadow-md">
+                {/* Table Header */}
+                <div className="grid grid-cols-[1fr_1fr_1fr_0.6fr_0.6fr_0.6fr] items-center gap-4 p-3 border-b bg-gray-200 text-sm font-semibold text-gray-700">
+                    <span>Status</span>
+                    <span>Name</span>
+                    <span>Category</span>
+                    <span>Quantity</span>
+                    <span>Price / Unit</span>
+                    <span>Request</span>
                 </div>
+
+                {/* Inventory Items */}
+                {filteredInventoryList.map((item, index) => (
+                    <div key={index} className="border-b">
+                        {/* Inventory Row */}
+                        <div
+                            className={`grid grid-cols-[1fr_1fr_1fr_0.6fr_0.6fr_0.6fr] items-center gap-4 p-3 text-sm bg-white hover:bg-gray-50 transition ${item.status === "out of stock" && "bg-red-50"
+                                }`}
+                        >
+                            <div className="relative w-full bg-gray-300 rounded h-6">
+                                <div
+                                    className="absolute top-0 left-0 h-6 rounded transition-all"
+                                    style={{
+                                        width: `${Math.min(Number(item.status), 100)}%`,
+                                        backgroundColor: `hsl(${Math.min(Number(item.status), 100) * 1.2}, 100%, 50%)`,
+                                    }}
+                                ></div>
+                                <p className="absolute inset-0 flex items-center justify-center text-xs font-semibold text-gray-900">
+                                    {item.status}%
+                                </p>
+                            </div>
+                            <p className="text-gray-700 font-medium">{item.name}</p>
+                            <p className="text-gray-600">{item.category}</p>
+                            <p className="text-gray-600">{item.quantity} {item.unit}</p>
+                            <p className="text-gray-600">${item.pricePerUnit}</p>
+                            <button
+                                className="text-blue-500 hover:text-blue-700 font-semibold transition"
+                                onClick={() => handleRequestClick(index)}
+                            >
+                                Request More
+                            </button>
+                        </div>
+
+                        {/* Request Modal (Stays in Place) */}
+                        {selectedIndex === index && (
+                            <div ref={requestRef} className="p-4 bg-gray-50 border-t">
+                                <h3 className="text-lg font-bold text-gray-800 mb-2">Request Inventory Stock</h3>
+                                {error && <p className="text-red-500 text-sm mb-2">{error}</p>}
+                                <div className="mb-3">
+                                    <label className="block text-sm font-medium text-gray-700">Quantity</label>
+                                    <input
+                                        type="number"
+                                        value={requestQuantity}
+                                        onChange={(e) => setRequestQuantity(e.target.value)}
+                                        className="border border-gray-300 rounded-lg px-4 py-2 w-full focus:ring-2 focus:ring-blue-500"
+                                    />
+                                </div>
+                                <div className="flex gap-4 mt-4">
+                                    <button
+                                        onClick={() => setSelectedIndex(null)}
+                                        className="px-4 py-2 bg-gray-300 text-gray-700 rounded-lg hover:bg-gray-400 transition"
+                                    >
+                                        Cancel
+                                    </button>
+                                    <button
+                                        onClick={() => handleSubmitRequest(item.id)}
+                                        className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition"
+                                    >
+                                        Submit
+                                    </button>
+                                </div>
+                            </div>
+                        )}
+                    </div>
+                ))}
             </div>
         </div>
     );
