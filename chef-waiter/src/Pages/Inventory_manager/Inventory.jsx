@@ -259,7 +259,7 @@ const Inventory = () => {
                         {/* Item Row */}
                         <div
                             className={`grid grid-cols-[0.4fr_0.8fr_0.7fr_0.6fr_0.5fr_0.5fr_0.5fr] items-center gap-4 p-4 text-sm font-medium ${item.status === "out of stock" ? "bg-red-100" : "bg-white"
-                                }`}
+                                } hover:bg-blue-50`}
                         >
                             <p
                                 className="text-[#112F45] cursor-pointer hover:text-blue-500 hover:font-bold truncate"

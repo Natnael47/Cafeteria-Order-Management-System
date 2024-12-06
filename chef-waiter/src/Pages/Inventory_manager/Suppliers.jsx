@@ -173,7 +173,7 @@ const Suppliers = () => {
                         <div
                             key={supplier.id}
                             className={`grid grid-cols-[2fr_2fr_2fr_2fr_1fr_1fr_1fr] text-sm ${index % 2 === 0 ? "bg-gray-50" : "bg-white"
-                                } border-b border-gray-300`}
+                                } border-b border-gray-300 hover:bg-blue-50`}
                         >
                             <div className="px-6 py-3 border-r border-gray-300">{supplier.name}</div>
                             <div className="px-6 py-3 border-r border-gray-300">

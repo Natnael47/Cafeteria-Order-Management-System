@@ -1,7 +1,9 @@
 import axios from "axios";
+import { ArrowDownToLine, ArrowUpFromLine } from "lucide-react";
 import React, { useContext, useEffect, useState } from "react";
 import { toast } from "react-toastify";
 import { backendUrl } from "../../App";
+import SortingDropdown from "../../Components/SortingDropdown";
 import { InventoryContext } from "../../Context/InventoryContext";
 
 const Stock = () => {
@@ -242,48 +244,93 @@ const Stock = () => {
         }
     };
 
+    const [sortAttribute, setSortAttribute] = useState('name');  // Default sort by name
+    const [sortOrder, setSortOrder] = useState('ascending');     // Default ascending
+
+    const handleSortChange = (attribute, order) => {
+        setSortAttribute(attribute);
+        setSortOrder(order);
+        // Save the selected sorting state to localStorage
+        localStorage.setItem('sortAttribute', attribute);
+        localStorage.setItem('sortOrder', order);
+    };
 
     return (
         <div className="flex flex-col m-5 w-full max-w-6.5xl">
-            <p className="mb-3 text-lg font-semibold">Stock Overview</p>
-            <div className="flex items-center justify-between mb-3">
-                <div className="flex items-center gap-4">
-                    <span className="text-gray-700">{getFormattedDate()}</span>
-                    <input
-                        type="text"
-                        placeholder="Search item name"
-                        value={searchTerm}
-                        onChange={(e) => setSearchTerm(e.target.value)}
-                        className="border border-gray-300 rounded px-3 py-1 focus:outline-none focus:ring-2 focus:ring-blue-500"
-                    />
+            {/* Header */}
+            <div className="flex flex-col space-y-2 mb-2">
+                {/* Top Section: Title and Buttons */}
+                <div className="flex items-center justify-between h-[10vh]">
+                    <h1 className="text-2xl sm:text-3xl font-extrabold text-gray-800">Stock Overview</h1>
+                    <div className="flex items-center space-x-3">
+                        {/* New Inventory Button */}
+                        <button
+                            className="px-4 py-2 bg-green-600 text-white font-medium rounded-md shadow-sm hover:bg-green-700 transition"
+                            onClick={handleAddPackageClick}
+                        >
+                            + Add Package
+                        </button>
+                        {/* Icon Button */}
+                        <button className="p-2 bg-gray-100 text-gray-700 rounded-md shadow-sm hover:bg-gray-200 transition">
+                            <svg
+                                xmlns="http://www.w3.org/2000/svg"
+                                fill="none"
+                                viewBox="0 0 24 24"
+                                stroke="currentColor"
+                                className="w-5 h-5"
+                            >
+                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M4 8h16M4 16h16" />
+                            </svg>
+                        </button>
+                    </div>
                 </div>
-                <button
-                    onClick={handleAddPackageClick} // Open the package popup
-                    className="bg-blue-500 text-white rounded px-4 py-2 hover:bg-blue-600"
-                >
-                    Add Package
-                </button>
 
+                {/* Middle Section: Search and Entries */}
+                <div className="flex items-center justify-between">
+                    {/* Entries Dropdown */}
+                    <div className="flex items-center space-x-2 text-sm">
+                        <label className="font-medium text-gray-700">Show</label>
+                        <select className="border border-gray-300 rounded px-3 py-1.5 focus:ring focus:ring-gray-200">
+                            <option value="10">10</option>
+                            <option value="25">25</option>
+                            <option value="50">50</option>
+                        </select>
+                        <label className="font-medium text-gray-700">entries</label>
+                    </div>
+                    {/* Sorting  & search */}
+                    <div className="flex items-center justify-end gap-5">
+                        <SortingDropdown onSortChange={handleSortChange} />
+                        {/* Search Bar */}
+                        <input
+                            type="text"
+                            placeholder="Search by item name"
+                            value={searchTerm}
+                            onChange={(e) => setSearchTerm(e.target.value)}
+                            className="border border-gray-300 rounded px-4 py-2 w-full sm:w-64 shadow-sm focus:ring focus:ring-gray-200"
+                        />
+                    </div>
+                </div>
             </div>
+
             <div className="bg-[#F3F4F6] rounded w-full max-h-[83vh] overflow-scroll">
                 <div>
-                    <div className="grid grid-cols-[1fr_1fr_1fr_1fr_1fr_0.5fr_0.5fr] items-center gap-2 p-3 border text-sm font-medium bg-[#FAFAFA] text-black sm:grid">
-                        <b>Status</b>
-                        <b>Name</b>
-                        <b>Remaining Stock</b>
-                        <b>Total Stock Out</b>
-                        <b>Opening Stock</b>
-                        <b>Stock In</b>
-                        <b>Stock Out</b>
+                    <div className="grid grid-cols-[1fr_1fr_1fr_1fr_1fr_0.5fr_0.5fr] items-center gap-4 p-5 border-b text-sm font-semibold bg-[#FAFAFA] text-black sm:grid">
+                        <div className="text-center font-medium">Status</div>
+                        <div className="text-center font-medium">Name</div>
+                        <div className="text-center font-medium">Remaining Stock</div>
+                        <div className="text-center font-medium">Total Stock Out</div>
+                        <div className="text-center font-medium">Opening Stock</div>
+                        <div className="text-center font-medium">Stock In</div>
+                        <div className="text-center font-medium">Stock Out</div>
                     </div>
+
                     {filteredInventoryList.map((item, index) => {
                         const totalStockOut = item.initialQuantity - item.quantity;
 
                         return (
                             <div key={index} className="relative">
                                 <div
-                                    className={`grid grid-cols-[1fr_1fr_1fr_1fr_1fr_0.5fr_0.5fr] items-center gap-2 p-3 border text-sm font-medium sm:grid ${item.quantity === 0 ? "bg-red-100" : "bg-white"
-                                        }`}
+                                    className={`grid grid-cols-[1fr_1fr_1fr_1fr_1fr_0.5fr_0.5fr] items-center gap-4 p-5 border-b text-sm font-medium sm:grid ${item.quantity === 0 ? "bg-red-100" : "bg-white"}`}
                                 >
                                     {/* Status Bar */}
                                     <div className="relative w-full bg-gray-200 rounded h-8">
@@ -302,40 +349,44 @@ const Stock = () => {
                                     </div>
 
                                     {/* Name */}
-                                    <p className="text-[#112F45]">{item.name}</p>
+                                    <p className="text-[#112F45] text-center">{item.name}</p>
 
                                     {/* Remaining Stock */}
-                                    <p className="font-bold">
+                                    <p className="font-bold text-center">
                                         {item.quantity} - {item.unit}
                                     </p>
 
                                     {/* Total Stock Out */}
-                                    <p className="text-red-600">
+                                    <p className="text-red-600 text-center">
                                         {totalStockOut} <span className="text-red-600">{item.unit}</span>
                                     </p>
 
                                     {/* Opening Stock */}
-                                    <p className="text-blue-600">
+                                    <p className="text-blue-600 text-center">
                                         {item.initialQuantity}{" "}
                                         <span className="text-blue-600">{item.unit}</span>
                                     </p>
 
                                     {/* Stock In Button */}
-                                    <button
-                                        onClick={() => handleStockAction(item, "in")}
-                                        className="text-green-600 hover:text-green-800 transition-colors border-2 border-green-600 rounded-md"
-                                    >
-                                        Stock In
-                                    </button>
+                                    <div className="flex justify-center">
+                                        <button
+                                            onClick={() => handleStockAction(item, "in")}
+                                            className="px-5 py-3 text-white bg-green-600 hover:bg-green-700 border-2 border-green-600 rounded-lg shadow-md hover:shadow-lg transition-all duration-300 transform hover:scale-105"
+                                        ><ArrowDownToLine />
+                                            Stock In
+                                        </button>
+                                    </div>
 
                                     {/* Stock Out Button */}
-                                    <button
-                                        onClick={() => handleStockAction(item, "out")}
-                                        disabled={item.quantity <= 0}
-                                        className="text-red-600 hover:text-red-800 transition-colors border-2 border-red-600 rounded-md"
-                                    >
-                                        Stock Out
-                                    </button>
+                                    <div className="flex justify-center">
+                                        <button
+                                            onClick={() => handleStockAction(item, "out")}
+                                            disabled={item.quantity <= 0}
+                                            className="px-5 py-3 text-white bg-red-600 hover:bg-red-700 border-2 border-red-600 rounded-lg shadow-md hover:shadow-lg transition-all duration-300 transform hover:scale-105"
+                                        ><ArrowUpFromLine />
+                                            Stock Out
+                                        </button>
+                                    </div>
                                 </div>
 
                                 {/* Add Stock Form */}
@@ -463,7 +514,6 @@ const Stock = () => {
                                         </form>
                                     </div>
                                 )}
-
 
                                 {/* Remove Stock Form */}
                                 {stockAction === "out" && selectedItem === item && (
