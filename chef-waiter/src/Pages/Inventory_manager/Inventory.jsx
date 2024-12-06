@@ -340,25 +340,28 @@ const Inventory = () => {
 
                         {/* Edit Section */}
                         {editIndex === index && (
-                            <div ref={editRef} className="p-4 border-t bg-gray-50">
-                                <div className="grid gap-4">
-                                    <div>
-                                        <label className="block text-sm font-medium mb-1">Name</label>
+                            <div ref={editRef} className="p-4 border-t bg-gray-50 rounded-lg shadow-md mt-1 mb-1">
+                                <div className="grid gap-4 md:grid-cols-2">
+                                    {/* Name */}
+                                    <div className="col-span-2 md:col-span-1">
+                                        <label className="block text-sm font-medium text-gray-700 mb-1">Name</label>
                                         <input
                                             type="text"
                                             name="name"
                                             value={editInventory.name}
                                             onChange={handleInputChange}
-                                            className="border border-gray-300 rounded-lg p-2 w-full"
+                                            className="border border-gray-300 rounded-lg p-2 w-full focus:ring focus:ring-blue-200"
                                         />
                                     </div>
-                                    <div>
-                                        <label className="block text-sm font-medium mb-1">Category</label>
+
+                                    {/* Category */}
+                                    <div className="col-span-2 md:col-span-1">
+                                        <label className="block text-sm font-medium text-gray-700 mb-1">Category</label>
                                         <select
                                             name="category"
                                             value={editInventory.category}
                                             onChange={handleInputChange}
-                                            className="border border-gray-300 rounded-lg p-2 w-full"
+                                            className="border border-gray-300 rounded-lg p-2 w-full focus:ring focus:ring-blue-200"
                                         >
                                             <option value="Food Supplies">Food Supplies</option>
                                             <option value="Beverages">Beverages</option>
@@ -367,63 +370,73 @@ const Inventory = () => {
                                             <option value="Electronics">Electronics</option>
                                         </select>
                                     </div>
-                                    <div>
-                                        <label className="block text-sm font-medium mb-1">Quantity</label>
-                                        <input
-                                            type="number"
-                                            name="quantity"
-                                            value={editInventory.quantity}
-                                            onChange={handleInputChange}
-                                            className="border border-gray-300 rounded-lg p-2 w-full"
-                                        />
+
+                                    {/* Quantity and Unit */}
+                                    <div className="grid grid-cols-2 gap-4 col-span-2">
+                                        <div>
+                                            <label className="block text-sm font-medium text-gray-700 mb-1">Quantity</label>
+                                            <input
+                                                type="number"
+                                                name="quantity"
+                                                value={editInventory.quantity}
+                                                onChange={handleInputChange}
+                                                className="border border-gray-300 rounded-lg p-2 w-full focus:ring focus:ring-blue-200"
+                                            />
+                                        </div>
+                                        <div>
+                                            <label className="block text-sm font-medium text-gray-700 mb-1">Unit</label>
+                                            <select
+                                                name="unit"
+                                                value={editInventory.unit}
+                                                onChange={handleInputChange}
+                                                className="border border-gray-300 rounded-lg p-2 w-full focus:ring focus:ring-blue-200"
+                                            >
+                                                <option value="kg">kg</option>
+                                                <option value="liters">liters</option>
+                                                <option value="packs">packs</option>
+                                                <option value="pieces">pieces</option>
+                                                <option value="grams">grams</option>
+                                            </select>
+                                        </div>
                                     </div>
-                                    <div>
-                                        <label className="block text-sm font-medium mb-1">Unit</label>
-                                        <select
-                                            name="unit"
-                                            value={editInventory.unit}
-                                            onChange={handleInputChange}
-                                            className="border border-gray-300 rounded-lg p-2 w-full"
-                                        >
-                                            <option value="kg">kg</option>
-                                            <option value="liters">liters</option>
-                                            <option value="packs">packs</option>
-                                            <option value="pieces">pieces</option>
-                                            <option value="grams">grams</option>
-                                        </select>
-                                    </div>
-                                    <div>
-                                        <label className="block text-sm font-medium mb-1">Price per Unit</label>
+
+                                    {/* Price per Unit */}
+                                    <div className="col-span-2 md:col-span-1">
+                                        <label className="block text-sm font-medium text-gray-700 mb-1">Price per Unit</label>
                                         <input
                                             type="number"
                                             name="pricePerUnit"
                                             value={editInventory.pricePerUnit}
                                             onChange={handleInputChange}
-                                            className="border border-gray-300 rounded-lg p-2 w-full"
+                                            className="border border-gray-300 rounded-lg p-2 w-full focus:ring focus:ring-blue-200"
                                         />
                                     </div>
-                                    <div>
-                                        <label className="block text-sm font-medium mb-1">Image</label>
+
+                                    {/* Image Upload */}
+                                    <div className="col-span-2">
+                                        <label className="block text-sm font-medium text-gray-700 mb-1">Image</label>
                                         <input
                                             type="file"
                                             onChange={handleImageChange}
-                                            className="border border-gray-300 rounded-lg p-2 w-full"
+                                            className="border border-gray-300 rounded-lg p-2 w-full focus:ring focus:ring-blue-200"
                                         />
                                         {editInventory.image && (typeof editInventory.image === "object" ? (
                                             <img
-                                                className="w-32 h-32 object-cover mt-2 rounded"
+                                                className="w-32 h-32 object-cover mt-2 rounded border border-gray-300"
                                                 src={URL.createObjectURL(editInventory.image)}
-                                                alt=""
+                                                alt="Preview"
                                             />
                                         ) : (
                                             <img
-                                                className="w-32 h-32 object-cover mt-2 rounded"
+                                                className="w-32 h-32 object-cover mt-2 rounded border border-gray-300"
                                                 src={`${backendUrl}/Inv_img/${editInventory.image}`}
-                                                alt=""
+                                                alt="Preview"
                                             />
                                         ))}
                                     </div>
                                 </div>
+
+                                {/* Buttons */}
                                 <div className="flex justify-end gap-4 mt-4">
                                     <button
                                         onClick={cancelEdit}
@@ -441,6 +454,7 @@ const Inventory = () => {
                                 </div>
                             </div>
                         )}
+
                     </div>
                 ))}
             </div>
