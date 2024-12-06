@@ -178,7 +178,7 @@ const Users = () => {
             </div>
 
             {/* the display Div */}
-            <div className="bg-[#F3F4F6] rounded w-full max-w-6xl max-h-[90vh] overflow-scroll">
+            <div className="bg-[#F3F4F6] rounded w-full max-w-6.5xl max-h-[68vh] overflow-scroll">
                 {currentView === "users" && (
                     <div className="bg-white shadow rounded">
                         {/* Users Data Table */}
@@ -227,7 +227,7 @@ const Users = () => {
                         <h2 className="text-2xl font-semibold text-gray-800 mb-6">Customer Feedback</h2>
 
                         {/* Feedback List */}
-                        <div className="space-y-6">
+                        <div className="space-y-4">
                             {feedbackList.length === 0 ? (
                                 <p className="text-center text-gray-600 text-lg">No feedback available.</p>
                             ) : (

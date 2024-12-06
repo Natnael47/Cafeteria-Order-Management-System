@@ -46,7 +46,7 @@ const EmployeesList = () => {
                     className="border border-gray-300 rounded px-4 py-2 text-gray-700 focus:ring-2 focus:ring-indigo-500 focus:outline-none"
                 />
             </div>
-            <div className="border rounded-lg w-full max-h-[81vh] overflow-y-scroll">
+            <div className="rounded-lg w-full max-h-[81vh] overflow-y-scroll">
                 {/* Employee Cards */}
                 <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6 pt-1">
                     {employees.map((item) => (

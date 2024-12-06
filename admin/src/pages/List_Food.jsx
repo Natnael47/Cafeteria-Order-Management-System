@@ -245,7 +245,7 @@ const List = () => {
                                 {/* Food Item */}
                                 <div
                                     className={`grid grid-cols-[0.5fr_1fr_1fr_0.8fr_0.5fr_0.5fr] items-center gap-4 p-4 border-b sm:grid ${item.menuStatus === false ? "bg-red-50" : "bg-white"
-                                        } hover:bg-gray-50`}
+                                        } hover:bg-blue-50`}
                                 >
                                     <img
                                         src={`${backendUrl}/images/${item.image}`}

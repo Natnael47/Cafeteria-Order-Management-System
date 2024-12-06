@@ -18,7 +18,7 @@ const Dashboard = () => {
             <h1 className="text-3xl font-bold text-gray-800 mb-5">Dashboard</h1>
 
             {/* Overview Cards */}
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 mb-10">
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 mb-5">
                 {[
                     { icon: <CircleUserRound size={iconSize} color={iconColor} />, label: 'Customers', value: dashData.users },
                     { icon: <ShoppingBag size={iconSize} color={iconColor} />, label: 'Orders', value: dashData.totalOrders },
@@ -39,7 +39,7 @@ const Dashboard = () => {
             </div>
 
             {/* Latest Orders Section */}
-            <div className="bg-white rounded-lg shadow-lg">
+            <div className="bg-white rounded-lg shadow-lg max-h-[65vh] overflow-scroll">
                 <div className="flex items-center gap-2.5 px-6 py-4 bg-[#22C55E] text-white rounded-t-lg">
                     <ListOrdered size={24} />
                     <p className="font-semibold text-lg">Latest Orders</p>
