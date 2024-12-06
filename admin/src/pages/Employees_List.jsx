@@ -16,9 +16,9 @@ const EmployeesList = () => {
     };
 
     return (
-        <div className="flex flex-col m-5 w-full max-w-7xl">
+        <div className="flex flex-col m-5 w-full max-w-6.5xl">
             {/* Header */}
-            <div className="flex items-center justify-between mb-6">
+            <div className="flex items-center justify-between mb-2">
                 <h1 className="text-3xl font-bold text-gray-800">Employee List</h1>
                 <div className="flex items-center space-x-4">
                     <button
@@ -30,7 +30,7 @@ const EmployeesList = () => {
                 </div>
             </div>
             {/* Search and Filters */}
-            <div className="flex items-center justify-between mb-4">
+            <div className="flex items-center justify-between mb-2">
                 <div className="flex items-center space-x-2">
                     <label className="text-gray-700 font-medium">Show</label>
                     <select className="border border-gray-300 rounded px-2 py-1 text-gray-700">
@@ -47,7 +47,7 @@ const EmployeesList = () => {
                 />
             </div>
             {/* Employee Cards */}
-            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6 pt-5">
+            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6 pt-1">
                 {employees.map((item) => (
                     <div
                         className="border border-gray-200 bg-white rounded-xl cursor-pointer group hover:shadow-lg hover:bg-indigo-50 transition-all duration-300"

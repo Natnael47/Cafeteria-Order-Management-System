@@ -121,7 +121,7 @@ const Users = () => {
     }, [token]);
 
     return (
-        <div className="flex flex-col m-5 w-full max-w-6xl max-h-[100vh]">
+        <div className="flex flex-col m-5 w-full max-w-6.5xl max-h-[100vh]">
             {/* Header */}
             <div className="flex items-center justify-between mb-6">
                 <h1 className="text-3xl font-bold text-gray-800">Customer</h1>

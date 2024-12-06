@@ -1,7 +1,7 @@
+import { Pencil, Trash2 } from 'lucide-react';
 import React, { useContext, useEffect, useRef, useState } from "react";
 import Modal from "react-modal";
 import { backendUrl } from "../../App";
-import { assets } from "../../assets/assets";
 import SortingDropdown from "../../Components/SortingDropdown";
 import { InventoryContext } from "../../Context/InventoryContext";
 
@@ -208,7 +208,7 @@ const Inventory = () => {
                     Add Item
                 </button>
             </div>
-            <div className="bg-[#F3F4F6] rounded w-full max-w-5.3xl max-h-[88vh] overflow-scroll">
+            <div className="bg-[#F3F4F6] rounded w-full max-w-5.3xl max-h-[82vh] overflow-scroll">
                 <div>
                     <div className="grid grid-cols-[0.4fr_0.8fr_0.7fr_0.6fr_0.5fr_0.5fr_0.5fr] items-center gap-2 p-3 border text-sm font-medium bg-[#FAFAFA] text-black sm:grid">
                         <b>Name</b>
@@ -242,12 +242,8 @@ const Inventory = () => {
                                 <p className="ml-2">{item.quantity} {item.unit}</p>
                                 <p>{item.category}</p>
                                 <p>${item.pricePerUnit}</p>
-                                <p onClick={() => openModal(item.id)} className="cursor-pointer pl-1">
-                                    <img src={assets.trash_icon} alt="Remove" className="w-7 ml-2 hover:scale-125 transition-transform" />
-                                </p>
-                                <p className="cursor-pointer pl-1" onClick={() => handleEditClick(item, index)}>
-                                    <img src={assets.modify_icon} alt="Modify" className="w-7 ml-2 hover:scale-125 transition-transform" />
-                                </p>
+                                <Trash2 onClick={() => openModal(item.id)} className="cursor-pointer pl-1" size={28} />
+                                <Pencil className="cursor-pointer pl-1" onClick={() => handleEditClick(item, index)} size={28} />
                             </div>
                             {selectedIndex === index && (
                                 <div className="p-4 border-t bg-gray-50">

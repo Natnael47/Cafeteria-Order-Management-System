@@ -185,9 +185,9 @@ const List = () => {
         .sort((a, b) => a.name.localeCompare(b.name));
 
     return (
-        <div className="flex flex-col m-5 max-w-6xl w-full">
+        <div className="flex flex-col m-5 max-w-6.5xl w-full">
             {/* Header */}
-            <div className="flex items-center justify-between mb-6">
+            <div className="flex items-center justify-between mb-2">
                 <h1 className="text-3xl font-bold text-gray-800">Food List</h1>
                 <div className="flex items-center space-x-4">
                     {/* New Food Button */}
@@ -207,7 +207,7 @@ const List = () => {
             </div>
 
             {/* Search and Show */}
-            <div className="flex items-center justify-between mb-4">
+            <div className="flex items-center justify-between mb-2">
                 <div className="flex items-center space-x-2">
                     <label className="text-gray-700">Show</label>
                     <select className="border border-gray-300 rounded px-2 py-1">
@@ -226,7 +226,7 @@ const List = () => {
                     className="border border-gray-300 rounded px-4 py-2"
                 />
             </div>
-            <div className="bg-[#F3F4F6] rounded w-full max-w-6xl max-h-[83vh] overflow-scroll">
+            <div className="bg-[#F3F4F6] rounded w-full max-w-[100%] max-h-[81vh] overflow-scroll">
                 <div>
                     <div className="grid grid-cols-[0.5fr_0.9fr_0.8fr_0.8fr_0.5fr_0.5fr] items-center gap-2 p-3 border border-black text-sm font-medium bg-gray-700 text-white sm:grid">
                         <b>Image</b>
