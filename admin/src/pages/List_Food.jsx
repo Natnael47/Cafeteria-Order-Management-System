@@ -258,12 +258,12 @@ const List = () => {
                                     <Trash2
                                         size={28}
                                         onClick={() => openModal(item.id)}
-                                        className="cursor-pointer text-red-500 hover:text-red-600"
+                                        className="cursor-pointer text-red-500 hover:text-red-600 ml-5"
                                     />
                                     <Pencil
                                         size={28}
                                         onClick={() => handleEditClick(item, index)}
-                                        className="cursor-pointer text-blue-500 hover:text-blue-600"
+                                        className="cursor-pointer text-blue-500 hover:text-blue-600 ml-3"
                                     />
                                 </div>
 
@@ -273,7 +273,7 @@ const List = () => {
                                         ref={editRef}
                                         className="bg-white mt-2 mb-4 p-6 rounded-lg shadow-lg border border-gray-300"
                                     >
-                                        <h2 className="text-xl font-semibold mb-4 text-indigo-600">
+                                        <h2 className="text-xl font-semibold mb-4 text-indigo-700">
                                             Edit Food Details
                                         </h2>
                                         <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
@@ -400,7 +400,7 @@ const List = () => {
                                                 onClick={updateFood}
                                                 disabled={!hasChanges}
                                                 className={`px-4 py-2 rounded-lg ${hasChanges
-                                                    ? "bg-indigo-500 text-white hover:bg-indigo-600"
+                                                    ? "bg-[#22C55E] text-white hover:bg-primary"
                                                     : "bg-gray-300 cursor-not-allowed"
                                                     }`}
                                             >

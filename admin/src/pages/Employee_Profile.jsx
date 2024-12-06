@@ -1,3 +1,4 @@
+import { ArrowLeft } from 'lucide-react';
 import React, { useContext, useEffect, useState } from 'react';
 import Modal from "react-modal";
 import { useParams } from 'react-router-dom';
@@ -97,9 +98,24 @@ const Employee_Profile = () => {
     };
 
     return (
-        <div className="m-5 w-full">
-            <h1 className="text-3xl font-bold text-gray-800 mb-5">{isEditing ? 'Edit Employee' : 'Employee Profile'}</h1>
-            <div className="bg-white shadow-lg px-8 py-8 border rounded-lg w-full max-w-6xl max-h-[78vh] overflow-y-scroll">
+        <div className="m-5 w-full max-w-6.5xl">
+            <div className="flex flex-row items-center justify-between mb-6">
+                {/* Page Title */}
+                <h1 className="text-3xl font-bold text-gray-800">
+                    {isEditing ? 'Edit Employee' : 'Employee Profile'}
+                </h1>
+
+                {/* Back Button */}
+                <button
+                    onClick={() => navigate('/employees-list')}
+                    className="flex items-center gap-2 px-6 py-2 bg-blue-600 text-white font-medium rounded-lg shadow hover:bg-blue-700 transition duration-300"
+                >
+                    <ArrowLeft className="w-5 h-5" />
+                    Back
+                </button>
+            </div>
+
+            <div className="bg-white shadow-lg px-8 py-8 border rounded-lg w-full max-h-[81vh] overflow-y-scroll">
                 {isEditing ? (
                     <form onSubmit={handleSave} className="text-gray-600">
                         <div className="flex items-center gap-6 mb-8">
@@ -300,65 +316,79 @@ const Employee_Profile = () => {
                         </div>
                     </form>
                 ) : (
-                    <div className="max-w-6xl bg-white rounded-lg p-6">
-                        {/* Profile Picture and Basic Details */}
-                        <div className="flex flex-col items-start">
-                            <img
-                                className=" items-start w-32 h-32 rounded-full border-4 border-indigo-500 object-cover"
-                                src={`${backendUrl}/empIMG/${employeeProfile.image}`}
-                                alt={`${formData.firstName}'s profile`}
-                            />
-                            <h1 className="text-2xl font-bold mt-4 text-gray-800">
-                                {formData.firstName} {formData.lastName}
-                            </h1>
-                            <p className="text-gray-500 mt-1 text-lg">{formData.position} - {formData.shift}</p>
+                    <div className="max-w-6xl mx-auto bg-white rounded-xl overflow-hidden p-6 items-start">
+                        <div className="flex flex-row justify-between items-center">
+                            {/* Profile Header Section */}
+                            <div className="flex items-center gap-6">
+                                <img
+                                    className="w-28 h-28 rounded-full border-4 border-blue-500 object-cover"
+                                    src={`${backendUrl}/empIMG/${employeeProfile.image}`}
+                                    alt={`${formData.firstName}'s profile`}
+                                />
+                                <div>
+                                    <h1 className="text-2xl font-bold text-gray-800">
+                                        {formData.firstName} {formData.lastName}
+                                    </h1>
+                                    <p className="text-gray-500 text-md">{formData.position} - {formData.shift}</p>
+                                </div>
+                            </div>
+                            {/* Action Buttons */}
+                            <div className="flex gap-4">
+                                <button
+                                    onClick={handleEditToggle}
+                                    className="px-5 py-2 bg-blue-600 text-white font-medium rounded shadow hover:bg-blue-700 transition duration-300"
+                                >
+                                    Edit Profile
+                                </button>
+                                <button
+                                    onClick={openModal}
+                                    className="px-5 py-2 bg-red-600 text-white font-medium rounded shadow hover:bg-red-700 transition duration-300"
+                                >
+                                    Delete Profile
+                                </button>
+                            </div>
                         </div>
 
-                        {/* Employee Details Grid */}
-                        <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mt-6">
+                        {/* Employee Details Section */}
+                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-6 mt-6">
                             {/* About Section */}
-                            <div className="bg-gray-100 p-4 rounded-lg shadow-inner">
-                                <h2 className="text-lg font-semibold text-gray-800">About</h2>
-                                <p className="text-gray-700 mt-2"><strong>Education:</strong> {formData.education}</p>
-                                <p className="text-gray-700"><strong>Phone:</strong> {formData.phone}</p>
+                            <div className="bg-gradient-to-r from-gray-50 to-gray-100 p-5 rounded-lg shadow-sm">
+                                <h2 className="text-lg font-semibold text-gray-800 mb-3">About</h2>
+                                <div className="space-y-2">
+                                    <p className="text-gray-700">
+                                        <span className="font-medium">Education:</span> {formData.education}
+                                    </p>
+                                    <p className="text-gray-700">
+                                        <span className="font-medium">Phone:</span> {formData.phone}
+                                    </p>
+                                </div>
                             </div>
 
                             {/* Experience and Salary Section */}
-                            <div className="bg-gray-100 p-4 rounded-lg shadow-inner">
-                                <h2 className="text-lg font-semibold text-gray-800">Details</h2>
-                                <p className="text-gray-700"><strong>Experience:</strong> {formData.experience}</p>
-                                <p className="text-gray-700 text-xl font-bold mt-2"><strong>Salary:</strong> ${formData.salary}</p>
+                            <div className="bg-gradient-to-r from-gray-50 to-gray-100 p-5 rounded-lg shadow-sm">
+                                <h2 className="text-lg font-semibold text-gray-800 mb-3">Details</h2>
+                                <div className="space-y-2">
+                                    <p className="text-gray-700">
+                                        <span className="font-medium">Experience:</span> {formData.experience}
+                                    </p>
+                                    <p className="text-gray-700 text-xl font-bold">
+                                        <span className="font-medium">Salary:</span> ${formData.salary}
+                                    </p>
+                                </div>
                             </div>
                         </div>
 
                         {/* Address Section */}
-                        <div className="bg-gray-100 p-4 rounded-lg shadow-inner mt-6">
-                            <h2 className="text-lg font-semibold text-gray-800">Address</h2>
-                            <p className="text-gray-700 mt-2">
+                        <div className="bg-gradient-to-r from-gray-50 to-gray-100 p-5 rounded-lg shadow-sm mt-6">
+                            <h2 className="text-lg font-semibold text-gray-800 mb-3">Address</h2>
+                            <p className="text-gray-700">
                                 {formData.address.line1}, {formData.address.line2}
                             </p>
                         </div>
-
-                        {/* Buttons */}
-                        <div className="flex justify-center mt-6 gap-4">
-                            <button
-                                onClick={handleEditToggle}
-                                className="px-5 py-2 bg-blue-600 text-white rounded shadow hover:bg-blue-700 transition"
-                            >
-                                Edit
-                            </button>
-                            <button
-                                onClick={openModal}
-                                className="px-5 py-2 bg-red-600 text-white rounded shadow hover:bg-red-700 transition"
-                            >
-                                Delete
-                            </button>
-                        </div>
                     </div>
-
                 )}
             </div>
-            <button onClick={() => navigate('/employees-list')} className="px-5 py-2 bg-gray-400 rounded text-white ml-7 mt-3">Back</button>
+
             <Modal
                 isOpen={modalIsOpen}
                 onRequestClose={closeModal}
