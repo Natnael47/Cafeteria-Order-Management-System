@@ -387,7 +387,7 @@ const Stock = () => {
                                         >
                                             <ArrowUpFromLine />
                                         </button>
-                                    </>
+                                    </div>
                                 </div>
 
                                 {/* Add Stock Form */}
