@@ -180,46 +180,61 @@ const Users = () => {
             {/* the display Div */}
             <div className="bg-[#F3F4F6] rounded w-full max-w-6.5xl max-h-[68vh] overflow-scroll">
                 {currentView === "users" && (
-                    <div className="bg-white shadow rounded">
+                    <div className="bg-white shadow-md rounded-lg p-6">
+                        <h2 className="text-xl font-semibold text-gray-800 mb-4">Users Data</h2>
                         {/* Users Data Table */}
-                        <table className="w-full text-left border-collapse">
-                            <thead>
-                                <tr className="bg-gray-100">
-                                    <th className="px-4 py-2 border">ID</th>
-                                    <th className="px-4 py-2 border">Name</th>
-                                    <th className="px-4 py-2 border">Email</th>
-                                    <th className="px-4 py-2 border">Address</th>
-                                    <th className="px-4 py-2 border">Gender</th>
-                                    <th className="px-4 py-2 border">Phone</th>
-                                    <th className="px-4 py-2 border">Account Created</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                {usersData.length > 0 ? (
-                                    usersData.map((user, index) => (
-                                        <tr key={user.id} className={index % 2 === 0 ? "bg-gray-50" : ""}>
-                                            <td className="px-4 py-2 border">{user.id}</td>
-                                            <td className="px-4 py-2 border">{user.firstName} {user.lastName}</td>
-                                            <td className="px-4 py-2 border">{user.email}</td>
-                                            <td className="px-4 py-2 border">
-                                                {user.address && user.address.line1 && user.address.line2
-                                                    ? `${user.address.line1}, ${user.address.line2}`
-                                                    : "No address available"}
-                                            </td>
-                                            <td className="px-4 py-2 border">{user.gender || 'Not Selected'}</td>
-                                            <td className="px-4 py-2 border">{user.phone || 'No Phone'}</td>
-                                            <td className="px-4 py-2 border">{formatDate(user.createdAt)}</td>
-                                        </tr>
-                                    ))
-                                ) : (
-                                    <tr>
-                                        <td colSpan="7" className="text-center py-4">No users found</td>
+                        <div className="overflow-x-auto">
+                            <table className="w-full text-left border-collapse rounded-lg overflow-hidden">
+                                <thead>
+                                    <tr className="bg-[#22C55E] text-white">
+                                        <th className="px-4 py-3 text-sm font-semibold">ID</th>
+                                        <th className="px-4 py-3 text-sm font-semibold">Name</th>
+                                        <th className="px-4 py-3 text-sm font-semibold">Email</th>
+                                        <th className="px-4 py-3 text-sm font-semibold">Address</th>
+                                        <th className="px-4 py-3 text-sm font-semibold">Gender</th>
+                                        <th className="px-4 py-3 text-sm font-semibold">Phone</th>
+                                        <th className="px-4 py-3 text-sm font-semibold">Account Created</th>
                                     </tr>
-                                )}
-                            </tbody>
-                        </table>
+                                </thead>
+                                <tbody>
+                                    {usersData.length > 0 ? (
+                                        usersData.map((user, index) => (
+                                            <tr
+                                                key={user.id}
+                                                className={`transition-colors duration-200 ${index % 2 === 0 ? "bg-gray-50" : "bg-white"
+                                                    } hover:bg-blue-100`}
+                                            >
+                                                <td className="px-4 py-3 text-sm border">{String(user.id).padStart(3, '0')}</td>
+                                                <td className="px-4 py-3 text-sm border">
+                                                    {user.firstName} {user.lastName}
+                                                </td>
+                                                <td className="px-4 py-3 text-sm border">{user.email}</td>
+                                                <td className="px-4 py-3 text-sm border">
+                                                    {user.address && user.address.line1 && user.address.line2
+                                                        ? `${user.address.line1}, ${user.address.line2}`
+                                                        : "No address available"}
+                                                </td>
+                                                <td className="px-4 py-3 text-sm border">{user.gender || "Not Selected"}</td>
+                                                <td className="px-4 py-3 text-sm border">{user.phone || "No Phone"}</td>
+                                                <td className="px-4 py-3 text-sm border">{formatDate(user.createdAt)}</td>
+                                            </tr>
+                                        ))
+                                    ) : (
+                                        <tr>
+                                            <td
+                                                colSpan="7"
+                                                className="text-center py-4 text-gray-500 font-medium bg-gray-50"
+                                            >
+                                                No users found
+                                            </td>
+                                        </tr>
+                                    )}
+                                </tbody>
+                            </table>
+                        </div>
                     </div>
                 )}
+
                 {/*Feedback page*/}
                 {currentView === "feedback" && (
                     <div className="p-6 bg-white shadow rounded-lg">

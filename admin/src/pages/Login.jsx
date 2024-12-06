@@ -1,4 +1,5 @@
 import axios from 'axios';
+import { Eye, EyeClosed } from 'lucide-react';
 import React, { useContext, useState } from 'react';
 import { toast } from "react-toastify";
 import { backendUrl } from '../App';
@@ -32,42 +33,55 @@ const Login = () => {
     }
 
     return (
-        <div className='min-h-screen flex items-center justify-center w-full bg-gray-100'>
-            <div className='bg-white shadow-xl rounded-lg px-8 py-6 max-w-md'>
-                <h1 className='text-2xl font-bold mb-4 text-black'>Admin Panel</h1>
+        <div className="min-h-screen flex items-center justify-center w-full bg-gradient-to-r from-indigo-500 to-purple-600">
+            <div className="bg-white shadow-2xl rounded-lg px-8 py-10 max-w-md w-full">
+                {/* Title */}
+                <h1 className="text-3xl font-extrabold text-gray-800 text-center mb-6">
+                    Admin Panel
+                </h1>
                 <form onSubmit={onSubmitHandler}>
-                    <div className='mb-3 min-w-72'>
-                        <p className='text-sm font-medium text-black mb-2'>Email Address</p>
+                    {/* Email Input */}
+                    <div className="mb-5">
+                        <label className="block text-sm font-semibold text-gray-700 mb-2">Email Address</label>
                         <input
-                            className='rounded-md w-full px-3 py-2 border border-black outline-none'
+                            className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 outline-none transition duration-200"
                             onChange={(e) => setEmail(e.target.value)}
                             value={email}
-                            type='email'
-                            placeholder='admin@coms.com'
+                            type="email"
+                            placeholder="admin@coms.com"
                             required
                         />
                     </div>
-                    <div className='mb-3 min-w-72'>
-                        <p className='text-sm font-medium text-black mb-2'>Password</p>
+
+                    {/* Password Input */}
+                    <div className="mb-5">
+                        <label className="block text-sm font-semibold text-gray-700 mb-2">Password</label>
                         <div className="relative">
                             <input
-                                className='rounded-md w-full px-3 py-2 border border-black outline-none'
+                                className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 outline-none transition duration-200"
                                 onChange={(e) => setPassword(e.target.value)}
                                 value={password}
-                                type={showPassword ? 'text' : 'password'} // Toggle input type based on showPassword
-                                placeholder='1q2w3e4r'
+                                type={showPassword ? 'text' : 'password'}
+                                placeholder="1q2w3e4r"
                                 required
                             />
                             <button
                                 type="button"
-                                onClick={() => setShowPassword(!showPassword)} // Toggle password visibility
-                                className="absolute right-2 top-2 text-gray-500"
+                                onClick={() => setShowPassword(!showPassword)}
+                                className="absolute right-3 top-3 text-gray-500"
                             >
-                                {showPassword ? "Hide" : "Show"} {/* Button text changes based on state */}
+                                {showPassword ? <EyeClosed size={20} /> : <Eye size={20} />}
                             </button>
                         </div>
                     </div>
-                    <button className='mt-2 w-full py-2 px-4 rounded-md text-white bg-black font-bold hover:bg-gray-700' type='submit'>Login</button>
+
+                    {/* Submit Button */}
+                    <button
+                        type="submit"
+                        className="w-full py-3 bg-indigo-600 text-white font-semibold text-lg rounded-lg shadow-md hover:bg-indigo-700 transition duration-300"
+                    >
+                        Login
+                    </button>
                 </form>
             </div>
         </div>

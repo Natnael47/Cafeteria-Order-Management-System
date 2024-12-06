@@ -1,4 +1,5 @@
 import axios from "axios";
+import { Eye, EyeClosed } from 'lucide-react';
 import React, { useContext, useState } from "react";
 import { toast } from "react-toastify";
 import { backendUrl } from "../App";
@@ -45,60 +46,71 @@ const Login = () => {
     };
 
     return (
-        <form onSubmit={onSubmitHandler} className="min-h-[100vh] flex items-center bg-gray-100">
-            <div className="flex flex-col gap-3 m-auto items-start p-8 min-w-[340px] sm:min-w-96 border rounded-xl text-[#5E5E5E] text-sm shadow-xl bg-white">
-                <p className="text-2xl font-bold text-black m-auto">
-                    <span className="text-primary"> {state} </span> Login
+        <form onSubmit={onSubmitHandler} className="min-h-screen flex items-center justify-center bg-gradient-to-r from-green-300 via-blue-500 to-green-300">
+            <div className="flex flex-col gap-6 p-10 bg-white rounded-2xl shadow-2xl max-w-sm w-full">
+                {/* Title */}
+                <p className="text-2xl font-extrabold text-gray-800 text-center">
+                    <span className="text-green-600">{state}</span> Login
                 </p>
+
+                {/* Email Field */}
                 <div className="w-full">
-                    <p className="text-black font-semibold">Email</p>
+                    <label className="block text-gray-700 font-medium mb-2">Email</label>
                     <input
                         onChange={(e) => setEmail(e.target.value)}
-                        className="border border-[#DADADA] rounded w-full p-2 mt-1"
-                        placeholder="Email"
+                        className="w-full px-4 py-2 text-gray-700 bg-gray-100 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:outline-none"
+                        placeholder="Enter your email"
                         type="email"
                         value={email}
                         required
                     />
                 </div>
+
+                {/* Password Field */}
                 <div className="w-full">
-                    <p className="text-black font-semibold">Password</p>
+                    <label className="block text-gray-700 font-medium mb-2">Password</label>
                     <div className="relative">
                         <input
                             onChange={(e) => setPassword(e.target.value)}
-                            className="border border-[#DADADA] rounded w-full p-2 mt-1"
-                            placeholder="Password"
-                            type={showPassword ? "text" : "password"} // Toggle input type based on showPassword
+                            className="w-full px-4 py-2 text-gray-700 bg-gray-100 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:outline-none"
+                            placeholder="Enter your password"
+                            type={showPassword ? "text" : "password"}
                             value={password}
                             required
                         />
                         <button
                             type="button"
-                            onClick={() => setShowPassword(!showPassword)} // Toggle password visibility
-                            className="absolute right-2 top-2 text-gray-500"
+                            onClick={() => setShowPassword(!showPassword)}
+                            className="absolute inset-y-0 right-3 text-gray-500 hover:text-green-600 focus:outline-none"
                         >
-                            {showPassword ? "Hide" : "Show"} {/* Button text changes based on state */}
+                            {showPassword ? <EyeClosed size={20} /> : <Eye size={20} />}
                         </button>
                     </div>
                 </div>
-                <button className="bg-primary text-white w-full py-2 rounded-md text-base font-bold mt-2 hover:bg-[#269231]">
+
+                {/* Login Button */}
+                <button
+                    className="w-full py-3 bg-green-500 text-white text-lg font-semibold rounded-lg hover:bg-green-600 transition duration-300"
+                >
                     Login
                 </button>
+
+                {/* Toggle Login Type */}
                 {state === "Chef" ? (
-                    <p className="text-center mt-4 text-black">
+                    <p className="text-center text-gray-600">
                         Inventory Manager Login?{" "}
                         <span
-                            className="text-blue-800 underline cursor-pointer"
+                            className="text-green-600 font-medium cursor-pointer hover:underline"
                             onClick={() => setState("Inventory Manager")}
                         >
                             Click here
                         </span>
                     </p>
                 ) : (
-                    <p className="text-center mt-4 text-black">
+                    <p className="text-center text-gray-600">
                         Chef Login?{" "}
                         <span
-                            className="text-blue-800 underline cursor-pointer"
+                            className="text-green-600 font-medium cursor-pointer hover:underline"
                             onClick={() => setState("Chef")}
                         >
                             Click here
