@@ -187,7 +187,7 @@ const Inventory = () => {
     return (
         <div className="flex flex-col m-5 w-full max-w-6.5xl">
             {/* Header */}
-            <div className="flex flex-col space-y-2 mb-4">
+            <div className="flex flex-col space-y-2 mb-2">
                 {/* Top Section: Title and Buttons */}
                 <div className="flex items-center justify-between h-[10vh]">
                     <h1 className="text-2xl sm:text-3xl font-extrabold text-gray-800">Inventory Items</h1>
@@ -238,12 +238,10 @@ const Inventory = () => {
                             className="border border-gray-300 rounded px-4 py-2 w-full sm:w-64 shadow-sm focus:ring focus:ring-gray-200"
                         />
                     </div>
-
                 </div>
             </div>
 
-
-            <div className="bg-[#F3F4F6] rounded-lg w-full max-h-[82vh] overflow-y-auto shadow-lg">
+            <div className="bg-[#F3F4F6] rounded-lg w-full max-h-[76vh] overflow-y-auto shadow-lg">
                 {/* Header */}
                 <div className="grid grid-cols-[0.4fr_0.8fr_0.7fr_0.6fr_0.5fr_0.5fr_0.5fr] items-center gap-4 p-4 border-b bg-[#FAFAFA] text-sm font-semibold text-gray-800">
                     <b>Name</b>

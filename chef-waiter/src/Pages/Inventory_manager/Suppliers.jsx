@@ -2,6 +2,7 @@ import { Pencil, Trash2 } from 'lucide-react';
 import React, { useContext, useEffect, useState } from "react";
 import Modal from "react-modal";
 import { toast } from "react-toastify";
+import SortingDropdown from '../../Components/SortingDropdown';
 import { InventoryContext } from "../../Context/InventoryContext";
 
 const Suppliers = () => {
@@ -18,6 +19,9 @@ const Suppliers = () => {
     const [isRemoveModalOpen, setIsRemoveModalOpen] = useState(false); // State to manage removal modal
     const [selectedSupplier, setSelectedSupplier] = useState(null); // Selected supplier for edit or delete
     const [entriesPerPage, setEntriesPerPage] = useState(0); // Default to showing all entries
+    const [searchTerm, setSearchTerm] = useState('');
+    const [sortAttribute, setSortAttribute] = useState('name');  // Default sort by name
+    const [sortOrder, setSortOrder] = useState('ascending');     // Default ascending
 
     const handleEntriesChange = (e) => {
         setEntriesPerPage(parseInt(e.target.value, 10)); // Update the state with the selected value
@@ -85,42 +89,68 @@ const Suppliers = () => {
         }
     };
 
+    const handleSortChange = (attribute, order) => {
+        setSortAttribute(attribute);
+        setSortOrder(order);
+        // Save the selected sorting state to localStorage
+        localStorage.setItem('sortAttribute', attribute);
+        localStorage.setItem('sortOrder', order);
+    };
+
     return (
         <div className="flex flex-col m-5 w-full max-w-6.5xl">
             {/* Header */}
-            <div className="flex items-center justify-between mb-6">
-                <h1 className="text-2xl font-semibold text-gray-700">Suppliers</h1>
-            </div>
-
-            {/* Search and Show */}
-            <div className="flex items-center justify-between mb-4">
-                <div className="flex items-center space-x-2">
-                    <label className="text-gray-700">Show</label>
-                    <select
-                        className="border border-gray-300 rounded px-2 py-1"
-                        value={entriesPerPage}
-                        onChange={(e) => setEntriesPerPage(parseInt(e.target.value, 10))}
-                    >
-                        <option value="0">All</option> {/* Option to show all entries */}
-                        <option value="5">5</option>
-                        <option value="10">10</option>
-                        <option value="25">25</option>
-                        <option value="50">50</option>
-                    </select>
-                    <label className="text-gray-700">entries</label>
+            <div className="flex flex-col space-y-2 mb-2">
+                {/* Top Section: Title and Buttons */}
+                <div className="flex items-center justify-between h-[10vh]">
+                    <h1 className="text-2xl sm:text-3xl font-extrabold text-gray-800">Suppliers</h1>
+                    <div className="flex items-center space-x-3">
+                        {/* New Inventory Button */}
+                        <button
+                            className="px-4 py-2 bg-green-600 text-white font-medium rounded-md shadow-sm hover:bg-green-700 transition"
+                            onClick={() => setIsPopupOpen(true)}
+                        >
+                            + New
+                        </button>
+                        {/* Icon Button */}
+                        <button className="p-2 bg-gray-100 text-gray-700 rounded-md shadow-sm hover:bg-gray-200 transition">
+                            <svg
+                                xmlns="http://www.w3.org/2000/svg"
+                                fill="none"
+                                viewBox="0 0 24 24"
+                                stroke="currentColor"
+                                className="w-5 h-5"
+                            >
+                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M4 8h16M4 16h16" />
+                            </svg>
+                        </button>
+                    </div>
                 </div>
-                <div className="flex items-center space-x-4">
-                    <input
-                        type="text"
-                        placeholder="Search"
-                        className="border border-gray-300 rounded px-4 py-2"
-                    />
-                    <button
-                        onClick={() => setIsPopupOpen(true)}
-                        className="bg-blue-500 text-white px-4 py-2 rounded"
-                    >
-                        New
-                    </button>
+
+                {/* Middle Section: Search and Entries */}
+                <div className="flex items-center justify-between">
+                    {/* Entries Dropdown */}
+                    <div className="flex items-center space-x-2 text-sm">
+                        <label className="font-medium text-gray-700">Show</label>
+                        <select className="border border-gray-300 rounded px-3 py-1.5 focus:ring focus:ring-gray-200">
+                            <option value="10">10</option>
+                            <option value="25">25</option>
+                            <option value="50">50</option>
+                        </select>
+                        <label className="font-medium text-gray-700">entries</label>
+                    </div>
+                    {/* Sorting  & search */}
+                    <div className="flex items-center justify-end gap-5">
+                        <SortingDropdown onSortChange={handleSortChange} />
+                        {/* Search Bar */}
+                        <input
+                            type="text"
+                            placeholder="Search by item name"
+                            value={searchTerm}
+                            onChange={(e) => setSearchTerm(e.target.value)}
+                            className="border border-gray-300 rounded px-4 py-2 w-full sm:w-64 shadow-sm focus:ring focus:ring-gray-200"
+                        />
+                    </div>
                 </div>
             </div>
 

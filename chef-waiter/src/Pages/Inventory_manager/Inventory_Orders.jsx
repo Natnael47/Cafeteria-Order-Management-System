@@ -4,6 +4,7 @@ import React, { useContext, useEffect, useState } from 'react';
 import Modal from 'react-modal';
 import { toast } from 'react-toastify';
 import { backendUrl } from '../../App';
+import SortingDropdown from '../../Components/SortingDropdown';
 import { InventoryContext } from '../../Context/InventoryContext';
 
 const InventoryOrders = () => {
@@ -60,7 +61,17 @@ const InventoryOrders = () => {
         setIsPackageSelectorOpen(null); // Close the modal
     };
 
+    const [searchTerm, setSearchTerm] = useState('');
+    const [sortAttribute, setSortAttribute] = useState('name');  // Default sort by name
+    const [sortOrder, setSortOrder] = useState('ascending');     // Default ascending
 
+    const handleSortChange = (attribute, order) => {
+        setSortAttribute(attribute);
+        setSortOrder(order);
+        // Save the selected sorting state to localStorage
+        localStorage.setItem('sortAttribute', attribute);
+        localStorage.setItem('sortOrder', order);
+    };
 
     const handlePackageSelection = async (packageId, orderId) => {
         try {
@@ -163,32 +174,59 @@ const InventoryOrders = () => {
 
     return (
         <div className="flex flex-col m-5 w-full max-w-6.5xl">
-            <div className="flex items-center justify-between mb-6">
-                <h1 className="text-2xl font-semibold text-gray-700">Inventory Orders</h1>
-            </div>
 
-            <div className="flex items-center justify-between mb-4">
-                <div className="flex items-center space-x-2">
-                    <label className="text-gray-700">Show</label>
-                    <select className="border border-gray-300 rounded px-2 py-1">
-                        <option value="10">10</option>
-                        <option value="25">25</option>
-                        <option value="50">50</option>
-                    </select>
-                    <label className="text-gray-700">entries</label>
+            {/* Header */}
+            <div className="flex flex-col space-y-2 mb-2">
+                {/* Top Section: Title and Buttons */}
+                <div className="flex items-center justify-between h-[10vh]">
+                    <h1 className="text-2xl sm:text-3xl font-extrabold text-gray-800">Inventory Orders</h1>
+                    <div className="flex items-center space-x-3">
+                        {/* New Inventory Button */}
+                        <button
+                            className="px-4 py-2 bg-green-600 text-white font-medium rounded-md shadow-sm hover:bg-green-700 transition"
+                            onClick={() => setIsPopupOpen(true)}
+                        >
+                            + New Package
+                        </button>
+                        {/* Icon Button */}
+                        <button className="p-2 bg-gray-100 text-gray-700 rounded-md shadow-sm hover:bg-gray-200 transition">
+                            <svg
+                                xmlns="http://www.w3.org/2000/svg"
+                                fill="none"
+                                viewBox="0 0 24 24"
+                                stroke="currentColor"
+                                className="w-5 h-5"
+                            >
+                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M4 8h16M4 16h16" />
+                            </svg>
+                        </button>
+                    </div>
                 </div>
-                <div className="flex items-center space-x-4">
-                    <input
-                        type="text"
-                        placeholder="Search"
-                        className="border border-gray-300 rounded px-4 py-2"
-                    />
-                    <button
-                        onClick={() => setIsPopupOpen(true)}
-                        className="bg-blue-500 text-white px-4 py-2 rounded"
-                    >
-                        New Package
-                    </button>
+
+                {/* Middle Section: Search and Entries */}
+                <div className="flex items-center justify-between">
+                    {/* Entries Dropdown */}
+                    <div className="flex items-center space-x-2 text-sm">
+                        <label className="font-medium text-gray-700">Show</label>
+                        <select className="border border-gray-300 rounded px-3 py-1.5 focus:ring focus:ring-gray-200">
+                            <option value="10">10</option>
+                            <option value="25">25</option>
+                            <option value="50">50</option>
+                        </select>
+                        <label className="font-medium text-gray-700">entries</label>
+                    </div>
+                    {/* Sorting  & search */}
+                    <div className="flex items-center justify-end gap-5">
+                        <SortingDropdown onSortChange={handleSortChange} />
+                        {/* Search Bar */}
+                        <input
+                            type="text"
+                            placeholder="Search by item name"
+                            value={searchTerm}
+                            onChange={(e) => setSearchTerm(e.target.value)}
+                            className="border border-gray-300 rounded px-4 py-2 w-full sm:w-64 shadow-sm focus:ring focus:ring-gray-200"
+                        />
+                    </div>
                 </div>
             </div>
 
