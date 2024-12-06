@@ -330,50 +330,48 @@ const Stock = () => {
                         return (
                             <div key={index} className="relative">
                                 <div
-                                    className={`grid grid-cols-[1fr_1fr_1fr_1fr_1fr_0.5fr_0.5fr] items-center gap-4 p-5 border-b text-sm font-medium sm:grid ${item.quantity === 0 ? "bg-red-100" : "bg-white"}`}
-                                >
+                                    className={`grid grid-cols-[1fr_1fr_1fr_1fr_1fr_0.6fr_0.4fr] items-center gap-4 p-4 border-b ${item.quantity === 0 ? "bg-red-50 border-red-200" : "bg-white border-gray-200"
+                                        } text-sm font-medium sm:grid transition-all hover:bg-blue-50`} >
+
                                     {/* Status Bar */}
-                                    <div className="relative w-full bg-gray-200 rounded h-8">
+                                    <div className="relative w-full bg-gray-200 rounded h-8 overflow-hidden">
                                         <div
-                                            className={`absolute top-0 left-0 h-8 rounded transition-all`}
+                                            className="absolute top-0 left-0 h-8 transition-all"
                                             style={{
                                                 width: `${(item.quantity / item.initialQuantity) * 100}%`,
                                                 backgroundColor: `hsl(${(item.quantity / item.initialQuantity) * 120}, 100%, 50%)`,
                                             }}
                                         ></div>
-                                        <p className="absolute inset-0 flex items-center justify-center text-sm font-semibold text-black">
-                                            {item.quantity === 0
-                                                ? "Out of Stock"
-                                                : `${((item.quantity / item.initialQuantity) * 100).toFixed(0)}%`}
+                                        <p className="absolute inset-0 flex items-center justify-center text-xs font-semibold text-black">
+                                            {item.quantity === 0 ? "Out of Stock" : `${((item.quantity / item.initialQuantity) * 100).toFixed(0)}%`}
                                         </p>
                                     </div>
 
                                     {/* Name */}
-                                    <p className="text-[#112F45] text-center">{item.name}</p>
+                                    <p className="text-center text-[#112F45] font-semibold">{item.name}</p>
 
                                     {/* Remaining Stock */}
-                                    <p className="font-bold text-center">
-                                        {item.quantity} - {item.unit}
+                                    <p className="text-center font-bold text-gray-700">
+                                        {item.quantity} <span className="text-gray-500">{item.unit}</span>
                                     </p>
 
                                     {/* Total Stock Out */}
-                                    <p className="text-red-600 text-center">
-                                        {totalStockOut} <span className="text-red-600">{item.unit}</span>
+                                    <p className="text-center text-red-500">
+                                        {totalStockOut} <span className="text-red-400">{item.unit}</span>
                                     </p>
 
                                     {/* Opening Stock */}
-                                    <p className="text-blue-600 text-center">
-                                        {item.initialQuantity}{" "}
-                                        <span className="text-blue-600">{item.unit}</span>
+                                    <p className="text-center text-blue-500">
+                                        {item.initialQuantity} <span className="text-blue-400">{item.unit}</span>
                                     </p>
 
                                     {/* Stock In Button */}
                                     <div className="flex justify-center">
                                         <button
                                             onClick={() => handleStockAction(item, "in")}
-                                            className="px-5 py-3 text-white bg-green-600 hover:bg-green-700 border-2 border-green-600 rounded-lg shadow-md hover:shadow-lg transition-all duration-300 transform hover:scale-105"
-                                        ><ArrowDownToLine />
-                                            Stock In
+                                            className="px-3 py-2 mr-4 text-white bg-green-600 rounded hover:bg-green-700 border border-green-600 text-xs font-medium transition-all"
+                                        >
+                                            <ArrowDownToLine />
                                         </button>
                                     </div>
 
@@ -382,24 +380,29 @@ const Stock = () => {
                                         <button
                                             onClick={() => handleStockAction(item, "out")}
                                             disabled={item.quantity <= 0}
-                                            className="px-5 py-3 text-white bg-red-600 hover:bg-red-700 border-2 border-red-600 rounded-lg shadow-md hover:shadow-lg transition-all duration-300 transform hover:scale-105"
-                                        ><ArrowUpFromLine />
-                                            Stock Out
+                                            className={`px-3 py-2 text-xs font-medium rounded transition-all mr-4 ${item.quantity > 0
+                                                ? "text-white bg-red-600 hover:bg-red-700 border border-red-600"
+                                                : "text-gray-400 bg-gray-200 border border-gray-300 cursor-not-allowed"
+                                                }`}
+                                        >
+                                            <ArrowUpFromLine />
                                         </button>
                                     </div>
                                 </div>
 
                                 {/* Add Stock Form */}
                                 {stockAction === "in" && selectedItem === item && (
-                                    <div className="mt-1 mb-1 p-3 bg-gray-50 rounded border">
-                                        <p className="font-bold text-lg">Add Stock</p>
-                                        <form onSubmit={onAddStockHandler} className="w-full">
+                                    <div className="mt-2 mb-2 p-4 bg-white shadow-md rounded-lg border border-gray-200">
+                                        {/* Header */}
+                                        <p className="font-bold text-lg text-gray-800 border-b pb-2 mb-4">
+                                            Add Stock
+                                        </p>
+                                        <form onSubmit={onAddStockHandler} className="space-y-4">
+                                            {/* Input Fields */}
                                             <div className="grid grid-cols-2 gap-4">
+                                                {/* Stock Amount */}
                                                 <div>
-                                                    <label
-                                                        htmlFor="stockAmount"
-                                                        className="block text-sm font-medium"
-                                                    >
+                                                    <label htmlFor="stockAmount" className="block text-sm font-medium text-gray-700">
                                                         Stock Amount
                                                     </label>
                                                     <input
@@ -408,15 +411,14 @@ const Stock = () => {
                                                         name="stockAmount"
                                                         value={formData.stockAmount}
                                                         onChange={onChangeHandler}
-                                                        className="p-2 border rounded w-full"
                                                         min="1"
+                                                        className="mt-1 p-2 border border-gray-300 rounded w-full focus:outline-none focus:ring-2 focus:ring-green-400 focus:border-green-400"
                                                     />
                                                 </div>
+
+                                                {/* Price per Unit */}
                                                 <div>
-                                                    <label
-                                                        htmlFor="pricePerUnit"
-                                                        className="block text-sm font-medium"
-                                                    >
+                                                    <label htmlFor="pricePerUnit" className="block text-sm font-medium text-gray-700">
                                                         Price per Unit
                                                     </label>
                                                     <input
@@ -425,14 +427,13 @@ const Stock = () => {
                                                         name="pricePerUnit"
                                                         value={formData.pricePerUnit}
                                                         onChange={onChangeHandler}
-                                                        className="p-2 border rounded w-full"
+                                                        className="mt-1 p-2 border border-gray-300 rounded w-full focus:outline-none focus:ring-2 focus:ring-green-400 focus:border-green-400"
                                                     />
                                                 </div>
+
+                                                {/* Date Received */}
                                                 <div>
-                                                    <label
-                                                        htmlFor="dateReceived"
-                                                        className="block text-sm font-medium"
-                                                    >
+                                                    <label htmlFor="dateReceived" className="block text-sm font-medium text-gray-700">
                                                         Date Received
                                                     </label>
                                                     <input
@@ -441,36 +442,31 @@ const Stock = () => {
                                                         name="dateReceived"
                                                         value={formData.dateReceived}
                                                         onChange={onChangeHandler}
-                                                        className="p-2 border rounded w-full"
+                                                        className="mt-1 p-2 border border-gray-300 rounded w-full focus:outline-none focus:ring-2 focus:ring-green-400 focus:border-green-400"
                                                     />
                                                 </div>
+
+                                                {/* Supplier */}
                                                 <div>
-                                                    <label
-                                                        htmlFor="supplier"
-                                                        className="block text-sm font-medium"
-                                                    >
+                                                    <label htmlFor="supplier" className="block text-sm font-medium text-gray-700">
                                                         Supplier
                                                     </label>
                                                     <select
                                                         id="supplier"
                                                         name="supplier"
-                                                        value={formData.supplierId || ""} // Supplier ID is used as the value
+                                                        value={formData.supplierId || ""}
                                                         onChange={(event) => {
                                                             const selectedSupplierId = event.target.value;
-
-                                                            // Find the selected supplier object in the supplierList
                                                             const selectedSupplier = supplierList.find(
                                                                 (supplier) => supplier.id.toString() === selectedSupplierId
                                                             );
-
-                                                            // Update formData with both supplierId and supplier (name)
                                                             setFormData((prevData) => ({
                                                                 ...prevData,
                                                                 supplierId: selectedSupplier ? selectedSupplier.id : "",
                                                                 supplier: selectedSupplier ? selectedSupplier.name : "",
                                                             }));
                                                         }}
-                                                        className="p-2 border rounded w-full"
+                                                        className="mt-1 p-2 border border-gray-300 rounded w-full focus:outline-none focus:ring-2 focus:ring-green-400 focus:border-green-400"
                                                     >
                                                         <option value="">Select a supplier</option>
                                                         {supplierList.map((supplier) => (
@@ -480,33 +476,34 @@ const Stock = () => {
                                                         ))}
                                                     </select>
                                                 </div>
+
+                                                {/* Expiry Date */}
                                                 <div>
-                                                    <label
-                                                        htmlFor="supplier"
-                                                        className="block text-sm font-medium"
-                                                    >
+                                                    <label htmlFor="expiryDate" className="block text-sm font-medium text-gray-700">
                                                         Expiry Date
                                                     </label>
-                                                    <input id="expiryDate"
+                                                    <input
+                                                        id="expiryDate"
                                                         type="date"
-                                                        placeholder="Expiry date"
+                                                        name="expiryDate"
                                                         value={formData.expiryDate}
                                                         onChange={onChangeHandler}
-                                                        name="expiryDate"
-                                                        className="p-2 border rounded w-full" />
+                                                        className="mt-1 p-2 border border-gray-300 rounded w-full focus:outline-none focus:ring-2 focus:ring-green-400 focus:border-green-400"
+                                                    />
                                                 </div>
                                             </div>
-                                            <div className="flex justify-end mt-4 gap-2">
+                                            {/* Action Buttons */}
+                                            <div className="flex justify-end gap-3 mt-4">
                                                 <button
                                                     type="button"
                                                     onClick={cancelEdit}
-                                                    className="bg-gray-300 px-4 py-2 rounded"
+                                                    className="bg-gray-200 text-gray-800 px-4 py-2 rounded-md border hover:bg-gray-300 transition-all"
                                                 >
                                                     Cancel
                                                 </button>
                                                 <button
                                                     type="submit"
-                                                    className="bg-green-500 text-white px-4 py-2 rounded"
+                                                    className="bg-green-500 text-white px-4 py-2 rounded-md hover:bg-green-600 transition-all"
                                                 >
                                                     Add
                                                 </button>
@@ -517,14 +514,19 @@ const Stock = () => {
 
                                 {/* Remove Stock Form */}
                                 {stockAction === "out" && selectedItem === item && (
-                                    <div className="mt-1 mb-1 p-3 bg-gray-50 rounded border">
-                                        <p className="font-bold text-lg">Remove Stock</p>
-                                        <form onSubmit={onRemoveStockHandler} className="w-full">
-                                            <div className="grid grid-cols-2 gap-4">
+                                    <div className="mt-2 mb-2 p-4 bg-white shadow-md rounded-lg border border-gray-200">
+                                        {/* Header */}
+                                        <p className="font-bold text-lg text-gray-800 border-b pb-2 mb-4">
+                                            Remove Stock
+                                        </p>
+                                        {/* Form */}
+                                        <form onSubmit={onRemoveStockHandler} className="space-y-4">
+                                            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                                                {/* Stock Amount */}
                                                 <div>
                                                     <label
                                                         htmlFor="stockAmountOut"
-                                                        className="block text-sm font-medium"
+                                                        className="block text-sm font-medium text-gray-700 mb-1"
                                                     >
                                                         Stock Amount
                                                     </label>
@@ -534,15 +536,17 @@ const Stock = () => {
                                                         name="stockAmount"
                                                         value={formData.stockAmount}
                                                         onChange={onChangeHandler}
-                                                        className="p-2 border rounded w-full"
+                                                        className="p-3 border rounded-md w-full focus:ring focus:ring-red-300 focus:outline-none"
+                                                        placeholder="Enter amount"
                                                         min="1"
                                                         max={selectedItem.quantity}
                                                     />
                                                 </div>
+                                                {/* Date Withdrawn */}
                                                 <div>
                                                     <label
                                                         htmlFor="dateWithdrawn"
-                                                        className="block text-sm font-medium"
+                                                        className="block text-sm font-medium text-gray-700 mb-1"
                                                     >
                                                         Date Withdrawn
                                                     </label>
@@ -552,13 +556,14 @@ const Stock = () => {
                                                         name="dateWithdrawn"
                                                         value={formData.dateWithdrawn}
                                                         onChange={onChangeHandler}
-                                                        className="p-2 border rounded w-full"
+                                                        className="p-3 border rounded-md w-full focus:ring focus:ring-red-300 focus:outline-none"
                                                     />
                                                 </div>
-                                                <div>
+                                                {/* Withdrawn By */}
+                                                <div className="sm:col-span-2">
                                                     <label
                                                         htmlFor="withdrawnBy"
-                                                        className="block text-sm font-medium"
+                                                        className="block text-sm font-medium text-gray-700 mb-1"
                                                     >
                                                         Withdrawn By
                                                     </label>
@@ -568,95 +573,111 @@ const Stock = () => {
                                                         name="withdrawnBy"
                                                         value={formData.withdrawnBy}
                                                         onChange={onChangeHandler}
-                                                        className="p-2 border rounded w-full"
+                                                        className="p-3 border rounded-md w-full focus:ring focus:ring-red-300 focus:outline-none"
+                                                        placeholder="Enter name"
                                                     />
                                                 </div>
                                             </div>
-                                            <div className="flex justify-end mt-4 gap-2">
+                                            {/* Action Buttons */}
+                                            <div className="flex justify-end gap-3 mt-4">
                                                 <button
                                                     type="button"
                                                     onClick={cancelEdit}
-                                                    className="bg-gray-300 px-4 py-2 rounded"
+                                                    className="bg-gray-200 text-gray-800 px-4 py-2 rounded-md border hover:bg-gray-300 transition-all"
                                                 >
                                                     Cancel
                                                 </button>
                                                 <button
                                                     type="submit"
-                                                    className="bg-red-500 text-white px-4 py-2 rounded"
-                                                >Remove</button>
+                                                    className="bg-red-500 text-white px-4 py-2 rounded-md hover:bg-red-600 transition-all"
+                                                >
+                                                    Remove
+                                                </button>
                                             </div>
                                         </form>
                                     </div>
                                 )}
 
-
                                 {isPackagePopupOpen && (
-                                    <div className="fixed inset-0 bg-gray-50 bg-opacity-20 flex justify-center items-center z-50">
-                                        <div className="bg-white p-6 rounded-md shadow-md w-1/2">
-                                            <h2 className="text-xl font-semibold mb-4">Select a Package</h2>
-                                            <div className="max-h-60 overflow-y-auto mb-4">
+                                    <div className="fixed inset-0 bg-gray-800 bg-opacity-50 backdrop-blur-sm flex justify-center items-center z-50">
+                                        <div className="bg-white p-6 rounded-lg shadow-xl w-2/3 max-w-lg">
+                                            {/* Title */}
+                                            <h2 className="text-2xl font-bold mb-6 text-gray-700">Select a Package</h2>
+
+                                            {/* Package List */}
+                                            <div className="max-h-60 overflow-y-auto mb-4 border rounded-md p-2 shadow-inner">
                                                 {packageList
                                                     .filter((pkg) => pkg.totalCost > 0) // Exclude packages with totalCost equal to 0
                                                     .map((pkg) => (
                                                         <div
                                                             key={pkg.id}
-                                                            className={`p-2 border-b cursor-pointer transition-all ${selectedPackage?.id === pkg.id
-                                                                ? "bg-blue-100" // Highlight selected package
+                                                            className={`p-3 rounded-md cursor-pointer transition-all ${selectedPackage?.id === pkg.id
+                                                                ? "bg-blue-100 border-blue-400 shadow"
                                                                 : "hover:bg-gray-100"
                                                                 }`}
                                                             onClick={() => handleSelectPackage(pkg)}
                                                         >
-                                                            {pkg.name}
+                                                            <span className="font-medium text-gray-700">{pkg.name}</span>
                                                         </div>
                                                     ))}
                                             </div>
 
-                                            {/* Cancel Option */}
-                                            <div className="flex justify-end gap-2">
+                                            {/* Cancel Button */}
+                                            <div className="flex justify-end mb-4">
                                                 <button
                                                     type="button"
-                                                    onClick={handleClosePopup} // Close popup when canceled
-                                                    className="bg-gray-300 px-4 py-2 rounded"
+                                                    onClick={handleClosePopup}
+                                                    className="bg-gray-300 text-gray-800 px-4 py-2 rounded-md hover:bg-gray-400 transition"
                                                 >
                                                     Cancel
                                                 </button>
                                             </div>
 
+                                            {/* Form (Only visible when a package is selected) */}
                                             {selectedPackage && (
-                                                <form onSubmit={handlePackageSubmit} className="mt-4">
+                                                <form onSubmit={handlePackageSubmit}>
                                                     <div className="grid grid-cols-2 gap-4 mb-4">
+                                                        {/* Date Received */}
                                                         <div>
-                                                            <label className="block text-sm font-medium">Date Received</label>
+                                                            <label className="block text-sm font-medium text-gray-600 mb-1">
+                                                                Date Received
+                                                            </label>
                                                             <input
                                                                 type="date"
                                                                 name="dateReceived"
                                                                 value={packageForm.dateReceived}
                                                                 onChange={handlePackageFormChange}
-                                                                className="p-2 border rounded w-full"
+                                                                className="p-2 border rounded-md w-full focus:outline-none focus:ring-2 focus:ring-blue-300"
                                                             />
                                                         </div>
+
+                                                        {/* Expiry Date */}
                                                         <div>
-                                                            <label className="block text-sm font-medium">Expiry Date</label>
+                                                            <label className="block text-sm font-medium text-gray-600 mb-1">
+                                                                Expiry Date
+                                                            </label>
                                                             <input
                                                                 type="date"
                                                                 name="expiryDate"
                                                                 value={packageForm.expiryDate}
                                                                 onChange={handlePackageFormChange}
-                                                                className="p-2 border rounded w-full"
+                                                                className="p-2 border rounded-md w-full focus:outline-none focus:ring-2 focus:ring-blue-300"
                                                             />
                                                         </div>
                                                     </div>
+
+                                                    {/* Action Buttons */}
                                                     <div className="flex justify-end gap-2">
                                                         <button
                                                             type="button"
-                                                            onClick={handleClosePopup} // Allow cancellation even in form
-                                                            className="bg-gray-300 px-4 py-2 rounded"
+                                                            onClick={handleClosePopup}
+                                                            className="bg-gray-300 text-gray-800 px-4 py-2 rounded-md hover:bg-gray-400 transition"
                                                         >
                                                             Cancel
                                                         </button>
                                                         <button
                                                             type="submit"
-                                                            className="bg-green-500 text-white px-4 py-2 rounded"
+                                                            className="bg-green-500 text-white px-4 py-2 rounded-md hover:bg-green-600 transition"
                                                         >
                                                             Submit
                                                         </button>
