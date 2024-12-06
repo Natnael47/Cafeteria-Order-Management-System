@@ -16,7 +16,7 @@ const EmployeesList = () => {
     };
 
     return (
-        <div className="flex flex-col m-5 w-full max-w-6.5xl">
+        <div className="flex flex-col m-5 w-full max-w-6.5xl overflow-scroll">
             {/* Header */}
             <div className="flex items-center justify-between mb-2">
                 <h1 className="text-3xl font-bold text-gray-800">Employee List</h1>
@@ -46,30 +46,32 @@ const EmployeesList = () => {
                     className="border border-gray-300 rounded px-4 py-2 text-gray-700 focus:ring-2 focus:ring-indigo-500 focus:outline-none"
                 />
             </div>
-            {/* Employee Cards */}
-            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6 pt-1">
-                {employees.map((item) => (
-                    <div
-                        className="border border-gray-200 bg-white rounded-xl cursor-pointer group hover:shadow-lg hover:bg-indigo-50 transition-all duration-300"
-                        key={item.id}
-                        onClick={() => handleEmployeeClick(item.id)}
-                    >
-                        {/* Employee Image */}
-                        <img
-                            className="w-full max-h-[200px] object-cover rounded-t-xl"
-                            src={`${backendUrl}/empIMG/${item.image}`}
-                            alt={`${item.firstName} ${item.lastName}`}
-                        />
-                        {/* Employee Info */}
-                        <div className="p-4">
-                            <h2 className="text-lg font-semibold text-gray-800 truncate group-hover:text-[#22C55E]">
-                                {item.firstName} {item.lastName}
-                            </h2>
-                            <p className="text-sm text-gray-600 truncate">{item.position}</p>
-                            <p className="text-sm text-gray-600 truncate">Shift: {item.shift}</p>
+            <div className="border rounded-lg w-full max-h-[81vh] overflow-y-scroll">
+                {/* Employee Cards */}
+                <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6 pt-1">
+                    {employees.map((item) => (
+                        <div
+                            className="border border-gray-200 bg-white rounded-xl cursor-pointer group hover:shadow-lg hover:bg-indigo-50 transition-all duration-300"
+                            key={item.id}
+                            onClick={() => handleEmployeeClick(item.id)}
+                        >
+                            {/* Employee Image */}
+                            <img
+                                className="w-full max-h-[200px] object-cover rounded-t-xl"
+                                src={`${backendUrl}/empIMG/${item.image}`}
+                                alt={`${item.firstName} ${item.lastName}`}
+                            />
+                            {/* Employee Info */}
+                            <div className="p-4">
+                                <h2 className="text-lg font-semibold text-gray-800 truncate group-hover:text-[#22C55E]">
+                                    {item.firstName} {item.lastName}
+                                </h2>
+                                <p className="text-sm text-gray-600 truncate">{item.position}</p>
+                                <p className="text-sm text-gray-600 truncate">Shift: {item.shift}</p>
+                            </div>
                         </div>
-                    </div>
-                ))}
+                    ))}
+                </div>
             </div>
         </div>
     );
