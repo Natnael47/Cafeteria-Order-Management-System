@@ -241,7 +241,7 @@ const Inventory = () => {
                 </div>
             </div>
 
-            <div className="bg-[#F3F4F6] rounded-lg w-full max-h-[76vh] overflow-y-auto shadow-lg">
+            <div className="bg-gray-100 rounded-lg w-full max-w-full max-h-[77vh] overflow-scroll shadow-lg">
                 {/* Header */}
                 <div className="grid grid-cols-[0.4fr_0.8fr_0.7fr_0.6fr_0.5fr_0.5fr_0.5fr] items-center gap-4 p-4 border-b bg-[#FAFAFA] text-sm font-semibold text-gray-800">
                     <b>Name</b>

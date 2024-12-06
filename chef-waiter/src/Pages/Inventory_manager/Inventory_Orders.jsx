@@ -244,45 +244,47 @@ const InventoryOrders = () => {
                 {/* Data Rows */}
                 {orderList.length > 0 ? (
                     orderList.map((order, index) => (
-                        <div
-                            key={index}
-                            className={`grid grid-cols-[1.5fr_2fr_1fr_1fr_1fr_2fr_1fr] text-sm ${index % 2 === 0 ? 'bg-gray-50' : 'bg-white'
-                                } hover:bg-blue-50 transition-all border-b border-gray-300`}
-                        >
-                            <div className="px-4 py-3 border-r border-gray-300 text-center text-gray-700">
-                                {order.orderStatus}
-                            </div>
-                            <div className="px-4 py-3 border-r border-gray-300 text-center text-gray-700">
-                                {order.inventoryName}
-                            </div>
-                            <div className="px-4 py-3 border-r border-gray-300 text-center text-gray-700">
-                                {order.quantityOrdered} {order.unit}
-                            </div>
-                            <div className="px-4 py-3 border-r border-gray-300 text-center text-gray-700">
-                                {order.unit}
-                            </div>
-                            <div className="px-4 py-3 border-r border-gray-300 text-center text-green-600 font-semibold">
-                                ETB {order.totalPrice}
-                            </div>
-                            <div className="px-4 py-3 border-r border-gray-300 text-center text-gray-600">
-                                {new Date(order.orderDate).toLocaleDateString()}
-                            </div>
-                            <div className="px-4 py-3 text-center flex justify-center items-center">
-                                {isOrderInPackage(order.id, packageList) ? (
-                                    <button
-                                        onClick={() => handleRemoveOrder(order)}
-                                        className="text-red-500 text-2xl hover:text-red-700 transition-all"
-                                    >
-                                        <Minus />
-                                    </button>
-                                ) : (
-                                    <button
-                                        onClick={() => handlePackageClick(order.id)}
-                                        className="text-green-500 text-2xl hover:text-green-700 transition-all"
-                                    >
-                                        <Plus />
-                                    </button>
-                                )}
+                        <div className="bg-gray-100 rounded-lg w-full max-w-full max-h-[77vh] overflow-scroll shadow-lg">
+                            <div
+                                key={index}
+                                className={`grid grid-cols-[1.5fr_2fr_1fr_1fr_1fr_2fr_1fr] text-sm ${index % 2 === 0 ? 'bg-gray-50' : 'bg-white'
+                                    } hover:bg-blue-50 transition-all border-b border-gray-300`}
+                            >
+                                <div className="px-4 py-3 border-r border-gray-300 text-center text-gray-700">
+                                    {order.orderStatus}
+                                </div>
+                                <div className="px-4 py-3 border-r border-gray-300 text-center text-gray-700">
+                                    {order.inventoryName}
+                                </div>
+                                <div className="px-4 py-3 border-r border-gray-300 text-center text-gray-700">
+                                    {order.quantityOrdered} {order.unit}
+                                </div>
+                                <div className="px-4 py-3 border-r border-gray-300 text-center text-gray-700">
+                                    {order.unit}
+                                </div>
+                                <div className="px-4 py-3 border-r border-gray-300 text-center text-green-600 font-semibold">
+                                    ETB {order.totalPrice}
+                                </div>
+                                <div className="px-4 py-3 border-r border-gray-300 text-center text-gray-600">
+                                    {new Date(order.orderDate).toLocaleDateString()}
+                                </div>
+                                <div className="px-4 py-3 text-center flex justify-center items-center">
+                                    {isOrderInPackage(order.id, packageList) ? (
+                                        <button
+                                            onClick={() => handleRemoveOrder(order)}
+                                            className="text-red-500 text-2xl hover:text-red-700 transition-all"
+                                        >
+                                            <Minus />
+                                        </button>
+                                    ) : (
+                                        <button
+                                            onClick={() => handlePackageClick(order.id)}
+                                            className="text-green-500 text-2xl hover:text-green-700 transition-all"
+                                        >
+                                            <Plus />
+                                        </button>
+                                    )}
+                                </div>
                             </div>
                         </div>
                     ))
