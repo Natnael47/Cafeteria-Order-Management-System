@@ -233,13 +233,14 @@ model withdrawallog {
 
 // Supplier model - Represents suppliers
 model supplier {
-  id                Int                 @id @default(autoincrement()) // Unique identifier for each supplier
-  name              String              @db.VarChar(255) // Name of the supplier
-  contactInfo       Json // Contact information for the supplier (e.g., phone, email, address)
-  status            String              @default("active") @db.VarChar(50) // Supplier status: active or inactive
-  products          inventorySupplier[] // Relation to the junction table for supplier-inventory mapping
-  inventoryPackages inventoryPackage[] // Relation to inventory packages
-  dateAdded         DateTime            @default(now()) // Date when the supplier was added
+  id                Int                 @id @default(autoincrement())
+  name              String              @db.VarChar(255)
+  email             String?             @unique // Add unique email field
+  contactInfo       Json
+  status            String              @default("active") @db.VarChar(50)
+  products          inventorySupplier[]
+  inventoryPackages inventoryPackage[]
+  dateAdded         DateTime            @default(now())
   inventory         inventory[]
   inventorypurchase inventorypurchase[]
   supplierorder     supplierorder[]
