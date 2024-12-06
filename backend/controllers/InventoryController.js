@@ -208,6 +208,8 @@ const addStock = async (req, res) => {
       },
     });
 
+    calculateStockPercentageAndStoreInStatus(inventoryId);
+
     // Respond with success
     return res.status(200).json({
       success: true,
@@ -381,6 +383,8 @@ const withdrawItem = async (req, res) => {
         dateUpdated: new Date(),
       },
     });
+
+    calculateStockPercentageAndStoreInStatus(inventoryId);
 
     // Log the withdrawal
     const withdrawalLog = await prisma.withdrawallog.create({
