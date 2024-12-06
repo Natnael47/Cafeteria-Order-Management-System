@@ -226,9 +226,10 @@ const List = () => {
                     className="border border-gray-300 rounded px-4 py-2"
                 />
             </div>
-            <div className="bg-[#F3F4F6] rounded w-full max-w-[100%] max-h-[81vh] overflow-scroll">
+            <div className="bg-gray-100 rounded-lg w-full max-w-full max-h-[81vh] overflow-scroll shadow-lg">
                 <div>
-                    <div className="grid grid-cols-[0.5fr_0.9fr_0.8fr_0.8fr_0.5fr_0.5fr] items-center gap-2 p-3 border border-black text-sm font-medium bg-gray-700 text-white sm:grid">
+                    {/* Table Header */}
+                    <div className="grid grid-cols-[0.5fr_1fr_1fr_0.8fr_0.5fr_0.5fr] items-center gap-4 p-4 border-b bg-[#22C55E] text-white text-base font-semibold">
                         <b>Image</b>
                         <b>Name</b>
                         <b>Category</b>
@@ -236,159 +237,175 @@ const List = () => {
                         <b>Remove</b>
                         <b>Modify</b>
                     </div>
+
+                    {/* Food List */}
                     {filteredFoodList.length > 0 ? (
                         filteredFoodList.map((item, index) => (
                             <div key={index}>
-                                <div className={`grid grid-cols-[0.5fr_0.9fr_0.8fr_0.8fr_0.5fr_0.5fr] items-center gap-2 p-3 border border-black text-sm font-medium sm:grid ${item.menuStatus === false ? "bg-red-100" : "bg-white"}`}>
+                                {/* Food Item */}
+                                <div
+                                    className={`grid grid-cols-[0.5fr_1fr_1fr_0.8fr_0.5fr_0.5fr] items-center gap-4 p-4 border-b sm:grid ${item.menuStatus === false ? "bg-red-50" : "bg-white"
+                                        } hover:bg-gray-50`}
+                                >
                                     <img
-                                        src={backendUrl + "/images/" + item.image}
-                                        alt=""
-                                        className="w-20"
+                                        src={`${backendUrl}/images/${item.image}`}
+                                        alt="Food"
+                                        className="w-20 h-20 rounded object-cover"
                                     />
-                                    <p>{item.name}</p>
-                                    <p>{item.category}</p>
-                                    <p>${item.price}</p>
-                                    <Trash2 size={28} onClick={() => openModal(item.id)} className="cursor-pointer pl-1" />
-                                    <Pencil size={28} className="cursor-pointer pl-1" onClick={() => handleEditClick(item, index)} />
+                                    <p className="truncate font-medium text-gray-700">{item.name}</p>
+                                    <p className="text-gray-600">{item.category}</p>
+                                    <p className="text-gray-700 font-semibold">${item.price}</p>
+                                    <Trash2
+                                        size={28}
+                                        onClick={() => openModal(item.id)}
+                                        className="cursor-pointer text-red-500 hover:text-red-600"
+                                    />
+                                    <Pencil
+                                        size={28}
+                                        onClick={() => handleEditClick(item, index)}
+                                        className="cursor-pointer text-blue-500 hover:text-blue-600"
+                                    />
                                 </div>
 
+                                {/* Inline Editing Div */}
                                 {editIndex === index && (
                                     <div
                                         ref={editRef}
-                                        className="bg-white p-5 rounded shadow-md mt-2 mb-3 border-2 border-gray-600"
+                                        className="bg-white mt-2 mb-4 p-6 rounded-lg shadow-lg border border-gray-300"
                                     >
-                                        <h2 className="text-lg font-semibold mb-4">Edit Food</h2>
-
-                                        <div>
-                                            <div className="flex flex-row mb-4 mt-3 gap-8">
-                                                <div className="add-img-upload flex-col">
-                                                    <p className="mb-1">Upload Image</p>
-                                                    <label
-                                                        htmlFor="image"
-                                                        className="flex items-center justify-center w-40 h-30 border-2 border-gray-500 rounded mb-2 cursor-pointer overflow-hidden"
-                                                    >
-                                                        <img
-                                                            className="w-40 object-cover"
-                                                            src={
-                                                                image
-                                                                    ? URL.createObjectURL(image)
-                                                                    : backendUrl + "/images/" + editFood.image
-                                                            }
-                                                            alt=""
-                                                        />
-                                                    </label>
-                                                    <input
-                                                        onChange={handleImageChange}
-                                                        type="file"
-                                                        id="image"
-                                                        hidden
-                                                        accept="image/*"
-                                                    />
-                                                </div>
-
-                                                <div className="flex flex-col">
-                                                    <div className="flex flex-row mb-4 gap-8">
-                                                        <div className="mb-2">
-                                                            <label className="block text-sm font-medium mb-1">
-                                                                Price
-                                                            </label>
-                                                            <input
-                                                                type="number"
-                                                                name="price"
-                                                                value={editFood.price}
-                                                                onChange={handleInputChange}
-                                                                className="w-full border p-2 rounded"
-                                                            />
-                                                        </div>
-                                                        <div className="mb-2">
-                                                            <label className="block text-sm font-medium mb-1">
-                                                                Category
-                                                            </label>
-                                                            <select
-                                                                name="category"
-                                                                value={editFood.category}
-                                                                onChange={handleInputChange}
-                                                                className="w-full border p-2 rounded"
-                                                            >
-                                                                <option value="Salad">Salad</option>
-                                                                <option value="Rolls">Rolls</option>
-                                                                <option value="Deserts">Deserts</option>
-                                                                <option value="Sandwich">Sandwich</option>
-                                                                <option value="Cake">Cake</option>
-                                                                <option value="Pure Veg">Pure Veg</option>
-                                                                <option value="Pasta">Pasta</option>
-                                                                <option value="Noodles">Noodles</option>
-                                                            </select>
-                                                        </div>
-                                                        <div className="mb-2">
-                                                            <label className="block text-sm font-medium mb-1">
-                                                                Menu Status
-                                                            </label>
-                                                            <input
-                                                                type="checkbox"
-                                                                name="menuStatus"
-                                                                checked={editFood.menuStatus}
-                                                                onChange={handleInputChange}
-                                                                className="ml-2 w-5 h-5"
-                                                            />
-                                                        </div>
-                                                        <div className="mb-2">
-                                                            <label className="block text-sm font-medium mb-1">
-                                                                Prep Time
-                                                            </label>
-                                                            <input
-                                                                type="number"
-                                                                name="prepTime"
-                                                                value={editFood.prepTime}
-                                                                onChange={handleInputChange}
-                                                                className="w-full border p-2 rounded"
-                                                            />
-                                                        </div>
-
-                                                    </div>
-
-                                                    <div className="mb-2">
+                                        <h2 className="text-xl font-semibold mb-4 text-indigo-600">
+                                            Edit Food Details
+                                        </h2>
+                                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
+                                            {/* Left Section */}
+                                            <div className="flex flex-col">
+                                                <div className="flex flex-row justify-between">
+                                                    <div>
                                                         <label className="block text-sm font-medium mb-1">
-                                                            Name
+                                                            Upload Image
+                                                        </label>
+                                                        <label
+                                                            htmlFor="image"
+                                                            className="flex items-center justify-center w-40 h-30 border-2 border-gray-500 rounded-lg cursor-pointer overflow-hidden"
+                                                        >
+                                                            <img
+                                                                className="w-full object-cover"
+                                                                src={
+                                                                    image
+                                                                        ? URL.createObjectURL(image)
+                                                                        : `${backendUrl}/images/${editFood.image}`
+                                                                }
+                                                                alt=""
+                                                            />
                                                         </label>
                                                         <input
-                                                            type="text"
-                                                            name="name"
-                                                            value={editFood.name}
+                                                            onChange={handleImageChange}
+                                                            type="file"
+                                                            id="image"
+                                                            hidden
+                                                            accept="image/*"
+                                                        />
+                                                    </div>
+                                                    <div className="mb-4">
+                                                        <label className="block text-sm font-medium mb-1">
+                                                            Menu Status
+                                                        </label>
+                                                        <input
+                                                            type="checkbox"
+                                                            name="menuStatus"
+                                                            checked={editFood.menuStatus}
                                                             onChange={handleInputChange}
-                                                            className="w-full border p-2 rounded"
+                                                            className="ml-2 w-5 h-5"
                                                         />
                                                     </div>
                                                 </div>
-                                            </div>
-
-                                            <div className="mb-4">
-                                                <label className="block text-sm font-medium mb-1">
+                                                <label className="block text-sm font-medium mb-1 mt-4">
                                                     Description
                                                 </label>
                                                 <textarea
                                                     name="description"
                                                     value={editFood.description}
                                                     onChange={handleInputChange}
-                                                    className="w-full border p-2 rounded"
+                                                    className="w-full border p-2 rounded-lg"
+                                                    rows="4"
                                                 />
                                             </div>
 
-                                            <div className="flex justify-end mt-4">
-                                                <button
-                                                    onClick={cancelEdit}
-                                                    className="bg-gray-300 px-4 py-2 rounded mr-2 hover:bg-gray-400"
+                                            {/* Right Section */}
+                                            <div className="flex flex-col">
+                                                <label className="block text-sm font-medium mb-1">Name</label>
+                                                <input
+                                                    type="text"
+                                                    name="name"
+                                                    value={editFood.name}
+                                                    onChange={handleInputChange}
+                                                    className="w-full border p-2 rounded-lg"
+                                                />
+
+                                                <label className="block text-sm font-medium mb-1 mt-4">
+                                                    Category
+                                                </label>
+                                                <select
+                                                    name="category"
+                                                    value={editFood.category}
+                                                    onChange={handleInputChange}
+                                                    className="w-full border p-2 rounded-lg"
                                                 >
-                                                    Cancel
-                                                </button>
-                                                <button
-                                                    onClick={updateFood}
-                                                    disabled={!hasChanges}
-                                                    className={`px-4 py-2 rounded ${hasChanges ? "bg-blue-500 text-white hover:bg-blue-600" : "bg-gray-300 cursor-not-allowed"}`}
-                                                >
-                                                    Save Changes
-                                                </button>
+                                                    <option value="Salad">Salad</option>
+                                                    <option value="Rolls">Rolls</option>
+                                                    <option value="Desserts">Desserts</option>
+                                                    <option value="Sandwich">Sandwich</option>
+                                                    <option value="Cake">Cake</option>
+                                                    <option value="Pure Veg">Pure Veg</option>
+                                                    <option value="Pasta">Pasta</option>
+                                                    <option value="Noodles">Noodles</option>
+                                                </select>
+                                                <div className="mb-4">
+                                                    <label className="block text-sm font-medium mb-1 mt-4">
+                                                        Price
+                                                    </label>
+                                                    <input
+                                                        type="number"
+                                                        name="price"
+                                                        value={editFood.price}
+                                                        onChange={handleInputChange}
+                                                        className="w-full border p-2 rounded-lg"
+                                                    />
+                                                </div>
+
+                                                <div className="mb-4">
+                                                    <label className="block text-sm font-medium mb-1">
+                                                        Prep Time (mins)
+                                                    </label>
+                                                    <input
+                                                        type="number"
+                                                        name="prepTime"
+                                                        value={editFood.prepTime}
+                                                        onChange={handleInputChange}
+                                                        className="w-full border p-2 rounded-lg"
+                                                    />
+                                                </div>
                                             </div>
+                                        </div>
+
+                                        {/* Action Buttons */}
+                                        <div className="flex justify-end mt-6">
+                                            <button
+                                                onClick={cancelEdit}
+                                                className="bg-gray-300 px-4 py-2 rounded-lg mr-2 hover:bg-gray-400"
+                                            >
+                                                Cancel
+                                            </button>
+                                            <button
+                                                onClick={updateFood}
+                                                disabled={!hasChanges}
+                                                className={`px-4 py-2 rounded-lg ${hasChanges
+                                                    ? "bg-indigo-500 text-white hover:bg-indigo-600"
+                                                    : "bg-gray-300 cursor-not-allowed"
+                                                    }`}
+                                            >
+                                                Save
+                                            </button>
                                         </div>
                                     </div>
                                 )}
@@ -399,9 +416,9 @@ const List = () => {
                             No foods match your search. Please try a different name.
                         </div>
                     )}
-                    <div className="bg-gray-700 h-6 sm:grid"></div>
                 </div>
             </div>
+
 
             <Modal
                 isOpen={modalIsOpen}
