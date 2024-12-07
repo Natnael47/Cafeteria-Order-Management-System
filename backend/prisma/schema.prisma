@@ -273,15 +273,15 @@ model inventoryPackage {
   id               Int                @id @default(autoincrement()) // Unique identifier for each package
   name             String             @db.VarChar(255) // Package name
   description      String?            @db.Text // Optional package description
-  supplierId       Int // Foreign key to Supplier table
-  chefId           Int? // Foreign key to Employee table (for chefs)
+  supplierId       Int? // Foreign key to Supplier table (nullable)
+  chefId           Int? // Foreign key to Employee table (nullable)
   packageType      String             @default("Order") @db.VarChar(50) // Type of the package (e.g., "Order" or "Request")
   status           String             @default("Pending") @db.VarChar(50) // Status of the package
   dateAdded        DateTime           @default(now()) // Date when the package was created
   totalCost        Float? // Total cost of the package (sum of all items)
   items            Json? // Array of items with inventoryId, quantity, pricePerUnit, etc.
-  supplier         supplier           @relation(fields: [supplierId], references: [id], map: "InventoryPackage_supplierId_fkey") // Relationship with Supplier
-  chef             employee?          @relation(fields: [chefId], references: [id], map: "InventoryPackage_chefId_fkey") // Relationship with Employee (Chef)
+  supplier         supplier?          @relation(fields: [supplierId], references: [id], map: "InventoryPackage_supplierId_fkey") // Optional relationship with Supplier
+  chef             employee?          @relation(fields: [chefId], references: [id], map: "InventoryPackage_chefId_fkey") // Optional relationship with Employee (Chef)
   inventoryrequest inventoryrequest[] // Reverse relation to inventoryRequest
 
   @@index([supplierId], map: "InventoryPackage_supplierId_fkey")

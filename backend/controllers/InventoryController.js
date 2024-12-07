@@ -1132,36 +1132,70 @@ const removeFromPackage = async (req, res) => {
 
 const createPackage = async (req, res) => {
   try {
-    // Extract name, description, and supplierId from the request body
-    const { name, description, supplierId } = req.body;
+    // Extract fields from the request body
+    const { name, description, packageType, supplierId, chefId } = req.body;
 
-    // Input validation
-    if (!name || !description || !supplierId) {
+    // Input validation for required fields
+    if (!name || !description || !packageType) {
       return res.status(400).json({
         success: false,
-        message: "Name, description, and supplierId are required",
+        message: "Name, description, and packageType are required",
       });
     }
 
-    // Verify that the supplier exists
-    const existingSupplier = await prisma.supplier.findUnique({
-      where: { id: supplierId },
-    });
-
-    if (!existingSupplier) {
-      return res.status(404).json({
+    // Validate packageType and corresponding IDs
+    if (packageType === "Order" && !supplierId) {
+      return res.status(400).json({
         success: false,
-        message: "Supplier not found",
+        message: "For 'Order' packageType, supplierId is required",
       });
     }
 
-    // Create a new package
+    if (packageType === "Request" && !chefId) {
+      return res.status(400).json({
+        success: false,
+        message: "For 'Request' packageType, chefId is required",
+      });
+    }
+
+    // Verify that the supplier exists if supplierId is provided
+    if (packageType === "Order" && supplierId) {
+      const existingSupplier = await prisma.supplier.findUnique({
+        where: { id: supplierId },
+      });
+
+      if (!existingSupplier) {
+        return res.status(404).json({
+          success: false,
+          message: "Supplier not found",
+        });
+      }
+    }
+
+    // Verify that the chef exists if chefId is provided
+    if (packageType === "Request" && chefId) {
+      const existingChef = await prisma.employee.findUnique({
+        where: { id: chefId },
+      });
+
+      if (!existingChef) {
+        return res.status(404).json({
+          success: false,
+          message: "Chef not found",
+        });
+      }
+    }
+
+    // Create a new package with appropriate fields
     const newPackage = await prisma.inventoryPackage.create({
       data: {
         name,
         description,
-        status: "New", // Default status
-        supplierId, // Link the package to the supplier
+        packageType,
+        status: "Pending", // Default status
+        // Set supplierId or chefId based on packageType
+        supplierId: packageType === "Order" ? supplierId : null,
+        chefId: packageType === "Request" ? chefId : null,
       },
     });
 
