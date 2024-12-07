@@ -1384,6 +1384,27 @@ const addPackage = async (req, res) => {
   }
 };
 
+// List all inventory requests
+const listInventoryRequests = async (req, res) => {
+  try {
+    const inventoryRequests = await prisma.inventoryrequest.findMany({
+      orderBy: { id: "desc" },
+      include: {
+        inventory: true,
+        employee: true,
+        package: true,
+      },
+    });
+
+    res.json({ success: true, data: inventoryRequests });
+  } catch (error) {
+    console.error("Error retrieving inventory requests:", error);
+    res
+      .status(500)
+      .json({ success: false, message: "Error retrieving inventory requests" });
+  }
+};
+
 // Export all functions
 export {
   addInventory,
@@ -1400,6 +1421,7 @@ export {
   getSupplierOrders,
   listInventory,
   listInventoryPackages,
+  listInventoryRequests,
   listSuppliers,
   logInventoryChange,
   removeFromPackage,

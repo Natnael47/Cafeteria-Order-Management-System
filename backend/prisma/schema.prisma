@@ -216,13 +216,13 @@ model inventoryrequest {
   dateRequested DateTime @default(now()) // Date of request
   status        String   @db.VarChar(50) // Status of the request
 
-  inventory inventory         @relation(fields: [inventoryId], references: [id], onDelete: Cascade) // Relationship with Inventory
-  employee  employee          @relation(fields: [employeeId], references: [id], map: "InventoryRequest_employeeId_fkey") // Relationship with Employee
-  package   inventoryPackage? @relation(fields: [packageId], references: [id], map: "InventoryRequest_packageId_fkey") // Relationship with InventoryPackage
+  inventory inventory         @relation(fields: [inventoryId], references: [id], onDelete: Cascade)
+  employee  employee          @relation(fields: [employeeId], references: [id], map: "InventoryRequest_employeeId_fkey")
+  package   inventoryPackage? @relation(fields: [packageId], references: [id], map: "InventoryRequest_packageId_fkey")
 
   @@index([inventoryId], map: "InventoryRequest_inventoryId_fkey")
-  @@index([employeeId], map: "InventoryRequest_employeeId_fkey") // Index for employeeId
-  @@index([packageId], map: "InventoryRequest_packageId_fkey") // Index for packageId
+  @@index([employeeId], map: "InventoryRequest_employeeId_fkey")
+  @@index([packageId], map: "InventoryRequest_packageId_fkey")
 }
 
 model withdrawallog {
