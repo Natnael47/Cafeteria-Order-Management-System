@@ -39,7 +39,7 @@ const Dashboard = () => {
             </div>
 
             {/* Latest Orders Section */}
-            <div className="bg-white rounded-lg shadow-lg max-h-[65vh] overflow-scroll">
+            <div className="bg-white rounded-lg shadow-lg max-h-[67vh] overflow-scroll">
                 <div className="flex items-center gap-2.5 px-6 py-4 bg-[#22C55E] text-white rounded-t-lg">
                     <ListOrdered size={24} />
                     <p className="font-semibold text-lg">Latest Orders</p>

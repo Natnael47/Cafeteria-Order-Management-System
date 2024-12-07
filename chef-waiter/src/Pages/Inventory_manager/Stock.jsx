@@ -22,6 +22,15 @@ const Stock = () => {
     });
 
     useEffect(() => {
+        // Retrieve the sorting state from localStorage
+        const savedSortAttribute = localStorage.getItem('sortAttribute');
+        const savedSortOrder = localStorage.getItem('sortOrder');
+
+        // If saved values exist, use them; otherwise, use the default values
+        if (savedSortAttribute && savedSortOrder) {
+            setSortAttribute(savedSortAttribute);
+            setSortOrder(savedSortOrder);
+        }
         fetchInventoryList(); // Fetch inventory list on component load
         fetchSuppliers(); // Fetch supplier list on component load
     }, []);
@@ -256,6 +265,34 @@ const Stock = () => {
         localStorage.setItem('sortOrder', order);
     };
 
+    const filteredAndSortedInventoryList = inventoryList
+        .filter((item) =>
+            item.name.toLowerCase().includes(searchTerm.toLowerCase())
+        )
+        .sort((a, b) => {
+            let valueA = a[sortAttribute];
+            let valueB = b[sortAttribute];
+
+            // If sorting by dateUpdated, convert the date strings to Date objects for proper sorting
+            if (sortAttribute === "dateUpdated") {
+                valueA = new Date(a.dateUpdated); // Convert to Date object
+                valueB = new Date(b.dateUpdated);
+            }
+
+            // Handle numeric sorting for quantity, pricePerUnit, and status
+            if (["quantity", "pricePerUnit", "status"].includes(sortAttribute)) {
+                valueA = parseFloat(valueA);
+                valueB = parseFloat(valueB);
+            }
+
+            // Ascending/Descending sorting
+            if (sortOrder === "ascending") {
+                return valueA > valueB ? 1 : valueA < valueB ? -1 : 0;
+            } else {
+                return valueA < valueB ? 1 : valueA > valueB ? -1 : 0;
+            }
+        });
+
     return (
         <div className="flex flex-col m-5 w-full max-w-6.5xl">
             {/* Header */}
@@ -325,7 +362,7 @@ const Stock = () => {
                         <div className="text-center font-medium">Stock Out</div>
                     </div>
 
-                    {filteredInventoryList.map((item, index) => {
+                    {filteredAndSortedInventoryList.map((item, index) => {
                         const totalStockOut = item.initialQuantity - item.quantity;
 
                         return (

@@ -250,7 +250,7 @@ const List = () => {
                                     <img
                                         src={`${backendUrl}/images/${item.image}`}
                                         alt="Food"
-                                        className="w-20 h-20 rounded object-cover"
+                                        className="w-20 h-[70px] rounded object-cover"
                                     />
                                     <p className="truncate font-medium text-gray-700">{item.name}</p>
                                     <p className="text-gray-600">{item.category}</p>

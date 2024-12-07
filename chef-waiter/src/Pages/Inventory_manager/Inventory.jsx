@@ -24,6 +24,7 @@ const Inventory = () => {
         name: "",
         category: "",
         quantity: "",
+        initialQuantity: "",
         unit: "",
         pricePerUnit: "",
         status: "",
@@ -408,6 +409,30 @@ const Inventory = () => {
                                             type="number"
                                             name="pricePerUnit"
                                             value={editInventory.pricePerUnit}
+                                            onChange={handleInputChange}
+                                            className="border border-gray-300 rounded-lg p-2 w-full focus:ring focus:ring-blue-200"
+                                        />
+                                    </div>
+
+                                    {/* Status */}
+                                    <div className="col-span-2 md:col-span-1">
+                                        <label className="block text-sm font-medium text-gray-700 mb-1">Status</label>
+                                        <input
+                                            type="number"
+                                            name="status"
+                                            value={editInventory.status}
+                                            onChange={handleInputChange}
+                                            className="border border-gray-300 rounded-lg p-2 w-full focus:ring focus:ring-blue-200"
+                                        />
+                                    </div>
+
+                                    {/* quantity */}
+                                    <div className="col-span-2 md:col-span-1">
+                                        <label className="block text-sm font-medium text-gray-700 mb-1">initialQuantity</label>
+                                        <input
+                                            type="number"
+                                            name="initialQuantity"
+                                            value={editInventory.initialQuantity}
                                             onChange={handleInputChange}
                                             className="border border-gray-300 rounded-lg p-2 w-full focus:ring focus:ring-blue-200"
                                         />

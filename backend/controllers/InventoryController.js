@@ -390,7 +390,18 @@ const withdrawItem = async (req, res) => {
       },
     });
 
-    calculateStockPercentageAndStoreInStatus(inventoryId);
+    // Update stock percentage and status
+    await calculateStockPercentageAndStoreInStatus(inventoryId);
+
+    // Fetch the updated inventory item to ensure correct status
+    const updatedInventoryStatus = await prisma.inventory.findUnique({
+      where: { id: inventoryId },
+    });
+
+    // Call orderInventory with the updated status
+    if (updatedInventoryStatus) {
+      await orderInventory(inventoryId);
+    }
 
     // Log the withdrawal
     const withdrawalLog = await prisma.withdrawallog.create({
@@ -528,12 +539,17 @@ const removeInventory = async (req, res) => {
   }
 };
 
-// Order new stock automatically if inventory status is below the threshold
 const orderInventory = async (inventoryId) => {
   try {
     // Find the inventory item
     const inventoryItem = await prisma.inventory.findUnique({
       where: { id: parseInt(inventoryId, 10) },
+      select: {
+        quantity: true,
+        initialQuantity: true,
+        status: true,
+        supplierId: true,
+      },
     });
 
     if (!inventoryItem) {
@@ -552,27 +568,39 @@ const orderInventory = async (inventoryId) => {
     }
 
     // Check if status is below the reorder threshold
-    const reorderThreshold = 5;
+    const reorderThreshold = 10;
     if (status >= reorderThreshold) {
-      console.log("Stock status is sufficient, no order needed.");
+      console.log(
+        "Stock status is sufficient, no order needed.",
+        inventoryId,
+        status
+      );
       return;
     }
 
-    // Determine the quantity to order (e.g., replenish to 50 units)
+    // Calculate quantity to order to restore initial levels
     const quantityToOrder =
       inventoryItem.initialQuantity - inventoryItem.quantity;
+
+    if (quantityToOrder <= 0) {
+      console.log(
+        "Inventory already at or above initial levels. No order needed."
+      );
+      return;
+    }
 
     // Create a supplier order
     const newSupplierOrder = await prisma.supplierorder.create({
       data: {
-        inventoryId: inventoryItem.id,
+        inventoryId: inventoryId,
         quantityOrdered: quantityToOrder,
-        supplierId: inventoryItem.supplierId, // Ensure supplierId is passed
+        supplierId: inventoryItem.supplierId,
         status: "Sent",
+        orderDate: new Date(),
       },
     });
 
-    console.log("Supplier order created:", newSupplierOrder);
+    console.log("Supplier order created successfully:", newSupplierOrder);
     return newSupplierOrder;
   } catch (error) {
     console.error("Error creating supplier order:", error);
@@ -1214,7 +1242,6 @@ const addPackage = async (req, res) => {
   try {
     const { packageId, dateReceived, expiryDate } = req.body;
 
-    // Validate required fields
     if (!packageId || !dateReceived) {
       return res.status(400).json({
         success: false,
@@ -1222,9 +1249,9 @@ const addPackage = async (req, res) => {
       });
     }
 
-    // Fetch package details to get supplierId
+    // Fetch package details
     const packageDetails = await prisma.inventoryPackage.findUnique({
-      where: { id: parseInt(packageId, 10) }, // Ensure packageId is an integer
+      where: { id: parseInt(packageId, 10) },
       select: { supplierId: true },
     });
 
@@ -1239,12 +1266,10 @@ const addPackage = async (req, res) => {
 
     // Fetch all items in the package
     const orderItems = await prisma.supplierorder.findMany({
-      where: { packageId: parseInt(packageId, 10) }, // Ensure packageId is an integer
+      where: { packageId: parseInt(packageId, 10) },
       select: {
         inventoryId: true,
         quantityOrdered: true,
-        status: true,
-        orderDate: true,
       },
     });
 
@@ -1255,25 +1280,14 @@ const addPackage = async (req, res) => {
       });
     }
 
-    // Group items by inventoryId and sum their quantities
-    const aggregatedItems = orderItems.reduce((acc, item) => {
+    const batchNumbers = {}; // Store batch numbers per inventory item
+
+    for (const item of orderItems) {
       const { inventoryId, quantityOrdered } = item;
-      const inventoryKey = parseInt(inventoryId, 10); // Ensure inventoryId is an integer
-      if (!acc[inventoryKey]) {
-        acc[inventoryKey] = { quantityOrdered: 0 };
-      }
-      acc[inventoryKey].quantityOrdered += quantityOrdered;
-      return acc;
-    }, {});
 
-    // Process each inventory item
-    for (const inventoryId of Object.keys(aggregatedItems)) {
-      const { quantityOrdered } = aggregatedItems[inventoryId];
-
-      // Fetch the inventory item details
+      // Fetch inventory details
       const inventoryItem = await prisma.inventory.findUnique({
-        where: { id: parseInt(inventoryId, 10) }, // Ensure inventoryId is an integer
-        select: { quantity: true, pricePerUnit: true, initialQuantity: true },
+        where: { id: parseInt(inventoryId, 10) },
       });
 
       if (!inventoryItem) {
@@ -1283,37 +1297,52 @@ const addPackage = async (req, res) => {
         continue;
       }
 
-      const updatedQuantity = inventoryItem.quantity + quantityOrdered;
+      // Generate or retrieve batch number
+      let batchNumber = batchNumbers[inventoryId];
+      if (!batchNumber) {
+        do {
+          batchNumber = `BATCH-#${Math.floor(100000 + Math.random() * 900000)}`;
+          const existingBatch = await prisma.stockBatch.findUnique({
+            where: { batchNumber },
+          });
+          if (!existingBatch) break;
+        } while (true);
 
-      // Update initialQuantity if updatedQuantity equals or exceeds it
-      let updatedInitialQuantity = inventoryItem.initialQuantity;
-
-      if (updatedQuantity >= updatedInitialQuantity) {
-        updatedInitialQuantity = updatedQuantity;
+        batchNumbers[inventoryId] = batchNumber; // Store batch number for reuse
       }
 
-      // Update the inventory item
+      // Create a new batch in StockBatch
+      const newBatch = await prisma.stockBatch.create({
+        data: {
+          batchNumber,
+          inventoryId: parseInt(inventoryId, 10),
+          supplierId,
+          purchaseDate: new Date(dateReceived),
+          quantityBought: quantityOrdered,
+          pricePerUnit: inventoryItem.pricePerUnit,
+          expiryDate: expiryDate ? new Date(expiryDate) : null,
+          quantityRemaining: quantityOrdered,
+        },
+      });
+
+      // Update inventory quantities
+      const updatedQuantity = inventoryItem.quantity + quantityOrdered;
+      const updatedInitialQuantity =
+        updatedQuantity > inventoryItem.initialQuantity
+          ? updatedQuantity
+          : inventoryItem.initialQuantity;
+
       await prisma.inventory.update({
         where: { id: parseInt(inventoryId, 10) },
         data: {
           quantity: updatedQuantity,
-          initialQuantity: updatedInitialQuantity, // Update initial quantity
           pricePerUnit: inventoryItem.pricePerUnit,
-          supplierId,
-          expiryDate: expiryDate ? new Date(expiryDate) : null,
-          dateReceived: new Date(dateReceived),
+          initialQuantity: updatedInitialQuantity,
           dateUpdated: new Date(),
         },
       });
 
-      // Ensure inventory-supplier mapping exists
-      await ensureInventorySupplier(
-        parseInt(inventoryId, 10),
-        supplierId,
-        inventoryItem.pricePerUnit
-      );
-
-      // Record purchase details in the inventorypurchase table
+      // Record purchase details in InventoryPurchase
       await prisma.inventorypurchase.create({
         data: {
           inventoryId: parseInt(inventoryId, 10),
@@ -1324,7 +1353,7 @@ const addPackage = async (req, res) => {
         },
       });
 
-      // Update stock percentage in the status field
+      // Recalculate stock percentage and update status
       await calculateStockPercentageAndStoreInStatus(parseInt(inventoryId, 10));
     }
 
@@ -1334,16 +1363,16 @@ const addPackage = async (req, res) => {
       data: { status: "done" },
     });
 
-    // Update the status of supplierOrder entries to "done" where packageId matches
+    // Update the status of supplierOrder entries to "done"
     await prisma.supplierorder.updateMany({
       where: { packageId: parseInt(packageId, 10) },
       data: { status: "done" },
     });
 
-    // Respond with success
     return res.status(200).json({
       success: true,
-      message: "Package items added successfully and statuses updated.",
+      message:
+        "Package items added successfully with batch numbers assigned and statuses updated.",
     });
   } catch (error) {
     console.error("Error in addPackage:", error);

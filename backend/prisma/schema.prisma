@@ -26,6 +26,7 @@ model employee {
   about            String             @db.Text // Additional information about the employee
   date             DateTime           @default(now()) // Date of record creation
   inventoryrequest inventoryrequest[]
+  inventoryPackage inventoryPackage[]
 }
 
 // User model - Represents customers or system users
@@ -207,17 +208,21 @@ model supplierorder {
 }
 
 model inventoryrequest {
-  id            Int       @id @default(autoincrement()) // Unique identifier for each request
+  id            Int      @id @default(autoincrement()) // Unique identifier for each request
   inventoryId   Int // Foreign key to Inventory table
   employeeId    Int // Foreign key to Employee table
+  packageId     Int? // Foreign key to InventoryPackage table
   quantity      Int // Quantity requested
-  dateRequested DateTime  @default(now()) // Date of request
-  status        String    @db.VarChar(50) // Status of the request
-  inventory     inventory @relation(fields: [inventoryId], references: [id], onDelete: Cascade) // Relationship with Inventory
-  employee      employee  @relation(fields: [employeeId], references: [id], map: "InventoryRequest_employeeId_fkey") // Relationship with Employee
+  dateRequested DateTime @default(now()) // Date of request
+  status        String   @db.VarChar(50) // Status of the request
+
+  inventory inventory         @relation(fields: [inventoryId], references: [id], onDelete: Cascade) // Relationship with Inventory
+  employee  employee          @relation(fields: [employeeId], references: [id], map: "InventoryRequest_employeeId_fkey") // Relationship with Employee
+  package   inventoryPackage? @relation(fields: [packageId], references: [id], map: "InventoryRequest_packageId_fkey") // Relationship with InventoryPackage
 
   @@index([inventoryId], map: "InventoryRequest_inventoryId_fkey")
   @@index([employeeId], map: "InventoryRequest_employeeId_fkey") // Index for employeeId
+  @@index([packageId], map: "InventoryRequest_packageId_fkey") // Index for packageId
 }
 
 model withdrawallog {
@@ -265,15 +270,20 @@ model inventorySupplier {
 
 // Inventory Package model - Tracks inventory packages
 model inventoryPackage {
-  id          Int      @id @default(autoincrement()) // Unique identifier for each package
-  name        String   @db.VarChar(255) // Package name
-  description String?  @db.Text // Optional package description
-  supplierId  Int // Foreign key to Supplier table
-  status      String   @default("Pending") @db.VarChar(50) // Status of the package
-  dateAdded   DateTime @default(now()) // Date when the package was created
-  totalCost   Float? // Total cost of the package (sum of all items)
-  items       Json? // Array of items with inventoryId, quantity, pricePerUnit, etc.
-  supplier    supplier @relation(fields: [supplierId], references: [id], map: "InventoryPackage_supplierId_fkey") // Relationship with Supplier
+  id               Int                @id @default(autoincrement()) // Unique identifier for each package
+  name             String             @db.VarChar(255) // Package name
+  description      String?            @db.Text // Optional package description
+  supplierId       Int // Foreign key to Supplier table
+  chefId           Int? // Foreign key to Employee table (for chefs)
+  packageType      String             @default("Order") @db.VarChar(50) // Type of the package (e.g., "Order" or "Request")
+  status           String             @default("Pending") @db.VarChar(50) // Status of the package
+  dateAdded        DateTime           @default(now()) // Date when the package was created
+  totalCost        Float? // Total cost of the package (sum of all items)
+  items            Json? // Array of items with inventoryId, quantity, pricePerUnit, etc.
+  supplier         supplier           @relation(fields: [supplierId], references: [id], map: "InventoryPackage_supplierId_fkey") // Relationship with Supplier
+  chef             employee?          @relation(fields: [chefId], references: [id], map: "InventoryPackage_chefId_fkey") // Relationship with Employee (Chef)
+  inventoryrequest inventoryrequest[] // Reverse relation to inventoryRequest
 
   @@index([supplierId], map: "InventoryPackage_supplierId_fkey")
+  @@index([chefId], map: "InventoryPackage_chefId_fkey") // Index for chefId
 }
