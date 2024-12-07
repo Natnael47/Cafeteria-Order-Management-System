@@ -14,6 +14,19 @@ const InventoryOrders = () => {
     const [selectedPackageId, setSelectedPackageId] = useState(null);
     const [isConfirmationModalOpen, setIsConfirmationModalOpen] = useState(false);
     const [orderToRemove, setOrderToRemove] = useState(null); // Store the order to remove
+    const [requestList, setRequestList] = useState([]); // State for request data
+
+    const fetchInventoryRequests = async () => {
+        try {
+            const response = await axios.get(`${backendUrl}/api/inventory/inventory-requests`, {
+                headers: { iToken },
+            });
+            setRequestList(response.data.requests || []);
+        } catch (error) {
+            console.error("Error fetching requests:", error);
+            toast.error("Failed to fetch requests.");
+        }
+    };
 
     const removeOrderFromPackage = async (packageId, orderId) => {
         try {
@@ -64,6 +77,13 @@ const InventoryOrders = () => {
     const [searchTerm, setSearchTerm] = useState('');
     const [sortAttribute, setSortAttribute] = useState('name');  // Default sort by name
     const [sortOrder, setSortOrder] = useState('ascending');     // Default ascending
+    const [currentView, setCurrentView] = useState("Order"); // Default to 'users' view
+
+    // Save the current view to localStorage whenever it changes
+    const handleTabChange = (view) => {
+        setCurrentView(view);
+        localStorage.setItem('currentView', view); // Save the current view to localStorage
+    };
 
     const handleSortChange = (attribute, order) => {
         setSortAttribute(attribute);
@@ -121,9 +141,10 @@ const InventoryOrders = () => {
     });
 
     useEffect(() => {
-        fetchInventoryOrders(); // Initial data fetch
-        fetchPackages(); // Fetch packages
-        fetchSuppliers(); // Fetch suppliers
+        fetchInventoryOrders();
+        fetchPackages();
+        fetchSuppliers();
+        fetchInventoryRequests(); // Fetch request data on mount
     }, []);
 
     const handleChange = (e) => {
@@ -187,6 +208,7 @@ const InventoryOrders = () => {
                         >
                             + New Package
                         </button>
+
                         {/* Icon Button */}
                         <button className="p-2 bg-gray-100 text-gray-700 rounded-md shadow-sm hover:bg-gray-200 transition">
                             <svg
@@ -200,6 +222,21 @@ const InventoryOrders = () => {
                             </svg>
                         </button>
                     </div>
+                </div>
+                {/* Tabs */}
+                <div className="flex items-center space-x-4 mb-6">
+                    <button
+                        className={`px-4 py-2 rounded ${currentView === "Order" ? "bg-green-500 text-white" : "bg-gray-200 text-gray-700"}`}
+                        onClick={() => handleTabChange("Order")}
+                    >
+                        Order
+                    </button>
+                    <button
+                        className={`px-4 py-2 rounded ${currentView === "request" ? "bg-green-500 text-white" : "bg-gray-200 text-gray-700"}`}
+                        onClick={() => handleTabChange("request")}
+                    >
+                        Request
+                    </button>
                 </div>
 
                 {/* Middle Section: Search and Entries */}
@@ -229,67 +266,69 @@ const InventoryOrders = () => {
                 </div>
             </div>
 
-            <div className="bg-white shadow-md border border-gray-300 rounded-lg overflow-hidden">
-                {/* Header Row */}
-                <div className="grid grid-cols-[1.5fr_2fr_1fr_1fr_1fr_2fr_1fr] bg-gray-100 border-b border-gray-300 font-semibold text-gray-700 text-sm">
-                    <div className="px-4 py-3 border-r border-gray-300 text-center">Order Status</div>
-                    <div className="px-4 py-3 border-r border-gray-300 text-center">Inventory Item</div>
-                    <div className="px-4 py-3 border-r border-gray-300 text-center">Quantity</div>
-                    <div className="px-4 py-3 border-r border-gray-300 text-center">Unit</div>
-                    <div className="px-4 py-3 border-r border-gray-300 text-center">Price</div>
-                    <div className="px-4 py-3 border-r border-gray-300 text-center">Order Date</div>
-                    <div className="px-4 py-3 text-center">Package</div>
-                </div>
-
-                {/* Data Rows */}
-                {orderList.length > 0 ? (
-                    orderList.map((order, index) => (
-                        <div className="bg-gray-100 rounded-lg w-full max-w-full max-h-[77vh] overflow-scroll shadow-lg">
-                            <div
-                                key={index}
-                                className={`grid grid-cols-[1.5fr_2fr_1fr_1fr_1fr_2fr_1fr] text-sm ${index % 2 === 0 ? 'bg-gray-50' : 'bg-white'
-                                    } hover:bg-blue-50 transition-all border-b border-gray-300`}
-                            >
-                                <div className="px-4 py-3 border-r border-gray-300 text-center text-gray-700">
-                                    {order.orderStatus}
-                                </div>
-                                <div className="px-4 py-3 border-r border-gray-300 text-center text-gray-700">
-                                    {order.inventoryName}
-                                </div>
-                                <div className="px-4 py-3 border-r border-gray-300 text-center text-gray-700">
-                                    {order.quantityOrdered} {order.unit}
-                                </div>
-                                <div className="px-4 py-3 border-r border-gray-300 text-center text-gray-700">
-                                    {order.unit}
-                                </div>
-                                <div className="px-4 py-3 border-r border-gray-300 text-center text-green-600 font-semibold">
-                                    ETB {order.totalPrice}
-                                </div>
-                                <div className="px-4 py-3 border-r border-gray-300 text-center text-gray-600">
-                                    {new Date(order.orderDate).toLocaleDateString()}
-                                </div>
-                                <div className="px-4 py-3 text-center flex justify-center items-center">
-                                    {isOrderInPackage(order.id, packageList) ? (
-                                        <button
-                                            onClick={() => handleRemoveOrder(order)}
-                                            className="text-red-500 text-2xl hover:text-red-700 transition-all"
-                                        >
-                                            <Minus />
-                                        </button>
-                                    ) : (
-                                        <button
-                                            onClick={() => handlePackageClick(order.id)}
-                                            className="text-green-500 text-2xl hover:text-green-700 transition-all"
-                                        >
-                                            <Plus />
-                                        </button>
-                                    )}
-                                </div>
-                            </div>
+            <div className="bg-[#F3F4F6] rounded w-full max-w-6.5xl max-h-[68vh] overflow-scroll">
+                {currentView === "Order" && (
+                    <>
+                        {/* Order Table Header */}
+                        <div className="grid grid-cols-[1.5fr_2fr_1fr_1fr_1fr_2fr_1fr] bg-gray-100 border-b border-gray-300 font-semibold text-gray-700 text-sm">
+                            <div className="px-4 py-3 border-r border-gray-300 text-center">Order Status</div>
+                            <div className="px-4 py-3 border-r border-gray-300 text-center">Inventory Item</div>
+                            <div className="px-4 py-3 border-r border-gray-300 text-center">Quantity</div>
+                            <div className="px-4 py-3 border-r border-gray-300 text-center">Unit</div>
+                            <div className="px-4 py-3 border-r border-gray-300 text-center">Price</div>
+                            <div className="px-4 py-3 border-r border-gray-300 text-center">Order Date</div>
+                            <div className="px-4 py-3 text-center">Package</div>
                         </div>
-                    ))
-                ) : (
-                    <div className="text-center text-gray-500 py-6">No orders found.</div>
+                        {/* Order Data Rows */}
+                        {orderList.length > 0 ? (
+                            orderList.map((order, index) => (
+                                <div key={index} className="grid grid-cols-[1.5fr_2fr_1fr_1fr_1fr_2fr_1fr] text-sm">
+                                    <div className="px-4 py-3 border-r border-gray-300 text-center">{order.orderStatus}</div>
+                                    <div className="px-4 py-3 border-r border-gray-300 text-center">{order.inventoryName}</div>
+                                    <div className="px-4 py-3 border-r border-gray-300 text-center">{order.quantityOrdered} {order.unit}</div>
+                                    <div className="px-4 py-3 border-r border-gray-300 text-center">{order.unit}</div>
+                                    <div className="px-4 py-3 border-r border-gray-300 text-center">{order.totalPrice}</div>
+                                    <div className="px-4 py-3 border-r border-gray-300 text-center">{new Date(order.orderDate).toLocaleDateString()}</div>
+                                    <div className="px-4 py-3 text-center">
+                                        {isOrderInPackage(order.id, packageList) ? (
+                                            <Minus onClick={() => handleRemoveOrder(order)} className="text-red-500 cursor-pointer" />
+                                        ) : (
+                                            <Plus onClick={() => handlePackageClick(order.id)} className="text-green-500 cursor-pointer" />
+                                        )}
+                                    </div>
+                                </div>
+                            ))
+                        ) : (
+                            <div className="text-center text-gray-500 py-6">No orders found.</div>
+                        )}
+                    </>
+                )}
+
+                {currentView === "request" && (
+                    <>
+                        {/* Request Table Header */}
+                        <div className="grid grid-cols-[2fr_1fr_1fr_2fr_1fr] bg-gray-100 border-b border-gray-300 font-semibold text-gray-700 text-sm">
+                            <div className="px-4 py-3 border-r border-gray-300 text-center">Request Item</div>
+                            <div className="px-4 py-3 border-r border-gray-300 text-center">Quantity</div>
+                            <div className="px-4 py-3 border-r border-gray-300 text-center">Requested By</div>
+                            <div className="px-4 py-3 border-r border-gray-300 text-center">Request Date</div>
+                            <div className="px-4 py-3 text-center">Status</div>
+                        </div>
+                        {/* Request Data Rows */}
+                        {requestList.length > 0 ? (
+                            requestList.map((request, index) => (
+                                <div key={index} className="grid grid-cols-[2fr_1fr_1fr_2fr_1fr] text-sm">
+                                    <div className="px-4 py-3 border-r border-gray-300 text-center">{request.itemName}</div>
+                                    <div className="px-4 py-3 border-r border-gray-300 text-center">{request.quantity}</div>
+                                    <div className="px-4 py-3 border-r border-gray-300 text-center">{request.requestedBy}</div>
+                                    <div className="px-4 py-3 border-r border-gray-300 text-center">{new Date(request.requestDate).toLocaleDateString()}</div>
+                                    <div className="px-4 py-3 text-center">{request.status}</div>
+                                </div>
+                            ))
+                        ) : (
+                            <div className="text-center text-gray-500 py-6">No requests found.</div>
+                        )}
+                    </>
                 )}
             </div>
 
