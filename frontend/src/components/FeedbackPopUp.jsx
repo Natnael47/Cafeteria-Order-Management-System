@@ -47,41 +47,56 @@ const FeedbackPopUp = ({ setShowFeedback }) => {
     };
 
     return (
-        <div className="absolute z-10 w-full h-full bg-gray-700/90 grid place-items-center">
-            <form onSubmit={submitFeedback} className="w-[max(30vw,330px)] text-gray-500 bg-white flex flex-col gap-4 p-4 rounded-md text-sm animate-fadeIn w-[min(95vw, 350px)] text-center">
+        <div className="absolute z-20 w-full h-full bg-gray-800/80 grid place-items-center backdrop-blur-sm">
+            <form
+                onSubmit={submitFeedback}
+                className="w-[max(30vw, 330px)] bg-white shadow-2xl rounded-lg p-6 animate-slideIn text-gray-600 max-w-[95vw] text-center"
+            >
+                {/* Header */}
                 <div className="flex justify-between items-center mb-4">
-                    <h2 className="text-lg font-bold text-black">We Appreciate Your Feedback</h2>
+                    <h2 className="text-2xl font-bold text-green-700">We Appreciate Your Feedback</h2>
                     <button
                         type="button"
-                        onClick={() => setShowFeedback(false)} // Close the popup
-                        className="text-lg text-green-600 font-bold cursor-pointer"
+                        onClick={() => setShowFeedback(false)}
+                        className="text-2xl text-red-500 hover:text-red-600 transition-transform transform hover:scale-110 cursor-pointer"
                     >
                         ✖
                     </button>
                 </div>
-                <p className="text-gray-700 mb-4">We are always looking for ways to improve your experience. Please take a moment to evaluate and tell us what you think.</p>
 
-                <div className="flex justify-center space-x-2 mb-2">
+                {/* Description */}
+                <p className="text-gray-700 mb-6 leading-relaxed">
+                    We are always looking for ways to improve your experience. Please take a moment to share your thoughts with us.
+                </p>
+
+                {/* Star Rating */}
+                <div className="flex justify-center space-x-2 mb-6">
                     {[1, 2, 3, 4, 5].map((star) => (
                         <span
                             key={star}
                             onClick={() => handleRatingChange(star)}
-                            className={`text-2xl cursor-pointer ${feedback.rating >= star ? 'text-yellow-500' : 'text-gray-300'}`}
+                            className={`text-3xl cursor-pointer transition-transform transform hover:scale-110 ${feedback.rating >= star ? 'text-yellow-400' : 'text-gray-300'
+                                }`}
                         >
                             ★
                         </span>
                     ))}
                 </div>
 
+                {/* Text Area */}
                 <textarea
                     placeholder="What can we do to improve your experience?"
                     value={feedback.comment}
                     onChange={handleCommentChange}
-                    className="border border-gray-300 w-full p-2 rounded-md mb-4 focus:outline-none"
-                    rows={3}
+                    className="border border-gray-300 w-full p-3 rounded-md mb-6 focus:outline-none focus:ring-2 focus:ring-green-400 transition-shadow"
+                    rows={4}
                 ></textarea>
 
-                <button type="submit" className="bg-green-500 text-white py-2 w-full rounded-md font-semibold hover:bg-green-600 transition-colors">
+                {/* Submit Button */}
+                <button
+                    type="submit"
+                    className="bg-gradient-to-r from-green-400 to-green-500 text-white py-3 w-full rounded-lg font-bold text-lg shadow-md hover:from-green-500 hover:to-green-600 hover:shadow-lg transition-all duration-300"
+                >
                     Send My Feedback
                 </button>
             </form>

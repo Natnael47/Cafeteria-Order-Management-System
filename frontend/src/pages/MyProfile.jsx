@@ -48,169 +48,141 @@ const MyProfile = () => {
     };
 
     return userData && (
-        <div className="max-w-lg mx-auto p-5 border-2 border-green-500 mt-5 rounded-lg flex flex-col items-center gap-4 text-sm">
-            {/* Display Name */}
-            <p className="text-neutral-500 underline">USER INFORMATION</p>
-            {
-                isEdit ? (
-                    <div className="flex gap-4 mt-2">
-                        <input
-                            className='bg-white text-3xl font-medium max-w-52 border-2 border-gray-500 rounded'
-                            type='text'
-                            value={editedData.firstName || ''}
-                            onChange={(e) => setEditedData(prev => ({ ...prev, firstName: e.target.value }))}
-                            placeholder="First Name"
-                        />
-                        <input
-                            className='bg-white text-3xl font-medium max-w-52 border-2 border-gray-500 rounded'
-                            type='text'
-                            value={editedData.lastName || ''}
-                            onChange={(e) => setEditedData(prev => ({ ...prev, lastName: e.target.value }))}
-                            placeholder="Last Name"
-                        />
-                    </div>
-                ) : (
-                    <p className='font-medium text-3xl text-neutral-800 mt-2 text-center'>{`${userData.firstName} ${userData.lastName}`}</p>
-                )
-            }
+        <div className="max-w-lg mx-auto p-6 border-2 border-green-500 mt-5 rounded-2xl flex flex-col items-center gap-6 text-sm shadow-lg bg-gradient-to-br from-white via-gray-100 to-green-50">
 
-            <hr className='bg-zinc-400 h-[1px] border-none w-full' />
+            {/* User Information Title */}
+            <p className="text-lg font-bold text-green-600 underline tracking-widest">USER INFORMATION</p>
+
+            {isEdit ? (
+                <div className="flex gap-4 mt-2">
+                    <input
+                        className='bg-white text-3xl font-semibold max-w-52 border-2 border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-green-400'
+                        type='text'
+                        value={editedData.firstName || ''}
+                        onChange={(e) => setEditedData(prev => ({ ...prev, firstName: e.target.value }))}
+                        placeholder="First Name"
+                    />
+                    <input
+                        className='bg-white text-3xl font-semibold max-w-52 border-2 border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-green-400'
+                        type='text'
+                        value={editedData.lastName || ''}
+                        onChange={(e) => setEditedData(prev => ({ ...prev, lastName: e.target.value }))}
+                        placeholder="Last Name"
+                    />
+                </div>
+            ) : (
+                <p className='font-bold text-3xl text-gray-800 mt-2 text-center'>{`${userData.firstName} ${userData.lastName}`}</p>
+            )}
+
+            <hr className='bg-green-300 h-[1px] border-none w-full' />
 
             {/* Contact Information */}
             <div className="w-full">
-                <p className='text-neutral-500 underline mt-3'>CONTACT INFORMATION</p>
-                <div className='grid grid-cols-[1fr_3fr] gap-y-2.5 mt-3 text-neutral-700'>
-                    <p className='font-medium'>Email:</p>
-                    <p className='text-blue-500'>{userData.email}</p>
+                <p className='text-lg font-bold text-green-600 underline tracking-widest mt-3'>CONTACT INFORMATION</p>
+                <div className='grid grid-cols-[1fr_3fr] gap-y-3 mt-3 text-gray-700'>
+                    <p className='font-semibold'>Email:</p>
+                    <p className='text-blue-600'>{userData.email}</p>
 
-                    <p className='font-medium'>Phone:</p>
-                    {
-                        isEdit ? (
-                            <div className="flex flex-col gap-1">
-                                <div className="flex items-center border border-gray-300 rounded-md px-2 py-1 focus-within:ring focus-within:ring-green-500">
-                                    <span className="text-gray-500 font-medium text-lg">+251</span>
-                                    <input
-                                        id="phone-input"
-                                        className="flex-1 outline-none border-none text-lg pl-2 bg-white"
-                                        type="text"
-                                        placeholder="912345678"
-                                        value={editedData.phone?.startsWith("+251") ? editedData.phone.slice(5) : editedData.phone || ''}
-                                        onChange={(e) => {
-                                            let value = e.target.value;
+                    <p className='font-semibold'>Phone:</p>
+                    {isEdit ? (
+                        <div className="flex items-center border-2 border-gray-300 rounded-lg px-3 py-2 focus-within:ring-2 focus-within:ring-green-400">
+                            <span className="text-gray-500 font-medium text-lg">+251</span>
+                            <input
+                                id="phone-input"
+                                className="flex-1 outline-none border-none text-lg pl-2"
+                                type="text"
+                                placeholder="912345678"
+                                value={editedData.phone?.startsWith("+251") ? editedData.phone.slice(5) : editedData.phone || ''}
+                                onChange={(e) => {
+                                    let value = e.target.value.replace(/\D/g, "").slice(0, 9);
+                                    setEditedData(prev => ({ ...prev, phone: `+251 ${value}` }));
+                                }}
+                                required
+                            />
+                        </div>
+                    ) : (
+                        <p className='text-blue-500'>{userData.phone}</p>
+                    )}
 
-                                            // Remove non-digit characters
-                                            value = value.replace(/\D/g, "");
-
-                                            // If the number starts with "0", limit to 10 digits
-                                            if (value.startsWith("0")) {
-                                                value = value.slice(1); // Remove the leading "0"
-                                            }
-
-                                            // Limit to a maximum of 9 digits (after "0" is removed if present)
-                                            value = value.slice(0, 9);
-
-                                            // Update the editedData state with the full formatted phone number
-                                            setEditedData(prev => ({ ...prev, phone: `+251 ${value}` }));
-                                        }}
-                                        required
-                                    />
-                                </div>
-                            </div>
-                        ) : (
-                            <p className='text-blue-400'>{userData.phone}</p>
-                        )
-                    }
-
-
-                    <p className='font-medium'>Address:</p>
+                    <p className='font-semibold'>Address:</p>
                     <div className={`flex flex-col ${isEdit ? 'gap-2' : 'gap-1'}`}>
-                        {
-                            isEdit ? (
-                                <>
-                                    <input
-                                        className='bg-white max-w-52 border-2 border-gray-500 rounded'
-                                        onChange={(e) => setEditedData(prev => ({ ...prev, address: { ...prev.address, line1: e.target.value } }))}
-                                        value={editedData.address?.line1 || ''}
-                                        type="text"
-                                        placeholder="Address Line 1"
-                                    />
-                                    <input
-                                        className='bg-white max-w-52 border-2 border-gray-500 rounded'
-                                        onChange={(e) => setEditedData(prev => ({ ...prev, address: { ...prev.address, line2: e.target.value } }))}
-                                        value={editedData.address?.line2 || ''}
-                                        type="text"
-                                        placeholder="Address Line 2"
-                                    />
-                                </>
-                            ) : (
-                                <p className='text-gray-500'>
-                                    {userData.address?.line1}
-                                    <br />
-                                    {userData.address?.line2}
-                                </p>
-                            )
-                        }
+                        {isEdit ? (
+                            <>
+                                <input
+                                    className='bg-white border-2 border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-green-400'
+                                    onChange={(e) => setEditedData(prev => ({ ...prev, address: { ...prev.address, line1: e.target.value } }))}
+                                    value={editedData.address?.line1 || ''}
+                                    type="text"
+                                    placeholder="Address Line 1"
+                                />
+                                <input
+                                    className='bg-white border-2 border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-green-400'
+                                    onChange={(e) => setEditedData(prev => ({ ...prev, address: { ...prev.address, line2: e.target.value } }))}
+                                    value={editedData.address?.line2 || ''}
+                                    type="text"
+                                    placeholder="Address Line 2"
+                                />
+                            </>
+                        ) : (
+                            <p className='text-gray-500'>
+                                {userData.address?.line1}<br />{userData.address?.line2}
+                            </p>
+                        )}
                     </div>
                 </div>
             </div>
 
             {/* Basic Information */}
             <div className="w-full">
-                <p className='text-neutral-500 underline mt-3'>BASIC INFORMATION</p>
-                <div className='grid grid-cols-[1fr_3fr] gap-y-2.5 mt-3 text-neutral-700'>
-                    <p className='font-medium'>Gender:</p>
-                    {
-                        isEdit ? (
-                            <select
-                                className='max-w-28 bg-white border-2 border-gray-500 rounded'
-                                onChange={(e) => setEditedData(prev => ({ ...prev, gender: e.target.value }))}
-                                value={editedData.gender || 'Not Selected'}
-                            >
-                                <option value="Not Selected">Not Selected</option>
-                                <option value="Male">Male</option>
-                                <option value="Female">Female</option>
-                                <option value="Other">Other</option>
-                            </select>
-                        ) : (
-                            <p className='text-gray-400'>{userData.gender === 'Not Selected' ? 'Not Selected' : userData.gender}</p>
-                        )
-                    }
+                <p className='text-lg font-bold text-green-600 underline tracking-widest mt-3'>BASIC INFORMATION</p>
+                <div className='grid grid-cols-[1fr_3fr] gap-y-3 mt-3 text-gray-700'>
+                    <p className='font-semibold'>Gender:</p>
+                    {isEdit ? (
+                        <select
+                            className='bg-white border-2 border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-green-400'
+                            onChange={(e) => setEditedData(prev => ({ ...prev, gender: e.target.value }))}
+                            value={editedData.gender || 'Not Selected'}
+                        >
+                            <option value="Not Selected">Not Selected</option>
+                            <option value="Male">Male</option>
+                            <option value="Female">Female</option>
+                            <option value="Other">Other</option>
+                        </select>
+                    ) : (
+                        <p className='text-gray-500'>{userData.gender === 'Not Selected' ? 'Not Selected' : userData.gender}</p>
+                    )}
 
-                    <p className='font-medium'>Birthday:</p>
-                    {
-                        isEdit ? (
-                            <input
-                                className='max-w-28 bg-white border-2 border-gray-500 rounded'
-                                type='date'
-                                value={editedData.dob || ''}
-                                onChange={e => setEditedData(prev => ({ ...prev, dob: e.target.value }))}
-                            />
-                        ) : (
-                            <p className='text-gray-400'>{userData.dob}</p>
-                        )
-                    }
+                    <p className='font-semibold'>Birthday:</p>
+                    {isEdit ? (
+                        <input
+                            className='bg-white border-2 border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-green-400'
+                            type='date'
+                            value={editedData.dob || ''}
+                            onChange={e => setEditedData(prev => ({ ...prev, dob: e.target.value }))}
+                        />
+                    ) : (
+                        <p className='text-gray-500'>{userData.dob}</p>
+                    )}
                 </div>
             </div>
 
             {/* Edit/Save Button */}
-            <div className='mt-10'>
-                {
-                    isEdit ? (
-                        <button
-                            className='border border-primary px-8 py-2 rounded-full hover:bg-primary hover:text-white transition-all'
-                            onClick={updateUserProfileData}
-                        >
-                            Save
-                        </button>
-                    ) : (
-                        <button
-                            className='border border-primary px-8 py-2 rounded-full hover:bg-primary hover:text-white transition-all'
-                            onClick={() => setIsEdit(true)}
-                        >
-                            Edit
-                        </button>
-                    )
-                }
+            <div className='mt-8'>
+                {isEdit ? (
+                    <button
+                        className='bg-green-500 text-white font-semibold px-8 py-2 rounded-full hover:bg-green-600 transition-transform transform hover:scale-105 shadow-md'
+                        onClick={updateUserProfileData}
+                    >
+                        Save
+                    </button>
+                ) : (
+                    <button
+                        className='bg-blue-500 text-white font-semibold px-8 py-2 rounded-full hover:bg-blue-600 transition-transform transform hover:scale-105 shadow-md'
+                        onClick={() => setIsEdit(true)}
+                    >
+                        Edit
+                    </button>
+                )}
             </div>
         </div>
     );

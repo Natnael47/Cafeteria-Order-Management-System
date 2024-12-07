@@ -1,4 +1,4 @@
-import { Search } from 'lucide-react';
+import { HandPlatter, LogOut, MessageSquareMore, Search, User } from 'lucide-react';
 import React, { useContext, useEffect, useState } from "react";
 import { Link, useLocation } from "react-router-dom";
 import { assets } from "../assets/assets";
@@ -59,62 +59,116 @@ export const Navbar = ({ setShowFeedback }) => {
     };
 
     return (
-        <div className={`fixed top-0 w-full bg-[#F0F9F1] z-50 transition-shadow duration-300 ${hasShadow ? 'shadow-md' : ''} flex justify-between items-center py-5 px-40`}>
+        <div
+            className={`fixed top-0 w-full bg-gradient-to-r bg-[#F0F9F1] z-50 transition-shadow duration-300 ${hasShadow ? 'shadow-lg' : ''
+                } flex justify-between items-center py-4 px-10 md:px-20 lg:px-40`}
+        >
+            {/* Logo */}
             <Link to='/'>
-                <img src={assets.logo2} alt="Logo" className="w-[150px] md:w-[120px] lg:w-[150px]" />
+                <img
+                    src={assets.logo2}
+                    alt='Logo'
+                    className='w-[150px] md:w-[120px] lg:w-[150px] transition-transform duration-300 hover:scale-105'
+                />
             </Link>
-            <ul className="flex list-none gap-5 text-black text-lg lg:gap-4 md:gap-3 md:text-base sm:flex">
-                <Link
-                    to='/'
-                    onClick={() => setMenu("home")}
-                    className={menu === "home" ? "border-b-2 border-black pb-1 font-semibold" : ""}
-                >
-                    Home
-                </Link>
-                <span
-                    onClick={handleMenuClick}
-                    className={menu === "menu" ? "border-b-2 border-black pb-1 font-semibold cursor-pointer" : "cursor-pointer"}
-                >
-                    Menu
-                </span>
-                <Link
-                    to='/about'
-                    onClick={() => setMenu("about")}
-                    className={menu === "about" ? "border-b-2 border-black pb-1 font-semibold" : ""}
-                >
-                    About
-                </Link>
-                <Link
-                    to='/contact'
-                    onClick={() => setMenu("contact-us")}
-                    className={menu === "contact-us" ? "border-b-2 border-black pb-1 font-semibold" : ""}
-                >
-                    Contact Us
-                </Link>
+
+            {/* Navigation Links */}
+            <ul className='flex list-none gap-6 text-black text-lg lg:gap-4 md:gap-3 md:text-base sm:flex'>
+                {[
+                    { name: 'Home', path: '/', key: 'home' },
+                    { name: 'Menu', key: 'menu', isSpan: true },
+                    { name: 'About', path: '/about', key: 'about' },
+                    { name: 'Contact Us', path: '/contact', key: 'contact-us' },
+                ].map((item) =>
+                    item.isSpan ? (
+                        <span
+                            key={item.key}
+                            onClick={handleMenuClick}
+                            className={`cursor-pointer pb-1 transition-colors duration-300 ${menu === item.key ? 'border-b-2 border-black font-semibold text-black' : 'hover:text-green-500'
+                                }`}
+                        >
+                            {item.name}
+                        </span>
+                    ) : (
+                        <Link
+                            key={item.key}
+                            to={item.path}
+                            onClick={() => setMenu(item.key)}
+                            className={`pb-1 transition-colors duration-300 ${menu === item.key ? 'border-b-2 border-black font-semibold text-black' : 'hover:text-green-500'
+                                }`}
+                        >
+                            {item.name}
+                        </Link>
+                    )
+                )}
             </ul>
-            <div className="flex items-center gap-10 md:gap-8">
-                <Search size={28} onClick={() => setShowSearch(true)} className='cursor-pointer' />
-                <div className="relative flex items-center gap-[30px]">
-                    <Link to='/cart' className="relative">
-                        <img src={assets.cart_icon} alt="Cart" className="cursor-pointer w-8" />
-                        <div className={`absolute w-4 h-4 -top-[8px] -right-[10px] rounded-full text-[10px] bg-red-600 text-white flex justify-center items-center transition ${getTotalCartAmount() === 0 ? "opacity-0" : "opacity-100"}`}>
+
+            {/* Right Section: Search, Cart, and Profile */}
+            <div className='flex items-center gap-10 md:gap-8'>
+                {/* Search Icon */}
+                <Search
+                    size={28}
+                    onClick={() => setShowSearch(true)}
+                    className='cursor-pointer transition-transform duration-300 hover:scale-110'
+                />
+
+                {/* Cart Icon */}
+                <div className='relative'>
+                    <Link to='/cart' className='relative'>
+                        <img
+                            src={assets.cart_icon}
+                            alt='Cart'
+                            className='w-8 cursor-pointer transition-transform duration-300 hover:scale-110'
+                        />
+                        <div
+                            className={`absolute w-4 h-4 -top-[8px] -right-[10px] rounded-full text-[10px] bg-red-600 text-white flex justify-center items-center transition ${getTotalCartAmount() === 0 ? 'opacity-0' : 'opacity-100'
+                                }`}
+                        >
                             {getCartItems()}
                         </div>
                     </Link>
                 </div>
 
+                {/* Sign In / Profile Dropdown */}
                 {!token ? (
-                    <button onClick={handleSignInClick} className="bg-[#39db4a] text-white text-lg font-medium py-2 px-6 rounded-full transition hover:bg-black">Sign In</button>
+                    <button
+                        onClick={handleSignInClick}
+                        className='bg-green-500 text-white text-lg font-medium py-2 px-6 rounded-full transition-all duration-300 hover:bg-black hover:shadow-md'
+                    >
+                        Sign In
+                    </button>
                 ) : (
-                    <div className="relative flex items-center gap-2 cursor-pointer group">
-                        <img src={assets.profile_icon} alt="Profile" />
-                        <img className="w-2.5" src={assets.drop_down_icon} alt="Dropdown" />
-                        <div className="absolute right-0 top-0 pt-14 z-20 hidden group-hover:block">
-                            <div className="bg-[#FBFDFB] rounded border border-primary p-4 flex flex-col gap-4 min-w-[160px]">
-                                <p onClick={() => navigate('/myprofile')} className="cursor-pointer hover:text-primary">My Profile</p>
-                                <p onClick={() => navigate('/myorders')} className="cursor-pointer hover:text-primary">My Orders</p>
-                                <p onClick={() => setShowFeedback(true)} className="cursor-pointer hover:text-primary">Feedback</p>
-                                <p onClick={logout} className="cursor-pointer hover:text-red-500">Logout</p>
+                    <div className='relative flex items-center gap-2 cursor-pointer group'>
+                        <img src={assets.profile_icon} alt='Profile' className='w-8 transition-transform duration-300 hover:scale-110' />
+                        <img src={assets.drop_down_icon} alt='Dropdown' className='w-2.5' />
+
+                        {/* Dropdown Menu */}
+                        <div className='absolute right-0 top-0 pt-14 z-20 hidden group-hover:block'>
+                            <div className='bg-white rounded-lg shadow-lg border border-green-300 p-4 flex flex-col gap-4 min-w-[160px]'>
+                                <p
+                                    onClick={() => navigate('/myprofile')}
+                                    className='flex items-center gap-2 cursor-pointer hover:text-green-500 transition-colors'
+                                >
+                                    <User /> Profile
+                                </p>
+                                <p
+                                    onClick={() => navigate('/myorders')}
+                                    className='flex items-center gap-2 cursor-pointer hover:text-green-500 transition-colors'
+                                >
+                                    <HandPlatter /> Orders
+                                </p>
+                                <p
+                                    onClick={() => setShowFeedback(true)}
+                                    className='flex items-center gap-2 cursor-pointer hover:text-green-500 transition-colors'
+                                >
+                                    <MessageSquareMore /> Feedback
+                                </p>
+                                <p
+                                    onClick={logout}
+                                    className='flex items-center gap-2 cursor-pointer text-red-500 hover:text-red-700 transition-colors'
+                                >
+                                    <LogOut /> Logout
+                                </p>
                             </div>
                         </div>
                     </div>
