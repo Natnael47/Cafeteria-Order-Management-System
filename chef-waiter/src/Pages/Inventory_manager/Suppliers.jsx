@@ -1,4 +1,4 @@
-import { Pencil, Trash2 } from 'lucide-react';
+import { Pencil, Plus, Trash2 } from 'lucide-react';
 import React, { useContext, useEffect, useState } from "react";
 import Modal from "react-modal";
 import { toast } from "react-toastify";
@@ -105,12 +105,13 @@ const Suppliers = () => {
                 <div className="flex items-center justify-between h-[10vh]">
                     <h1 className="text-2xl sm:text-3xl font-extrabold text-gray-800">Suppliers</h1>
                     <div className="flex items-center space-x-3">
-                        {/* New Inventory Button */}
+                        {/* New Supplier Button */}
                         <button
-                            className="px-4 py-2 bg-green-600 text-white font-medium rounded-md shadow-sm hover:bg-green-700 transition"
+                            className="py-2 px-4 bg-[#22C55E] text-white font-semibold rounded-md shadow-sm flex items-center hover:bg-green-600"
                             onClick={() => setIsPopupOpen(true)}
                         >
-                            + New
+                            <Plus size={20} />
+                            <span>New Supplier</span>
                         </button>
                         {/* Icon Button */}
                         <button className="p-2 bg-gray-100 text-gray-700 rounded-md shadow-sm hover:bg-gray-200 transition">

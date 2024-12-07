@@ -76,6 +76,7 @@ const Stock = () => {
                 supplierId: formData.supplierId, // Supplier ID
                 expiryDate: formData.expiryDate,
                 dateReceived: formData.dateReceived,
+                batchNumber: formData.batchNumber,
             };
 
             try {
@@ -312,9 +313,9 @@ const Stock = () => {
                 </div>
             </div>
 
-            <div className="bg-[#F3F4F6] rounded w-full max-h-[83vh] overflow-scroll">
+            <div className="bg-[#F3F4F6] rounded w-full max-h-[78vh] overflow-scroll">
                 <div>
-                    <div className="grid grid-cols-[1fr_1fr_1fr_1fr_1fr_0.5fr_0.5fr] items-center gap-4 p-5 border-b text-sm font-semibold bg-[#FAFAFA] text-black sm:grid">
+                    <div className="grid grid-cols-[1fr_1fr_1fr_1fr_1fr_0.5fr_0.5fr] items-center gap-4 p-5 border-b text-[15px] font-semibold bg-[#FAFAFA] border-gray-500 text-black sm:grid">
                         <div className="text-center font-medium">Status</div>
                         <div className="text-center font-medium">Name</div>
                         <div className="text-center font-medium">Remaining Stock</div>
@@ -489,6 +490,21 @@ const Stock = () => {
                                                         type="date"
                                                         name="expiryDate"
                                                         value={formData.expiryDate}
+                                                        onChange={onChangeHandler}
+                                                        className="mt-1 p-2 border border-gray-300 rounded w-full focus:outline-none focus:ring-2 focus:ring-green-400 focus:border-green-400"
+                                                    />
+                                                </div>
+                                                {/* Batch Number */}
+                                                <div>
+                                                    <label htmlFor="pricePerUnit" className="block text-sm font-medium text-gray-700">
+                                                        Batch Number <span>(optional)</span>
+                                                    </label>
+                                                    <input
+                                                        id="batchNumber"
+                                                        type="text"
+                                                        name="batchNumber"
+                                                        placeholder="Provided Batch Number"
+                                                        value={formData.batchNumber}
                                                         onChange={onChangeHandler}
                                                         className="mt-1 p-2 border border-gray-300 rounded w-full focus:outline-none focus:ring-2 focus:ring-green-400 focus:border-green-400"
                                                     />

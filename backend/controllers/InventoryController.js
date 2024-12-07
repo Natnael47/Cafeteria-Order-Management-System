@@ -142,6 +142,7 @@ const addStock = async (req, res) => {
       supplierId,
       expiryDate,
       dateReceived,
+      batchNumber: providedBatchNumber, // Destructure batchNumber from req.body
     } = req.body;
 
     // Input validation
@@ -168,15 +169,18 @@ const addStock = async (req, res) => {
         .json({ success: false, message: "Inventory item not found" });
     }
 
-    // Generate a unique batch number
-    let batchNumber;
-    do {
-      batchNumber = `BATCH-#${Math.floor(100000 + Math.random() * 900000)}`; // Generate "Batch-#XXXXXX"
-      const existingBatch = await prisma.stockBatch.findUnique({
-        where: { batchNumber },
-      });
-      if (!existingBatch) break; // Ensure uniqueness
-    } while (true);
+    // Determine batchNumber
+    let batchNumber = providedBatchNumber; // Use the provided batchNumber, if available
+    if (!batchNumber) {
+      // Generate a new unique batchNumber if not provided
+      do {
+        batchNumber = `BATCH-#${Math.floor(100000 + Math.random() * 900000)}`; // Generate "BATCH-#XXXXXX"
+        const existingBatch = await prisma.stockBatch.findUnique({
+          where: { batchNumber },
+        });
+        if (!existingBatch) break; // Ensure uniqueness
+      } while (true);
+    }
 
     // Create a new batch in the StockBatch table
     const newBatch = await prisma.stockBatch.create({
@@ -203,11 +207,13 @@ const addStock = async (req, res) => {
       where: { id: inventoryId },
       data: {
         quantity: updatedQuantity,
-        initialQuantity: updatedInitialQuantity, // Update initialQuantity if needed
+        pricePerUnit: pricePerUnit,
+        initialQuantity: updatedInitialQuantity,
         dateUpdated: new Date(),
       },
     });
 
+    // Recalculate stock percentage and store it in the status
     calculateStockPercentageAndStoreInStatus(inventoryId);
 
     // Respond with success
