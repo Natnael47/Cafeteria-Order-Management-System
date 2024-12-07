@@ -19,11 +19,11 @@ const ExploreMenu = ({ category, setCategory }) => {
                             className="cursor-pointer"
                         >
                             <img
-                                className={`w-[7.5vw] min-w-[80px] rounded-full transition-all duration-200 ${category === item.menu_name ? "border-[5px] border-[#46dc55] p-[2px]" : ""}`}
+                                className={`w-[7.5vw] min-w-[80px] rounded-full transition-all duration-200  ${category === item.menu_name ? "border-[5px] border-[#46dc55] p-[2px]" : ""}`}
                                 src={item.menu_image}
                                 alt={item.menu_name}
                             />
-                            <p className="mt-2 text-black text-[max(1.4vw,16px)] cursor-pointer">{item.menu_name}</p>
+                            <p className="mt-2 text-black text-[max(1.4vw,16px)] cursor-pointer hover:text-primary">{item.menu_name}</p>
                         </div>
                     )
                 })}

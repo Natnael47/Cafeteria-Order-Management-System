@@ -3,7 +3,7 @@ import React from 'react';
 
 const ServicesSection = () => {
     return (
-        <div className="bg-gradient-to-r from-green-100 via-blue-100 to-green-100 p-10 rounded-lg shadow-lg mx-auto max-w-6xl mt-10">
+        <div className=" mx-auto max-w-6xl mt-10">
             <h2 className="text-3xl font-extrabold text-gray-800 text-center mb-12">
                 Our Awesome Services
             </h2>
