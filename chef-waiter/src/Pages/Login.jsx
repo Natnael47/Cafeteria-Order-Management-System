@@ -1,5 +1,5 @@
 import axios from "axios";
-import { Eye, EyeClosed } from 'lucide-react';
+import { Eye, EyeOff } from 'lucide-react';
 import React, { useContext, useState } from "react";
 import { toast } from "react-toastify";
 import { backendUrl } from "../App";
@@ -83,7 +83,7 @@ const Login = () => {
                             onClick={() => setShowPassword(!showPassword)}
                             className="absolute inset-y-0 right-3 text-gray-500 hover:text-green-600 focus:outline-none"
                         >
-                            {showPassword ? <EyeClosed size={20} /> : <Eye size={20} />}
+                            {showPassword ? <Eye size={20} /> : <EyeOff size={20} />}
                         </button>
                     </div>
                 </div>
