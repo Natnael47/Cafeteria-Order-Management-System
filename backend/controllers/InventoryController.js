@@ -1390,9 +1390,25 @@ const listInventoryRequests = async (req, res) => {
     const inventoryRequests = await prisma.inventoryrequest.findMany({
       orderBy: { id: "desc" },
       include: {
-        inventory: true,
-        employee: true,
-        package: true,
+        employee: {
+          select: {
+            id: true,
+            firstName: true,
+            lastName: true,
+            email: true,
+            image: true,
+          },
+        },
+        inventory: {
+          select: {
+            id: true,
+            name: true,
+            image: true,
+            status: true,
+            quantity: true,
+          },
+        },
+        package: true, // Fetch all fields from the package table
       },
     });
 

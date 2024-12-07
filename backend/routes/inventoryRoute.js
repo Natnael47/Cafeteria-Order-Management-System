@@ -66,6 +66,6 @@ inventoryRoute.post("/new-package", empAuth, createPackage);
 inventoryRoute.get("/packages", empAuth, listInventoryPackages);
 inventoryRoute.post("/stock-package", empAuth, addPackage);
 
-inventoryRoute.get("/inventory-requests", listInventoryRequests);
+inventoryRoute.get("/inventory-requests", empAuth, listInventoryRequests);
 
 export default inventoryRoute;
