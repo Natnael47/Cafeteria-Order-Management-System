@@ -181,16 +181,12 @@ const InventoryOrders = () => {
             ...(formattedPackageType === 'Order' && { supplierId: parseInt(supplierId, 10) }),
         };
 
-        console.log("Data to Send:", dataToSend); // Debugging log
-
         try {
             const response = await axios.post(
                 `${backendUrl}/api/inventory/new-package`,
                 dataToSend,
                 { headers: { iToken } }
             );
-
-            console.log("Response Data:", response.data);
 
             if (response.data.success) {
                 toast.success('Package added successfully');
