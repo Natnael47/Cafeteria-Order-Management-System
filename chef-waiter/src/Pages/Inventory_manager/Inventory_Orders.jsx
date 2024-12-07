@@ -142,6 +142,8 @@ const InventoryOrders = () => {
         name: '',
         description: '',
         supplierId: '',
+        packageType: '',
+        chefId: ''
     });
 
     useEffect(() => {
@@ -157,19 +159,38 @@ const InventoryOrders = () => {
     };
 
     const handleAddPackage = async () => {
-        const { name, description, supplierId } = newPackageData;
+        const { name, description, supplierId, packageType, chefId } = newPackageData;
 
-        if (!supplierId || !name || !description) {
-            toast.error('Please fill in all fields and select a valid supplier.');
+        // Ensure packageType is sent as "Order" or "Request" (capitalized)
+        const formattedPackageType = packageType === 'order' ? 'Order' : packageType === 'request' ? 'Request' : packageType;
+
+        // Validation
+        if (!name || !description || (formattedPackageType === 'Order' && !supplierId) || (formattedPackageType === 'Request' && !chefId)) {
+            toast.error('Please fill in all fields and select a valid supplier or employee.');
             return;
         }
+
+        // Prepare the data to send based on package type
+        const dataToSend = {
+            name,
+            description,
+            packageType: formattedPackageType, // Send capitalized package type
+            // Only send chefId for 'Request' type
+            ...(formattedPackageType === 'Request' && { chefId: parseInt(chefId, 10) }),
+            // Only send supplierId for 'Order' type
+            ...(formattedPackageType === 'Order' && { supplierId: parseInt(supplierId, 10) }),
+        };
+
+        console.log("Data to Send:", dataToSend); // Debugging log
 
         try {
             const response = await axios.post(
                 `${backendUrl}/api/inventory/new-package`,
-                { name, description, supplierId: parseInt(supplierId, 10) },
+                dataToSend,
                 { headers: { iToken } }
             );
+
+            console.log("Response Data:", response.data);
 
             if (response.data.success) {
                 toast.success('Package added successfully');
@@ -423,6 +444,7 @@ const InventoryOrders = () => {
                 >
                     <h2 className="text-2xl font-bold text-gray-800 mb-6">Add New Package</h2>
                     <div className="space-y-4">
+                        {/* Package Name Input */}
                         <input
                             type="text"
                             name="name"
@@ -431,6 +453,8 @@ const InventoryOrders = () => {
                             placeholder="Package Name"
                             className="w-full border border-gray-300 rounded-lg px-4 py-3 text-gray-800 focus:outline-none focus:ring-2 focus:ring-blue-500"
                         />
+
+                        {/* Description Input */}
                         <input
                             type="text"
                             name="description"
@@ -439,24 +463,72 @@ const InventoryOrders = () => {
                             placeholder="Description"
                             className="w-full border border-gray-300 rounded-lg px-4 py-3 text-gray-800 focus:outline-none focus:ring-2 focus:ring-blue-500"
                         />
+
+                        {/* Package Type Selection */}
                         <select
-                            name="supplierId"
-                            value={newPackageData.supplierId}
+                            name="packageType"
+                            value={newPackageData.packageType}
                             onChange={handleChange}
                             className="w-full border border-gray-300 rounded-lg px-4 py-3 text-gray-800 focus:outline-none focus:ring-2 focus:ring-blue-500"
                         >
                             <option value="" disabled>
-                                Select Supplier
+                                Select Package Type
                             </option>
-                            {supplierList
-                                .filter((supplier) => supplier.status === "active") // Filter active suppliers
-                                .map((supplier) => (
-                                    <option key={supplier.id} value={supplier.id}>
-                                        {supplier.name}
-                                    </option>
-                                ))}
+                            <option value="order">Order</option>
+                            <option value="request">Request</option>
                         </select>
+
+                        {/* Conditional Rendering Based on Package Type */}
+                        {newPackageData.packageType === "order" && (
+                            <select
+                                name="supplierId"
+                                value={newPackageData.supplierId}
+                                onChange={handleChange}
+                                className="w-full border border-gray-300 rounded-lg px-4 py-3 text-gray-800 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                            >
+                                <option value="" disabled>
+                                    Select Supplier
+                                </option>
+                                {supplierList
+                                    .filter((supplier) => supplier.status === "active") // Filter active suppliers
+                                    .map((supplier) => (
+                                        <option key={supplier.id} value={supplier.id}>
+                                            {supplier.name}
+                                        </option>
+                                    ))}
+                            </select>
+                        )}
+
+                        {newPackageData.packageType === "request" && (
+                            <select
+                                name="chefId"
+                                value={newPackageData.chefId}
+                                onChange={handleChange}
+                                className="w-full border border-gray-300 rounded-lg px-4 py-3 text-gray-800 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                            >
+                                <option value="" disabled>
+                                    Select Employee
+                                </option>
+                                {requestList.length > 0 ? (
+                                    Array.from(
+                                        new Map(
+                                            requestList.map((request) => [
+                                                request.employee.id,
+                                                request.employee,
+                                            ])
+                                        ).values()
+                                    ).map((employee) => (
+                                        <option key={employee.id} value={employee.id}>
+                                            {employee.firstName} {employee.lastName}
+                                        </option>
+                                    ))
+                                ) : (
+                                    <option disabled>No employees available</option>
+                                )}
+                            </select>
+                        )}
                     </div>
+
                     <div className="flex justify-end space-x-4 mt-6">
                         <button
                             onClick={() => setIsPopupOpen(false)}
@@ -473,6 +545,7 @@ const InventoryOrders = () => {
                     </div>
                 </Modal>
             )}
+
         </div>
     );
 };
