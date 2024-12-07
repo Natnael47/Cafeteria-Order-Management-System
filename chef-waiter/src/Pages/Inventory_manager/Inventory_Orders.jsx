@@ -21,7 +21,11 @@ const InventoryOrders = () => {
             const response = await axios.get(`${backendUrl}/api/inventory/inventory-requests`, {
                 headers: { iToken },
             });
-            setRequestList(response.data.requests || []);
+            if (response.data.success) {
+                setRequestList(response.data.data); // Update the state with fetched order data
+            } else {
+                toast.error("Error fetching inventory orders");
+            }
         } catch (error) {
             console.error("Error fetching requests:", error);
             toast.error("Failed to fetch requests.");
@@ -307,22 +311,33 @@ const InventoryOrders = () => {
                 {currentView === "request" && (
                     <>
                         {/* Request Table Header */}
-                        <div className="grid grid-cols-[2fr_1fr_1fr_2fr_1fr] bg-gray-100 border-b border-gray-300 font-semibold text-gray-700 text-sm">
+                        <div className="grid grid-cols-[2fr_1fr_2fr_2fr_1fr_1fr] bg-gray-100 border-b border-gray-300 font-semibold text-gray-700 text-sm">
                             <div className="px-4 py-3 border-r border-gray-300 text-center">Request Item</div>
                             <div className="px-4 py-3 border-r border-gray-300 text-center">Quantity</div>
                             <div className="px-4 py-3 border-r border-gray-300 text-center">Requested By</div>
                             <div className="px-4 py-3 border-r border-gray-300 text-center">Request Date</div>
-                            <div className="px-4 py-3 text-center">Status</div>
+                            <div className="px-4 py-3 border-r border-gray-300 text-center">Package</div>
+                            <div className="px-4 py-3 text-center">Reject</div>
                         </div>
+
                         {/* Request Data Rows */}
                         {requestList.length > 0 ? (
                             requestList.map((request, index) => (
-                                <div key={index} className="grid grid-cols-[2fr_1fr_1fr_2fr_1fr] text-sm">
-                                    <div className="px-4 py-3 border-r border-gray-300 text-center">{request.itemName}</div>
+                                <div key={index} className="grid grid-cols-[2fr_1fr_2fr_2fr_1fr_1fr] text-sm">
+                                    <div className="px-4 py-3 border-r border-gray-300 text-center">{request.inventory.name}</div>
                                     <div className="px-4 py-3 border-r border-gray-300 text-center">{request.quantity}</div>
-                                    <div className="px-4 py-3 border-r border-gray-300 text-center">{request.requestedBy}</div>
-                                    <div className="px-4 py-3 border-r border-gray-300 text-center">{new Date(request.requestDate).toLocaleDateString()}</div>
-                                    <div className="px-4 py-3 text-center">{request.status}</div>
+                                    <div className="px-4 py-3 border-r border-gray-300 text-center">
+                                        {request.employee.firstName} {request.employee.lastName}
+                                    </div>
+                                    <div className="px-4 py-3 border-r border-gray-300 text-center">
+                                        {new Date(request.dateRequested).toLocaleDateString()}
+                                    </div>
+                                    <div className="px-4 py-3 border-r border-gray-300 text-center">
+                                        {request.package ? request.package.name : "N/A"}
+                                    </div>
+                                    <div className="px-4 py-3 text-center">
+                                        <button className="text-red-500 hover:underline">Reject</button>
+                                    </div>
                                 </div>
                             ))
                         ) : (
