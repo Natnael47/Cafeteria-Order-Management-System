@@ -51,29 +51,60 @@ const Add = () => {
     }
 
     return (
-        <form className='flex flex-col w-full items-start m-5' onSubmit={onSubmitHandler}>
-            <p className="mb-3 text-lg font-semibold">Add Food</p>
+        <form
+            className="flex flex-col w-full items-start m-5"
+            onSubmit={onSubmitHandler}
+        >
+            {/* Form Title */}
+            <p className="mb-2 text-2xl font-bold text-gray-800">Add Food</p>
 
-            <div className="bg-white px-8 py-4 border rounded w-full max-w-4xl max-h-[88vh] overflow-scroll">
-                <div className="add-img-upload flex-col">
-                    <p className='mt-3 mb-1'>Upload Image</p>
-                    <label htmlFor='image'>
-                        <img className="w-40" src={image ? URL.createObjectURL(image) : assets.upload_area} alt='' />
+            {/* Form Container */}
+            <div className="bg-white px-8 py-6 border shadow-lg rounded-lg w-full max-w-4xl">
+                {/* Image Upload */}
+                <div className="flex flex-col items-start mb-4">
+                    <p className="mb-1 ml-1 text-lg font-semibold text-gray-700">Upload Image</p>
+                    <label htmlFor="image" className="cursor-pointer">
+                        <img
+                            className="w-[150px] h-[100px] object-cover rounded-md border"
+                            src={image ? URL.createObjectURL(image) : assets.upload_area}
+                            alt="Upload"
+                        />
                     </label>
-                    <input onChange={(e) => setImage(e.target.files[0])} type='file' id='image' hidden required />
+                    <input
+                        onChange={(e) => setImage(e.target.files[0])}
+                        type="file"
+                        id="image"
+                        hidden
+                        required
+                    />
                 </div>
-                <div className="w-full">
-                    <p className="mb-2 mt-4">Food name</p>
-                    <input className="w-full max-w-[500px] px-3 py-2" onChange={onChangeHandler} value={data.name} type='text' name='name' placeholder='Write Name' required />
-                </div>
-                <div className="w-full ">
-                    <p className="mb-2 mt-4">Description</p>
-                    <textarea className="w-full max-w-[500px] max-h-[100px] px-3 py-2" onChange={onChangeHandler} value={data.description} name='description' rows="6" placeholder='Write Description Here' required />
-                </div>
-                <div className="flex flex-col sm:flex-row gap-2 w-full sm:gap-8 mt-3">
-                    <div>
-                        <p className="mb-2">Food category</p>
-                        <select className="w-full px-3 py-2 sm:w-[120px] relative max-h-48 overflow-y-auto" onChange={onChangeHandler} value={data.category} name='category'>
+
+                {/* Food Name and Category */}
+                <div className="flex flex-wrap justify-between w-full gap-6 mb-6">
+                    {/* Food Name */}
+                    <div className="flex-1 min-w-[220px]">
+                        <p className="mb-2 font-semibold text-gray-700">Food Name</p>
+                        <input
+                            className="w-full px-4 py-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-green-400"
+                            onChange={onChangeHandler}
+                            value={data.name}
+                            type="text"
+                            name="name"
+                            placeholder="Write Name"
+                            required
+                        />
+                    </div>
+
+                    {/* Category */}
+                    <div className="flex-1 min-w-[220px]">
+                        <p className="mb-2 font-semibold text-gray-700">Category</p>
+                        <select
+                            className="w-full px-4 py-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-green-400"
+                            onChange={onChangeHandler}
+                            value={data.category}
+                            name="category"
+                            required
+                        >
                             <option value="Salad">Salad</option>
                             <option value="Rolls">Rolls</option>
                             <option value="Deserts">Deserts</option>
@@ -84,38 +115,72 @@ const Add = () => {
                             <option value="Noodles">Noodles</option>
                         </select>
                     </div>
+                </div>
 
-                    <div>
-                        <p className="mb-2">Price</p>
-                        <input className="w-full px-3 py-2 sm:w-[120px] max-h-[40px]" onChange={onChangeHandler} value={data.price} type='number' name='price' placeholder='$20' required />
+                {/* Description */}
+                <div className="w-full mb-6">
+                    <p className="mb-2 font-semibold text-gray-700">Description</p>
+                    <textarea
+                        className="w-full px-4 py-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-green-400"
+                        onChange={onChangeHandler}
+                        value={data.description}
+                        name="description"
+                        rows="3"
+                        placeholder="Write Description Here"
+                        required
+                    />
+                </div>
+
+                {/* Price and Cook Time */}
+                <div className="flex flex-wrap justify-between w-full gap-6 mb-6">
+                    {/* Price */}
+                    <div className="flex-1 min-w-[220px]">
+                        <p className="mb-2 font-semibold text-gray-700">Price</p>
+                        <input
+                            className="w-full px-4 py-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-green-400"
+                            onChange={onChangeHandler}
+                            value={data.price}
+                            type="number"
+                            name="price"
+                            placeholder="$20"
+                            required
+                        />
                     </div>
 
-                    {/* Prep Time Input */}
-                    <div>
-                        <p className="mb-2">Prep Time (in minutes)</p>
-                        <input className="w-full px-3 py-2 sm:w-[120px] max-h-[40px]" onChange={onChangeHandler} value={data.prepTime} type='number' name='prepTime' placeholder='30' />
+                    {/* Cook Time */}
+                    <div className="flex-1 min-w-[220px]">
+                        <p className="mb-2 font-semibold text-gray-700">Prep Time (in minutes)</p>
+                        <input
+                            className="w-full px-4 py-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-green-400"
+                            onChange={onChangeHandler}
+                            value={data.prepTime}
+                            type="number"
+                            name="prepTime"
+                            placeholder="30"
+                        />
                     </div>
                 </div>
 
-                {/* Buttons at the bottom */}
-                <div className="flex gap-5 w-full mt-5">
+                {/* Buttons */}
+                <div className="flex justify-end gap-4">
                     <button
-                        type='submit'
-                        className='bg-black px-4 py-3 rounded-md mr-2 hover:bg-primary text-white w-28'
+                        type="submit"
+                        className="bg-green-500 hover:bg-green-600 text-white font-semibold px-6 py-3 rounded-lg shadow-md transition-all"
                     >
                         Add
                     </button>
                     <button
                         type="button"
-                        onClick={() => navigate('/list')}
-                        className="bg-gray-300 px-4 py-3 rounded-md mr-2 hover:bg-gray-400 w-28"
+                        onClick={() => navigate("/list")}
+                        className="bg-gray-300 hover:bg-gray-400 text-gray-700 font-semibold px-6 py-3 rounded-lg shadow-md transition-all"
                     >
                         Cancel
                     </button>
                 </div>
             </div>
         </form>
-    )
+    );
+
 }
 
 export default Add;
