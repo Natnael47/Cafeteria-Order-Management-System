@@ -69,59 +69,107 @@ const Orders = () => {
     }, [token]);
 
     return (
-        <div className='m-5 w-full'>
-            <h1 className="text-3xl font-bold text-gray-800">Orders</h1>
+        <div className="m-5 w-full">
+            {/* Title */}
+            <h1 className="text-4xl font-extrabold text-gray-800 mb-5 text-center">
+                Orders
+            </h1>
 
-            <div className='bg-[#F3F4F6] rounded w-full max-w-5.3xl max-h-[90vh] overflow-scroll'>
+            {/* Orders Container */}
+            <div className="bg-gray-50 rounded-lg shadow-lg p-5 max-w-6xl mx-auto max-h-[85vh] overflow-y-auto">
+                {orders.length > 0 ? (
+                    orders.map((order, index) => (
+                        <div
+                            key={index}
+                            className="grid grid-cols-1 sm:grid-cols-[0.5fr_2fr_1fr] lg:grid-cols-[0.5fr_2fr_1fr_1fr_1fr] gap-4 items-start border border-gray-300 rounded-lg p-5 md:p-6 my-4 bg-white hover:shadow-md transition-shadow"
+                        >
+                            {/* Order Icon */}
+                            <img
+                                className="w-16 h-16 object-cover"
+                                src={assets.parcel_icon}
+                                alt="Parcel Icon"
+                            />
 
-                <div className='bg-[#F3F4F6]'>
-                    {
-                        orders.map((order, index) => (
-                            <div className='grid grid-cols-1 sm:grid-cols-[0.5fr_2fr_1fr] lg:grid-cols-[0.5fr_2fr_1fr_1fr_1fr] gap-3 items-start border-2 border-black p-5 md:p-8 my-3 md:my-4 text-xs sm:text-sm text-black bg-white' key={index}>
-                                <img className='w-16' src={assets.parcel_icon} alt="" />
-                                <div>
-
-                                    <div>
-                                        {order.items.map((item, index) => {
-                                            if (index === order.items.length - 1) {
-                                                return <p className='py-0.5' key={index}> {item.name} X <span>  {item.quantity} </span></p>
-                                            } else {
-                                                return <p className='py-0.5' key={index}> {item.name} X <span>  {item.quantity} ,</span></p>
-                                            }
-                                        })}
-                                    </div>
-                                    <p className='mt-3 mb-2 font-medium'>{order.address.firstName + " " + order.address.lastName}</p>
-                                    <div>
-                                        <p>{order.address.street + ","}</p>
-                                        <p>{order.address.city + ", " + order.address.state + ", " + order.address.country + ", " + order.address.zipcode}</p>
-                                    </div>
-                                    <p>{order.address.phone}</p>
+                            {/* Order Details */}
+                            <div>
+                                {/* Items */}
+                                <div className="mb-3">
+                                    {order.items.map((item, index) => (
+                                        <p className="py-0.5 text-gray-700" key={index}>
+                                            {item.name} x{" "}
+                                            <span className="font-medium">{item.quantity}</span>
+                                            {index < order.items.length - 1 && ","}
+                                        </p>
+                                    ))}
                                 </div>
-                                <div>
-                                    <p className='text-sm sm:text-[15px]'>Items : {order.items.length}</p>
-                                    <p className='mt-3'>Method : {order.paymentMethod}</p>
-                                    <div className='flex flex-row'>
-                                        <p>Payment : </p>
-                                        <p className={order.payment ? 'text-green-500 font-semibold' : 'text-red-500 font-semibold'}>_{order.payment ? "Done" : "Pending"}</p>
-                                    </div>
-                                    <p>Date : {new Date(order.date).toLocaleDateString()}</p>
+
+                                {/* Customer Name */}
+                                <p className="mt-3 mb-2 font-semibold text-gray-900">
+                                    {order.address.firstName + " " + order.address.lastName}
+                                </p>
+
+                                {/* Address */}
+                                <div className="text-gray-600">
+                                    <p>{order.address.street},</p>
+                                    <p>
+                                        {order.address.city}, {order.address.state}, {order.address.country}, {order.address.zipcode}
+                                    </p>
                                 </div>
-                                <p className='text-sm sm:text-[15px] font-bold'>${order.amount}</p>
-                                <select onChange={(event) => statusHandler(event, order.id)} value={order.status} className='p-2 font-semibold'>
-                                    <option value="Order Placed">Order Placed</option>
-                                    <option value="Food Processing">Food Processing</option>
-                                    <option value="Shipped">Shipped</option>
-                                    <option value="Out For Delivery">Out For Delivery</option>
-                                    <option value="Delivered">Delivered</option>
-                                </select>
+
+                                {/* Phone */}
+                                <p className="mt-2 text-gray-800">{order.address.phone}</p>
                             </div>
-                        ))
-                    }
-                </div>
-            </div>
 
+                            {/* Payment Details */}
+                            <div>
+                                <p className="text-sm sm:text-base font-semibold text-gray-700">
+                                    Items: <span>{order.items.length}</span>
+                                </p>
+                                <p className="mt-3 text-gray-600">
+                                    Method: <span>{order.paymentMethod}</span>
+                                </p>
+                                <div className="flex items-center mt-2">
+                                    <p className="mr-2">Payment:</p>
+                                    <p
+                                        className={`font-semibold ${order.payment ? "text-green-500" : "text-red-500"
+                                            }`}
+                                    >
+                                        {order.payment ? "Done" : "Pending"}
+                                    </p>
+                                </div>
+                                <p className="mt-3 text-gray-600">
+                                    Date: {new Date(order.date).toLocaleDateString()}
+                                </p>
+                            </div>
+
+                            {/* Order Amount */}
+                            <p className="text-lg sm:text-xl font-bold text-gray-800 text-right">
+                                ${order.amount.toFixed(2)}
+                            </p>
+
+                            {/* Status Selector */}
+                            <select
+                                onChange={(event) => statusHandler(event, order.id)}
+                                value={order.status}
+                                className="p-2 text-sm font-medium bg-gray-100 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:outline-none"
+                            >
+                                <option value="Order Placed">Order Placed</option>
+                                <option value="Food Processing">Food Processing</option>
+                                <option value="Shipped">Shipped</option>
+                                <option value="Out For Delivery">Out For Delivery</option>
+                                <option value="Delivered">Delivered</option>
+                            </select>
+                        </div>
+                    ))
+                ) : (
+                    <p className="text-center text-gray-500 font-medium py-10">
+                        No orders available.
+                    </p>
+                )}
+            </div>
         </div>
     );
+
 };
 
 export default Orders;
