@@ -1,6 +1,7 @@
 import {
     ArrowUpDown,
     ClipboardList,
+    HandPlatter,
     LayoutDashboard,
     PackageOpen,
     ShieldQuestion,
@@ -64,7 +65,7 @@ const SideBar = () => {
                     >
                         {({ isActive }) => (
                             <>
-                                <PackageOpen
+                                <HandPlatter
                                     size={isActive ? activeIconSize : defaultIconSize}
                                     color={isActive ? activeIconColor : defaultIconColor}
                                     strokeWidth={isActive ? 2.5 : 2}

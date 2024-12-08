@@ -1,4 +1,4 @@
-import { BookUser, ChefHat, ClipboardList, House, Users, Utensils } from 'lucide-react';
+import { BookUser, ClipboardList, HandPlatter, House, Users, Utensils } from 'lucide-react';
 import React from 'react';
 import { NavLink } from 'react-router-dom';
 
@@ -79,7 +79,7 @@ const Sidebar = () => {
                 >
                     {({ isActive }) => (
                         <>
-                            <ChefHat
+                            <HandPlatter
                                 size={isActive ? 32 : 28}
                                 color={isActive ? activeColors.orders : defaultColors.orders}
                                 strokeWidth={isActive ? 2.5 : 2}
