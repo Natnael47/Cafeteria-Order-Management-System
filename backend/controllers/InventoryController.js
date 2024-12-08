@@ -1478,6 +1478,171 @@ const listInventoryRequests = async (req, res) => {
   }
 };
 
+//Dashboard
+const getInventoryDashboardData = async (req, res) => {
+  try {
+    // Fetch KPIs
+    const [
+      totalItems,
+      lowStockItems,
+      totalRequestsProcessed,
+      totalInventoryValue,
+    ] = await Promise.all([
+      prisma.inventory.count(), // Total Inventory Items
+      prisma.inventory.count({
+        where: { quantity: { lte: 10 } }, // Low Stock Threshold (<=10 as an example)
+      }),
+      prisma.inventoryrequest.count(), // Total Requests Processed
+      prisma.inventory.aggregate({
+        _sum: { quantity: true, pricePerUnit: true }, // Sum of quantity * pricePerUnit
+      }),
+    ]);
+
+    // Fetch Inventory Overview
+    const inventoryOverview = await prisma.inventory.findMany({
+      select: {
+        id: true,
+        name: true,
+        category: true,
+        quantity: true,
+        unit: true,
+        pricePerUnit: true,
+        status: true,
+        expiryDate: true,
+      },
+      orderBy: { id: "asc" }, // Example ordering
+    });
+
+    // Fetch Latest Updated Inventory Items
+    const latestUpdatedItems = await prisma.inventory.findMany({
+      select: {
+        id: true,
+        name: true,
+        category: true,
+        quantity: true,
+        unit: true,
+        pricePerUnit: true,
+        status: true,
+        expiryDate: true,
+      },
+      orderBy: { dateUpdated: "desc" }, // Order by latest updates
+      take: 6, // Fetch only the latest 6 items
+    });
+
+    // Fetch Graph Data
+    const [inventoryByCategory, stockTrends, expenditureBySupplier] =
+      await Promise.all([
+        prisma.inventory.groupBy({
+          by: ["category"],
+          _count: { id: true },
+        }), // Inventory by Category
+        prisma.inventory.groupBy({
+          by: ["dateUpdated"],
+          _sum: { quantity: true },
+          orderBy: { dateUpdated: "asc" },
+        }), // Stock Trends
+        prisma.inventorypurchase.groupBy({
+          by: ["supplierId"],
+          _sum: { cost: true },
+          orderBy: { _sum: { cost: "desc" } },
+        }), // Expenditure by Supplier
+      ]);
+
+    // Fetch Low Stock Alerts
+    const lowStockAlerts = await prisma.inventory.findMany({
+      where: { quantity: { lte: 10 } },
+      select: {
+        id: true,
+        name: true,
+        quantity: true,
+        expiryDate: true,
+        image: true,
+      },
+    });
+
+    // Fetch Requests and Withdrawals
+    const [pendingRequests, recentWithdrawals] = await Promise.all([
+      prisma.inventoryrequest.findMany({
+        where: { status: { not: "Completed" } }, // Pending Requests
+        include: {
+          employee: {
+            select: { id: true, firstName: true, lastName: true },
+          },
+          inventory: {
+            select: { name: true, quantity: true },
+          },
+        },
+      }),
+      prisma.withdrawallog.findMany({
+        orderBy: { dateWithdrawn: "desc" },
+        take: 10, // Recent Withdrawals
+        include: {
+          inventory: { select: { name: true } },
+          employee: { select: { firstName: true, lastName: true } },
+        },
+      }),
+    ]);
+
+    // Fetch Batch Management Data
+    const batchDetails = await prisma.StockBatch.findMany({
+      select: {
+        batchNumber: true,
+        inventory: { select: { name: true } },
+        quantityRemaining: true,
+        expiryDate: true,
+        pricePerUnit: true,
+      },
+    });
+
+    // Fetch Supplier Performance Data
+    const supplierPerformance = await prisma.supplier.findMany({
+      include: {
+        inventorypurchase: {
+          select: {
+            cost: true,
+            pricePerUnit: true,
+          },
+        },
+      },
+    });
+
+    // Response structure
+    res.status(200).json({
+      success: true,
+      data: {
+        KPIs: {
+          totalItems,
+          lowStockItems,
+          totalRequestsProcessed,
+          totalInventoryValue:
+            totalInventoryValue._sum.quantity *
+            totalInventoryValue._sum.pricePerUnit,
+        },
+        inventoryOverview,
+        latestUpdatedItems, // Include the new data in the response
+        graphs: {
+          inventoryByCategory,
+          stockTrends,
+          expenditureBySupplier,
+        },
+        alerts: lowStockAlerts,
+        requestsAndWithdrawals: {
+          pendingRequests,
+          recentWithdrawals,
+        },
+        batchManagement: batchDetails,
+        supplierPerformance,
+      },
+    });
+  } catch (error) {
+    console.error("Error fetching dashboard data:", error);
+    res.status(500).json({
+      success: false,
+      message: "Error fetching dashboard data",
+    });
+  }
+};
+
 // Export all functions
 export {
   addInventory,
@@ -1491,6 +1656,7 @@ export {
   createPackage,
   generateReport,
   generateUsageReport,
+  getInventoryDashboardData,
   getSupplierOrders,
   listInventory,
   listInventoryPackages,

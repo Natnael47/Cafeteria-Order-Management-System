@@ -7,6 +7,7 @@ import {
   addSupplier,
   addToPackage,
   createPackage,
+  getInventoryDashboardData,
   getSupplierOrders,
   listInventory,
   listInventoryPackages,
@@ -67,5 +68,7 @@ inventoryRoute.get("/packages", empAuth, listInventoryPackages);
 inventoryRoute.post("/stock-package", empAuth, addPackage);
 
 inventoryRoute.get("/inventory-requests", empAuth, listInventoryRequests);
+
+inventoryRoute.get("/inventory-dashboard", empAuth, getInventoryDashboardData);
 
 export default inventoryRoute;
