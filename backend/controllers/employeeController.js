@@ -50,7 +50,8 @@ const loginEmployee = async (req, res, role) => {
 export const login_Chef = (req, res) => loginEmployee(req, res, "chef");
 
 // Login Barista
-export const login_Barista = (req, res) => loginEmployee(req, res, "baristas");
+export const login_InventoryManager = (req, res) =>
+  loginEmployee(req, res, "inventory");
 
 // API to get employee profile
 export const employee_Profile = async (req, res) => {

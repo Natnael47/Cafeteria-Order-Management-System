@@ -31,7 +31,7 @@ const Login = () => {
                     toast.error(data.message);
                 }
             } else {
-                const { data } = await axios.post(backendUrl + "/api/employee/login-barista", { email, password });
+                const { data } = await axios.post(backendUrl + "/api/employee/login-inventory_manager", { email, password });
                 if (data.success) {
                     localStorage.setItem('iToken', data.token);
                     setIToken(data.token);

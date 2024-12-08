@@ -188,11 +188,11 @@ const AddEmployee = () => {
                             <select onChange={(e) => setPosition(e.target.value)} value={position} className='border rounded px-3 py-2' name="" id="position">
                                 <option value="Executive Chef">Executive Chef</option>
                                 <option value="Pastry Chef">Pastry Chef</option>
+                                <option value="Inventory Manager">Inventory Manager</option>
                                 <option value="Waitstaff/Servers">Waitstaff/Servers</option>
                                 <option value="Baristas">Baristas</option>
                                 <option value="Bartenders">Bartenders</option>
                                 <option value="Cashier">Cashier</option>
-                                <option value="Inventory Manager">Inventory Manager</option>
                                 <option value="Bar Manager">Bar Manager</option>
                                 <option value="Cleaner/Janitorial Staff">Cleaner/Janitorial Staff</option>
                             </select>
