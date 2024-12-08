@@ -46,19 +46,22 @@ const Login = () => {
     };
 
     return (
-        <form onSubmit={onSubmitHandler} className="min-h-screen flex items-center justify-center bg-gradient-to-r from-green-300 via-blue-500 to-green-300">
-            <div className="flex flex-col gap-6 p-10 bg-white rounded-2xl shadow-2xl max-w-sm w-full">
+        <form
+            onSubmit={onSubmitHandler}
+            className="min-h-screen flex items-center justify-center bg-gradient-to-br from-green-300 via-blue-500 to-green-300 px-4"
+        >
+            <div className="flex flex-col gap-6 p-8 sm:p-10 bg-white rounded-3xl shadow-2xl max-w-sm w-full">
                 {/* Title */}
-                <p className="text-2xl font-extrabold text-gray-800 text-center">
+                <h1 className="text-2xl font-extrabold text-gray-800 text-center">
                     <span className="text-green-600">{state}</span> Login
-                </p>
+                </h1>
 
                 {/* Email Field */}
                 <div className="w-full">
                     <label className="block text-gray-700 font-medium mb-2">Email</label>
                     <input
                         onChange={(e) => setEmail(e.target.value)}
-                        className="w-full px-4 py-2 text-gray-700 bg-gray-100 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:outline-none"
+                        className="w-full px-4 py-3 text-gray-700 bg-gray-50 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-green-500 focus:outline-none placeholder-gray-400"
                         placeholder="Enter your email"
                         type="email"
                         value={email}
@@ -72,7 +75,7 @@ const Login = () => {
                     <div className="relative">
                         <input
                             onChange={(e) => setPassword(e.target.value)}
-                            className="w-full px-4 py-2 text-gray-700 bg-gray-100 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:outline-none"
+                            className="w-full px-4 py-3 text-gray-700 bg-gray-50 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-green-500 focus:outline-none placeholder-gray-400"
                             placeholder="Enter your password"
                             type={showPassword ? "text" : "password"}
                             value={password}
@@ -81,7 +84,7 @@ const Login = () => {
                         <button
                             type="button"
                             onClick={() => setShowPassword(!showPassword)}
-                            className="absolute inset-y-0 right-3 text-gray-500 hover:text-green-600 focus:outline-none"
+                            className="absolute inset-y-0 right-3 flex items-center text-gray-500 hover:text-green-600 focus:outline-none"
                         >
                             {showPassword ? <Eye size={20} /> : <EyeOff size={20} />}
                         </button>
@@ -90,36 +93,39 @@ const Login = () => {
 
                 {/* Login Button */}
                 <button
-                    className="w-full py-3 bg-green-500 text-white text-lg font-semibold rounded-lg hover:bg-green-600 transition duration-300"
+                    className="w-full py-3 bg-green-500 text-white text-lg font-bold rounded-lg shadow-md hover:shadow-lg hover:bg-green-600 transition-all duration-300"
                 >
                     Login
                 </button>
 
                 {/* Toggle Login Type */}
-                {state === "Chef" ? (
-                    <p className="text-center text-gray-600">
-                        Inventory Manager Login?{" "}
-                        <span
-                            className="text-green-600 font-medium cursor-pointer hover:underline"
-                            onClick={() => setState("Inventory Manager")}
-                        >
-                            Click here
-                        </span>
-                    </p>
-                ) : (
-                    <p className="text-center text-gray-600">
-                        Chef Login?{" "}
-                        <span
-                            className="text-green-600 font-medium cursor-pointer hover:underline"
-                            onClick={() => setState("Chef")}
-                        >
-                            Click here
-                        </span>
-                    </p>
-                )}
+                <p className="text-center text-gray-600">
+                    {state === "Chef" ? (
+                        <>
+                            Inventory Manager Login?{" "}
+                            <span
+                                className="text-green-600 font-medium cursor-pointer hover:underline"
+                                onClick={() => setState("Inventory Manager")}
+                            >
+                                Click here
+                            </span>
+                        </>
+                    ) : (
+                        <>
+                            Chef Login?{" "}
+                            <span
+                                className="text-green-600 font-medium cursor-pointer hover:underline"
+                                onClick={() => setState("Chef")}
+                            >
+                                Click here
+                            </span>
+                        </>
+                    )}
+                </p>
             </div>
         </form>
     );
+
 };
 
 export default Login;

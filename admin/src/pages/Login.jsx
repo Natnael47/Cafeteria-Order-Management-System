@@ -33,7 +33,7 @@ const Login = () => {
     }
 
     return (
-        <div className="min-h-screen flex items-center justify-center w-full bg-gradient-to-r from-indigo-500 to-purple-600">
+        <div className="min-h-screen flex items-center justify-center w-full bg-gradient-to-r from-primary to-[#22C55E]">
             <div className="bg-white shadow-2xl rounded-lg px-8 py-10 max-w-md w-full">
                 {/* Title */}
                 <h1 className="text-3xl font-extrabold text-gray-800 text-center mb-6">
@@ -78,7 +78,7 @@ const Login = () => {
                     {/* Submit Button */}
                     <button
                         type="submit"
-                        className="w-full py-3 bg-indigo-600 text-white font-semibold text-lg rounded-lg shadow-md hover:bg-indigo-700 transition duration-300"
+                        className="w-full py-3 bg-[#22C55E] text-white font-semibold text-lg rounded-lg shadow-md hover:bg-black transition duration-300"
                     >
                         Login
                     </button>
