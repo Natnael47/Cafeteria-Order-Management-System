@@ -291,36 +291,61 @@ const InventoryOrders = () => {
                 {currentView === "Order" && (
                     <>
                         {/* Order Table Header */}
-                        <div className="grid grid-cols-[1.5fr_2fr_1fr_1fr_1fr_2fr_1fr] bg-gray-100 border-b border-gray-300 font-semibold text-gray-700 text-sm">
+                        <div className="grid grid-cols-[1.5fr_2fr_1fr_1fr_1fr_2fr_1fr] bg-gradient-to-r from-gray-200 via-gray-100 to-gray-200 border-b border-gray-300 font-semibold text-gray-700 text-sm rounded-t-md">
                             <div className="px-4 py-3 border-r border-gray-300 text-center">Order Status</div>
                             <div className="px-4 py-3 border-r border-gray-300 text-center">Inventory Item</div>
                             <div className="px-4 py-3 border-r border-gray-300 text-center">Quantity</div>
-                            <div className="px-4 py-3 border-r border-gray-300 text-center">Unit</div>
                             <div className="px-4 py-3 border-r border-gray-300 text-center">Price</div>
+                            <div className="px-4 py-3 border-r border-gray-300 text-center">Supplier</div>
                             <div className="px-4 py-3 border-r border-gray-300 text-center">Order Date</div>
                             <div className="px-4 py-3 text-center">Package</div>
                         </div>
                         {/* Order Data Rows */}
                         {orderList.length > 0 ? (
                             orderList.map((order, index) => (
-                                <div key={index} className="grid grid-cols-[1.5fr_2fr_1fr_1fr_1fr_2fr_1fr] text-sm">
-                                    <div className="px-4 py-3 border-r border-gray-300 text-center">{order.orderStatus}</div>
+                                <div
+                                    key={index}
+                                    className={`grid grid-cols-[1.5fr_2fr_1fr_1fr_1fr_2fr_1fr] text-sm bg-white border-b border-gray-200 hover:shadow-lg hover:bg-gray-50 ${index % 2 === 0 ? "bg-gray-50" : "bg-white"
+                                        } transition duration-200`}
+                                >
+                                    <div className="px-4 py-3 border-r border-gray-300 text-center">
+                                        <span
+                                            className={`px-2 py-1 rounded-full text-xs font-semibold ${order.orderStatus === "Pending"
+                                                ? "bg-yellow-100 text-yellow-700"
+                                                : order.orderStatus === "Approved"
+                                                    ? "bg-green-100 text-green-700"
+                                                    : "bg-red-100 text-red-700"
+                                                }`}
+                                        >
+                                            {order.orderStatus}
+                                        </span>
+                                    </div>
                                     <div className="px-4 py-3 border-r border-gray-300 text-center">{order.inventoryName}</div>
                                     <div className="px-4 py-3 border-r border-gray-300 text-center">{order.quantityOrdered} {order.unit}</div>
-                                    <div className="px-4 py-3 border-r border-gray-300 text-center">{order.unit}</div>
-                                    <div className="px-4 py-3 border-r border-gray-300 text-center">{order.totalPrice}</div>
-                                    <div className="px-4 py-3 border-r border-gray-300 text-center">{new Date(order.orderDate).toLocaleDateString()}</div>
+                                    <div className="px-4 py-3 border-r border-gray-300 text-center">${order.totalPrice.toFixed(2)}</div>
+                                    <div className="px-4 py-3 border-r border-gray-300 text-center">{order.supplierName}</div>
+                                    <div className="px-4 py-3 border-r border-gray-300 text-center">
+                                        {new Date(order.orderDate).toLocaleDateString()}
+                                    </div>
                                     <div className="px-4 py-3 text-center">
                                         {isOrderInPackage(order.id, packageList) ? (
-                                            <Minus onClick={() => handleRemoveOrder(order)} className="text-red-500 cursor-pointer" />
+                                            <Minus
+                                                onClick={() => handleRemoveOrder(order)}
+                                                className="text-red-500 cursor-pointer hover:scale-125 transition-transform"
+                                            />
                                         ) : (
-                                            <Plus onClick={() => handlePackageClick(order.id)} className="text-green-500 cursor-pointer" />
+                                            <Plus
+                                                onClick={() => handlePackageClick(order.id)}
+                                                className="text-green-500 cursor-pointer hover:scale-125 transition-transform"
+                                            />
                                         )}
                                     </div>
                                 </div>
                             ))
                         ) : (
-                            <div className="text-center text-gray-500 py-6">No orders found.</div>
+                            <div className="text-center text-gray-500 py-6 bg-gray-50 rounded-b-md">
+                                No orders found.
+                            </div>
                         )}
                     </>
                 )}
@@ -328,40 +353,83 @@ const InventoryOrders = () => {
                 {currentView === "request" && (
                     <>
                         {/* Request Table Header */}
-                        <div className="grid grid-cols-[2fr_1fr_2fr_2fr_1fr_1fr] bg-gray-100 border-b border-gray-300 font-semibold text-gray-700 text-sm">
+                        <div className="grid grid-cols-[2fr_1fr_2fr_2fr_1fr_1fr] bg-gradient-to-r from-gray-200 via-gray-100 to-gray-200 border-b border-gray-300 font-semibold text-gray-700 text-sm rounded-t-md">
                             <div className="px-4 py-3 border-r border-gray-300 text-center">Request Item</div>
                             <div className="px-4 py-3 border-r border-gray-300 text-center">Quantity</div>
                             <div className="px-4 py-3 border-r border-gray-300 text-center">Requested By</div>
                             <div className="px-4 py-3 border-r border-gray-300 text-center">Request Date</div>
                             <div className="px-4 py-3 border-r border-gray-300 text-center">Package</div>
-                            <div className="px-4 py-3 text-center">Reject</div>
+                            <div className="px-4 py-3 text-center">Decision</div>
                         </div>
 
                         {/* Request Data Rows */}
                         {requestList.length > 0 ? (
                             requestList.map((request, index) => (
-                                <div key={index} className="grid grid-cols-[2fr_1fr_2fr_2fr_1fr_1fr] text-sm">
-                                    <div className="px-4 py-3 border-r border-gray-300 text-center">{request.inventory.name}</div>
+                                <div
+                                    key={index}
+                                    className={`grid grid-cols-[2fr_1fr_2fr_2fr_1fr_1fr] text-sm border-b border-gray-200 hover:bg-gray-50 ${index % 2 === 0 ? "bg-gray-50" : "bg-white"
+                                        } transition duration-200`}
+                                >
+                                    {/* Request Item */}
+                                    <div className="px-4 py-3 border-r border-gray-300 text-center">
+                                        {request.inventory.name}
+                                    </div>
+
+                                    {/* Quantity */}
                                     <div className="px-4 py-3 border-r border-gray-300 text-center">{request.quantity}</div>
+
+                                    {/* Requested By */}
                                     <div className="px-4 py-3 border-r border-gray-300 text-center">
                                         {request.employee.firstName} {request.employee.lastName}
                                     </div>
+
+                                    {/* Request Date */}
                                     <div className="px-4 py-3 border-r border-gray-300 text-center">
                                         {new Date(request.dateRequested).toLocaleDateString()}
                                     </div>
+
+                                    {/* Package */}
                                     <div className="px-4 py-3 border-r border-gray-300 text-center">
-                                        {request.package ? request.package.name : "N/A"}
+                                        <div className="flex justify-center items-center gap-2">
+                                            {request.package ? (
+                                                <>
+                                                    <span className="text-gray-700">{request.package.name}</span>
+                                                    <Minus
+                                                        onClick={() => handleRemoveFromPackage(request.id)}
+                                                        className="text-red-500 cursor-pointer hover:scale-125 transition-transform"
+                                                    />
+                                                </>
+                                            ) : (
+                                                <Plus
+                                                    onClick={() => handleAddToPackage(request.id)}
+                                                    className="text-green-500 cursor-pointer hover:scale-125 transition-transform"
+                                                />
+                                            )}
+                                        </div>
                                     </div>
+
+                                    {/* Decision */}
                                     <div className="px-4 py-3 text-center">
-                                        <button className="text-red-500 hover:underline">Reject</button>
+                                        {request.isRejected ? (
+                                            <span className="text-red-500">
+                                                ❌
+                                            </span>
+                                        ) : (
+                                            <span className="text-green-500">
+                                                ✔️
+                                            </span>
+                                        )}
                                     </div>
                                 </div>
                             ))
                         ) : (
-                            <div className="text-center text-gray-500 py-6">No requests found.</div>
+                            <div className="text-center text-gray-500 py-6 bg-gray-50 rounded-b-md">
+                                No requests found.
+                            </div>
                         )}
                     </>
                 )}
+
             </div>
 
             {isConfirmationModalOpen && (
@@ -405,22 +473,26 @@ const InventoryOrders = () => {
                     isOpen={isPackageSelectorOpen !== null}
                     onRequestClose={closePackageModal}
                     className="bg-white p-8 rounded-lg shadow-2xl w-[90%] max-w-lg mx-auto mt-20"
-                    overlayClassName="fixed inset-0 bg-black bg-opacity-60 z-50"
+                    overlayClassName="fixed inset-0 bg-black bg-opacity-60 z-50 flex items-center justify-center"
                 >
-                    <h3 className="text-3xl font-semibold text-gray-800 mb-8 text-center">Select a Package</h3>
-                    <div className="grid grid-cols-2 gap-6">
+                    <h3 className="text-3xl font-bold text-gray-800 mb-6 text-center">Select a Package</h3>
+
+                    {/* Scrollable Package List */}
+                    <div className="max-h-[300px] overflow-y-auto grid grid-cols-1 sm:grid-cols-2 gap-4 p-2">
                         {packageList.map((pkg) => (
                             <button
                                 key={pkg.id}
-                                className="flex items-center justify-center bg-gradient-to-r from-blue-500 to-blue-600 text-white px-6 py-4 rounded-lg font-medium shadow-lg hover:from-blue-600 hover:to-blue-700 transform hover:scale-105 transition-all duration-300"
+                                className="flex items-center justify-center bg-gradient-to-r from-indigo-500 to-indigo-600 text-white px-5 py-4 rounded-lg font-medium shadow-md hover:from-indigo-600 hover:to-indigo-700 transform hover:scale-105 transition-transform duration-300"
                                 onClick={() => handlePackageSelection(pkg.id, isPackageSelectorOpen)}
                             >
-                                <Package className="mr-3 text-white" size={32} />
-                                {pkg.name}
+                                <Package className="mr-3 text-white" size={28} />
+                                <span>{pkg.name}</span>
                             </button>
                         ))}
                     </div>
-                    <div className="flex justify-end mt-8">
+
+                    {/* Footer with Cancel Button */}
+                    <div className="flex justify-end mt-6">
                         <button
                             onClick={closePackageModal}
                             className="bg-gray-200 text-gray-700 px-6 py-3 rounded-lg hover:bg-gray-300 transition-all duration-200"

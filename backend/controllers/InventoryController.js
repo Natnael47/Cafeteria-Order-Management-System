@@ -142,6 +142,7 @@ const addStock = async (req, res) => {
       supplierId,
       expiryDate,
       dateReceived,
+      empId,
       batchNumber: providedBatchNumber, // Destructure batchNumber from req.body
     } = req.body;
 
@@ -213,6 +214,18 @@ const addStock = async (req, res) => {
       },
     });
 
+    // Record purchase details in InventoryPurchase
+    const newPurchase = await prisma.inventorypurchase.create({
+      data: {
+        inventoryId: parseInt(inventoryId, 10),
+        quantityBought: quantity,
+        supplierId,
+        employeeId: empId,
+        cost: quantity * pricePerUnit,
+        pricePerUnit: pricePerUnit,
+      },
+    });
+
     // Recalculate stock percentage and store it in the status
     calculateStockPercentageAndStoreInStatus(inventoryId);
 
@@ -221,6 +234,7 @@ const addStock = async (req, res) => {
       success: true,
       message: "Stock added successfully",
       newBatch,
+      newPurchase,
       updatedInventory,
     });
   } catch (error) {
@@ -304,13 +318,14 @@ const requestInventoryItem = async (req, res) => {
 // Withdraw item from inventory and log the withdrawal
 const withdrawItem = async (req, res) => {
   try {
-    const { inventoryId, withdrawnBy, quantity } = req.body;
+    const { inventoryId, reason, quantity, empId } = req.body;
 
     // Input validation
     if (
       !inventoryId ||
-      !withdrawnBy ||
+      !reason ||
       !quantity ||
+      !empId ||
       isNaN(quantity) ||
       quantity <= 0
     ) {
@@ -407,7 +422,8 @@ const withdrawItem = async (req, res) => {
     const withdrawalLog = await prisma.withdrawallog.create({
       data: {
         inventoryId,
-        withdrawnBy,
+        reason,
+        employeeId: empId,
         quantity,
         dateWithdrawn: new Date(),
       },
@@ -622,6 +638,11 @@ const getSupplierOrders = async (req, res) => {
             status: true,
           },
         },
+        supplier: {
+          select: {
+            name: true,
+          },
+        },
       },
     });
 
@@ -639,6 +660,7 @@ const getSupplierOrders = async (req, res) => {
       orderStatus: order.status,
       inventoryStatus: order.inventory.status,
       packageId: order.packageId, // Include the packageId field here
+      supplierName: order.supplier.name,
     }));
 
     // Send the data to the frontend
@@ -1274,7 +1296,7 @@ const listInventoryPackages = async (req, res) => {
 
 const addPackage = async (req, res) => {
   try {
-    const { packageId, dateReceived, expiryDate } = req.body;
+    const { packageId, dateReceived, expiryDate, empId } = req.body;
 
     if (!packageId || !dateReceived) {
       return res.status(400).json({
@@ -1346,7 +1368,7 @@ const addPackage = async (req, res) => {
       }
 
       // Create a new batch in StockBatch
-      const newBatch = await prisma.stockBatch.create({
+      await prisma.stockBatch.create({
         data: {
           batchNumber,
           inventoryId: parseInt(inventoryId, 10),
@@ -1382,6 +1404,7 @@ const addPackage = async (req, res) => {
           inventoryId: parseInt(inventoryId, 10),
           quantityBought: quantityOrdered,
           supplierId,
+          employeeId: empId,
           cost: quantityOrdered * inventoryItem.pricePerUnit,
           pricePerUnit: inventoryItem.pricePerUnit,
         },

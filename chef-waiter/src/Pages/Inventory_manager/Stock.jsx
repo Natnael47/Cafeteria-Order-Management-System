@@ -17,7 +17,7 @@ const Stock = () => {
         supplier: "", // For stock in
         expiryDate: "", // For stock in
         dateReceived: "", // For stock in
-        withdrawnBy: "", // For stock out
+        reason: "", // For stock out
         dateWithdrawn: "", // For stock out
     });
 
@@ -57,7 +57,7 @@ const Stock = () => {
             supplier: item.supplier || "", // Set default supplier from the selected item
             dateReceived: today.toISOString().split("T")[0], // Default to today's date
             expiryDate: twoMonthsFromToday.toISOString().split("T")[0], // Default to two months from today
-            withdrawnBy: "",
+            reason: "",
             dateWithdrawn: today.toISOString().split("T")[0], // Default to today's date
         }); // Reset form data
     };
@@ -120,7 +120,7 @@ const Stock = () => {
     const onRemoveStockHandler = async (event) => {
         event.preventDefault();
 
-        if (selectedItem && formData.stockAmount > 0 && formData.withdrawnBy) {
+        if (selectedItem && formData.stockAmount > 0 && formData.reason) {
             const removedStock = parseInt(formData.stockAmount);
             if (removedStock > selectedItem.quantity) {
                 toast.error("Insufficient stock available.");
@@ -129,7 +129,7 @@ const Stock = () => {
 
             const formDataToSend = {
                 inventoryId: selectedItem.id,
-                withdrawnBy: formData.withdrawnBy,
+                reason: formData.reason,
                 quantity: removedStock,
                 dateWithdrawn: formData.dateWithdrawn || new Date().toISOString(),
             };
@@ -158,7 +158,7 @@ const Stock = () => {
                 toast.error(`Error: ${error.message}`);
             }
         } else {
-            toast.error("Please enter a valid quantity and withdrawn by.");
+            toast.error("Please enter a valid quantity and Reason.");
         }
     };
 
@@ -171,7 +171,7 @@ const Stock = () => {
             supplier: "",
             expiryDate: "",
             dateReceived: "",
-            withdrawnBy: "",
+            reason: "",
             dateWithdrawn: "",
         });
     };
@@ -614,24 +614,31 @@ const Stock = () => {
                                                         className="p-3 border rounded-md w-full focus:ring focus:ring-red-300 focus:outline-none"
                                                     />
                                                 </div>
-                                                {/* Withdrawn By */}
+                                                {/* Withdraw Reason */}
                                                 <div className="sm:col-span-2">
                                                     <label
-                                                        htmlFor="withdrawnBy"
+                                                        htmlFor="reason"
                                                         className="block text-sm font-medium text-gray-700 mb-1"
                                                     >
-                                                        Withdrawn By
+                                                        Withdraw Reason
                                                     </label>
-                                                    <input
-                                                        id="withdrawnBy"
-                                                        type="text"
-                                                        name="withdrawnBy"
-                                                        value={formData.withdrawnBy}
+                                                    <select
+                                                        id="reason"
+                                                        name="reason"
+                                                        value={formData.reason}
                                                         onChange={onChangeHandler}
                                                         className="p-3 border rounded-md w-full focus:ring focus:ring-red-300 focus:outline-none"
-                                                        placeholder="Enter name"
-                                                    />
+                                                    >
+                                                        <option value="" disabled>
+                                                            Select reason
+                                                        </option>
+                                                        <option value="damaged">Damaged</option>
+                                                        <option value="request">Request</option>
+                                                        <option value="expired">Expired</option>
+                                                        <option value="other">Other</option>
+                                                    </select>
                                                 </div>
+
                                             </div>
                                             {/* Action Buttons */}
                                             <div className="flex justify-end gap-3 mt-4">

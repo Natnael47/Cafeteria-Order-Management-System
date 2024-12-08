@@ -53,7 +53,8 @@ const InventoryContextProvide = (props) => {
                 headers: { iToken },
             });
             if (response.data.success) {
-                setOrderList(response.data.data); // Update the state with fetched order data
+                setOrderList(response.data.data);
+                console.log(response.data.data);
 
             } else {
                 toast.error("Error fetching inventory orders");
