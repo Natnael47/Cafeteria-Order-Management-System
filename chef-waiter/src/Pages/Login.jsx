@@ -48,9 +48,9 @@ const Login = () => {
     return (
         <form
             onSubmit={onSubmitHandler}
-            className="min-h-screen flex items-center justify-center bg-gradient-to-br from-green-300 via-blue-500 to-green-300 px-4"
+            className="min-h-screen flex items-center justify-center bg-gradient-to-br from-[#22c55edc] via-primary to-[#22c571] px-4"
         >
-            <div className="flex flex-col gap-6 p-8 sm:p-10 bg-white rounded-3xl shadow-2xl max-w-sm w-full">
+            <div className="flex flex-col gap-6 p-8 sm:p-10 bg-white rounded-xl shadow-2xl max-w-sm w-full">
                 {/* Title */}
                 <h1 className="text-2xl font-extrabold text-gray-800 text-center">
                     <span className="text-green-600">{state}</span> Login
@@ -61,7 +61,7 @@ const Login = () => {
                     <label className="block text-gray-700 font-medium mb-2">Email</label>
                     <input
                         onChange={(e) => setEmail(e.target.value)}
-                        className="w-full px-4 py-3 text-gray-700 bg-gray-50 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-green-500 focus:outline-none placeholder-gray-400"
+                        className="w-full px-4 py-3 text-gray-700 bg-gray-50 border border-gray-300 rounded-lg focus:ring-1 focus:ring-green-500 focus:border-green-500 focus:outline-none placeholder-gray-400"
                         placeholder="Enter your email"
                         type="email"
                         value={email}
@@ -75,7 +75,7 @@ const Login = () => {
                     <div className="relative">
                         <input
                             onChange={(e) => setPassword(e.target.value)}
-                            className="w-full px-4 py-3 text-gray-700 bg-gray-50 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-green-500 focus:outline-none placeholder-gray-400"
+                            className="w-full px-4 py-3 text-gray-700 bg-gray-50 border border-gray-300 rounded-lg focus:ring-1 focus:ring-green-500 focus:border-green-500 focus:outline-none placeholder-gray-400"
                             placeholder="Enter your password"
                             type={showPassword ? "text" : "password"}
                             value={password}
@@ -104,7 +104,7 @@ const Login = () => {
                         <>
                             Inventory Manager Login?{" "}
                             <span
-                                className="text-green-600 font-medium cursor-pointer hover:underline"
+                                className="text-indigo-500 font-medium cursor-pointer hover:underline"
                                 onClick={() => setState("Inventory Manager")}
                             >
                                 Click here
@@ -114,7 +114,7 @@ const Login = () => {
                         <>
                             Chef Login?{" "}
                             <span
-                                className="text-green-600 font-medium cursor-pointer hover:underline"
+                                className="text-indigo-500 font-medium cursor-pointer hover:underline"
                                 onClick={() => setState("Chef")}
                             >
                                 Click here

@@ -44,7 +44,7 @@ const Login = () => {
                     <div className="mb-5">
                         <label className="block text-sm font-semibold text-gray-700 mb-2">Email Address</label>
                         <input
-                            className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 outline-none transition duration-200"
+                            className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-1 focus:ring-green-500 focus:border-green-500 focus:outline-none transition duration-200"
                             onChange={(e) => setEmail(e.target.value)}
                             value={email}
                             type="email"
@@ -58,7 +58,7 @@ const Login = () => {
                         <label className="block text-sm font-semibold text-gray-700 mb-2">Password</label>
                         <div className="relative">
                             <input
-                                className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 outline-none transition duration-200"
+                                className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-1 focus:ring-green-500 focus:border-green-500 focus:outline-none transition duration-200"
                                 onChange={(e) => setPassword(e.target.value)}
                                 value={password}
                                 type={showPassword ? 'text' : 'password'}

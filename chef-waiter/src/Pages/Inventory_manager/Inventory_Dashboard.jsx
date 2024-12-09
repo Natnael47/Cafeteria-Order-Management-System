@@ -1,6 +1,6 @@
 import axios from 'axios';
 import 'chart.js/auto'; // Required for Chart.js
-import { ArrowDownUp, CircleDollarSign, ShieldQuestion, ShoppingBag } from 'lucide-react';
+import { ArrowDownUp, ChartNoAxesCombined, ChartPie, CircleDollarSign, List, ShieldQuestion, ShoppingBag } from 'lucide-react';
 import React, { useContext, useEffect, useState } from 'react';
 import { Bar, Line, Pie } from 'react-chartjs-2';
 import { backendUrl } from '../../App';
@@ -34,7 +34,7 @@ const Inventory_Dashboard = () => {
         return <div>Loading...</div>;
     }
 
-    const { KPIs, graphs, requestsAndWithdrawals, latestUpdatedItems } = dashboardData;
+    const { KPIs, graphs, requestsAndWithdrawals, latestUpdatedItems, supplierPerformance } = dashboardData;
 
     const inventoryItems = showAllInventory
         ? dashboardData.inventoryOverview
@@ -64,8 +64,17 @@ const Inventory_Dashboard = () => {
         ],
     };
 
+    // Create a map of supplierId to supplierName
+    const supplierMap = supplierPerformance.reduce((acc, supplier) => {
+        acc[supplier.id] = supplier.name;
+        return acc;
+    }, {});
+
+    // Prepare the data for the expenditure by supplier chart
     const expenditureBySupplierData = {
-        labels: graphs.expenditureBySupplier.map((item) => item.supplierId),
+        labels: graphs.expenditureBySupplier.map((item) =>
+            supplierMap[item.supplierId] || `Supplier ${item.supplierId}` // Use the name or default to Supplier ID
+        ),
         datasets: [
             {
                 label: 'Expenditure by Supplier',
@@ -74,6 +83,10 @@ const Inventory_Dashboard = () => {
             },
         ],
     };
+
+    // Debugging: Log the final data structure
+    console.log('Expenditure by Supplier Data:', expenditureBySupplierData);
+
 
     return (
         <div className="m-5 w-full max-w-6.5xl">
@@ -106,8 +119,8 @@ const Inventory_Dashboard = () => {
 
             <div className='bg-white rounded-lg shadow-lg max-h-[72vh] overflow-scroll'>
                 {/* Inventory Overview Section */}
-                <div className="mb-5 bg-white shadow-lg rounded-lg overflow-hidden p-6">
-                    <h2 className="text-2xl font-bold mb-4 text-gray-700">Inventory Overview</h2>
+                <div className="mb-5 bg-gradient-to-r from-gray-50 to-white shadow-lg rounded-xl overflow-hidden p-6 transition-transform hover:scale-105">
+                    <h2 className="text-2xl font-semibold mb-4 text-gray-800">Inventory Overview</h2>
                     <div className="overflow-x-auto">
                         <table className="table-auto w-full text-left whitespace-nowrap">
                             <thead>
@@ -122,40 +135,71 @@ const Inventory_Dashboard = () => {
                                 </tr>
                             </thead>
                             <tbody className="divide-y divide-gray-200">
-                                {inventoryItems.map((item, index) => (
-                                    <tr key={index} className="hover:bg-gray-50 transition duration-300">
-                                        <td className="px-6 py-4 font-medium text-gray-700">{item.name}</td>
-                                        <td className="px-6 py-4 text-gray-600">{item.category}</td>
-                                        <td className="px-6 py-4 text-gray-600">{item.quantity}</td>
-                                        <td className="px-6 py-4 text-gray-600">{item.unit}</td>
-                                        <td className="px-6 py-4 text-gray-600">Rs. {item.pricePerUnit}</td>
-                                        <td className="px-6 py-4">
-                                            <span
-                                                className={`px-3 py-1 rounded-full text-sm font-semibold ${item.status === 'In Stock'
-                                                    ? 'bg-green-100 text-green-700'
-                                                    : item.status === 'Low Stock'
-                                                        ? 'bg-yellow-100 text-yellow-700'
-                                                        : 'bg-red-100 text-red-700'
-                                                    }`}
-                                            >
-                                                {item.status}
-                                            </span>
-                                        </td>
-                                        <td className="px-6 py-4 text-gray-600">{item.expiryDate}</td>
-                                    </tr>
-                                ))}
+                                {inventoryItems.map((item, index) => {
+                                    const expiryDate = new Date(item.expiryDate);
+                                    const today = new Date();
+                                    const timeDiff = expiryDate - today;
+                                    const daysLeft = Math.ceil(timeDiff / (1000 * 60 * 60 * 24));
+                                    const monthsLeft = Math.floor(daysLeft / 30);
+                                    const yearsLeft = Math.floor(daysLeft / 365);
+
+                                    const isCloseToExpiry = daysLeft <= 30; // Highlight if less than 30 days left
+                                    const timeLeft =
+                                        yearsLeft > 0
+                                            ? `${yearsLeft} year${yearsLeft > 1 ? 's' : ''} left`
+                                            : monthsLeft > 0
+                                                ? `${monthsLeft} month${monthsLeft > 1 ? 's' : ''} left`
+                                                : `${daysLeft} day${daysLeft > 1 ? 's' : ''} left`;
+
+                                    return (
+                                        <tr key={index} className="hover:bg-gray-50 transition duration-300">
+                                            <td className="px-6 py-4 font-medium text-gray-700">{item.name}</td>
+                                            <td className="px-6 py-4 text-gray-600">{item.category}</td>
+                                            <td className="px-6 py-4 text-gray-600">{item.quantity}</td>
+                                            <td className="px-6 py-4 text-gray-600">{item.unit}</td>
+                                            <td className="px-6 py-4 text-gray-600">Etb. {item.pricePerUnit}</td>
+                                            <td className="px-6 py-4">
+                                                <span
+                                                    className={`px-3 py-1 rounded-full text-sm font-semibold ${item.status === 'In Stock'
+                                                        ? 'bg-green-100 text-green-700'
+                                                        : item.status === 'Low Stock'
+                                                            ? 'bg-yellow-100 text-yellow-700'
+                                                            : 'bg-red-100 text-red-700'
+                                                        }`}
+                                                >
+                                                    {item.status}
+                                                </span>
+                                            </td>
+                                            <td className="px-6 py-4">
+                                                <span
+                                                    className={`text-sm font-semibold ${isCloseToExpiry
+                                                        ? 'text-red-600 font-bold'
+                                                        : 'text-gray-600'
+                                                        }`}
+                                                >
+                                                    {expiryDate.toLocaleDateString('en-US', {
+                                                        weekday: 'short',
+                                                        day: 'numeric',
+                                                        year: 'numeric',
+                                                    })} ({timeLeft})
+                                                </span>
+                                            </td>
+                                        </tr>
+                                    );
+                                })}
                             </tbody>
                         </table>
                     </div>
                     <div className="text-center mt-4">
                         <button
-                            className="bg-blue-500 hover:bg-blue-600 text-white font-semibold px-2 py-2 rounded-full shadow-md transition-transform transform hover:scale-105"
+                            className="bg-blue-500 hover:bg-blue-600 text-white font-semibold px-4 py-2 rounded-full shadow-md transition-transform transform hover:scale-105"
                             onClick={() => setShowAllInventory(!showAllInventory)}
                         >
                             {showAllInventory ? 'Show Latest 6' : 'Show All'}
                         </button>
                     </div>
                 </div>
+
 
                 {/* Main Container for All Sections */}
                 <div className="grid grid-cols-1 gap-6 p-6 bg-gray-50 rounded-lg shadow-md">
@@ -166,7 +210,7 @@ const Inventory_Dashboard = () => {
                         {/* Pending Requests Section */}
                         <div className="p-6 bg-white shadow-lg rounded-lg transition-transform hover:scale-105">
                             <h2 className="text-xl font-bold mb-4 text-gray-700 flex items-center">
-                                <span className="mr-2">📋</span> Pending Requests
+                                <span className="mr-2"><List /></span> Pending Requests
                             </h2>
                             <div className="overflow-auto max-h-80">
                                 <table className="w-full table-auto border-collapse">
@@ -193,7 +237,7 @@ const Inventory_Dashboard = () => {
                         {/* Inventory by Category Chart */}
                         <div className="p-6 bg-white shadow-lg rounded-lg transition-transform hover:scale-105">
                             <h2 className="text-xl font-bold text-gray-700 mb-4 flex items-center">
-                                <span className="mr-2">📊</span> Inventory by Category
+                                <span className="mr-2"><ChartPie /></span> Inventory by Category
                             </h2>
                             <div className="h-80 flex items-center justify-center">
                                 <Pie
@@ -219,58 +263,114 @@ const Inventory_Dashboard = () => {
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
 
                         {/* Stock Trends Line Chart */}
-                        <div className="p-6 bg-white shadow-lg rounded-lg transition-transform hover:scale-105">
-                            <h2 className="text-xl font-bold text-gray-700 mb-4 flex items-center">
-                                <span className="mr-2">📈</span> Stock Trends
+                        <div className="p-6 bg-white shadow-xl rounded-lg transition-transform hover:scale-105 hover:shadow-2xl">
+                            <h2 className="text-2xl font-bold text-black mb-4 flex items-center">
+                                <span className="mr-3 text-black">
+                                    <ChartNoAxesCombined />
+                                </span>
+                                Stock Trends
                             </h2>
-                            <div className="h-80">
+                            <div className="h-80 bg-white rounded-lg p-4">
                                 <Line
-                                    data={stockTrendsData}
+                                    data={{
+                                        ...stockTrendsData,
+                                        labels: stockTrendsData.labels.map(date =>
+                                            new Date(date).toLocaleDateString('en-US', { year: 'numeric', month: 'short', day: 'numeric' })
+                                        ), // Convert dates to a readable format
+                                    }}
                                     options={{
                                         scales: {
                                             x: {
                                                 grid: { display: false },
-                                                ticks: { color: '#4B5563' }
+                                                ticks: { color: '#6B7280', font: { size: 12 } },
                                             },
                                             y: {
-                                                ticks: { color: '#4B5563' }
-                                            }
+                                                ticks: { color: '#6B7280', font: { size: 12 } },
+                                                grid: {
+                                                    color: '#E5E7EB',
+                                                    borderDash: [5, 5],
+                                                },
+                                            },
                                         },
                                         plugins: {
                                             legend: {
-                                                display: false
-                                            }
+                                                display: true,
+                                                labels: {
+                                                    color: '#374151',
+                                                    font: { size: 14 },
+                                                },
+                                            },
+                                            tooltip: {
+                                                backgroundColor: '#4B5563',
+                                                titleColor: '#FFFFFF',
+                                                bodyColor: '#FFFFFF',
+                                                cornerRadius: 8,
+                                                padding: 12,
+                                            },
                                         },
-                                        maintainAspectRatio: false
+                                        maintainAspectRatio: false,
                                     }}
                                 />
                             </div>
                         </div>
 
                         {/* Expenditure by Supplier Bar Chart */}
-                        <div className="p-6 bg-white shadow-lg rounded-lg transition-transform hover:scale-105">
-                            <h2 className="text-xl font-bold text-gray-700 mb-4 flex items-center">
-                                <span className="mr-2">💰</span> Expenditure by Supplier
+                        <div className="p-6 bg-white shadow-xl rounded-lg transform transition duration-300 hover:scale-105 hover:shadow-2xl">
+                            <h2 className="text-2xl font-extrabold text-gray-800 mb-6 flex items-center justify-between">
+                                <span className="flex items-center">
+                                    <CircleDollarSign className="text-green-500 w-8 h-8 mr-3" />
+                                    Expenditure by Supplier
+                                </span>
                             </h2>
                             <div className="h-80">
                                 <Bar
-                                    data={expenditureBySupplierData}
+                                    data={{
+                                        ...expenditureBySupplierData,
+                                        datasets: [
+                                            {
+                                                ...expenditureBySupplierData.datasets[0],
+                                                backgroundColor: expenditureBySupplierData.labels.map(
+                                                    (_, idx) =>
+                                                        `hsl(${(idx * 360) / expenditureBySupplierData.labels.length}, 70%, 60%)`
+                                                ),
+                                            },
+                                        ],
+                                    }}
                                     options={{
                                         plugins: {
                                             legend: {
                                                 position: 'top',
-                                                labels: { color: '#4B5563' }
-                                            }
+                                                labels: {
+                                                    color: '#374151',
+                                                    font: { size: 14, family: 'Poppins' },
+                                                },
+                                            },
+                                            tooltip: {
+                                                backgroundColor: '#374151',
+                                                titleColor: '#F9FAFB',
+                                                bodyColor: '#F9FAFB',
+                                            },
                                         },
                                         scales: {
                                             x: {
-                                                ticks: { color: '#4B5563' }
+                                                grid: { display: false },
+                                                ticks: {
+                                                    color: '#374151',
+                                                    font: { size: 12, family: 'Poppins' },
+                                                },
                                             },
                                             y: {
-                                                ticks: { color: '#4B5563' }
-                                            }
+                                                grid: {
+                                                    color: '#E5E7EB',
+                                                    borderDash: [5, 5],
+                                                },
+                                                ticks: {
+                                                    color: '#374151',
+                                                    font: { size: 12, family: 'Poppins' },
+                                                },
+                                            },
                                         },
-                                        maintainAspectRatio: false
+                                        maintainAspectRatio: false,
                                     }}
                                 />
                             </div>
