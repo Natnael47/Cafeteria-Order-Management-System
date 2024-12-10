@@ -126,7 +126,8 @@ const getUserProfile = async (req, res) => {
 
 // Update user profile
 const updateUserProfile = async (req, res) => {
-  const { userId, firstName, lastName, gender, address, dob, phone } = req.body;
+  const { userId, firstName, lastName, email, gender, address, dob, phone } =
+    req.body;
 
   try {
     // Fetch existing user data
@@ -140,10 +141,30 @@ const updateUserProfile = async (req, res) => {
         .json({ success: false, message: "User not found" });
     }
 
+    // Validate and check if email is being updated
+    if (email && email !== existingUser.email) {
+      if (!validator.isEmail(email)) {
+        return res.status(400).json({
+          success: false,
+          message: "Invalid email format",
+        });
+      }
+
+      // Check if email is already in use
+      const emailExists = await prisma.user.findUnique({ where: { email } });
+      if (emailExists) {
+        return res.status(400).json({
+          success: false,
+          message: "Email is already in use",
+        });
+      }
+    }
+
     // Merge existing data with new data, prioritizing new data
     const updatedData = {
       firstName: firstName || existingUser.firstName,
       lastName: lastName || existingUser.lastName,
+      email: email || existingUser.email, // Update email if provided
       gender: gender || existingUser.gender,
       dob: dob || existingUser.dob,
       phone: phone || existingUser.phone,
@@ -171,6 +192,61 @@ const updateUserProfile = async (req, res) => {
     res.status(500).json({
       success: false,
       message: "An error occurred while updating the profile",
+    });
+  }
+};
+
+// Change user password
+const changePassword = async (req, res) => {
+  const { userId, currentPassword, newPassword } = req.body;
+
+  try {
+    // Fetch the user
+    const user = await prisma.user.findUnique({
+      where: { id: parseInt(userId, 10) },
+    });
+
+    if (!user) {
+      return res
+        .status(404)
+        .json({ success: false, message: "User not found" });
+    }
+
+    // Verify current password
+    const isMatch = await bcrypt.compare(currentPassword, user.password);
+    if (!isMatch) {
+      return res
+        .status(401)
+        .json({ success: false, message: "Current password is incorrect" });
+    }
+
+    // Validate new password
+    if (newPassword.length < 8) {
+      return res.status(400).json({
+        success: false,
+        message: "New password must be at least 8 characters long",
+      });
+    }
+
+    // Hash the new password
+    const salt = await bcrypt.genSalt(10);
+    const hashedNewPassword = await bcrypt.hash(newPassword, salt);
+
+    // Update password in the database
+    await prisma.user.update({
+      where: { id: parseInt(userId, 10) },
+      data: { password: hashedNewPassword },
+    });
+
+    res.json({
+      success: true,
+      message: "Password updated successfully",
+    });
+  } catch (error) {
+    console.error("Error changing password:", error);
+    res.status(500).json({
+      success: false,
+      message: "An error occurred while changing the password",
     });
   }
 };
@@ -206,4 +282,11 @@ const allUsers = async (req, res) => {
   }
 };
 
-export { allUsers, getUserProfile, loginUser, registerUser, updateUserProfile };
+export {
+  allUsers,
+  changePassword,
+  getUserProfile,
+  loginUser,
+  registerUser,
+  updateUserProfile,
+};

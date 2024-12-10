@@ -1,31 +1,45 @@
-import axios from 'axios';
-import React, { useContext, useEffect, useState } from 'react';
-import { toast } from 'react-toastify';
-import { backendUrl } from '../App';
-import { StoreContext } from '../context/StoreContext';
+import axios from "axios";
+import React, { useContext, useEffect, useState } from "react";
+import { toast } from "react-toastify";
+import { backendUrl } from "../App";
+import { StoreContext } from "../context/StoreContext";
 
 const MyProfile = () => {
     const { userData, setUserData, token, loadUserProfileData } = useContext(StoreContext);
     const [isEdit, setIsEdit] = useState(false);
-    const [editedData, setEditedData] = useState({});
+    const [isChangePassword, setIsChangePassword] = useState(false);
+    const [isViewProfile, setIsViewProfile] = useState(false);
+    const [isUpdateAddress, setIsUpdateAddress] = useState(false);
 
+    const [editedData, setEditedData] = useState({});
+    const [passwordData, setPasswordData] = useState({
+        oldPassword: "",
+        newPassword: "",
+        confirmPassword: "",
+    });
+    const [updatedAddress, setUpdatedAddress] = useState({
+        line1: "",
+        line2: "",
+    });
+
+    // Load user data into the state when component mounts
     useEffect(() => {
-        setEditedData({ ...userData, phone: userData.phone || '' }); // Ensures phone is initialized
+        console.log("User Data:", userData); // Debug log
+        setEditedData({
+            firstName: userData.firstName || "",
+            lastName: userData.lastName || "",
+            email: userData.email || "",
+            gender: userData.gender || "",
+            phone: userData.phone || "",
+            dob: userData.dob || "",
+            address: userData.address || { line1: "", line2: "" },
+        });
+        setUpdatedAddress(userData.address || { line1: "", line2: "" });
     }, [userData]);
 
 
-    // Function to check if there are any changes
-    const hasChanges = () => {
-        return JSON.stringify(editedData) !== JSON.stringify(userData);
-    };
-
-    const updateUserProfileData = async () => {
-        if (!hasChanges()) {
-            toast.info("No changes detected");
-            setIsEdit(false);
-            return;
-        }
-
+    // Handle profile edit submission
+    const handleProfileEdit = async () => {
         try {
             const { data } = await axios.post(
                 `${backendUrl}/api/user/update-profile`,
@@ -36,156 +50,268 @@ const MyProfile = () => {
             if (data.success) {
                 toast.success(data.message);
                 await loadUserProfileData();
-                setUserData(editedData);  // Update userData to reflect saved changes
                 setIsEdit(false);
             } else {
                 toast.error(data.message);
             }
         } catch (error) {
-            console.error("Error updating profile:", error);
             toast.error("An error occurred while updating the profile.");
         }
     };
 
-    return userData && (
-        <div className="max-w-lg mx-auto p-6 border-2 border-green-500 mt-5 rounded-2xl flex flex-col items-center gap-6 text-sm shadow-lg bg-gradient-to-br from-white via-gray-100 to-green-50">
+    // Handle password change submission
+    const handlePasswordChange = async () => {
+        if (passwordData.newPassword !== passwordData.confirmPassword) {
+            toast.error("Passwords do not match!");
+            return;
+        }
 
-            {/* User Information Title */}
-            <p className="text-lg font-bold text-green-600 underline tracking-widest">USER INFORMATION</p>
+        try {
+            const { data } = await axios.post(
+                `${backendUrl}/api/user/change-password`,
+                {
+                    oldPassword: passwordData.oldPassword,
+                    newPassword: passwordData.newPassword,
+                },
+                { headers: { token } }
+            );
 
-            {isEdit ? (
-                <div className="flex gap-4 mt-2">
-                    <input
-                        className='bg-white text-3xl font-semibold max-w-52 border-2 border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-green-400'
-                        type='text'
-                        value={editedData.firstName || ''}
-                        onChange={(e) => setEditedData(prev => ({ ...prev, firstName: e.target.value }))}
-                        placeholder="First Name"
-                    />
-                    <input
-                        className='bg-white text-3xl font-semibold max-w-52 border-2 border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-green-400'
-                        type='text'
-                        value={editedData.lastName || ''}
-                        onChange={(e) => setEditedData(prev => ({ ...prev, lastName: e.target.value }))}
-                        placeholder="Last Name"
-                    />
-                </div>
-            ) : (
-                <p className='font-bold text-3xl text-gray-800 mt-2 text-center'>{`${userData.firstName} ${userData.lastName}`}</p>
-            )}
+            if (data.success) {
+                toast.success(data.message);
+                setPasswordData({ oldPassword: "", newPassword: "", confirmPassword: "" });
+                setIsChangePassword(false);
+            } else {
+                toast.error(data.message);
+            }
+        } catch (error) {
+            toast.error("An error occurred while changing the password.");
+        }
+    };
 
-            <hr className='bg-green-300 h-[1px] border-none w-full' />
+    // Handle address update submission
+    const handleAddressUpdate = async () => {
+        try {
+            const { data } = await axios.post(
+                `${backendUrl}/api/user/update-address`,
+                updatedAddress,
+                { headers: { token } }
+            );
 
-            {/* Contact Information */}
-            <div className="w-full">
-                <p className='text-lg font-bold text-green-600 underline tracking-widest mt-3'>CONTACT INFORMATION</p>
-                <div className='grid grid-cols-[1fr_3fr] gap-y-3 mt-3 text-gray-700'>
-                    <p className='font-semibold'>Email:</p>
-                    <p className='text-blue-600'>{userData.email}</p>
+            if (data.success) {
+                toast.success(data.message);
+                await loadUserProfileData();
+                setIsUpdateAddress(false);
+            } else {
+                toast.error(data.message);
+            }
+        } catch (error) {
+            toast.error("An error occurred while updating the address.");
+        }
+    };
 
-                    <p className='font-semibold'>Phone:</p>
-                    {isEdit ? (
-                        <div className="flex items-center border-2 border-gray-300 rounded-lg px-3 py-2 focus-within:ring-2 focus-within:ring-green-400">
-                            <span className="text-gray-500 font-medium text-lg">+251</span>
-                            <input
-                                id="phone-input"
-                                className="flex-1 outline-none border-none text-lg pl-2"
-                                type="text"
-                                placeholder="912345678"
-                                value={editedData.phone?.startsWith("+251") ? editedData.phone.slice(5) : editedData.phone || ''}
-                                onChange={(e) => {
-                                    let value = e.target.value.replace(/\D/g, "").slice(0, 9);
-                                    setEditedData(prev => ({ ...prev, phone: `+251 ${value}` }));
-                                }}
-                                required
-                            />
-                        </div>
-                    ) : (
-                        <p className='text-blue-500'>{userData.phone}</p>
-                    )}
-
-                    <p className='font-semibold'>Address:</p>
-                    <div className={`flex flex-col ${isEdit ? 'gap-2' : 'gap-1'}`}>
-                        {isEdit ? (
-                            <>
-                                <input
-                                    className='bg-white border-2 border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-green-400'
-                                    onChange={(e) => setEditedData(prev => ({ ...prev, address: { ...prev.address, line1: e.target.value } }))}
-                                    value={editedData.address?.line1 || ''}
-                                    type="text"
-                                    placeholder="Address Line 1"
-                                />
-                                <input
-                                    className='bg-white border-2 border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-green-400'
-                                    onChange={(e) => setEditedData(prev => ({ ...prev, address: { ...prev.address, line2: e.target.value } }))}
-                                    value={editedData.address?.line2 || ''}
-                                    type="text"
-                                    placeholder="Address Line 2"
-                                />
-                            </>
-                        ) : (
-                            <p className='text-gray-500'>
-                                {userData.address?.line1}<br />{userData.address?.line2}
-                            </p>
-                        )}
-                    </div>
-                </div>
+    return (
+        <div className="flex h-screen">
+            {/* Sidebar Navigation */}
+            <div className="w-1/10 flex flex-col p-4 gap-4">
+                <button
+                    className={`py-3 px-4 rounded-lg border text-green-700 font-semibold transition-colors ${isEdit ? "bg-green-100" : "hover:bg-green-50"}`}
+                    onClick={() => {
+                        setIsEdit(true);
+                        setIsChangePassword(false);
+                        setIsViewProfile(false);
+                        setIsUpdateAddress(false);
+                    }}
+                >
+                    Edit Profile
+                </button>
+                <button
+                    className={`py-3 px-4 rounded-lg border text-green-700 font-semibold transition-colors ${isChangePassword ? "bg-green-100" : "hover:bg-green-50"}`}
+                    onClick={() => {
+                        setIsEdit(false);
+                        setIsChangePassword(true);
+                        setIsViewProfile(false);
+                        setIsUpdateAddress(false);
+                    }}
+                >
+                    Change Password
+                </button>
+                <button
+                    className={`py-3 px-4 rounded-lg border text-green-700 font-semibold transition-colors ${isViewProfile ? "bg-green-100" : "hover:bg-green-50"}`}
+                    onClick={() => {
+                        setIsViewProfile(true);
+                        setIsEdit(false);
+                        setIsChangePassword(false);
+                        setIsUpdateAddress(false);
+                    }}
+                >
+                    View Profile
+                </button>
+                <button
+                    className={`py-3 px-4 rounded-lg border text-green-700 font-semibold transition-colors ${isUpdateAddress ? "bg-green-100" : "hover:bg-green-50"}`}
+                    onClick={() => {
+                        setIsUpdateAddress(true);
+                        setIsEdit(false);
+                        setIsChangePassword(false);
+                        setIsViewProfile(false);
+                    }}
+                >
+                    Update Address
+                </button>
             </div>
 
-            {/* Basic Information */}
-            <div className="w-full">
-                <p className='text-lg font-bold text-green-600 underline tracking-widest mt-3'>BASIC INFORMATION</p>
-                <div className='grid grid-cols-[1fr_3fr] gap-y-3 mt-3 text-gray-700'>
-                    <p className='font-semibold'>Gender:</p>
-                    {isEdit ? (
-                        <select
-                            className='bg-white border-2 border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-green-400'
-                            onChange={(e) => setEditedData(prev => ({ ...prev, gender: e.target.value }))}
-                            value={editedData.gender || 'Not Selected'}
-                        >
-                            <option value="Not Selected">Not Selected</option>
-                            <option value="Male">Male</option>
-                            <option value="Female">Female</option>
-                            <option value="Other">Other</option>
-                        </select>
-                    ) : (
-                        <p className='text-gray-500'>{userData.gender === 'Not Selected' ? 'Not Selected' : userData.gender}</p>
-                    )}
-
-                    <p className='font-semibold'>Birthday:</p>
-                    {isEdit ? (
+            {/* Main Content */}
+            <div className="w-9/10 p-8 bg-gray-100">
+                {/* Edit Profile Section */}
+                {isEdit && (
+                    <div className="bg-white p-8 rounded-lg shadow-lg">
+                        <h2 className="text-2xl font-bold text-green-700 mb-6">Edit Profile</h2>
                         <input
-                            className='bg-white border-2 border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-green-400'
-                            type='date'
-                            value={editedData.dob || ''}
-                            onChange={e => setEditedData(prev => ({ ...prev, dob: e.target.value }))}
+                            type="text"
+                            placeholder="First Name"
+                            className="w-full p-3 mb-4 border rounded-lg"
+                            value={editedData.firstName}
+                            onChange={(e) => setEditedData({ ...editedData, firstName: e.target.value })}
                         />
-                    ) : (
-                        <p className='text-gray-500'>{userData.dob}</p>
-                    )}
-                </div>
-            </div>
+                        <input
+                            type="text"
+                            placeholder="Last Name"
+                            className="w-full p-3 mb-4 border rounded-lg"
+                            value={editedData.lastName}
+                            onChange={(e) => setEditedData({ ...editedData, lastName: e.target.value })}
+                        />
+                        <input
+                            type="email"
+                            placeholder="Email"
+                            className="w-full p-3 mb-4 border rounded-lg"
+                            value={editedData.email}
+                            onChange={(e) => setEditedData({ ...editedData, email: e.target.value })}
+                        />
+                        <input
+                            type="text"
+                            placeholder="Gender"
+                            className="w-full p-3 mb-4 border rounded-lg"
+                            value={editedData.gender}
+                            onChange={(e) => setEditedData({ ...editedData, gender: e.target.value })}
+                        />
+                        <input
+                            type="text"
+                            placeholder="Phone"
+                            className="w-full p-3 mb-4 border rounded-lg"
+                            value={editedData.phone}
+                            onChange={(e) => setEditedData({ ...editedData, phone: e.target.value })}
+                        />
+                        <input
+                            type="date"
+                            placeholder="Date of Birth"
+                            className="w-full p-3 mb-4 border rounded-lg"
+                            value={editedData.dob}
+                            onChange={(e) => setEditedData({ ...editedData, dob: e.target.value })}
+                        />
+                        <input
+                            type="text"
+                            placeholder="Address Line 1"
+                            className="w-full p-3 mb-4 border rounded-lg"
+                            value={editedData.address.line1}
+                            onChange={(e) =>
+                                setEditedData({ ...editedData, address: { ...editedData.address, line1: e.target.value } })
+                            }
+                        />
+                        <input
+                            type="text"
+                            placeholder="Address Line 2"
+                            className="w-full p-3 mb-4 border rounded-lg"
+                            value={editedData.address.line2}
+                            onChange={(e) =>
+                                setEditedData({ ...editedData, address: { ...editedData.address, line2: e.target.value } })
+                            }
+                        />
+                        <button
+                            className="bg-green-700 text-white py-3 px-6 rounded-lg hover:bg-green-800"
+                            onClick={handleProfileEdit}
+                        >
+                            Save Changes
+                        </button>
+                    </div>
+                )}
 
-            {/* Edit/Save Button */}
-            <div className='mt-8'>
-                {isEdit ? (
-                    <button
-                        className='bg-green-500 text-white font-semibold px-8 py-2 rounded-full hover:bg-green-600 transition-transform transform hover:scale-105 shadow-md'
-                        onClick={updateUserProfileData}
-                    >
-                        Save
-                    </button>
-                ) : (
-                    <button
-                        className='bg-blue-500 text-white font-semibold px-8 py-2 rounded-full hover:bg-blue-600 transition-transform transform hover:scale-105 shadow-md'
-                        onClick={() => setIsEdit(true)}
-                    >
-                        Edit
-                    </button>
+                {/* View Profile Section */}
+                {isViewProfile && (
+                    <div className="bg-white p-8 rounded-lg shadow-lg">
+                        <h2 className="text-2xl font-bold text-green-700 mb-6">View Profile</h2>
+                        <p className="mb-4"><strong>First Name:</strong> {userData.firstName}</p>
+                        <p className="mb-4"><strong>Last Name:</strong> {userData.lastName}</p>
+                        <p className="mb-4"><strong>Email:</strong> {userData.email}</p>
+                        <p className="mb-4"><strong>Gender:</strong> {userData.gender}</p>
+                        <p className="mb-4"><strong>Phone:</strong> {userData.phone}</p>
+                        <p className="mb-4"><strong>Date of Birth:</strong> {userData.dob}</p>
+                        <p className="mb-4"><strong>Address Line 1:</strong> {userData.address?.line1}</p>
+                        <p className="mb-4"><strong>Address Line 2:</strong> {userData.address?.line2}</p>
+                    </div>
+                )}
+
+                {/* Update Address Section */}
+                {isUpdateAddress && (
+                    <div className="bg-white p-8 rounded-lg shadow-lg">
+                        <h2 className="text-2xl font-bold text-green-700 mb-6">Update Address</h2>
+                        <input
+                            type="text"
+                            placeholder="Address Line 1"
+                            className="w-full p-3 mb-4 border rounded-lg"
+                            value={updatedAddress.line1}
+                            onChange={(e) => setUpdatedAddress({ ...updatedAddress, line1: e.target.value })}
+                        />
+                        <input
+                            type="text"
+                            placeholder="Address Line 2"
+                            className="w-full p-3 mb-4 border rounded-lg"
+                            value={updatedAddress.line2}
+                            onChange={(e) => setUpdatedAddress({ ...updatedAddress, line2: e.target.value })}
+                        />
+                        <button
+                            className="bg-green-700 text-white py-3 px-6 rounded-lg hover:bg-green-800"
+                            onClick={handleAddressUpdate}
+                        >
+                            Save Address
+                        </button>
+                    </div>
+                )}
+
+                {/* Change Password Section */}
+                {isChangePassword && (
+                    <div className="bg-white p-8 rounded-lg shadow-lg">
+                        <h2 className="text-2xl font-bold text-green-700 mb-6">Change Password</h2>
+                        <input
+                            type="password"
+                            placeholder="Old Password"
+                            className="w-full p-3 mb-4 border rounded-lg"
+                            value={passwordData.oldPassword}
+                            onChange={(e) => setPasswordData({ ...passwordData, oldPassword: e.target.value })}
+                        />
+                        <input
+                            type="password"
+                            placeholder="New Password"
+                            className="w-full p-3 mb-4 border rounded-lg"
+                            value={passwordData.newPassword}
+                            onChange={(e) => setPasswordData({ ...passwordData, newPassword: e.target.value })}
+                        />
+                        <input
+                            type="password"
+                            placeholder="Confirm New Password"
+                            className="w-full p-3 mb-4 border rounded-lg"
+                            value={passwordData.confirmPassword}
+                            onChange={(e) => setPasswordData({ ...passwordData, confirmPassword: e.target.value })}
+                        />
+                        <button
+                            className="bg-green-700 text-white py-3 px-6 rounded-lg hover:bg-green-800"
+                            onClick={handlePasswordChange}
+                        >
+                            Change Password
+                        </button>
+                    </div>
                 )}
             </div>
         </div>
     );
-}
+};
 
 export default MyProfile;
