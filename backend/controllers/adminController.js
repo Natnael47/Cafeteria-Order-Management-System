@@ -10,25 +10,93 @@ const prisma = new PrismaClient();
 // Admin Dashboard Elements like (number of users, number of employees, total orders, latest orders)
 const adminDashboard = async (req, res) => {
   try {
-    // Fetch the total count of users, employees, orders, and foods
-    const [usersCount, employeesCount, ordersCount, foodsCount, latestOrders] =
-      await Promise.all([
-        prisma.user.count(),
-        prisma.employee.count(),
-        prisma.order.count(), // Get the total number of orders
-        prisma.food.count(), // Get the total number of food items
-        prisma.order.findMany({
-          orderBy: { date: "desc" },
-          take: 5, // Get the latest 5 orders
-        }),
-      ]);
+    // Fetch the total count of users, employees, orders, and foods, along with additional metrics
+    const [
+      usersCount,
+      employeesCount,
+      ordersCount,
+      foodsCount,
+      latestOrders,
+      topSellingItems,
+      recentFeedback,
+      averageUserRating,
+      returningUsersCount,
+      totalOrdersWithReturnUsers,
+      totalPreparationTime,
+      completedOrdersCount,
+      successfulPaymentsCount,
+      totalEmployeeTasks,
+    ] = await Promise.all([
+      prisma.user.count(),
+      prisma.employee.count(),
+      prisma.order.count(),
+      prisma.food.count(),
+      prisma.order.findMany({
+        orderBy: { date: "desc" },
+        take: 5, // Get the latest 5 orders
+      }),
+      prisma.orderItem.groupBy({
+        by: ["foodId"],
+        _count: { foodId: true },
+        orderBy: { _count: { foodId: "desc" } },
+        take: 5, // Top 5 selling items
+      }),
+      prisma.feedback.findMany({
+        orderBy: { date: "desc" },
+        take: 5, // Recent 5 feedback
+      }),
+      prisma.feedback.aggregate({
+        _avg: { rating: true }, // Calculate average rating
+      }),
+      prisma.user.count({
+        where: {
+          order: {
+            some: {}, // Users with at least one order
+          },
+        },
+      }),
+      prisma.order.count(), // Total orders for retention calculation
+      prisma.order.aggregate({
+        _sum: { totalPrepTime: true }, // Sum of preparation times
+      }),
+      prisma.order.count({
+        where: { status: "Completed" }, // Completed orders count
+      }),
+      prisma.payment.count({
+        where: { status: "Successful" }, // Successful payments count
+      }),
+      prisma.inventoryrequest.count(), // Total tasks handled by employees (example metric)
+    ]);
+
+    // Calculate KPIs
+    const customerRetentionRate = (
+      (returningUsersCount / usersCount) *
+      100
+    ).toFixed(2);
+    const averageFulfillmentTime = (
+      totalPreparationTime._sum.totalPrepTime / completedOrdersCount
+    ).toFixed(2);
+    const paymentCompletionRate = (
+      (successfulPaymentsCount / ordersCount) *
+      100
+    ).toFixed(2);
+    const employeeEfficiency = (totalEmployeeTasks / employeesCount).toFixed(2);
 
     const dashData = {
       users: usersCount,
       employees: employeesCount,
-      totalOrders: ordersCount, // Total number of orders
-      totalFoods: foodsCount, // Total number of food items
-      latestOrders: latestOrders, // Latest 5 orders
+      totalOrders: ordersCount,
+      totalFoods: foodsCount,
+      latestOrders: latestOrders,
+      topSellingItems: topSellingItems,
+      recentFeedback: recentFeedback,
+      averageUserRating: averageUserRating._avg.rating || 0,
+      kpis: {
+        customerRetentionRate: `${customerRetentionRate}%`,
+        averageFulfillmentTime: `${averageFulfillmentTime} mins`,
+        paymentCompletionRate: `${paymentCompletionRate}%`,
+        employeeEfficiency: `${employeeEfficiency} tasks/employee`,
+      },
     };
 
     res.json({ success: true, data: dashData });

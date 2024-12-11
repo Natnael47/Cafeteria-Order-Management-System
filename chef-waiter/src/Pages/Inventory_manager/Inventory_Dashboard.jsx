@@ -89,7 +89,7 @@ const Inventory_Dashboard = () => {
 
 
     return (
-        <div className="m-5 w-full max-w-6.5xl">
+        <div className="m-5 w-full max-w-6.5xl max-h-[90vh]">
             {/* Header */}
             <h1 className="text-2xl font-bold mb-5">Inventory Dashboard</h1>
 
@@ -117,14 +117,14 @@ const Inventory_Dashboard = () => {
                 ))}
             </div>
 
-            <div className='bg-white rounded-lg shadow-lg max-h-[72vh] overflow-scroll'>
+            <div className='bg-white rounded-lg shadow-lg max-h-[73vh] overflow-scroll'>
                 {/* Inventory Overview Section */}
-                <div className="mb-5 bg-gradient-to-r from-gray-50 to-white shadow-lg rounded-xl overflow-hidden p-6 transition-transform hover:scale-105">
+                <div className="mb-5 bg-gradient-to-r from-gray-50 to-white shadow-lg rounded-xl overflow-hidden p-6">
                     <h2 className="text-2xl font-semibold mb-4 text-gray-800">Inventory Overview</h2>
                     <div className="overflow-x-auto">
                         <table className="table-auto w-full text-left whitespace-nowrap">
                             <thead>
-                                <tr className="bg-gradient-to-r from-blue-500 to-blue-400 text-white">
+                                <tr className="bg-blue-600 text-white">
                                     <th className="px-6 py-3">Item Name</th>
                                     <th className="px-6 py-3">Category</th>
                                     <th className="px-6 py-3">Quantity</th>
