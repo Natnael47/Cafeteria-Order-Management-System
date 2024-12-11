@@ -93,7 +93,7 @@ const Login = () => {
 
                 {/* Login Button */}
                 <button
-                    className="w-full py-3 bg-green-500 text-white text-lg font-bold rounded-lg shadow-md hover:shadow-lg hover:bg-green-600 transition-all duration-300"
+                    className="w-full py-3 bg-green-600 text-white text-lg font-bold rounded-lg shadow-md hover:shadow-lg hover:bg-black transition-all duration-300"
                 >
                     Login
                 </button>
