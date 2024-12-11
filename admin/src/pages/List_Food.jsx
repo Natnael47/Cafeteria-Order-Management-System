@@ -185,7 +185,7 @@ const List = () => {
         .sort((a, b) => a.name.localeCompare(b.name));
 
     return (
-        <div className="flex flex-col m-5 max-w-6.5xl w-full">
+        <div className="m-5 w-full max-w-6.5xl max-h-[90vh]">
             {/* Header */}
             <div className="flex items-center justify-between mb-2">
                 <h1 className="text-3xl font-bold text-gray-800">Food List</h1>
@@ -226,7 +226,7 @@ const List = () => {
                     className="border border-gray-300 rounded px-4 py-2"
                 />
             </div>
-            <div className="bg-gray-100 rounded-lg w-full max-w-full max-h-[81vh] overflow-scroll shadow-lg">
+            <div className="bg-gray-100 rounded-lg w-full max-h-[84vh] overflow-scroll shadow-lg">
                 <div>
                     {/* Table Header */}
                     <div className="grid grid-cols-[0.5fr_1fr_1fr_0.8fr_0.5fr_0.5fr] items-center gap-4 p-4 border-b bg-[#22C55E] text-white text-base font-semibold">
@@ -271,7 +271,7 @@ const List = () => {
                                 {editIndex === index && (
                                     <div
                                         ref={editRef}
-                                        className="bg-white mt-2 mb-4 p-6 rounded-lg shadow-lg border border-gray-300"
+                                        className="bg-white mt-2 mb-2 p-6 rounded-lg shadow-lg border border-gray-300"
                                     >
                                         <h2 className="text-xl font-semibold mb-4 text-indigo-700">
                                             Edit Food Details
