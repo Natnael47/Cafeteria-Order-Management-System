@@ -121,7 +121,7 @@ const Users = () => {
     }, [token]);
 
     return (
-        <div className="flex flex-col m-5 w-full max-w-6.5xl max-h-[100vh]">
+        <div className="m-5 w-full max-w-6.5xl max-h-[90vh]">
             {/* Header */}
             <div className="flex items-center justify-between mb-6">
                 <h1 className="text-3xl font-bold text-gray-800">Customer</h1>
@@ -178,7 +178,7 @@ const Users = () => {
             </div>
 
             {/* the display Div */}
-            <div className="bg-[#F3F4F6] rounded w-full max-w-6.5xl max-h-[68vh] overflow-scroll">
+            <div className="bg-[#F3F4F6] rounded w-full max-w-6.5xl max-h-[72vh] overflow-scroll">
                 {currentView === "users" && (
                     <div className="bg-white shadow-md rounded-lg p-6">
                         <h2 className="text-xl font-semibold text-gray-800 mb-4">Users Data</h2>
