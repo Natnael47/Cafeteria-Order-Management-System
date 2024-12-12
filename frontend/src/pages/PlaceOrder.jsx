@@ -159,7 +159,7 @@ const PlaceOrder = () => {
                     placeholder="Email address"
                     required
                 />
-                <div className="flex items-center border border-gray-300 rounded-md px-2 py-1 focus-within:ring focus-within:ring-green-500">
+                <div className="flex bg-white items-center border border-gray-300 rounded-md px-2 py-1 focus-within:ring-1 focus-within:ring-black">
                     <span className="text-gray-500 font-medium text-lg">+251</span>
                     <input
                         className="flex-1 outline-none border-none text-lg pl-2 bg-white"
