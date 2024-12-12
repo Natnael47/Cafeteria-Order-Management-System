@@ -1,5 +1,4 @@
 import React, { useState } from "react";
-import AppDownload from "../components/AppDownload";
 import ExploreMenu from "../components/ExploreMenu";
 import Feedback from "../components/Feedback";
 import FoodDisplay from "../components/FoodDisplay";
@@ -15,7 +14,6 @@ const Home = () => {
             <ExploreMenu category={category} setCategory={setCategory} />
             <FoodDisplay category={category} />
             <ServicesSection />
-            <AppDownload />
             <Feedback />
         </div>
     );
