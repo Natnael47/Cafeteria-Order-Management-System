@@ -384,11 +384,11 @@ const InventoryOrders = () => {
                 {currentView === "request" && (
                     <>
                         {/* Request Table Header */}
-                        <div className="grid grid-cols-[2fr_1fr_2fr_2fr_1fr] bg-gradient-to-r from-gray-200 via-gray-100 to-gray-200 border-b border-gray-300 font-semibold text-gray-700 text-sm rounded-t-md">
-                            <div className="px-4 py-3 border-r border-gray-300 text-center">Request Item</div>
-                            <div className="px-4 py-3 border-r border-gray-300 text-center">Quantity</div>
-                            <div className="px-4 py-3 border-r border-gray-300 text-center">Requested By</div>
-                            <div className="px-4 py-3 border-r border-gray-300 text-center">Request Date</div>
+                        <div className="grid grid-cols-[2fr_1fr_2fr_2fr_1fr] bg-gradient-to-r from-gray-700 to-gray-500 text-white text-sm font-semibold rounded-t-md shadow-md">
+                            <div className="px-4 py-3 border-r border-gray-600 text-center">Request Item</div>
+                            <div className="px-4 py-3 border-r border-gray-600 text-center">Quantity</div>
+                            <div className="px-4 py-3 border-r border-gray-600 text-center">Requested By</div>
+                            <div className="px-4 py-3 border-r border-gray-600 text-center">Request Date</div>
                             <div className="px-4 py-3 text-center">Decision</div>
                         </div>
 
@@ -397,7 +397,8 @@ const InventoryOrders = () => {
                             requestList.map((request, index) => (
                                 <div
                                     key={index}
-                                    className={`grid grid-cols-[2fr_1fr_2fr_2fr_1fr] text-sm border-b border-gray-200 hover:bg-gray-50 ${index % 2 === 0 ? "bg-gray-50" : "bg-white"} transition duration-200`}
+                                    className={`grid grid-cols-[2fr_1fr_2fr_2fr_1fr] text-sm border-b border-gray-200 hover:bg-gray-100 transition duration-200 ${index % 2 === 0 ? "bg-gray-50" : "bg-white"
+                                        }`}
                                 >
                                     {/* Request Item */}
                                     <div className="px-4 py-3 border-r border-gray-300 text-center">
@@ -405,7 +406,9 @@ const InventoryOrders = () => {
                                     </div>
 
                                     {/* Quantity */}
-                                    <div className="px-4 py-3 border-r border-gray-300 text-center">{request.quantity}</div>
+                                    <div className="px-4 py-3 border-r border-gray-300 text-center">
+                                        {request.quantity}
+                                    </div>
 
                                     {/* Requested By */}
                                     <div className="px-4 py-3 border-r border-gray-300 text-center">
@@ -420,12 +423,11 @@ const InventoryOrders = () => {
                                     {/* Decision */}
                                     <div className="px-4 py-3 text-center">
                                         <span
-                                            className="cursor-pointer hover:scale-110 transition-transform text-green-500"
+                                            className="cursor-pointer text-green-500 hover:text-green-600 hover:scale-105 transition-transform"
                                             onClick={() => openModal(request)}
                                         >
-                                            ✔️
+                                            ✔️ Send
                                         </span>
-
                                     </div>
                                 </div>
                             ))
@@ -625,21 +627,26 @@ const InventoryOrders = () => {
                 isOpen={modalIsOpen}
                 onRequestClose={closeModal}
                 contentLabel="Confirm Request Process"
-                className="bg-white p-5 rounded shadow-md max-w-md mx-auto mt-20"
+                className="bg-white p-6 rounded-xl shadow-lg max-w-lg mx-auto mt-20 animate-fadeIn"
                 overlayClassName="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center"
             >
                 {selectedRequest && (
                     <>
-                        <h2 className="text-lg font-semibold">Confirm Send Stock</h2>
-                        <p>Are you sure you want to send the following stock?</p>
-                        <ul className="mt-4 text-sm text-gray-600">
-                            <li><strong>Item:</strong> {selectedRequest.inventory.name}</li>
-                            <li><strong>Quantity:</strong> {selectedRequest.quantity}</li>
-                            <li><strong>Requested By:</strong> {selectedRequest.employee.firstName} {selectedRequest.employee.lastName}</li>
-                            <li><strong>Request Date:</strong> {new Date(selectedRequest.dateRequested).toLocaleDateString()}</li>
-                        </ul>
-                        <div className="mt-6 flex justify-end">
-                            <button onClick={closeModal} className="bg-gray-300 px-4 py-2 rounded mr-2 hover:bg-gray-400 transition-colors">
+                        <h2 className="text-xl font-semibold text-gray-800 mb-3">Confirm Stock Dispatch</h2>
+                        <p className="text-sm text-gray-600 mb-5">Please review the details before confirming:</p>
+                        <div className="bg-gray-100 p-4 rounded-md shadow-inner mb-6">
+                            <ul className="space-y-2 text-sm text-gray-700">
+                                <li><strong>Item:</strong> {selectedRequest.inventory.name}</li>
+                                <li><strong>Quantity:</strong> {selectedRequest.quantity}</li>
+                                <li><strong>Requested By:</strong> {selectedRequest.employee.firstName} {selectedRequest.employee.lastName}</li>
+                                <li><strong>Request Date:</strong> {new Date(selectedRequest.dateRequested).toLocaleDateString()}</li>
+                            </ul>
+                        </div>
+                        <div className="flex justify-end space-x-3">
+                            <button
+                                onClick={closeModal}
+                                className="px-4 py-2 text-sm font-medium bg-gray-300 text-gray-700 rounded-md hover:bg-gray-400 transition-colors"
+                            >
                                 Cancel
                             </button>
                             <button
@@ -647,7 +654,7 @@ const InventoryOrders = () => {
                                     processInventoryRequest(selectedRequest.id, iToken);
                                     closeModal();
                                 }}
-                                className="bg-green-500 text-white px-4 py-2 rounded hover:bg-green-600 transition-colors"
+                                className="px-4 py-2 text-sm font-medium bg-green-500 text-white rounded-md hover:bg-green-600 transition-colors"
                             >
                                 Confirm
                             </button>
