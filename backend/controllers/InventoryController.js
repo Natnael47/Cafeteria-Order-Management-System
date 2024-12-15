@@ -1441,10 +1441,15 @@ const addPackage = async (req, res) => {
   }
 };
 
-// List all inventory requests
+// List all inventory requests without "Approved" status
 const listInventoryRequests = async (req, res) => {
   try {
     const inventoryRequests = await prisma.inventoryrequest.findMany({
+      where: {
+        NOT: {
+          status: "Approved",
+        },
+      },
       orderBy: { dateRequested: "asc" },
       include: {
         employee: {
@@ -1746,6 +1751,9 @@ const processInventoryRequest = async (req, res) => {
         dateWithdrawn: new Date(),
       },
     });
+
+    // Update stock percentage and status
+    await calculateStockPercentageAndStoreInStatus(inventoryId);
 
     // Update the InventoryRequest with the withdrawal log ID and status
     await prisma.inventoryrequest.update({

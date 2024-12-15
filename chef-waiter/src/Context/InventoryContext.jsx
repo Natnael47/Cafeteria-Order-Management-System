@@ -54,8 +54,7 @@ const InventoryContextProvide = (props) => {
             });
             if (response.data.success) {
                 setOrderList(response.data.data);
-                console.log(response.data.data);
-
+                //console.log(response.data.data);
             } else {
                 toast.error("Error fetching inventory orders");
             }

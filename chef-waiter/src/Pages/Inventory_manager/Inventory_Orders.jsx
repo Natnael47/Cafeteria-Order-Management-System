@@ -138,6 +138,19 @@ const InventoryOrders = () => {
         }
     };
 
+    const [modalIsOpen, setModalIsOpen] = useState(false);
+    const [selectedRequest, setSelectedRequest] = useState(null);
+
+    const openModal = (request) => {
+        setSelectedRequest(request);
+        setModalIsOpen(true);
+    };
+
+    const closeModal = () => {
+        setSelectedRequest(null);
+        setModalIsOpen(false);
+    };
+
     const [newPackageData, setNewPackageData] = useState({
         name: '',
         description: '',
@@ -208,6 +221,24 @@ const InventoryOrders = () => {
         );
     };
 
+    const processInventoryRequest = async (id, token) => {
+        try {
+            const response = await axios.post(
+                `${backendUrl}/api/inventory/send-request`,
+                { requestId: id },
+                { headers: { iToken: token } }
+            );
+            if (response.data.success) {
+                toast.success("Request processed successfully");
+                fetchInventoryRequests(); // Refresh the list
+            } else {
+                toast.error(response.data.message || "Failed to process request");
+            }
+        } catch (error) {
+            console.error("Error processing request:", error);
+            toast.error("An error occurred while processing the request.");
+        }
+    };
 
     const handlePackageClick = (orderId) => {
         setIsPackageSelectorOpen(orderId);  // Set the order ID to track which order is being modified
@@ -353,12 +384,11 @@ const InventoryOrders = () => {
                 {currentView === "request" && (
                     <>
                         {/* Request Table Header */}
-                        <div className="grid grid-cols-[2fr_1fr_2fr_2fr_1fr_1fr] bg-gradient-to-r from-gray-200 via-gray-100 to-gray-200 border-b border-gray-300 font-semibold text-gray-700 text-sm rounded-t-md">
+                        <div className="grid grid-cols-[2fr_1fr_2fr_2fr_1fr] bg-gradient-to-r from-gray-200 via-gray-100 to-gray-200 border-b border-gray-300 font-semibold text-gray-700 text-sm rounded-t-md">
                             <div className="px-4 py-3 border-r border-gray-300 text-center">Request Item</div>
                             <div className="px-4 py-3 border-r border-gray-300 text-center">Quantity</div>
                             <div className="px-4 py-3 border-r border-gray-300 text-center">Requested By</div>
                             <div className="px-4 py-3 border-r border-gray-300 text-center">Request Date</div>
-                            <div className="px-4 py-3 border-r border-gray-300 text-center">Package</div>
                             <div className="px-4 py-3 text-center">Decision</div>
                         </div>
 
@@ -367,8 +397,7 @@ const InventoryOrders = () => {
                             requestList.map((request, index) => (
                                 <div
                                     key={index}
-                                    className={`grid grid-cols-[2fr_1fr_2fr_2fr_1fr_1fr] text-sm border-b border-gray-200 hover:bg-gray-50 ${index % 2 === 0 ? "bg-gray-50" : "bg-white"
-                                        } transition duration-200`}
+                                    className={`grid grid-cols-[2fr_1fr_2fr_2fr_1fr] text-sm border-b border-gray-200 hover:bg-gray-50 ${index % 2 === 0 ? "bg-gray-50" : "bg-white"} transition duration-200`}
                                 >
                                     {/* Request Item */}
                                     <div className="px-4 py-3 border-r border-gray-300 text-center">
@@ -388,37 +417,15 @@ const InventoryOrders = () => {
                                         {new Date(request.dateRequested).toLocaleDateString()}
                                     </div>
 
-                                    {/* Package */}
-                                    <div className="px-4 py-3 border-r border-gray-300 text-center">
-                                        <div className="flex justify-center items-center gap-2">
-                                            {request.package ? (
-                                                <>
-                                                    <span className="text-gray-700">{request.package.name}</span>
-                                                    <Minus
-                                                        onClick={() => handleRemoveFromPackage(request.id)}
-                                                        className="text-red-500 cursor-pointer hover:scale-125 transition-transform"
-                                                    />
-                                                </>
-                                            ) : (
-                                                <Plus
-                                                    onClick={() => handleAddToPackage(request.id)}
-                                                    className="text-green-500 cursor-pointer hover:scale-125 transition-transform"
-                                                />
-                                            )}
-                                        </div>
-                                    </div>
-
                                     {/* Decision */}
                                     <div className="px-4 py-3 text-center">
-                                        {request.isRejected ? (
-                                            <span className="text-red-500">
-                                                ❌
-                                            </span>
-                                        ) : (
-                                            <span className="text-green-500">
-                                                ✔️
-                                            </span>
-                                        )}
+                                        <span
+                                            className="cursor-pointer hover:scale-110 transition-transform text-green-500"
+                                            onClick={() => openModal(request)}
+                                        >
+                                            ✔️
+                                        </span>
+
                                     </div>
                                 </div>
                             ))
@@ -613,6 +620,41 @@ const InventoryOrders = () => {
                     </div>
                 </Modal>
             )}
+
+            <Modal
+                isOpen={modalIsOpen}
+                onRequestClose={closeModal}
+                contentLabel="Confirm Request Process"
+                className="bg-white p-5 rounded shadow-md max-w-md mx-auto mt-20"
+                overlayClassName="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center"
+            >
+                {selectedRequest && (
+                    <>
+                        <h2 className="text-lg font-semibold">Confirm Send Stock</h2>
+                        <p>Are you sure you want to send the following stock?</p>
+                        <ul className="mt-4 text-sm text-gray-600">
+                            <li><strong>Item:</strong> {selectedRequest.inventory.name}</li>
+                            <li><strong>Quantity:</strong> {selectedRequest.quantity}</li>
+                            <li><strong>Requested By:</strong> {selectedRequest.employee.firstName} {selectedRequest.employee.lastName}</li>
+                            <li><strong>Request Date:</strong> {new Date(selectedRequest.dateRequested).toLocaleDateString()}</li>
+                        </ul>
+                        <div className="mt-6 flex justify-end">
+                            <button onClick={closeModal} className="bg-gray-300 px-4 py-2 rounded mr-2 hover:bg-gray-400 transition-colors">
+                                Cancel
+                            </button>
+                            <button
+                                onClick={() => {
+                                    processInventoryRequest(selectedRequest.id, iToken);
+                                    closeModal();
+                                }}
+                                className="bg-green-500 text-white px-4 py-2 rounded hover:bg-green-600 transition-colors"
+                            >
+                                Confirm
+                            </button>
+                        </div>
+                    </>
+                )}
+            </Modal>
 
         </div>
     );

@@ -167,7 +167,7 @@ const Inventory_Dashboard = () => {
                                                             : 'bg-red-100 text-red-700'
                                                         }`}
                                                 >
-                                                    {item.status}
+                                                    {item.status} %
                                                 </span>
                                             </td>
                                             <td className="px-6 py-4">
