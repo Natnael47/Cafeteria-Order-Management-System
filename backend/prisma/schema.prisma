@@ -170,14 +170,15 @@ model inventory {
 }
 
 model withdrawallog {
-  id            Int       @id @default(autoincrement()) // Unique identifier for each withdrawal log
-  inventoryId   Int // Foreign key to Inventory table
-  employeeId    Int? // Foreign key to Employee table (optional to allow SetNull)
-  reason        String? // Reason for withdrawal
-  quantity      Int // Quantity withdrawn
-  dateWithdrawn DateTime  @default(now()) // Date when the item was withdrawn
-  inventory     inventory @relation(fields: [inventoryId], references: [id], onDelete: Cascade) // Relationship with Inventory
-  employee      employee? @relation(fields: [employeeId], references: [id], onDelete: SetNull) // Link to Employee who made the withdrawal
+  id               Int                @id @default(autoincrement()) // Unique identifier for each withdrawal log
+  inventoryId      Int // Foreign key to Inventory table
+  employeeId       Int? // Foreign key to Employee table (optional to allow SetNull)
+  reason           String? // Reason for withdrawal
+  quantity         Int // Quantity withdrawn
+  dateWithdrawn    DateTime           @default(now()) // Date when the item was withdrawn
+  inventory        inventory          @relation(fields: [inventoryId], references: [id], onDelete: Cascade) // Relationship with Inventory
+  employee         employee?          @relation(fields: [employeeId], references: [id], onDelete: SetNull) // Link to Employee who made the withdrawal
+  inventoryrequest inventoryrequest[]
 
   @@index([inventoryId], map: "WithdrawalLog_inventoryId_fkey")
   @@index([employeeId], map: "WithdrawalLog_employeeId_fkey")
@@ -229,21 +230,23 @@ model supplierorder {
 }
 
 model inventoryrequest {
-  id            Int      @id @default(autoincrement()) // Unique identifier for each request
-  inventoryId   Int // Foreign key to Inventory table
-  employeeId    Int // Foreign key to Employee table
-  packageId     Int? // Foreign key to InventoryPackage table
-  quantity      Int // Quantity requested
-  dateRequested DateTime @default(now()) // Date of request
-  status        String   @db.VarChar(50) // Status of the request
+  id              Int      @id @default(autoincrement()) // Unique identifier for each request
+  inventoryId     Int // Foreign key to Inventory table
+  employeeId      Int // Foreign key to Employee table
+  withdrawalLogId Int? // Foreign key to WithdrawalLog table (optional)
+  quantity        Int // Quantity requested
+  dateRequested   DateTime @default(now()) // Date of request
+  status          String   @db.VarChar(50) // Status of the request
 
-  inventory inventory         @relation(fields: [inventoryId], references: [id], onDelete: Cascade)
-  employee  employee          @relation(fields: [employeeId], references: [id], map: "InventoryRequest_employeeId_fkey")
-  package   inventoryPackage? @relation(fields: [packageId], references: [id], map: "InventoryRequest_packageId_fkey")
+  inventory          inventory         @relation(fields: [inventoryId], references: [id], onDelete: Cascade)
+  employee           employee          @relation(fields: [employeeId], references: [id], map: "InventoryRequest_employeeId_fkey")
+  withdrawalLog      withdrawallog?    @relation(fields: [withdrawalLogId], references: [id], map: "InventoryRequest_withdrawalLogId_fkey") // Optional relation
+  inventoryPackage   inventoryPackage? @relation(fields: [inventoryPackageId], references: [id])
+  inventoryPackageId Int?
 
   @@index([inventoryId], map: "InventoryRequest_inventoryId_fkey")
   @@index([employeeId], map: "InventoryRequest_employeeId_fkey")
-  @@index([packageId], map: "InventoryRequest_packageId_fkey")
+  @@index([withdrawalLogId], map: "InventoryRequest_withdrawalLogId_fkey")
 }
 
 // Supplier model - Represents suppliers

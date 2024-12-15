@@ -13,6 +13,7 @@ import {
   listInventoryPackages,
   listInventoryRequests,
   listSuppliers,
+  processInventoryRequest,
   removeFromPackage,
   removeInventory,
   removeSupplier,
@@ -70,5 +71,6 @@ inventoryRoute.post("/stock-package", empAuth, addPackage);
 inventoryRoute.get("/inventory-requests", empAuth, listInventoryRequests);
 
 inventoryRoute.get("/inventory-dashboard", empAuth, getInventoryDashboardData);
+inventoryRoute.post("/send-request", empAuth, processInventoryRequest);
 
 export default inventoryRoute;

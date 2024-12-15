@@ -295,7 +295,7 @@ const requestInventoryItem = async (req, res) => {
         employeeId: empId,
         quantity: parsedQuantity,
         dateRequested: new Date(), // Current date and time
-        status: "sent", // Default status
+        status: "submitted", // Default status
       },
     });
 
@@ -1445,7 +1445,7 @@ const addPackage = async (req, res) => {
 const listInventoryRequests = async (req, res) => {
   try {
     const inventoryRequests = await prisma.inventoryrequest.findMany({
-      orderBy: { id: "desc" },
+      orderBy: { dateRequested: "asc" },
       include: {
         employee: {
           select: {
@@ -1465,7 +1465,6 @@ const listInventoryRequests = async (req, res) => {
             quantity: true,
           },
         },
-        package: true, // Fetch all fields from the package table
       },
     });
 
@@ -1643,6 +1642,134 @@ const getInventoryDashboardData = async (req, res) => {
   }
 };
 
+// Function to process inventory requests and withdraw stock
+const processInventoryRequest = async (req, res) => {
+  try {
+    const { requestId, empId } = req.body;
+
+    // Fetch the inventory request by ID
+    const inventoryRequest = await prisma.inventoryrequest.findUnique({
+      where: { id: requestId },
+      include: {
+        inventory: true,
+      },
+    });
+
+    // Check if the request exists
+    if (!inventoryRequest) {
+      return res.status(404).json({
+        success: false,
+        message: "Inventory request not found",
+      });
+    }
+
+    const { inventoryId, quantity } = inventoryRequest;
+
+    // Find the inventory item
+    const inventoryItem = await prisma.inventory.findUnique({
+      where: { id: inventoryId },
+    });
+
+    // Validate inventory availability
+    if (!inventoryItem) {
+      return res.status(404).json({
+        success: false,
+        message: "Inventory item not found",
+      });
+    }
+
+    if (inventoryItem.quantity < quantity) {
+      return res.status(400).json({
+        success: false,
+        message: "Insufficient stock available for withdrawal",
+      });
+    }
+
+    let remainingQuantity = quantity;
+    const batchesToUpdate = [];
+
+    // Fetch oldest batches with remaining stock (FIFO logic)
+    const stockBatches = await prisma.stockBatch.findMany({
+      where: {
+        inventoryId,
+        quantityRemaining: { gt: 0 },
+      },
+      orderBy: { purchaseDate: "asc" },
+    });
+
+    for (const batch of stockBatches) {
+      if (remainingQuantity <= 0) break;
+
+      const deductQuantity = Math.min(
+        batch.quantityRemaining,
+        remainingQuantity
+      );
+      remainingQuantity -= deductQuantity;
+
+      batchesToUpdate.push({
+        id: batch.id,
+        quantityRemaining: batch.quantityRemaining - deductQuantity,
+      });
+    }
+
+    if (remainingQuantity > 0) {
+      return res.status(400).json({
+        success: false,
+        message: "Not enough stock available to fulfill the withdrawal",
+      });
+    }
+
+    // Update the affected batches
+    for (const batch of batchesToUpdate) {
+      await prisma.stockBatch.update({
+        where: { id: batch.id },
+        data: { quantityRemaining: batch.quantityRemaining },
+      });
+    }
+
+    // Update inventory total quantity
+    await prisma.inventory.update({
+      where: { id: inventoryId },
+      data: {
+        quantity: inventoryItem.quantity - quantity,
+        dateUpdated: new Date(),
+      },
+    });
+
+    // Log the withdrawal
+    const withdrawalLog = await prisma.withdrawallog.create({
+      data: {
+        inventoryId,
+        reason: "request",
+        employeeId: empId,
+        quantity,
+        dateWithdrawn: new Date(),
+      },
+    });
+
+    // Update the InventoryRequest with the withdrawal log ID and status
+    await prisma.inventoryrequest.update({
+      where: { id: requestId },
+      data: {
+        withdrawalLogId: withdrawalLog.id,
+        status: "Approved", // Set the status to "Approved"
+      },
+    });
+
+    res.json({
+      success: true,
+      message: "Inventory request processed successfully",
+      withdrawalLog,
+    });
+  } catch (error) {
+    console.error("Error processing inventory request:", error);
+    res.status(500).json({
+      success: false,
+      message: "Error processing inventory request",
+    });
+  }
+};
+
 // Export all functions
 export {
   addInventory,
@@ -1663,6 +1790,7 @@ export {
   listInventoryRequests,
   listSuppliers,
   logInventoryChange,
+  processInventoryRequest,
   removeFromPackage,
   removeInventory,
   removeSupplier,
