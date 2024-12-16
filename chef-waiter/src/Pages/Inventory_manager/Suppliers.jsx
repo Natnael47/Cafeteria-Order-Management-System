@@ -431,6 +431,5 @@ const Suppliers = () => {
             )}
         </div>
     );
-};
-
+}
 export default Suppliers;

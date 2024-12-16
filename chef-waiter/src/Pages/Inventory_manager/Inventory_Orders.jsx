@@ -326,7 +326,7 @@ const InventoryOrders = () => {
                             <div className="px-4 py-3 border-r border-gray-300 text-center">Order Status</div>
                             <div className="px-4 py-3 border-r border-gray-300 text-center">Inventory Item</div>
                             <div className="px-4 py-3 border-r border-gray-300 text-center">Quantity</div>
-                            <div className="px-4 py-3 border-r border-gray-300 text-center">Price</div>
+                            <div className="px-4 py-3 border-r border-gray-300 text-center">Total Price</div>
                             <div className="px-4 py-3 border-r border-gray-300 text-center">Supplier</div>
                             <div className="px-4 py-3 border-r border-gray-300 text-center">Order Date</div>
                             <div className="px-4 py-3 text-center">Package</div>
@@ -358,7 +358,7 @@ const InventoryOrders = () => {
                                     <div className="px-4 py-3 border-r border-gray-300 text-center">
                                         {new Date(order.orderDate).toLocaleDateString()}
                                     </div>
-                                    <div className="px-4 py-3 text-center">
+                                    <div className="px-4 py-3 text-center items-center">
                                         {isOrderInPackage(order.id, packageList) ? (
                                             <Minus
                                                 onClick={() => handleRemoveOrder(order)}
