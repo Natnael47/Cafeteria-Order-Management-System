@@ -3,13 +3,11 @@ import "dotenv/config";
 import express from "express";
 import adminRouter from "./routes/adminRoute.js";
 import cartRouter from "./routes/cartRoute.js";
-import chefRouter from "./routes/chefRoute.js";
 import employeeRoute from "./routes/employeeRoute.js";
 import feedBackRoute from "./routes/feedBackRoute.js";
 import foodRouter from "./routes/foodRoute.js";
 import inventoryRoute from "./routes/inventoryRoute.js";
 import orderRouter from "./routes/orderRoute.js";
-import prismaRoute from "./routes/prismaRoute.js";
 import userRouter from "./routes/userRoute.js";
 
 // app config
@@ -37,17 +35,12 @@ app.use("/api/cart", cartRouter);
 app.use("/api/order", orderRouter);
 //For Admin
 app.use("/api/admin", adminRouter);
-//for chef
-app.use("/api/chef", chefRouter);
 //API For Employees
 app.use("/api/employee", employeeRoute);
 //API For Feedback
 app.use("/api/feedback", feedBackRoute);
 //API for Inventory
 app.use("/api/inventory", inventoryRoute);
-
-//-------------------------------Test Prisma route
-app.use("/api/prisma", prismaRoute);
 
 // Define the route
 app.get("/", (req, res) => {
