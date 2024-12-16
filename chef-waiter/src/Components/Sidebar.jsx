@@ -260,7 +260,7 @@ const SideBar = () => {
                                     className={`hidden md:block transition-colors duration-300 ease-in-out ${isActive ? "text-white font-bold" : "text-black"
                                         }`}
                                 >
-                                    Archived Orders
+                                    Orders & Requests
                                 </p>
                             </>
                         )}

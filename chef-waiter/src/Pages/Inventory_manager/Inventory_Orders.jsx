@@ -322,7 +322,7 @@ const InventoryOrders = () => {
                 {currentView === "Order" && (
                     <>
                         {/* Order Table Header */}
-                        <div className="grid grid-cols-[1.5fr_2fr_1fr_1fr_1fr_2fr_1fr] bg-gradient-to-r from-gray-200 via-gray-100 to-gray-200 border-b border-gray-300 font-semibold text-gray-700 text-sm rounded-t-md">
+                        <div className="grid grid-cols-[1.5fr_2fr_1fr_1fr_1fr_2fr_1fr] bg-[#22C55E] border-b border-gray-300 font-semibold text-white text-sm rounded-t-md">
                             <div className="px-4 py-3 border-r border-gray-300 text-center">Order Status</div>
                             <div className="px-4 py-3 border-r border-gray-300 text-center">Inventory Item</div>
                             <div className="px-4 py-3 border-r border-gray-300 text-center">Quantity</div>
@@ -384,7 +384,7 @@ const InventoryOrders = () => {
                 {currentView === "request" && (
                     <>
                         {/* Request Table Header */}
-                        <div className="grid grid-cols-[2fr_1fr_2fr_2fr_1fr] bg-gradient-to-r from-gray-700 to-gray-500 text-white text-sm font-semibold rounded-t-md shadow-md">
+                        <div className="grid grid-cols-[2fr_1fr_2fr_2fr_1fr] bg-[#22C55E] text-white text-sm font-semibold rounded-t-md shadow-md">
                             <div className="px-4 py-3 border-r border-gray-600 text-center">Request Item</div>
                             <div className="px-4 py-3 border-r border-gray-600 text-center">Quantity</div>
                             <div className="px-4 py-3 border-r border-gray-600 text-center">Requested By</div>
