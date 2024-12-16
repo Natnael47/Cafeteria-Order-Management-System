@@ -65,12 +65,12 @@ export const login_InventoryManager = (req, res) =>
 
 // Employee Logout Function
 export const logoutEmployee = async (req, res) => {
-  const { employeeId } = req.body;
+  const { empId } = req.body;
   try {
     // Find the latest workLog entry without a logoutTime for the given employee
     const latestWorkLog = await prisma.workLog.findFirst({
       where: {
-        employeeId: parseInt(employeeId),
+        employeeId: parseInt(empId),
         logoutTime: null, // Ensure we only target the ongoing login session
       },
       orderBy: {
