@@ -84,10 +84,6 @@ const Inventory_Dashboard = () => {
         ],
     };
 
-    // Debugging: Log the final data structure
-    console.log('Expenditure by Supplier Data:', expenditureBySupplierData);
-
-
     return (
         <div className="m-5 w-full max-w-6.5xl max-h-[90vh]">
             {/* Header */}
