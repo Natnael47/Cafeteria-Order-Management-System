@@ -116,6 +116,39 @@ const Users = () => {
         }
     };
 
+    const updateAccountStatus = async (event, userId) => {
+        try {
+            const newStatus = event.target.value;
+
+            // Map the selected value to the correct status string, e.g., "BANNED" for "Suspended"
+            let accountStatus = "";
+            if (newStatus === "Active") {
+                accountStatus = "ACTIVE";
+            } else if (newStatus === "Suspended") {
+                accountStatus = "BANNED";
+            }
+
+            const response = await axios.post(
+                `${backendUrl}/api/user/update-account-status`,
+                { userId, accountStatus }, // Send the data as required by the backend
+                { headers: { token } }
+            );
+
+            console.log({ userId, accountStatus });
+
+
+            if (response.data.success) {
+                toast.success("Account status updated successfully");
+                fetchUserList(); // Refresh the user list to reflect changes
+            } else {
+                toast.error(response.data.message);
+            }
+        } catch (error) {
+            console.error("Error updating account status:", error);
+            toast.error("An error occurred while updating the status.");
+        }
+    };
+
     useEffect(() => {
         fetchOrder();
     }, [token]);
@@ -194,6 +227,7 @@ const Users = () => {
                                         <th className="px-4 py-3 text-sm font-semibold">Gender</th>
                                         <th className="px-4 py-3 text-sm font-semibold">Phone</th>
                                         <th className="px-4 py-3 text-sm font-semibold">Account Created</th>
+                                        <th className="px-4 py-3 text-sm font-semibold">Account Status</th>
                                     </tr>
                                 </thead>
                                 <tbody>
@@ -217,6 +251,18 @@ const Users = () => {
                                                 <td className="px-4 py-3 text-sm border">{user.gender || "Not Selected"}</td>
                                                 <td className="px-4 py-3 text-sm border">{user.phone || "No Phone"}</td>
                                                 <td className="px-4 py-3 text-sm border">{formatDate(user.createdAt)}</td>
+                                                {/* Status Dropdown */}
+                                                <td className="px-4 py-3 text-sm border">
+                                                    <select
+                                                        className="p-2 border rounded"
+                                                        value={user.status}
+                                                        onChange={(event) => updateAccountStatus(event, user.id)} // Use the updateAccountStatus function
+                                                    >
+                                                        <option value="Active">Active</option>
+                                                        <option value="Suspended">Suspended</option>
+                                                    </select>
+                                                </td>
+
                                             </tr>
                                         ))
                                     ) : (
