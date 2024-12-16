@@ -5,6 +5,7 @@ import {
   getUserProfile,
   loginUser,
   registerUser,
+  updateAccountStatus,
   updateUserProfile,
 } from "../controllers/userController.js";
 import adminAuth from "../middleware/adminAuth.js";
@@ -20,5 +21,6 @@ userRouter.post("/update-profile", authUser, updateUserProfile);
 
 userRouter.get("/all-users", adminAuth, allUsers);
 userRouter.post("/change-password", authUser, changePassword);
+userRouter.post("/update-account-status", adminAuth, updateAccountStatus);
 
 export default userRouter;

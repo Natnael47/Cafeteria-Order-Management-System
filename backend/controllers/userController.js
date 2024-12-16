@@ -80,6 +80,21 @@ const loginUser = async (req, res) => {
       return res.json({ success: false, message: "User not found" });
     }
 
+    // Check if the account status is not active
+    if (user.accountStatus === "BANNED") {
+      return res.json({
+        success: false,
+        message: "Your account has been banned.",
+      });
+    }
+
+    if (user.accountStatus === "DEACTIVATED") {
+      return res.json({
+        success: false,
+        message: "Your account is deactivated.",
+      });
+    }
+
     // Compare password
     const isMatch = await bcrypt.compare(password, user.password);
     if (!isMatch) {
@@ -282,11 +297,58 @@ const allUsers = async (req, res) => {
   }
 };
 
+// Update user account status
+const updateAccountStatus = async (req, res) => {
+  const { userId, accountStatus } = req.body;
+
+  // Validate accountStatus value
+  const validStatuses = ["ACTIVE", "BANNED", "DEACTIVATED"];
+  if (!validStatuses.includes(accountStatus)) {
+    return res.status(400).json({
+      success: false,
+      message:
+        "Invalid account status. Valid options are: ACTIVE, BANNED, DEACTIVATED.",
+    });
+  }
+
+  try {
+    // Check if the user exists
+    const user = await prisma.user.findUnique({
+      where: { id: parseInt(userId, 10) },
+    });
+
+    if (!user) {
+      return res
+        .status(404)
+        .json({ success: false, message: "User not found" });
+    }
+
+    // Update the account status
+    const updatedUser = await prisma.user.update({
+      where: { id: parseInt(userId, 10) },
+      data: { accountStatus },
+    });
+
+    res.json({
+      success: true,
+      message: `Account status updated to ${accountStatus}`,
+      updatedUser,
+    });
+  } catch (error) {
+    console.error("Error updating account status:", error);
+    res.status(500).json({
+      success: false,
+      message: "An error occurred while updating the account status",
+    });
+  }
+};
+
 export {
   allUsers,
   changePassword,
   getUserProfile,
   loginUser,
   registerUser,
+  updateAccountStatus,
   updateUserProfile,
 };

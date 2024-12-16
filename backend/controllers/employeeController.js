@@ -16,6 +16,7 @@ const createToken = (id) => {
 const loginEmployee = async (req, res, role) => {
   const { email, password } = req.body;
   try {
+    // Find employee with the given email and role
     const employee = await prisma.employee.findFirst({
       where: {
         email,
@@ -28,14 +29,23 @@ const loginEmployee = async (req, res, role) => {
     if (!employee) {
       return res.json({
         success: false,
-        message: "User not found",
+        message: "Employee not found",
       });
     }
 
+    // Check if the password is correct
     const isMatch = await bcrypt.compare(password, employee.password);
     if (!isMatch) {
       return res.json({ success: false, message: "Password incorrect" });
     }
+
+    // Create a workLog entry for login
+    await prisma.workLog.create({
+      data: {
+        employeeId: employee.id,
+        loginTime: new Date(), // Record current login time
+      },
+    });
 
     // Generate token
     const token = createToken(employee.id);
@@ -49,9 +59,46 @@ const loginEmployee = async (req, res, role) => {
 // Login Chef
 export const login_Chef = (req, res) => loginEmployee(req, res, "chef");
 
-// Login Barista
+// Login Inventory Manager
 export const login_InventoryManager = (req, res) =>
   loginEmployee(req, res, "inventory");
+
+// Employee Logout Function
+export const logoutEmployee = async (req, res) => {
+  const { employeeId } = req.body;
+  try {
+    // Find the latest workLog entry without a logoutTime for the given employee
+    const latestWorkLog = await prisma.workLog.findFirst({
+      where: {
+        employeeId: parseInt(employeeId),
+        logoutTime: null, // Ensure we only target the ongoing login session
+      },
+      orderBy: {
+        loginTime: "desc",
+      },
+    });
+
+    if (!latestWorkLog) {
+      return res.json({
+        success: false,
+        message: "No active session found for this employee",
+      });
+    }
+
+    // Update the workLog entry with the current logout time
+    await prisma.workLog.update({
+      where: { id: latestWorkLog.id },
+      data: {
+        logoutTime: new Date(), // Record current logout time
+      },
+    });
+
+    res.json({ success: true, message: "Logout successful" });
+  } catch (error) {
+    console.error("Error logging out:", error);
+    res.status(500).json({ success: false, message: "Internal server error" });
+  }
+};
 
 // API to get employee profile
 export const employee_Profile = async (req, res) => {

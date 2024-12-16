@@ -56,7 +56,7 @@ const Add = () => {
             onSubmit={onSubmitHandler}
         >
             {/* Form Title */}
-            <p className="mb-2 text-2xl font-bold text-gray-800">Add Food</p>
+            <p className="mb-2 text-2xl font-bold text-gray-800">Add Food / Drink</p>
 
             {/* Form Container */}
             <div className="bg-white px-8 py-6 border shadow-lg rounded-lg w-full max-w-4xl">
@@ -83,7 +83,7 @@ const Add = () => {
                 <div className="flex flex-wrap justify-between w-full gap-6 mb-6">
                     {/* Food Name */}
                     <div className="flex-1 min-w-[220px]">
-                        <p className="mb-2 font-semibold text-gray-700">Food Name</p>
+                        <p className="mb-2 font-semibold text-gray-700">Name</p>
                         <input
                             className="w-full px-4 py-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-green-400"
                             onChange={onChangeHandler}

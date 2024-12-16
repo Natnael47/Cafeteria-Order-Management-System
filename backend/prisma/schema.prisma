@@ -29,24 +29,46 @@ model employee {
   inventoryPackage  inventoryPackage[]
   withdrawallog     withdrawallog[]
   inventorypurchase inventorypurchase[]
+  workLogs          workLog[]
+}
+
+// workLog model - Tracks employee login and logout timestamps
+model workLog {
+  id         Int       @id @default(autoincrement()) // Unique identifier for each log entry
+  employeeId Int // Foreign key to reference the employee
+  loginTime  DateTime  @default(now()) // Timestamp for login
+  logoutTime DateTime? // Nullable timestamp for logout (set when the employee logs out)
+
+  // Define relationship with the employee model
+  employee employee @relation(fields: [employeeId], references: [id])
+
+  @@map("work_log") // Optional: Custom table name in the database
+}
+
+// Enum for account status
+enum AccountStatus {
+  ACTIVE
+  BANNED
+  DEACTIVATED
 }
 
 // User model - Represents customers or system users
 model user {
-  id        Int        @id @default(autoincrement()) // Unique identifier for each user
-  firstName String     @db.VarChar(255) // User's first name
-  lastName  String?    @db.VarChar(255) // User's last name
-  email     String     @unique(map: "User_email_key") @db.VarChar(255) // Unique email address
-  password  String     @db.VarChar(255) // User's password
-  gender    String?    @default("not selected") @db.VarChar(50) // User's gender with default
-  address   Json? // User's address information in JSON format
-  dob       String?    @default("not selected") @db.VarChar(100) // Date of birth
-  phone     String?    @default("+251 911524856") @db.VarChar(20) // User's phone number
-  createdAt DateTime   @default(now()) // Timestamp of record creation
-  updatedAt DateTime?  @updatedAt // Automatically updated timestamp for modifications
-  cartData  Json? // User's shopping cart data in JSON format
-  feedback  feedback[] // Relation to feedback table
-  order     order[] // Relation to order table
+  id            Int           @id @default(autoincrement()) // Unique identifier for each user
+  firstName     String        @db.VarChar(255) // User's first name
+  lastName      String?       @db.VarChar(255) // User's last name
+  email         String        @unique(map: "User_email_key") @db.VarChar(255) // Unique email address
+  password      String        @db.VarChar(255) // User's password
+  gender        String?       @default("not selected") @db.VarChar(50) // User's gender with default
+  address       Json? // User's address information in JSON format
+  dob           String?       @default("not selected") @db.VarChar(100) // Date of birth
+  phone         String?       @default("+251 911524856") @db.VarChar(20) // User's phone number
+  createdAt     DateTime      @default(now()) // Timestamp of record creation
+  updatedAt     DateTime?     @updatedAt // Automatically updated timestamp for modifications
+  cartData      Json? // User's shopping cart data in JSON format
+  feedback      feedback[] // Relation to feedback table
+  order         order[] // Relation to order table
+  accountStatus AccountStatus @default(ACTIVE) // User's account status
 }
 
 // Feedback model - Represents user feedback
