@@ -282,8 +282,9 @@ const allUsers = async (req, res) => {
         dob: true,
         phone: true,
         address: true,
-        createdAt: true, // Include creation date
-        updatedAt: true, // Include last update date
+        createdAt: true,
+        updatedAt: true,
+        accountStatus: true,
       },
     });
 
