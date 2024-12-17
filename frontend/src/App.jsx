@@ -9,6 +9,7 @@ import SearchBar from "./components/SearchBar";
 import About from "./pages/About";
 import Cart from './pages/Cart';
 import Contact from "./pages/Contact";
+import Food_Detail from "./pages/Food_Detail";
 import Home from './pages/Home';
 import Login from "./pages/Login";
 import Menu from "./pages/Menu";
@@ -42,6 +43,7 @@ const App = () => {
           <Route path="/about" element={<About />} />
           <Route path="/contact" element={<Contact />} />
           <Route path="/login" element={<Login />} />
+          <Route path="/food-detail/:id" element={<Food_Detail />} />
         </Routes>
       </div>
 

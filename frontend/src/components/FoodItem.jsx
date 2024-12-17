@@ -4,10 +4,11 @@ import { assets } from '../assets/assets';
 import { StoreContext } from '../context/StoreContext';
 
 const FoodItem = ({ id, name, price, description, image }) => {
-    const { cartItems, addToCart, removeFromCart } = useContext(StoreContext);
+    const { cartItems, addToCart, removeFromCart, navigate } = useContext(StoreContext);
+
 
     return (
-        <div className="w-full mx-auto border-2 border-[#39db4a] rounded-[15px] shadow-[0_0_10px_rgba(0,0,0,0.09)] transition duration-300 animate-fadeIn bg-[#d7f6da]">
+        <div onClick={() => navigate(`/food-detail/${id}`)} className="w-full mx-auto border-2 border-[#39db4a] rounded-[15px] shadow-[0_0_10px_rgba(0,0,0,0.09)] transition duration-300 animate-fadeIn bg-[#d7f6da]">
             <div className="relative">
                 <img
                     className="w-full rounded-t-[15px]"
