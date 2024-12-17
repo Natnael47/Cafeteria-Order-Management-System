@@ -22,7 +22,6 @@ const Users = () => {
             if (response.data.success) {
                 setUsersData(response.data.data); // Assuming the response contains a 'data' field with the users
                 console.log(response.data.data);
-
             } else {
                 toast.error("Error fetching user list");
             }
@@ -237,8 +236,9 @@ const Users = () => {
                                         usersData.map((user, index) => (
                                             <tr
                                                 key={user.id}
-                                                className={`transition-colors duration-200 ${index % 2 === 0 ? "bg-gray-50" : "bg-white"
-                                                    } hover:bg-blue-100`}
+                                                className={`transition-colors duration-200 
+        ${user.accountStatus !== 'ACTIVE' ? "bg-red-50" : index % 2 === 0 ? "bg-gray-50" : "bg-white"}
+        hover:bg-blue-100`}
                                             >
                                                 <td className="px-4 py-3 text-sm border">{String(user.id).padStart(3, '0')}</td>
                                                 <td className="px-4 py-3 text-sm border">
@@ -257,12 +257,13 @@ const Users = () => {
                                                 <td className="px-4 py-3 text-sm border">
                                                     <select
                                                         className="p-2 border rounded"
-                                                        value={user.status}
-                                                        onChange={(event) => updateAccountStatus(event, user.id)} // Use the updateAccountStatus function
+                                                        value={user.accountStatus === "BANNED" ? "Suspended" : "Active"}
+                                                        onChange={(event) => updateAccountStatus(event, user.id)}
                                                     >
                                                         <option value="Active">Active</option>
                                                         <option value="Suspended">Suspended</option>
                                                     </select>
+
                                                 </td>
 
                                             </tr>
