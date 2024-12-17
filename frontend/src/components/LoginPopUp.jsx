@@ -1,8 +1,8 @@
-import axios from 'axios';
-import React, { useContext, useEffect, useState } from 'react';
-import { backendUrl } from '../App';
-import { assets } from '../assets/assets';
-import { StoreContext } from '../context/StoreContext';
+import axios from "axios";
+import { Eye, EyeOff, X } from "lucide-react";
+import React, { useContext, useEffect, useState } from "react";
+import { backendUrl } from "../App";
+import { StoreContext } from "../context/StoreContext";
 
 const LoginPopUp = ({ setShowLogin }) => {
     const [currState, setCurrState] = useState("Login");
@@ -10,18 +10,23 @@ const LoginPopUp = ({ setShowLogin }) => {
 
     const [data, setData] = useState({
         firstName: "",
-        gender: "",
+        lastName: "",
         email: "",
-        password: ""
+        password: "",
     });
 
-    // State to manage password visibility
     const [showPassword, setShowPassword] = useState(false);
 
     const onChangeHandler = (event) => {
-        const name = event.target.name;
-        const value = event.target.value;
-        setData(prevData => ({ ...prevData, [name]: value }));
+        const { name, value } = event.target;
+
+        if (name === "fullName") {
+            const [firstName = "", ...rest] = value.trim().split(" ");
+            const lastName = rest.join(" ");
+            setData((prevData) => ({ ...prevData, firstName, lastName }));
+        } else {
+            setData((prevData) => ({ ...prevData, [name]: value }));
+        }
     };
 
     const onLogin = async (event) => {
@@ -30,64 +35,84 @@ const LoginPopUp = ({ setShowLogin }) => {
 
         url += currState === "Login" ? "login" : "register";
 
-        const response = await axios.post(url, data);
+        try {
+            const response = await axios.post(url, data);
 
-        if (response.data.success) {
-            setToken(response.data.token);
-            localStorage.setItem("token", response.data.token);
-            setShowLogin(false);
-        } else {
-            alert(response.data.message);
+            if (response.data.success) {
+                setToken(response.data.token);
+                localStorage.setItem("token", response.data.token);
+                setShowLogin(false);
+            } else {
+                alert(response.data.message);
+            }
+        } catch (error) {
+            console.error("Error during login/register:", error);
+            alert("An error occurred. Please try again.");
         }
     };
 
-    // Lock scroll when popup is open and restore when closed
     useEffect(() => {
-        // Disable scrolling on body when login popup is visible
         document.body.style.overflow = "hidden";
-
-        // Cleanup to restore scroll when the popup is closed
         return () => {
             document.body.style.overflow = "auto";
         };
-    }, []); // Empty dependency array ensures this runs only once when the component mounts
+    }, []);
 
     return (
-        <div className="absolute z-10 w-full h-full bg-gray-700/90 grid place-items-center">
-            <form onSubmit={onLogin} className="w-[max(23vw,330px)] text-gray-500 bg-white flex flex-col gap-6 p-6 rounded-md text-sm animate-fadeIn">
-                <div className="flex justify-between items-center text-black text-[16px]">
-                    <h2 className='font-semibold'>{currState}</h2>
-                    <img onClick={() => setShowLogin(false)} src={assets.cross_icon} alt="Close" className="w-4 cursor-pointer" />
-                </div>
-                <div className="flex flex-col">
-                    {currState === "Sign Up" && (
-                        <>
-                            <label htmlFor="firstName" className="text-gray-600 mb-2 font-semibold">First Name</label>
-                            <input
-                                name="firstName"
-                                onChange={onChangeHandler}
-                                value={data.firstName}
-                                type="text"
-                                placeholder="First Name"
-                                required
-                                className="border border-gray-500 p-2 rounded-md focus:outline-none mb-2"
-                            />
-                            <label htmlFor="gender" className="text-gray-600 mb-2 font-semibold">Gender</label>
-                            <select
-                                name="gender"
-                                onChange={onChangeHandler}
-                                value={data.gender}
-                                required
-                                className="border border-gray-500 p-2 rounded-md focus:outline-none mb-2"
-                            >
-                                <option value="" disabled>Select Gender</option>
-                                <option value="male">Male</option>
-                                <option value="female">Female</option>
-                                <option value="other">Other</option>
-                            </select>
-                        </>
-                    )}
-                    <label htmlFor="email" className="text-gray-600 mb-2 font-semibold">Email</label>
+        <div
+            className="fixed inset-0 z-50 bg-gray-500/50 grid place-items-center"
+            aria-hidden={true}
+        >
+            <div
+                className="absolute inset-0 bg-black opacity-60 pointer-events-none"
+                aria-hidden={true}
+            ></div>
+
+            <form
+                onSubmit={onLogin}
+                className="relative bg-white rounded-lg shadow-lg p-8 w-[90%] max-w-md text-gray-800"
+            >
+                <button
+                    type="button"
+                    onClick={() => setShowLogin(false)}
+                    className="absolute top-4 right-4 text-gray-500 hover:text-red-500"
+                >
+                    <X size={24} />
+                </button>
+
+                <h2 className="text-2xl font-semibold text-center mb-4">
+                    {currState === "Sign Up" ? "Create Account" : "Login"}
+                </h2>
+                <p className="text-center text-sm text-gray-500 mb-6">
+                    Please {currState === "Sign Up" ? "sign up" : "log in"} to continue.
+                </p>
+
+                {currState === "Sign Up" && (
+                    <div className="mb-4">
+                        <label
+                            htmlFor="fullName"
+                            className="block text-sm font-medium text-gray-700"
+                        >
+                            Full Name
+                        </label>
+                        <input
+                            name="fullName"
+                            onChange={onChangeHandler}
+                            type="text"
+                            placeholder="Full Name"
+                            required
+                            className="mt-1  block w-full rounded-md border border-black shadow-sm focus:ring-primary focus:border-primary sm:text-base px-4 py-3"
+                        />
+                    </div>
+                )}
+
+                <div className="mb-4">
+                    <label
+                        htmlFor="email"
+                        className="block text-sm font-medium text-gray-700"
+                    >
+                        Email
+                    </label>
                     <input
                         name="email"
                         onChange={onChangeHandler}
@@ -95,44 +120,85 @@ const LoginPopUp = ({ setShowLogin }) => {
                         type="email"
                         placeholder="Your Email"
                         required
-                        className="border border-gray-500 p-2 rounded-md focus:outline-none mb-2"
+                        className="mt-1 block w-full rounded-md border border-black shadow-sm focus:ring-primary focus:border-primary sm:text-base px-4 py-3"
                     />
-                    <label htmlFor="password" className="text-gray-600 mb-2 font-semibold">Password</label>
+                </div>
+
+                <div className="mb-6">
+                    <label
+                        htmlFor="password"
+                        className="block text-sm font-medium text-gray-700"
+                    >
+                        Password
+                    </label>
                     <div className="relative">
                         <input
                             name="password"
                             onChange={onChangeHandler}
                             value={data.password}
-                            type={showPassword ? "text" : "password"} // Toggle input type based on showPassword
+                            type={showPassword ? "text" : "password"}
                             placeholder="Password"
                             required
-                            className="border border-gray-500 p-2 rounded-md focus:outline-none w-full"
+                            className="mt-1 block w-full rounded-md border border-black shadow-sm focus:ring-primary focus:border-primary sm:text-base px-4 py-3"
                         />
                         <button
                             type="button"
-                            onClick={() => setShowPassword(!showPassword)} // Toggle password visibility
-                            className="absolute right-2 top-2 text-gray-500"
+                            onClick={() => setShowPassword(!showPassword)}
+                            className="absolute inset-y-0 right-4 text-gray-400 hover:text-gray-600"
                         >
-                            {showPassword ? "Hide" : "Show"} {/* Button text changes based on state */}
+                            {showPassword ? <Eye size={20} /> : <EyeOff size={20} />}
                         </button>
                     </div>
                 </div>
-                <button type="submit" className="bg-primary text-white py-2 rounded-md font-semibold hover:bg-black text-[14px] transition-colors">
-                    {currState === "Sign Up" ? "Create Account" : "Login"}
+
+                <button
+                    type="submit"
+                    className="w-full py-3 rounded-md bg-primary text-white font-medium hover:bg-primary-dark transition"
+                >
+                    {currState === "Sign Up" ? "Sign Up" : "Login"}
                 </button>
-                <div className="flex items-start gap-2 -mt-4">
-                    <input type="checkbox" required className="mt-1 cursor-pointer" />
-                    <p className="text-xs">By continuing, I agree to the terms of use & privacy policy.</p>
+
+                <p className="mt-4 text-sm text-center text-gray-500">
+                    {currState === "Login" ? (
+                        <>
+                            Don't have an account?{" "}
+                            <span
+                                onClick={() => setCurrState("Sign Up")}
+                                className="text-primary cursor-pointer hover:underline"
+                            >
+                                Sign up
+                            </span>
+                        </>
+                    ) : (
+                        <>
+                            Already have an account?{" "}
+                            <span
+                                onClick={() => setCurrState("Login")}
+                                className="text-primary cursor-pointer hover:underline"
+                            >
+                                Login here
+                            </span>
+                        </>
+                    )}
+                </p>
+
+                <div className="relative w-full flex items-center my-4">
+                    <div className="flex-grow border-t border-gray-300"></div>
+                    <span className="mx-2 text-gray-400">Or</span>
+                    <div className="flex-grow border-t border-gray-300"></div>
                 </div>
-                {currState === "Login" ? (
-                    <p className="text-start">
-                        Create a new account? <span onClick={() => setCurrState("Sign Up")} className="text-red-500 font-medium cursor-pointer">Click here</span>
-                    </p>
-                ) : (
-                    <p className="text-start">
-                        Already have an account? <span onClick={() => setCurrState("Login")} className="text-red-500 font-medium cursor-pointer">Login here</span>
-                    </p>
-                )}
+
+                <button
+                    type="button"
+                    className="flex items-center justify-center gap-2 w-full border border-gray-300 py-3 rounded-md font-semibold text-gray-700 hover:bg-gray-100 transition-all"
+                >
+                    <img
+                        src="https://www.svgrepo.com/show/475656/google-color.svg"
+                        alt="Google"
+                        className="w-5 h-5"
+                    />
+                    {currState === "Sign Up" ? "Sign up with Google" : "Login with Google"}
+                </button>
             </form>
         </div>
     );

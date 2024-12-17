@@ -1,14 +1,37 @@
-import React, { useContext } from 'react';
+import React, { useContext, useState } from 'react';
+import { toast } from 'react-toastify';
 import { backendUrl } from '../App';
 import CartTotal from '../components/CartTotal';
+import LoginPopUp from '../components/LoginPopup';
 import Title from '../components/Title';
 import { StoreContext } from '../context/StoreContext';
 
 const Cart = () => {
-    const { cartItems, food_list, removeFromCart, getTotalCartAmount, navigate } = useContext(StoreContext);
+    const { cartItems, food_list, removeFromCart, navigate, token } = useContext(StoreContext);
+    const [showLogin, setShowLogin] = useState(false);
+
+    const handleProceedToCheckout = () => {
+        // Check if user is logged in
+        if (!token) {
+            setShowLogin(true); // Show login popup
+            toast.warn("Please log in to place an order.");
+        }
+        // Check if cart is empty
+        else if (Object.values(cartItems).every(count => count <= 0)) {
+            toast.info("Your cart is empty. Add items to proceed.");
+            navigate("/menu");
+        }
+        // All conditions satisfied, navigate to orders page
+        else {
+            navigate('/orders');
+        }
+    };
 
     return (
         <div className='mt-[100px]'>
+            {/* Show login popup */}
+            {showLogin && <LoginPopUp setShowLogin={setShowLogin} />}
+
             <div>
                 <div className='text-2xl'>
                     <Title text1={'CART'} text2={'ITEMS'} />
@@ -39,6 +62,7 @@ const Cart = () => {
                             </div>
                         );
                     }
+                    return null;
                 })}
             </div>
             <div className="mt-[80px] flex justify-between gap-[max(12vw,20px)] flex-col lg:flex-row">
@@ -48,7 +72,12 @@ const Cart = () => {
                     </div>
 
                     <div className='w-full mt-2'>
-                        <button className='bg-primary text-white px-16 py-3 text-sm border rounded hover:bg-black hover:text-white transition-all' onClick={() => navigate('/orders')}>PROCEED TO CHECKOUT</button>
+                        <button
+                            className='bg-primary text-white px-16 py-3 text-sm border rounded hover:bg-black hover:text-white transition-all'
+                            onClick={handleProceedToCheckout}
+                        >
+                            PROCEED TO CHECKOUT
+                        </button>
                     </div>
 
                 </div>
