@@ -4,6 +4,7 @@ import { ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import FeedbackPopUp from "./components/FeedbackPopUp";
 import Footer from "./components/Footer";
+import LoginPopup from "./components/LoginPopup";
 import { Navbar } from "./components/Navbar";
 import SearchBar from "./components/SearchBar";
 import About from "./pages/About";
@@ -22,11 +23,13 @@ export const backendUrl = import.meta.env.VITE_BACKEND_URL;
 
 const App = () => {
   const [showFeedback, setShowFeedback] = useState(false);
+  const [showLogin, setShowLogin] = useState(false);
 
   return (
     <>
       <ToastContainer />
       {showFeedback && <FeedbackPopUp setShowFeedback={setShowFeedback} />}
+      {showLogin && <LoginPopup setShowLogin={setShowLogin} />}
 
       <Navbar setShowFeedback={setShowFeedback} />
 
