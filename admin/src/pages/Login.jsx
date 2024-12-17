@@ -58,17 +58,17 @@ const Login = () => {
                         <label className="block text-sm font-semibold text-gray-700 mb-2">Password</label>
                         <div className="relative">
                             <input
-                                className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-1 focus:ring-green-500 focus:border-green-500 focus:outline-none transition duration-200"
                                 onChange={(e) => setPassword(e.target.value)}
-                                value={password}
-                                type={showPassword ? 'text' : 'password'}
+                                className="w-full px-4 py-3 text-gray-700 bg-gray-50 border border-gray-300 rounded-lg focus:ring-1 focus:ring-green-500 focus:border-green-500 focus:outline-none placeholder-gray-400"
                                 placeholder="1q2w3e4r"
+                                type={showPassword ? "text" : "password"}
+                                value={password}
                                 required
                             />
                             <button
                                 type="button"
                                 onClick={() => setShowPassword(!showPassword)}
-                                className="absolute right-3 top-3 text-gray-500"
+                                className="absolute inset-y-0 right-3 flex items-center text-gray-500 hover:text-green-600 focus:outline-none"
                             >
                                 {showPassword ? <Eye size={20} /> : <EyeOff size={20} />}
                             </button>
