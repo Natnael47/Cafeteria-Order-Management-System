@@ -18,7 +18,7 @@ const Profile = () => {
     return (
         <div className="flex flex-col m-5 w-full">
             {/* Header */}
-            <div className="flex items-center justify-between mb-6">
+            <div className="flex items-center justify-between mb-3">
                 <h1 className="text-2xl font-semibold text-gray-700">My Profile</h1>
             </div>
             <div className="max-w-4xl bg-white shadow-md rounded-lg p-6">

@@ -1,5 +1,6 @@
 import express from "express";
 import {
+  change_Employee_Password,
   delete_Employee,
   employee_Profile,
   get_Single_Employee_Profile,
@@ -20,6 +21,7 @@ employeeRoute.post("/logout-employee", empAuth, logoutEmployee);
 employeeRoute.get("/profile", empAuth, employee_Profile);
 employeeRoute.post("/update-profile", empAuth, update_Employee_Profile);
 employeeRoute.get("/employee-profile/:empId", get_Single_Employee_Profile);
+employeeRoute.post("/change-password", empAuth, change_Employee_Password);
 //for admin
 employeeRoute.post("/delete-employee", adminAuth, delete_Employee);
 

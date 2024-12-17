@@ -277,3 +277,49 @@ export const delete_Employee = async (req, res) => {
     res.status(500).json({ success: false, message: "Internal server error" });
   }
 };
+
+export const change_Employee_Password = async (req, res) => {
+  const { empId, oldPassword, newPassword } = req.body;
+
+  if (!empId || !oldPassword || !newPassword) {
+    return res
+      .status(400)
+      .json({ success: false, message: "All fields are required" });
+  }
+
+  try {
+    // Find the employee by ID
+    const employee = await prisma.employee.findUnique({
+      where: { id: parseInt(empId) },
+    });
+
+    if (!employee) {
+      return res
+        .status(404)
+        .json({ success: false, message: "Employee not found" });
+    }
+
+    // Compare the old password with the stored hashed password
+    const isMatch = await bcrypt.compare(oldPassword, employee.password);
+    if (!isMatch) {
+      return res
+        .status(400)
+        .json({ success: false, message: "Old password is incorrect" });
+    }
+
+    // Hash the new password
+    const salt = await bcrypt.genSalt(10);
+    const hashedPassword = await bcrypt.hash(newPassword, salt);
+
+    // Update the employee's password
+    await prisma.employee.update({
+      where: { id: parseInt(empId) },
+      data: { password: hashedPassword },
+    });
+
+    res.json({ success: true, message: "Password updated successfully" });
+  } catch (error) {
+    console.error("Error changing password:", error);
+    res.status(500).json({ success: false, message: "Internal server error" });
+  }
+};
