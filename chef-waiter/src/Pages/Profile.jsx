@@ -1,13 +1,24 @@
-import axios from "axios";
 import { Eye, EyeOff } from "lucide-react";
 import React, { useContext, useEffect, useState } from "react";
-import { toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import { backendUrl } from "../App";
 import { AppContext } from "../Context/AppContext";
 
 const Profile = () => {
-    const { cToken, iToken, profileData, get_Profile_Data } = useContext(AppContext);
+    const { cToken, iToken, profileData, get_Profile_Data, changePassword } = useContext(AppContext);
+
+    const handleChangePassword = async (e) => {
+        e.preventDefault();
+
+        const success = await changePassword(oldPassword, newPassword, confirmPassword, cToken, iToken);
+
+        if (success) {
+            setOldPassword("");
+            setNewPassword("");
+            setConfirmPassword("");
+            setShowChangePassword(false); // Go back to profile view
+        }
+    };
 
     // State for toggling views
     const [showChangePassword, setShowChangePassword] = useState(false);
@@ -26,45 +37,6 @@ const Profile = () => {
             get_Profile_Data();
         }
     }, [cToken, iToken]);
-
-    // Handle password change form submission
-    const handleChangePassword = async (e) => {
-        e.preventDefault();
-
-        if (newPassword !== confirmPassword) {
-            toast.error("New password and confirm password do not match.");
-            return;
-        }
-
-        try {
-            const response = await axios.post(
-                `${backendUrl}/api/employee/change-password`, // Backend endpoint
-                {
-                    oldPassword,
-                    newPassword,
-                },
-                {
-                    headers: {
-                        ctoken: cToken || "", // Send cToken in the headers
-                        itoken: iToken || "", // Send iToken if cToken is empty
-                    },
-                }
-            );
-
-            if (response.data.success) {
-                toast.success("Password changed successfully!");
-                setOldPassword("");
-                setNewPassword("");
-                setConfirmPassword("");
-                setShowChangePassword(false); // Go back to profile view
-            } else {
-                toast.error(response.data.message || "Failed to change password.");
-            }
-        } catch (error) {
-            console.error(error);
-            toast.error("An error occurred. Please try again later.");
-        }
-    };
 
     if (!profileData) {
         return <div className="text-center text-gray-500">Loading profile...</div>;

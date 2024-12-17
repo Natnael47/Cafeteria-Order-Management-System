@@ -42,8 +42,46 @@ const AppContextProvider = (props) => {
         }
     }
 
+    // Inside AppContextProvider
+
+    const changePassword = async (oldPassword, newPassword, confirmPassword, cToken, iToken) => {
+        if (newPassword !== confirmPassword) {
+            toast.error("New password and confirm password do not match.");
+            return false; // Indicate failure
+        }
+
+        try {
+            const response = await axios.post(
+                `${backendUrl}/api/employee/change-password`,
+                {
+                    oldPassword,
+                    newPassword,
+                },
+                {
+                    headers: {
+                        ctoken: cToken || "",
+                        itoken: iToken || "",
+                    },
+                }
+            );
+
+            if (response.data.success) {
+                toast.success("Password changed successfully!");
+                return true; // Indicate success
+            } else {
+                toast.error(response.data.message || "Failed to change password.");
+                return false; // Indicate failure
+            }
+        } catch (error) {
+            console.error(error);
+            toast.error("An error occurred. Please try again later.");
+            return false; // Indicate failure
+        }
+    };
+
     const value = {
-        profileData, setProfileData, get_Profile_Data, cToken, iToken
+        profileData, setProfileData, get_Profile_Data, cToken, iToken,
+        changePassword
     }
 
     return (
