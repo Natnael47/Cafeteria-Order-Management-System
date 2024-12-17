@@ -8,13 +8,12 @@ const FoodItem = ({ id, name, price, description, image }) => {
 
 
     return (
-        <div onClick={() => navigate(`/food-detail/${id}`)} className="w-full mx-auto border-2 border-[#39db4a] rounded-[15px] shadow-[0_0_10px_rgba(0,0,0,0.09)] transition duration-300 animate-fadeIn bg-[#d7f6da]">
+        <div className="w-full mx-auto border-2 border-[#39db4a] rounded-[15px] shadow-[0_0_10px_rgba(0,0,0,0.09)] transition duration-300 animate-fadeIn bg-[#d7f6da]">
             <div className="relative">
                 <img
                     className="w-full rounded-t-[15px]"
                     src={`${backendUrl || ''}/images/${image || ''}`}
                     alt={name}
-
                 />
                 {!cartItems?.[id] ? (
                     <img
@@ -41,7 +40,7 @@ const FoodItem = ({ id, name, price, description, image }) => {
                     </div>
                 )}
             </div>
-            <div className="p-[20px]">
+            <div onClick={() => navigate(`/food-detail/${id}`)} className="p-[20px] hover:bg-blue-100">
                 <div className="flex justify-between items-center mb-[10px] text-[#215727]">
                     <p className="text-[20px] font-medium">{name}</p>
                     <img
