@@ -25,29 +25,33 @@ const Food_Detail = () => {
                         setCurrentFood(foodItem);
 
                         // Fetch customizations, ratings, and favorite status
-                        const response = await axios.get(`${backendUrl}/api/user/get-favorite`, { headers: { token } });
+                        const response = await axios.get(`${backendUrl}/api/user/get-favorite`, {
+                            headers: { token },
+                        });
 
                         if (response.data.success) {
                             const { customizations, ratings, favorites } = response.data.data;
 
-                            const foodCustomization = customizations.find(c => c.foodId === Number(id));
-                            setCustomizations(foodCustomization ? foodCustomization.customNote : ""); // Update logic here
+                            // Apply customization (customNote) for this food
+                            const foodCustomization = customizations.find((c) => c.foodId === Number(id));
+                            setCustomizations(foodCustomization ? foodCustomization.customNote : "");
 
-                            const foodRating = ratings.find(r => r.foodId === Number(id));
-                            if (foodRating) {
-                                setRating(foodRating.userRating);
-                            }
+                            // Apply rating for this food
+                            const foodRating = ratings.find((r) => r.foodId === Number(id));
+                            setRating(foodRating ? foodRating.userRating : 0);
 
-                            const favoriteFood = favorites.find(f => f.foodId === Number(id));
+                            // Apply favorite status for this food
+                            const favoriteFood = favorites.find((f) => f.foodId === Number(id));
                             setIsFavorite(!!favoriteFood);
                         }
-                        setLoading(false);
                     } else {
                         navigate("/not-found");
                     }
                 }
             } catch (error) {
                 console.error("Error fetching food details:", error);
+            } finally {
+                setLoading(false);
             }
         };
 
