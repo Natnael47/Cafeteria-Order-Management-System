@@ -1,13 +1,19 @@
 import express from "express";
 import multer from "multer";
 import {
+  addFavorite,
   addFood,
   listFood,
   listMenuFood,
+  rateFood,
+  removeFavorite,
   removeFood,
+  saveCustomization,
+  updateCustomization,
   updateFood,
 } from "../controllers/foodController.js";
 import adminAuth from "../middleware/adminAuth.js";
+import authUser from "../middleware/userAuth.js";
 
 const foodRouter = express.Router();
 
@@ -29,5 +35,11 @@ foodRouter.get("/list-menu", listMenuFood);
 foodRouter.post("/remove", adminAuth, removeFood);
 
 foodRouter.post("/update", adminAuth, upload.single("image"), updateFood);
+
+foodRouter.post("/rate-food", authUser, rateFood);
+foodRouter.post("/add-favorite", authUser, addFavorite);
+foodRouter.post("/remove-favorite", authUser, removeFavorite);
+foodRouter.post("/save-customization", authUser, saveCustomization);
+foodRouter.post("/update-customization", authUser, updateCustomization);
 
 export default foodRouter;

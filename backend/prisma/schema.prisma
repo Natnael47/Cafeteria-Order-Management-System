@@ -72,6 +72,7 @@ model user {
   favorites      favorite[] // Relation to user's favorite food items
   customizations customization[] // Relation to food customizations
   accountStatus  AccountStatus   @default(ACTIVE) // User's account status
+  rating         rating[]
 }
 
 // Food model - Represents food items
@@ -90,6 +91,21 @@ model food {
   orderItem      orderItem[]
   favorites      favorite[] // Relation to favorites table
   customizations customization[] // Relation to customizations table
+  ratings        rating[] // Relation to ratings table
+}
+
+// Rating model - Represents user ratings for food items
+model rating {
+  id        Int      @id @default(autoincrement())
+  userId    Int
+  foodId    Int
+  rating    Float
+  createdAt DateTime @default(now())
+
+  user user @relation(fields: [userId], references: [id])
+  food food @relation(fields: [foodId], references: [id])
+
+  @@unique([userId, foodId], map: "Unique_user_food_rating") // Ensure one rating per user-food combination
 }
 
 // Favorite model - Represents user's favorite food items
