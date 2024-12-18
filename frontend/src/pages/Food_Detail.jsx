@@ -1,5 +1,5 @@
 import axios from "axios";
-import { ArrowDown, ArrowUp, Heart, Star } from "lucide-react";
+import { ArrowDown, ArrowUp, Heart, Minus, Plus, Star } from "lucide-react";
 import React, { useContext, useEffect, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import { backendUrl } from "../App";
@@ -148,17 +148,19 @@ const Food_Detail = () => {
     }
 
     return (
-        <div className="relative min-h-screen flex flex-col items-center p-2">
+        <div className="relative min-h-screen flex flex-col items-center p-4 bg-gradient-to-br from-gray-100 to-gray-300">
+
             {/* Navigation Arrows */}
             <button
-                className="absolute top-5 left-1/2 transform -translate-x-1/2 bg-green-500 text-white p-3 rounded-full hover:bg-green-600 transition-all shadow-lg"
+                className="absolute -top-4 right-1/2 transform translate-x-1/2 bg-green-500 text-white p-4 rounded-full hover:bg-green-600 transition-all shadow-lg hover:scale-105"
                 onClick={handlePrevious}
                 aria-label="Previous Food"
             >
                 <ArrowUp size={28} />
             </button>
+
             <button
-                className="absolute bottom-5 left-1/2 transform -translate-x-1/2 bg-green-500 text-white p-3 rounded-full hover:bg-green-600 transition-all shadow-lg"
+                className="absolute -bottom-4 right-1/2 transform translate-x-1/2 bg-green-500 text-white p-4 rounded-full hover:bg-green-600 transition-all shadow-lg hover:scale-105"
                 onClick={handleNext}
                 aria-label="Next Food"
             >
@@ -166,46 +168,59 @@ const Food_Detail = () => {
             </button>
 
             {/* Food Card */}
-            <div className="w-full max-w-6xl flex flex-col lg:flex-row items-center gap-10 bg-white rounded-lg shadow-2xl overflow-hidden">
-                <img
-                    src={`${backendUrl}/images/${currentFood.image}`}
-                    alt={currentFood.name}
-                    className="w-full lg:w-[50%] h-[400px] object-cover"
-                />
+            <div className="w-full max-w-6xl flex flex-col lg:flex-row items-center gap-10 bg-white rounded-3xl shadow-2xl overflow-hidden hover:shadow-3xl transition-all p-6">
+
+                {/* Food Image */}
+                <div className="relative w-full lg:w-[45%]">
+                    <img
+                        src={`${backendUrl}/images/${currentFood.image}`}
+                        alt={currentFood.name}
+                        className="w-full h-[400px] object-cover rounded-lg transition-transform hover:scale-105"
+                    />
+                    <button
+                        onClick={toggleFavorite}
+                        className="absolute top-4 left-4 bg-white p-2 rounded-full shadow-md flex items-center gap-2 hover:scale-110 transition-transform"
+                        aria-label="Add to Favorite"
+                    >
+                        <Heart
+                            size={32}
+                            className={`transition ${isFavorite ? "text-red-500" : "text-gray-400"}`}
+                            fill={isFavorite ? "#ef4444" : "none"}
+                        />
+                        <span className="text-gray-700 font-semibold">Add to Favorite</span>
+                    </button>
+                </div>
 
                 {/* Food Details */}
-                <div className="p-6 flex-1">
-                    <div className="flex justify-between items-center">
-                        <h1 className="text-5xl font-extrabold text-green-600 mb-4">{currentFood.name}</h1>
-                        <button onClick={toggleFavorite}>
-                            <Heart
-                                size={32}
-                                className={`transition ${isFavorite ? "text-red-500" : "text-gray-400"}`}
-                            />
-                        </button>
+                <div className="flex-1 flex flex-col justify-between">
+                    <div className="mb-6">
+                        <h1 className="text-5xl font-extrabold text-green-700 mb-2">{currentFood.name}</h1>
+                        <p className="text-gray-600 text-lg leading-relaxed mb-4">{currentFood.description}</p>
+                        <p className="text-3xl font-bold text-green-700 mb-6">{currentFood.price} Birr</p>
                     </div>
-                    <p className="text-gray-700 text-lg mb-4">{currentFood.description}</p>
-                    <p className="text-2xl font-semibold text-green-700 mb-6">{currentFood.price} Birr</p>
 
                     {/* Add to Cart Controls */}
-                    <div className="flex items-center gap-4 mb-6">
-                        <button
-                            onClick={() => removeFromCart(currentFood.id)}
-                            className="bg-red-500 hover:bg-red-600 text-white px-4 py-2 rounded transition"
-                        >
-                            -
-                        </button>
-                        <p className="text-2xl font-semibold">{cartItems[currentFood.id] || 0}</p>
-                        <button
-                            onClick={() => addToCart(currentFood.id)}
-                            className="bg-green-500 hover:bg-green-600 text-white px-4 py-2 rounded transition"
-                        >
-                            +
-                        </button>
+                    <div className="mb-8">
+                        <label className="block text-gray-800 font-semibold mb-2">Add/Remove from Cart:</label>
+                        <div className="flex items-center gap-4">
+                            <button
+                                onClick={() => removeFromCart(currentFood.id)}
+                                className="bg-red-500 hover:bg-red-600 text-white px-5 py-3 rounded-full transition-transform hover:scale-105 shadow-md"
+                            >
+                                <Minus size={20} />
+                            </button>
+                            <p className="text-2xl font-semibold">{cartItems[currentFood.id] || 0}</p>
+                            <button
+                                onClick={() => addToCart(currentFood.id)}
+                                className="bg-green-500 hover:bg-green-600 text-white px-5 py-3 rounded-full transition-transform hover:scale-105 shadow-md"
+                            >
+                                <Plus size={20} />
+                            </button>
+                        </div>
                     </div>
 
                     {/* Customizations */}
-                    <div className="mb-6">
+                    <div className="mb-8">
                         <label className="block text-gray-800 font-semibold mb-2">Customizations:</label>
                         <textarea
                             value={customizations}
@@ -214,18 +229,20 @@ const Food_Detail = () => {
                             rows="3"
                             placeholder="E.g., No tomato, less salt..."
                         ></textarea>
-                        <button
-                            onClick={saveCustomizations}
-                            className="mt-2 bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded transition"
-                        >
-                            Save Customizations
-                        </button>
-                        <button
-                            onClick={deleteCustomizations}
-                            className="mt-2 bg-red-500 hover:bg-red-600 text-white px-4 py-2 rounded transition"
-                        >
-                            Delete Customizations
-                        </button>
+                        <div className="flex gap-4 mt-4">
+                            <button
+                                onClick={saveCustomizations}
+                                className="bg-blue-500 hover:bg-blue-600 text-white px-5 py-3 rounded-full transition-transform hover:scale-105 shadow-md"
+                            >
+                                Save Customizations
+                            </button>
+                            <button
+                                onClick={deleteCustomizations}
+                                className="bg-red-500 hover:bg-red-600 text-white px-5 py-3 rounded-full transition-transform hover:scale-105 shadow-md"
+                            >
+                                Delete Customizations
+                            </button>
+                        </div>
                     </div>
 
                     {/* Star Rating */}
@@ -236,10 +253,13 @@ const Food_Detail = () => {
                                 <button
                                     key={star}
                                     onClick={() => saveRating(star)}
-                                    className={`p-2 rounded-full ${rating >= star ? "text-yellow-500" : "text-gray-400"
+                                    className={`p-2 transition-transform hover:scale-110 ${rating >= star ? "text-yellow-400" : "text-gray-300"
                                         }`}
                                 >
-                                    <Star size={24} />
+                                    <Star
+                                        size={32}
+                                        fill={rating >= star ? "#facc15" : "none"}
+                                    />
                                 </button>
                             ))}
                         </div>
@@ -248,6 +268,7 @@ const Food_Detail = () => {
             </div>
         </div>
     );
+
 };
 
 export default Food_Detail;
