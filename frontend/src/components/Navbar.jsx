@@ -139,7 +139,7 @@ export const Navbar = ({ setShowFeedback }) => {
                     </button>
                 ) : (
                     <div className='relative flex items-center gap-2 cursor-pointer group'>
-                        <img src={assets.profile_icon} alt='Profile' className='w-8 transition-transform duration-300 hover:scale-110' />
+                        <img src={assets.profile_icon} alt='Profile' className='w-7 transition-transform duration-300 hover:scale-110' />
                         <img src={assets.drop_down_icon} alt='Dropdown' className='w-2.5' />
 
                         {/* Dropdown Menu */}
