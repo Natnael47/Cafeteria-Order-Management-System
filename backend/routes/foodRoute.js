@@ -3,6 +3,7 @@ import multer from "multer";
 import {
   addFavorite,
   addFood,
+  deleteCustomization,
   listFood,
   listMenuFood,
   rateFood,
@@ -39,5 +40,6 @@ foodRouter.post("/rate-food", authUser, rateFood);
 foodRouter.post("/add-favorite", authUser, addFavorite);
 foodRouter.post("/remove-favorite", authUser, removeFavorite);
 foodRouter.post("/save-customization", authUser, saveOrUpdateCustomization);
+foodRouter.post("/remove-customization", authUser, deleteCustomization);
 
 export default foodRouter;

@@ -267,6 +267,49 @@ const saveOrUpdateCustomization = async (req, res) => {
   }
 };
 
+// Delete food customization
+const deleteCustomization = async (req, res) => {
+  try {
+    const { userId, foodId } = req.body;
+
+    // Validate input
+    if (!userId || !foodId) {
+      return res.json({ success: false, message: "Missing required fields" });
+    }
+
+    // Check if a customization exists for the user and food
+    const existingCustomization = await prisma.customization.findFirst({
+      where: {
+        userId: parseInt(userId),
+        foodId: parseInt(foodId),
+      },
+    });
+
+    if (!existingCustomization) {
+      return res.json({
+        success: false,
+        message: "No customization found for this user and food",
+      });
+    }
+
+    // Delete the customization
+    await prisma.customization.delete({
+      where: { id: existingCustomization.id },
+    });
+
+    res.json({
+      success: true,
+      message: "Customization deleted successfully",
+    });
+  } catch (error) {
+    console.error("Error deleting customization:", error);
+    res.json({
+      success: false,
+      message: "Error deleting customization",
+    });
+  }
+};
+
 // Add food to favorites
 const addFavorite = async (req, res) => {
   try {
@@ -321,6 +364,12 @@ const removeFavorite = async (req, res) => {
   }
 };
 
-export { addFavorite, rateFood, removeFavorite, saveOrUpdateCustomization };
+export {
+  addFavorite,
+  deleteCustomization,
+  rateFood,
+  removeFavorite,
+  saveOrUpdateCustomization,
+};
 
 export { addFood, listFood, listMenuFood, removeFood, updateFood };

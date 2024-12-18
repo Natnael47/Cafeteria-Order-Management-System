@@ -126,6 +126,23 @@ const Food_Detail = () => {
         }
     };
 
+    const deleteCustomizations = async () => {
+        try {
+            const response = await axios.post(`${backendUrl}/api/food/remove-customization`, {
+                foodId: currentFood.id,
+            }, { headers: { token } });
+
+            if (response.data.success) {
+                setCustomizations(""); // Clear customization in the UI
+                console.log(response.data.message);
+            } else {
+                console.error("Error deleting customization:", response.data.message);
+            }
+        } catch (error) {
+            console.error("Error deleting customization:", error);
+        }
+    };
+
     if (loading || !currentFood) {
         return <div className="flex justify-center items-center h-screen text-green-600 text-xl">Loading...</div>;
     }
@@ -202,6 +219,12 @@ const Food_Detail = () => {
                             className="mt-2 bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded transition"
                         >
                             Save Customizations
+                        </button>
+                        <button
+                            onClick={deleteCustomizations}
+                            className="mt-2 bg-red-500 hover:bg-red-600 text-white px-4 py-2 rounded transition"
+                        >
+                            Delete Customizations
                         </button>
                     </div>
 
