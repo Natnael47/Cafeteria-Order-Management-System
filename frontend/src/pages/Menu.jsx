@@ -49,6 +49,7 @@ const Menu = () => {
                                     description={item.description}
                                     price={item.price}
                                     image={item.image}
+                                    rating={item.rating}
                                 />
                             ))}
                     </div>

@@ -1,7 +1,6 @@
-import { Star } from "lucide-react"; // Importing Lucide icon for stars
+import { Minus, Plus, Star } from "lucide-react"; // Importing Lucide icons
 import React, { useContext } from "react";
 import { backendUrl } from "../App";
-import { assets } from "../assets/assets";
 import { StoreContext } from "../context/StoreContext";
 
 const FoodItem = ({ id, name, price, description, image, rating }) => {
@@ -9,21 +8,21 @@ const FoodItem = ({ id, name, price, description, image, rating }) => {
 
     // Function to generate star elements for the rating
     const renderStars = (rating) => {
-        const fullStars = Math.floor(rating); // Number of full stars
-        const halfStar = rating % 1 !== 0; // Check if there's a half star
-        const emptyStars = 5 - fullStars - (halfStar ? 1 : 0); // Remaining stars to fill up to 5
+        const fullStars = Math.floor(rating);
+        const halfStar = rating % 1 !== 0;
+        const emptyStars = 5 - fullStars - (halfStar ? 1 : 0);
 
         const stars = [];
         for (let i = 0; i < fullStars; i++) {
             stars.push(
-                <Star key={`full-${i}`} className="text-yellow-500 w-6 h-6" fill="currentColor" />
+                <Star key={`full-${i}`} className="text-yellow-400 w-4 h-4" fill="currentColor" />
             );
         }
         if (halfStar) {
             stars.push(
                 <Star
                     key="half"
-                    className="text-yellow-500 w-6 h-6"
+                    className="text-yellow-400 w-4 h-4"
                     fill="url(#half-star-gradient)"
                 >
                     <defs>
@@ -36,60 +35,59 @@ const FoodItem = ({ id, name, price, description, image, rating }) => {
             );
         }
         for (let i = 0; i < emptyStars; i++) {
-            stars.push(
-                <Star key={`empty-${i}`} className="text-gray-300 w-6 h-6" />
-            );
+            stars.push(<Star key={`empty-${i}`} className="text-gray-300 w-4 h-4" />);
         }
 
         return stars;
     };
 
     return (
-        <div className="w-full mx-auto border-2 border-[#39db4a] rounded-[15px] shadow-[0_0_10px_rgba(0,0,0,0.09)] transition duration-300 animate-fadeIn bg-[#d7f6da]">
-            <div className="relative">
+        <div className="w-full mx-auto border rounded-lg shadow-lg transition duration-300 hover:shadow-xl bg-white overflow-hidden">
+            <div className="relative group">
                 <img
-                    className="w-full rounded-t-[15px]"
+                    className="w-full h-[200px] object-cover group-hover:scale-105 transition-transform duration-300"
                     src={`${backendUrl || ""}/images/${image || ""}`}
                     alt={name}
                 />
+                {/* Add to cart button */}
                 {!cartItems?.[id] ? (
-                    <img
-                        className="w-[35px] absolute bottom-[15px] right-[15px] cursor-pointer rounded-full"
+                    <div
+                        className="absolute bottom-4 right-4 flex items-center justify-center rounded-full bg-green-500 w-9 h-9 cursor-pointer hover:bg-green-600 shadow-md transition"
                         onClick={() => addToCart(id)}
-                        src={assets?.add_icon_white || ""}
-                        alt="Add to cart"
-                    />
+                    >
+                        <Plus className="text-white w-5 h-5" />
+                    </div>
                 ) : (
-                    <div className="absolute bottom-[15px] right-[15px] flex items-center gap-[10px] p-[6px] rounded-full bg-white">
-                        <img
-                            className="w-[30px] cursor-pointer"
+                    <div className="absolute bottom-4 right-4 flex items-center gap-2 p-2 rounded-full bg-white shadow-md">
+                        <div
+                            className="w-8 h-8 flex items-center justify-center rounded-full bg-red-100 cursor-pointer hover:bg-red-200 transition"
                             onClick={() => removeFromCart(id)}
-                            src={assets?.remove_icon_red || ""}
-                            alt="Remove from cart"
-                        />
-                        <p>{cartItems[id]}</p>
-                        <img
-                            className="w-[30px] cursor-pointer"
+                        >
+                            <Minus className="text-red-700 w-4 h-4" />
+                        </div>
+                        <p className="text-base font-medium">{cartItems[id]}</p>
+                        <div
+                            className="w-8 h-8 flex items-center justify-center rounded-full bg-green-100 cursor-pointer hover:bg-green-200 transition"
                             onClick={() => addToCart(id)}
-                            src={assets?.add_icon_green || ""}
-                            alt="Add more"
-                        />
+                        >
+                            <Plus className="text-green-700 w-4 h-4" />
+                        </div>
                     </div>
                 )}
             </div>
+            {/* Food Details */}
             <div
                 onClick={() => navigate(`/food-detail/${id}`)}
-                className="p-[20px] hover:bg-blue-100 cursor-pointer"
+                className="p-4 hover:bg-gray-100 cursor-pointer"
             >
-                <div className="flex justify-between items-center mb-[10px] text-[#215727]">
-                    <p className="text-[20px] font-medium">{name}</p>
+                <div className="flex justify-between items-center mb-2">
+                    <p className="text-lg font-semibold text-gray-800">{name}</p>
                     <div className="flex items-center gap-1">
                         {renderStars(rating)}
-                        <span className="text-black font-medium text-sm ml-1">{rating.toFixed(1)}</span>
                     </div>
                 </div>
-                <p className="text-black text-[14px]">{description}</p>
-                <p className="text-black text-[22px] font-medium my-[10px]">{price} Birr</p>
+                <p className="text-sm text-gray-600">{description}</p>
+                <p className="text-lg font-semibold text-green-600 mt-2">{price} Birr</p>
             </div>
         </div>
     );
