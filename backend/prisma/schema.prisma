@@ -54,31 +54,84 @@ enum AccountStatus {
 
 // User model - Represents customers or system users
 model user {
-  id            Int           @id @default(autoincrement()) // Unique identifier for each user
-  firstName     String        @db.VarChar(255) // User's first name
-  lastName      String?       @db.VarChar(255) // User's last name
-  email         String        @unique(map: "User_email_key") @db.VarChar(255) // Unique email address
-  password      String        @db.VarChar(255) // User's password
-  gender        String?       @default("not selected") @db.VarChar(50) // User's gender with default
-  address       Json? // User's address information in JSON format
-  dob           String?       @default("not selected") @db.VarChar(100) // Date of birth
-  phone         String?       @default("+251 911524856") @db.VarChar(20) // User's phone number
-  createdAt     DateTime      @default(now()) // Timestamp of record creation
-  updatedAt     DateTime?     @updatedAt // Automatically updated timestamp for modifications
-  cartData      Json? // User's shopping cart data in JSON format
-  feedback      feedback[] // Relation to feedback table
-  order         order[] // Relation to order table
-  accountStatus AccountStatus @default(ACTIVE) // User's account status
+  id             Int             @id @default(autoincrement()) // Unique identifier for each user
+  firstName      String          @db.VarChar(255) // User's first name
+  lastName       String?         @db.VarChar(255) // User's last name
+  email          String          @unique(map: "User_email_key") @db.VarChar(255) // Unique email address
+  password       String          @db.VarChar(255) // User's password
+  gender         String?         @default("not selected") @db.VarChar(50) // User's gender with default
+  address        Json? // User's address information in JSON format
+  dob            String?         @default("not selected") @db.VarChar(100) // Date of birth
+  phone          String?         @default("+251 911524856") @db.VarChar(20) // User's phone number
+  createdAt      DateTime        @default(now()) // Timestamp of record creation
+  updatedAt      DateTime?       @updatedAt // Automatically updated timestamp for modifications
+  lastUpdated    DateTime?       @updatedAt // Tracks last update timestamp
+  cartData       Json? // User's shopping cart data in JSON format
+  feedback       feedback[] // Relation to feedback table
+  order          order[] // Relation to order table
+  favorites      favorite[] // Relation to user's favorite food items
+  customizations customization[] // Relation to food customizations
+  accountStatus  AccountStatus   @default(ACTIVE) // User's account status
+}
+
+// Food model - Represents food items
+model food {
+  id             Int             @id @default(autoincrement()) // Unique identifier for each food item
+  name           String          @db.VarChar(255) // Name of the food item
+  description    String          @db.VarChar(255) // Description of the food item
+  price          Float // Price of the food item
+  image          String          @db.VarChar(255) // URL or path to food item image
+  category       String          @db.VarChar(255) // Category of the food item (e.g., appetizer, dessert)
+  menuStatus     Boolean         @default(true) // Indicates if the item is available on the menu
+  prepTime       Int             @default(0) // Preparation time in minutes
+  rating         Float?          @default(0.0) // Average rating of the food item
+  createdAt      DateTime        @default(now()) // Timestamp of record creation
+  lastUpdated    DateTime?       @updatedAt // Tracks last update timestamp
+  orderItem      orderItem[]
+  favorites      favorite[] // Relation to favorites table
+  customizations customization[] // Relation to customizations table
+}
+
+// Favorite model - Represents user's favorite food items
+model favorite {
+  id          Int       @id @default(autoincrement()) // Unique identifier for each favorite entry
+  userId      Int // Foreign key to User table
+  foodId      Int // Foreign key to Food table
+  addedAt     DateTime  @default(now()) // Date when the food was marked as favorite
+  lastUpdated DateTime? @updatedAt // Tracks last update timestamp
+
+  user user @relation(fields: [userId], references: [id], map: "Favorite_userId_fkey")
+  food food @relation(fields: [foodId], references: [id], map: "Favorite_foodId_fkey")
+
+  @@unique([userId, foodId], map: "Unique_user_food_favorite")
+}
+
+// Customization model - Represents user's customizations for food items
+model customization {
+  id          Int       @id @default(autoincrement()) // Unique identifier for each customization entry
+  userId      Int // Foreign key to User table
+  foodId      Int // Foreign key to Food table
+  customNote  String    @db.VarChar(255) // Note describing the customization (e.g., "No pickles", "Extra cheese")
+  createdAt   DateTime  @default(now()) // Date when customization was added
+  lastUpdated DateTime? @updatedAt // Tracks last update timestamp
+
+  user user @relation(fields: [userId], references: [id], map: "Customization_userId_fkey")
+  food food @relation(fields: [foodId], references: [id], map: "Customization_foodId_fkey")
+
+  @@index([userId], map: "Customization_userId_fkey")
+  @@index([foodId], map: "Customization_foodId_fkey")
 }
 
 // Feedback model - Represents user feedback
 model feedback {
-  id      Int      @id @default(autoincrement()) // Unique identifier for each feedback
-  userId  Int // Foreign key to User table
-  comment String   @db.Text // User's feedback comment
-  rating  Float // User's rating
-  date    DateTime @default(now()) // Date when feedback was given
-  user    user     @relation(fields: [userId], references: [id], map: "Feedback_userId_fkey")
+  id          Int       @id @default(autoincrement()) // Unique identifier for each feedback
+  userId      Int // Foreign key to User table
+  comment     String    @db.Text // User's feedback comment
+  rating      Float // User's rating
+  date        DateTime  @default(now()) // Date when feedback was given
+  lastUpdated DateTime? @updatedAt // Tracks last update timestamp
+
+  user user @relation(fields: [userId], references: [id], map: "Feedback_userId_fkey")
 
   @@index([userId], map: "Feedback_userId_fkey")
 }
@@ -151,19 +204,6 @@ model orderLog {
   order order @relation(fields: [orderId], references: [id], onDelete: Cascade)
 
   @@index([orderId], map: "OrderLog_orderId_fkey")
-}
-
-// Food model - Represents food items
-model food {
-  id          Int         @id @default(autoincrement()) // Unique identifier for each food item
-  name        String      @db.VarChar(255) // Name of the food item
-  description String      @db.VarChar(255) // Description of the food item
-  price       Float // Price of the food item
-  image       String      @db.VarChar(255) // URL or path to food item image
-  category    String      @db.VarChar(255) // Category of the food item (e.g., appetizer, dessert)
-  menuStatus  Boolean     @default(true) // Indicates if the item is available on the menu
-  prepTime    Int         @default(0) // Preparation time in minutes
-  orderItem   orderItem[]
 }
 
 model inventory {
