@@ -1,3 +1,4 @@
+import axios from "axios";
 import { ArrowDown, ArrowUp, Star } from "lucide-react";
 import React, { useContext, useEffect, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
@@ -5,7 +6,7 @@ import { backendUrl } from "../App";
 import { StoreContext } from "../context/StoreContext";
 
 const Food_Detail = () => {
-    const { food_list, addToCart, removeFromCart, cartItems } = useContext(StoreContext);
+    const { food_list, addToCart, removeFromCart, cartItems, userId, token } = useContext(StoreContext);
     const { id } = useParams(); // Get food id from URL
     const navigate = useNavigate();
 
@@ -38,7 +39,40 @@ const Food_Detail = () => {
         navigate(`/food-detail/${food_list[prevIndex].id}`);
     };
 
-    const handleRating = (value) => setRating(value);
+    const saveRating = async (value) => {
+        try {
+            setRating(value); // Update rating locally
+            const response = await axios.post(
+                `${backendUrl}/api/food/rate-food`,
+                {
+                    foodId: currentFood.id,
+                    rating: value,
+                }, { headers: { token } }
+            );
+            if (!response.data.success) {
+                console.error("Error saving rating:", response.data.message);
+            }
+        } catch (error) {
+            console.error("Error saving rating:", error);
+        }
+    };
+
+    const saveCustomizations = async () => {
+        try {
+            const response = await axios.post(
+                `${backendUrl}/api/food/save-customization`,
+                {
+                    foodId: currentFood.id,
+                    customNote: customizations,
+                }, { headers: { token } }
+            );
+            if (!response.data.success) {
+                console.error("Error saving customization:", response.data.message);
+            }
+        } catch (error) {
+            console.error("Error saving customization:", error);
+        }
+    };
 
     if (loading || !currentFood) {
         return <div className="flex justify-center items-center h-screen text-green-600 text-xl">Loading...</div>;
@@ -103,6 +137,12 @@ const Food_Detail = () => {
                             rows="3"
                             placeholder="E.g., No tomato, less salt..."
                         ></textarea>
+                        <button
+                            onClick={saveCustomizations}
+                            className="mt-2 bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded transition"
+                        >
+                            Save Customizations
+                        </button>
                     </div>
 
                     {/* Star Rating */}
@@ -112,7 +152,7 @@ const Food_Detail = () => {
                             {[1, 2, 3, 4, 5].map((star) => (
                                 <button
                                     key={star}
-                                    onClick={() => handleRating(star)}
+                                    onClick={() => saveRating(star)}
                                     className={`p-2 rounded-full ${rating >= star ? "text-yellow-500" : "text-gray-400"
                                         }`}
                                 >

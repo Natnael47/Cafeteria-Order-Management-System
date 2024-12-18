@@ -8,8 +8,7 @@ import {
   rateFood,
   removeFavorite,
   removeFood,
-  saveCustomization,
-  updateCustomization,
+  saveOrUpdateCustomization,
   updateFood,
 } from "../controllers/foodController.js";
 import adminAuth from "../middleware/adminAuth.js";
@@ -39,7 +38,6 @@ foodRouter.post("/update", adminAuth, upload.single("image"), updateFood);
 foodRouter.post("/rate-food", authUser, rateFood);
 foodRouter.post("/add-favorite", authUser, addFavorite);
 foodRouter.post("/remove-favorite", authUser, removeFavorite);
-foodRouter.post("/save-customization", authUser, saveCustomization);
-foodRouter.post("/update-customization", authUser, updateCustomization);
+foodRouter.post("/save-customization", authUser, saveOrUpdateCustomization);
 
 export default foodRouter;

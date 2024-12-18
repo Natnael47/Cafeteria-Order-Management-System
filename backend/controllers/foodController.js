@@ -214,7 +214,7 @@ const rateFood = async (req, res) => {
 };
 
 // Save food customization
-const saveCustomization = async (req, res) => {
+const saveOrUpdateCustomization = async (req, res) => {
   try {
     const { userId, foodId, customNote } = req.body;
 
@@ -223,48 +223,47 @@ const saveCustomization = async (req, res) => {
       return res.json({ success: false, message: "Missing required fields" });
     }
 
-    const customization = await prisma.customization.create({
-      data: {
+    // Check if a customization already exists for the user and food
+    const existingCustomization = await prisma.customization.findFirst({
+      where: {
         userId: parseInt(userId),
         foodId: parseInt(foodId),
-        customNote,
       },
     });
 
-    res.json({
-      success: true,
-      message: "Customization saved successfully",
-      data: customization,
-    });
-  } catch (error) {
-    console.error("Error saving customization:", error);
-    res.json({ success: false, message: "Error saving customization" });
-  }
-};
-
-// Update food customization
-const updateCustomization = async (req, res) => {
-  try {
-    const { customizationId, customNote } = req.body;
-
-    // Validate input
-    if (!customizationId || !customNote) {
-      return res.json({ success: false, message: "Missing required fields" });
+    let customization;
+    if (existingCustomization) {
+      // Update the existing customization
+      customization = await prisma.customization.update({
+        where: { id: existingCustomization.id },
+        data: { customNote },
+      });
+      res.json({
+        success: true,
+        message: "Customization updated successfully",
+        data: customization,
+      });
+    } else {
+      // Create a new customization
+      customization = await prisma.customization.create({
+        data: {
+          userId: parseInt(userId),
+          foodId: parseInt(foodId),
+          customNote,
+        },
+      });
+      res.json({
+        success: true,
+        message: "Customization saved successfully",
+        data: customization,
+      });
     }
-
-    const customization = await prisma.customization.update({
-      where: { id: parseInt(customizationId) },
-      data: { customNote },
-    });
-
-    res.json({
-      success: true,
-      message: "Customization updated successfully",
-      data: customization,
-    });
   } catch (error) {
-    console.error("Error updating customization:", error);
-    res.json({ success: false, message: "Error updating customization" });
+    console.error("Error saving or updating customization:", error);
+    res.json({
+      success: false,
+      message: "Error saving or updating customization",
+    });
   }
 };
 
@@ -322,12 +321,6 @@ const removeFavorite = async (req, res) => {
   }
 };
 
-export {
-  addFavorite,
-  rateFood,
-  removeFavorite,
-  saveCustomization,
-  updateCustomization,
-};
+export { addFavorite, rateFood, removeFavorite, saveOrUpdateCustomization };
 
 export { addFood, listFood, listMenuFood, removeFood, updateFood };
