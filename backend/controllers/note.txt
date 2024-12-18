@@ -1,0 +1,176 @@
+Here’s how you can test each function in Postman:
+
+---
+
+### **1. Test `rateFood` Function**
+**Endpoint:**  
+`POST /rate-food`
+
+**Body (JSON):**
+```json
+{
+  "userId": 1,
+  "foodId": 2,
+  "rating": 4.5
+}
+```
+
+**Steps in Postman:**
+1. Set the method to `POST`.
+2. Enter the endpoint URL.
+3. Under the **Body** tab, select **raw**, set the type to `JSON`, and paste the JSON body.
+4. Click **Send**.
+
+**Expected Response:**
+```json
+{
+  "success": true,
+  "message": "Food rated successfully",
+  "data": {
+    "id": 2,
+    "name": "Food Name",
+    "rating": 4.5,
+    ...
+  }
+}
+```
+
+---
+
+### **2. Test `saveCustomization` Function**
+**Endpoint:**  
+`POST /save-customization`
+
+**Body (JSON):**
+```json
+{
+  "userId": 1,
+  "foodId": 2,
+  "customNote": "Extra cheese, no pickles"
+}
+```
+
+**Steps in Postman:**
+1. Set the method to `POST`.
+2. Enter the endpoint URL.
+3. Under the **Body** tab, select **raw**, set the type to `JSON`, and paste the JSON body.
+4. Click **Send**.
+
+**Expected Response:**
+```json
+{
+  "success": true,
+  "message": "Customization saved successfully",
+  "data": {
+    "id": 1,
+    "userId": 1,
+    "foodId": 2,
+    "customNote": "Extra cheese, no pickles",
+    ...
+  }
+}
+```
+
+---
+
+### **3. Test `updateCustomization` Function**
+**Endpoint:**  
+`PUT /update-customization`
+
+**Body (JSON):**
+```json
+{
+  "customizationId": 1,
+  "customNote": "No pickles, extra onions"
+}
+```
+
+**Steps in Postman:**
+1. Set the method to `PUT`.
+2. Enter the endpoint URL.
+3. Under the **Body** tab, select **raw**, set the type to `JSON`, and paste the JSON body.
+4. Click **Send**.
+
+**Expected Response:**
+```json
+{
+  "success": true,
+  "message": "Customization updated successfully",
+  "data": {
+    "id": 1,
+    "customNote": "No pickles, extra onions",
+    ...
+  }
+}
+```
+
+---
+
+### **4. Test `addFavorite` Function**
+**Endpoint:**  
+`POST /add-favorite`
+
+**Body (JSON):**
+```json
+{
+  "userId": 1,
+  "foodId": 2
+}
+```
+
+**Steps in Postman:**
+1. Set the method to `POST`.
+2. Enter the endpoint URL.
+3. Under the **Body** tab, select **raw**, set the type to `JSON`, and paste the JSON body.
+4. Click **Send**.
+
+**Expected Response:**
+```json
+{
+  "success": true,
+  "message": "Food added to favorites",
+  "data": {
+    "id": 1,
+    "userId": 1,
+    "foodId": 2,
+    ...
+  }
+}
+```
+
+---
+
+### **5. Test `removeFavorite` Function**
+**Endpoint:**  
+`DELETE /remove-favorite`
+
+**Body (JSON):**
+```json
+{
+  "userId": 1,
+  "foodId": 2
+}
+```
+
+**Steps in Postman:**
+1. Set the method to `DELETE`.
+2. Enter the endpoint URL.
+3. Under the **Body** tab, select **raw**, set the type to `JSON`, and paste the JSON body.
+4. Click **Send**.
+
+**Expected Response:**
+```json
+{
+  "success": true,
+  "message": "Food removed from favorites"
+}
+```
+
+---
+
+### Notes for All Tests:
+- Replace `userId`, `foodId`, and other IDs with valid values from your database.
+- Ensure your server is running, and the endpoints match the routes defined in your backend.
+- Use meaningful values to test edge cases (e.g., invalid IDs or missing fields) and verify error handling.
+
+Let me know if you need help with setting up Postman or testing additional functionalities!

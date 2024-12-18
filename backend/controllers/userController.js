@@ -344,9 +344,59 @@ const updateAccountStatus = async (req, res) => {
   }
 };
 
+// Get user favorites and customizations
+const getUserFavoritesAndCustomizations = async (req, res) => {
+  try {
+    const { userId } = req.body;
+
+    // Validate input
+    if (!userId) {
+      return res.json({ success: false, message: "Missing required fields" });
+    }
+
+    // Fetch user's favorite foods
+    const favorites = await prisma.favorite.findMany({
+      where: { userId: parseInt(userId) },
+      include: { food: true }, // Include related food details
+    });
+
+    // Fetch user's customizations
+    const customizations = await prisma.customization.findMany({
+      where: { userId: parseInt(userId) },
+      include: { food: true }, // Include related food details
+    });
+
+    res.json({
+      success: true,
+      message: "Fetched user favorites and customizations successfully",
+      data: {
+        favorites: favorites.map((favorite) => ({
+          foodId: favorite.foodId,
+          foodName: favorite.food.name,
+          foodCategory: favorite.food.category,
+          foodPrice: favorite.food.price,
+          foodImage: favorite.food.image,
+        })),
+        customizations: customizations.map((customization) => ({
+          foodId: customization.foodId,
+          foodName: customization.food.name,
+          customNote: customization.customNote,
+        })),
+      },
+    });
+  } catch (error) {
+    console.error("Error fetching favorites and customizations:", error);
+    res.json({
+      success: false,
+      message: "Error fetching favorites and customizations",
+    });
+  }
+};
+
 export {
   allUsers,
   changePassword,
+  getUserFavoritesAndCustomizations,
   getUserProfile,
   loginUser,
   registerUser,
