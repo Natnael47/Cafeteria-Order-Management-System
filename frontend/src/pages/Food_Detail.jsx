@@ -175,7 +175,7 @@ const Food_Detail = () => {
                     <img
                         src={`${backendUrl}/images/${currentFood.image}`}
                         alt={currentFood.name}
-                        className="w-full h-[400px] object-cover rounded-lg transition-transform hover:scale-105"
+                        className="w-full h-[400px] object-cover rounded-lg"
                     />
                     <button
                         onClick={toggleFavorite}
