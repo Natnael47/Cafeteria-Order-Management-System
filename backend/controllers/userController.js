@@ -354,21 +354,31 @@ const getUserFavoritesAndCustomizations = async (req, res) => {
       return res.json({ success: false, message: "Missing required fields" });
     }
 
+    const userIdInt = parseInt(userId);
+
     // Fetch user's favorite foods
     const favorites = await prisma.favorite.findMany({
-      where: { userId: parseInt(userId) },
+      where: { userId: userIdInt },
       include: { food: true }, // Include related food details
     });
 
     // Fetch user's customizations
     const customizations = await prisma.customization.findMany({
-      where: { userId: parseInt(userId) },
+      where: { userId: userIdInt },
       include: { food: true }, // Include related food details
     });
 
+    // Fetch user's ratings
+    const ratings = await prisma.rating.findMany({
+      where: { userId: userIdInt },
+      include: { food: true }, // Include related food details
+    });
+
+    // Map and organize the data
     res.json({
       success: true,
-      message: "Fetched user favorites and customizations successfully",
+      message:
+        "Fetched user favorites, customizations, and ratings successfully",
       data: {
         favorites: favorites.map((favorite) => ({
           foodId: favorite.foodId,
@@ -382,13 +392,21 @@ const getUserFavoritesAndCustomizations = async (req, res) => {
           foodName: customization.food.name,
           customNote: customization.customNote,
         })),
+        ratings: ratings.map((rating) => ({
+          foodId: rating.foodId,
+          foodName: rating.food.name,
+          userRating: rating.rating,
+        })),
       },
     });
   } catch (error) {
-    console.error("Error fetching favorites and customizations:", error);
+    console.error(
+      "Error fetching favorites, customizations, and ratings:",
+      error
+    );
     res.json({
       success: false,
-      message: "Error fetching favorites and customizations",
+      message: "Error fetching favorites, customizations, and ratings",
     });
   }
 };
