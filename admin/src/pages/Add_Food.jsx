@@ -41,8 +41,6 @@ const Add = () => {
                 price: "",
                 category: "Salad",
                 prepTime: "",
-                isAlcoholic: false,
-                size: "large"
             });
             setImage(false);
             navigate('/list');
