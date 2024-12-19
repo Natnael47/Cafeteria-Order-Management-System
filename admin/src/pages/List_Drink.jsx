@@ -22,6 +22,7 @@ const List_Drink = () => {
         image: "",
         drink_Description: "",
         menu_Status: "",
+        is_Alcoholic: "",
         drink_Size: ""
     });
     const [originalFood, setOriginalFood] = useState(null);
@@ -80,6 +81,8 @@ const List_Drink = () => {
             image: "",
             drink_Description: "",
             menu_Status: false,
+            is_Alcoholic: false,
+            drink_Size: ""
         });
         setOriginalFood(null);
         setImage(false);
@@ -122,6 +125,7 @@ const List_Drink = () => {
         formData.append("drink_Price", editFood.drink_Price);
         formData.append("drink_Description", editFood.drink_Description);
         formData.append("menu_Status", editFood.menu_Status ? "1" : "0");
+        formData.append("is_Alcoholic", editFood.is_Alcoholic ? "true" : "false");
         formData.append("drink_Size", editFood.drink_Size);
         if (editFood.image instanceof File) {
             formData.append("image", editFood.image);
@@ -224,11 +228,13 @@ const List_Drink = () => {
             <div className="bg-gray-100 rounded-lg w-full max-h-[84vh] overflow-scroll shadow-lg">
                 <div>
                     {/* Table Header */}
-                    <div className="grid grid-cols-[0.5fr_1fr_1fr_0.8fr_0.5fr_0.5fr] items-center gap-4 p-4 border-b bg-[#22C55E] text-white text-base font-semibold">
+                    <div className="max-w-6.5xl grid grid-cols-[0.5fr_1fr_1fr_1fr_0.8fr_0.5fr_0.5fr_0.8fr_0.8fr] items-center gap-6 p-4 border-b bg-[#22C55E] text-white text-base font-semibold">
                         <b>Image</b>
                         <b>Name</b>
                         <b>Category</b>
                         <b>Price</b>
+                        <b>Size</b>
+                        <b>Alcoholic</b>
                         <b>Remove</b>
                         <b>Modify</b>
                     </div>
@@ -237,24 +243,43 @@ const List_Drink = () => {
                     {filteredFoodList.length > 0 ? (
                         filteredFoodList.map((item, index) => (
                             <div key={index}>
-                                {/* Food Item */}
+                                {/* List Items */}
                                 <div
-                                    className={`grid grid-cols-[0.5fr_1fr_1fr_0.8fr_0.5fr_0.5fr] items-center gap-4 p-4 border-b sm:grid ${item.menu_Status === false ? "bg-red-50" : "bg-white"
+                                    className={`max-w-6.5xl grid grid-cols-[0.5fr_1fr_1fr_1fr_0.8fr_0.5fr_0.5fr_0.8fr_0.8fr] items-center gap-6 p-4 border-b sm:grid ${item.menu_Status === false ? "bg-red-50" : "bg-white"
                                         } hover:bg-blue-50`}
                                 >
+                                    {/* Drink Image */}
                                     <img
                                         src={`${backendUrl}/drink-images/${item.drink_Image}`}
-                                        alt="Food"
+                                        alt="Drink"
                                         className="w-20 h-[70px] rounded object-cover"
                                     />
+
+                                    {/* Drink Name */}
                                     <p className="truncate font-medium text-gray-700">{item.drink_Name}</p>
+
+                                    {/* Drink Category */}
                                     <p className="text-gray-600">{item.drink_Category}</p>
+
+                                    {/* Drink Price */}
                                     <p className="text-gray-700 font-semibold">${item.drink_Price}</p>
+
+                                    {/* Drink Size */}
+                                    <p className="text-gray-600">{item.drink_Size || "N/A"}</p>
+
+                                    {/* Alcoholic Status */}
+                                    <p className={`text-sm font-medium ${item.is_Alcoholic ? "text-red-600" : "text-green-600"}`}>
+                                        {item.is_Alcoholic ? "Yes" : "No"}
+                                    </p>
+
+                                    {/* Remove Button */}
                                     <Trash2
                                         size={28}
                                         onClick={() => openModal(item.drink_Id)}
                                         className="cursor-pointer text-red-500 hover:text-red-600 ml-5"
                                     />
+
+                                    {/* Edit Button */}
                                     <Pencil
                                         size={28}
                                         onClick={() => handleEditClick(item, index)}
@@ -309,6 +334,18 @@ const List_Drink = () => {
                                                             type="checkbox"
                                                             name="menu_Status"
                                                             checked={editFood.menu_Status}
+                                                            onChange={handleInputChange}
+                                                            className="ml-2 w-5 h-5"
+                                                        />
+                                                    </div>
+                                                    <div className="mb-4">
+                                                        <label className="block text-sm font-medium mb-1">
+                                                            Alcohol
+                                                        </label>
+                                                        <input
+                                                            type="checkbox"
+                                                            name="is_Alcoholic"
+                                                            checked={editFood.is_Alcoholic}
                                                             onChange={handleInputChange}
                                                             className="ml-2 w-5 h-5"
                                                         />
@@ -370,16 +407,21 @@ const List_Drink = () => {
 
                                                 <div className="mb-4">
                                                     <label className="block text-sm font-medium mb-1">
-                                                        Prep Time (mins)
+                                                        Size
                                                     </label>
-                                                    <input
-                                                        type="text"
+                                                    <select
                                                         name="drink_Size"
                                                         value={editFood.drink_Size}
                                                         onChange={handleInputChange}
                                                         className="w-full border p-2 rounded-lg"
-                                                    />
+                                                    >
+                                                        <option value="">Select Size</option>
+                                                        <option value="Large">Large</option>
+                                                        <option value="Medium">Medium</option>
+                                                        <option value="Small">Small</option>
+                                                    </select>
                                                 </div>
+
                                             </div>
                                         </div>
 
