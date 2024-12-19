@@ -72,6 +72,28 @@ const Sidebar = () => {
                 </NavLink>
 
                 <NavLink
+                    to="/list-drink"
+                    className={({ isActive }) =>
+                        `flex items-center gap-3 py-3.5 px-3 md:px-9 md:min-w-72 cursor-pointer transform transition-transform duration-300 ease-in-out ${isActive ? 'bg-[#22C55E] scale-95 border-r-4 rounded-md shadow-lg border-[#22C55E]' : ''}`
+                    }
+                >
+                    {({ isActive }) => (
+                        <>
+                            <Utensils
+                                size={isActive ? 32 : 28}
+                                color={isActive ? activeColors.foodItems : defaultColors.foodItems}
+                                strokeWidth={isActive ? 2.5 : 2}
+                            />
+                            <p
+                                className={`hidden md:block transition-colors duration-300 ease-in-out ${isActive ? 'text-white font-bold' : 'text-black'}`}
+                            >
+                                Drinks
+                            </p>
+                        </>
+                    )}
+                </NavLink>
+
+                <NavLink
                     to="/orders"
                     className={({ isActive }) =>
                         `flex items-center gap-3 py-3.5 px-3 md:px-9 md:min-w-72 cursor-pointer transform transition-transform duration-300 ease-in-out ${isActive ? 'bg-[#22C55E] scale-95 border-r-4 rounded-md shadow-lg border-[#22C55E]' : ''}`

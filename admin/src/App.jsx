@@ -10,6 +10,7 @@ import Add from './pages/Add_Food';
 import Dashboard from './pages/Dashboard';
 import EmployeeProfile from './pages/Employee_Profile';
 import EmployeesList from './pages/Employees_List';
+import List_Drink from './pages/List_Drink';
 import List from './pages/List_Food';
 import Login from './pages/Login';
 import Orders from './pages/Orders';
@@ -31,6 +32,7 @@ const App = () => {
           <Route path='/' element={<Dashboard />} />
           <Route path='/add' element={<Add />} />
           <Route path='/list' element={<List />} />
+          <Route path='/list-drink' element={<List_Drink />} />
           <Route path='/orders' element={<Orders />} />
           <Route path='/reports' element={<Reports />} />
           <Route path='/users' element={<Users />} />
