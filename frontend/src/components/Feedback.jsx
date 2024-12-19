@@ -38,7 +38,7 @@ const Feedback = () => {
     };
 
     return (
-        <div className="mt-12 text-center p-5 bg-[#f4f8f4]">
+        <div className="mt-12 text-center p-5">
             <h2 className="text-2xl font-bold mb-5">What Our Customers Say?</h2>
             <div className="relative flex items-center justify-center">
                 {/* Left button */}

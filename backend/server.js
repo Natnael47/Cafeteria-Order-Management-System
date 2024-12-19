@@ -3,6 +3,7 @@ import "dotenv/config";
 import express from "express";
 import adminRouter from "./routes/adminRoute.js";
 import cartRouter from "./routes/cartRoute.js";
+import drinkRouter from "./routes/drinkRoute.js";
 import employeeRoute from "./routes/employeeRoute.js";
 import feedBackRoute from "./routes/feedBackRoute.js";
 import foodRouter from "./routes/foodRoute.js";
@@ -25,7 +26,9 @@ app.use(express.urlencoded({ extended: true }));
 
 //api endpoints for Customer
 app.use("/api/food", foodRouter);
+app.use("/api/drink", drinkRouter);
 app.use("/images", express.static("uploads"));
+app.use("/drink-images", express.static("uploads2"));
 app.use("/empIMG", express.static("uploadsEmp"));
 app.use("/Inv_img", express.static("upload_inv"));
 //API For USERS

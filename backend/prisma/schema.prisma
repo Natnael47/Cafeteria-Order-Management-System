@@ -94,6 +94,26 @@ model food {
   ratings        rating[] // Relation to ratings table
 }
 
+model Drink {
+  drink_Id          Int       @id @default(autoincrement()) // Unique identifier
+  drink_Name        String    @db.VarChar(255) // Name of the drink
+  drink_Description String    @db.VarChar(255) // Description
+  drink_Price       Float // Price
+  drink_Image       String    @db.VarChar(255) // URL or path to drink image
+  drink_Category    String    @db.VarChar(255) // Category (e.g., soda, juice, alcoholic)
+  is_Alcoholic      Boolean   @default(false) // Indicates if the drink contains alcohol
+  drink_Size        String?   @db.VarChar(50) // Size of the drink (e.g., small, medium, large)
+  menu_Status       Boolean   @default(true) // Availability on the menu
+  average_Rating    Float?    @default(0.0) // Average rating
+  created_At        DateTime  @default(now()) // Creation timestamp
+  last_Updated      DateTime? @updatedAt // Last update timestamp
+
+  order_Items    orderItem[] // Relation to order items
+  favorites      favorite[] // Relation to favorites
+  customizations customization[] // Relation to customizations
+  ratings        rating[] // Relation to ratings
+}
+
 // Rating model - Represents user ratings for food items
 model rating {
   id        Int      @id @default(autoincrement())
@@ -102,8 +122,10 @@ model rating {
   rating    Float
   createdAt DateTime @default(now())
 
-  user user @relation(fields: [userId], references: [id])
-  food food @relation(fields: [foodId], references: [id])
+  user          user   @relation(fields: [userId], references: [id])
+  food          food   @relation(fields: [foodId], references: [id])
+  Drink         Drink? @relation(fields: [drinkDrink_Id], references: [drink_Id])
+  drinkDrink_Id Int?
 
   @@unique([userId, foodId], map: "Unique_user_food_rating") // Ensure one rating per user-food combination
 }
@@ -116,8 +138,10 @@ model favorite {
   addedAt     DateTime  @default(now()) // Date when the food was marked as favorite
   lastUpdated DateTime? @updatedAt // Tracks last update timestamp
 
-  user user @relation(fields: [userId], references: [id], map: "Favorite_userId_fkey")
-  food food @relation(fields: [foodId], references: [id], map: "Favorite_foodId_fkey")
+  user          user   @relation(fields: [userId], references: [id], map: "Favorite_userId_fkey")
+  food          food   @relation(fields: [foodId], references: [id], map: "Favorite_foodId_fkey")
+  Drink         Drink? @relation(fields: [drinkDrink_Id], references: [drink_Id])
+  drinkDrink_Id Int?
 
   @@unique([userId, foodId], map: "Unique_user_food_favorite")
 }
@@ -131,8 +155,10 @@ model customization {
   createdAt   DateTime  @default(now()) // Date when customization was added
   lastUpdated DateTime? @updatedAt // Tracks last update timestamp
 
-  user user @relation(fields: [userId], references: [id], map: "Customization_userId_fkey")
-  food food @relation(fields: [foodId], references: [id], map: "Customization_foodId_fkey")
+  user          user   @relation(fields: [userId], references: [id], map: "Customization_userId_fkey")
+  food          food   @relation(fields: [foodId], references: [id], map: "Customization_foodId_fkey")
+  Drink         Drink? @relation(fields: [drinkDrink_Id], references: [drink_Id])
+  drinkDrink_Id Int?
 
   @@index([userId], map: "Customization_userId_fkey")
   @@index([foodId], map: "Customization_foodId_fkey")
@@ -186,8 +212,10 @@ model orderItem {
   startedAt     DateTime? // When cooking started
   completedAt   DateTime? // When cooking was completed
 
-  order order @relation(fields: [orderId], references: [id], onDelete: Cascade)
-  food  food  @relation(fields: [foodId], references: [id], onDelete: Cascade)
+  order         order  @relation(fields: [orderId], references: [id], onDelete: Cascade)
+  food          food   @relation(fields: [foodId], references: [id], onDelete: Cascade)
+  Drink         Drink? @relation(fields: [drinkDrink_Id], references: [drink_Id])
+  drinkDrink_Id Int?
 }
 
 // Payment model - Represents order payments
