@@ -33,7 +33,7 @@ const Add = () => {
         formData.append("prepTime", data.prepTime); // Added prepTime to formData
         formData.append("image", image);
 
-        const response = await axios.post(backendUrl + "/api/drink/add", formData, { headers: { token } });
+        const response = await axios.post(backendUrl + "/api/food/add", formData, { headers: { token } });
         if (response.data.success) {
             setData({
                 name: "",
