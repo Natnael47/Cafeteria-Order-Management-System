@@ -187,7 +187,7 @@ const List_Drink = () => {
         <div className="m-5 w-full max-w-6.5xl max-h-[90vh]">
             {/* Header */}
             <div className="flex items-center justify-between mb-2">
-                <h1 className="text-3xl font-bold text-gray-800">Menu Items</h1>
+                <h1 className="text-3xl font-bold text-gray-800">Drink Items</h1>
                 <div className="flex items-center space-x-4">
                     {/* New Food Button */}
                     <button

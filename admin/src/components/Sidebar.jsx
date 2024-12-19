@@ -65,7 +65,7 @@ const Sidebar = () => {
                             <p
                                 className={`hidden md:block transition-colors duration-300 ease-in-out ${isActive ? 'text-white font-bold' : 'text-black'}`}
                             >
-                                Menu Items
+                                Food Items
                             </p>
                         </>
                     )}
@@ -87,7 +87,7 @@ const Sidebar = () => {
                             <p
                                 className={`hidden md:block transition-colors duration-300 ease-in-out ${isActive ? 'text-white font-bold' : 'text-black'}`}
                             >
-                                Drinks
+                                Drink Items
                             </p>
                         </>
                     )}
