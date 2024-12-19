@@ -1,4 +1,4 @@
-import { BookUser, ClipboardList, HandPlatter, House, Users, Utensils } from 'lucide-react';
+import { BookUser, ClipboardList, CupSoda, HandPlatter, House, Users, Utensils } from 'lucide-react';
 import React from 'react';
 import { NavLink } from 'react-router-dom';
 
@@ -79,7 +79,7 @@ const Sidebar = () => {
                 >
                     {({ isActive }) => (
                         <>
-                            <Utensils
+                            <CupSoda
                                 size={isActive ? 32 : 28}
                                 color={isActive ? activeColors.foodItems : defaultColors.foodItems}
                                 strokeWidth={isActive ? 2.5 : 2}
