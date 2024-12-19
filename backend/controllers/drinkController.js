@@ -133,22 +133,22 @@ const updateDrink = async (req, res) => {
     const updatedDrink = await prisma.drink.update({
       where: { drink_Id: drinkId },
       data: {
-        drink_Name: req.body.name || existingDrink.drink_Name,
+        drink_Name: req.body.drink_Name || existingDrink.drink_Name,
         drink_Description:
-          req.body.description || existingDrink.drink_Description,
-        drink_Price: req.body.price
-          ? parseFloat(req.body.price)
+          req.body.drink_Description || existingDrink.drink_Description,
+        drink_Price: req.body.drink_Price
+          ? parseFloat(req.body.drink_Price)
           : existingDrink.drink_Price,
-        drink_Category: req.body.category || existingDrink.drink_Category,
+        drink_Category: req.body.drink_Category || existingDrink.drink_Category,
         drink_Image: imageFilename,
         is_Alcoholic:
-          req.body.isAlcoholic !== undefined
-            ? req.body.isAlcoholic === "true"
+          req.body.is_Alcoholic !== undefined
+            ? req.body.is_Alcoholic === "true"
             : existingDrink.is_Alcoholic,
-        drink_Size: req.body.size || existingDrink.drink_Size,
+        drink_Size: req.body.drink_Size || existingDrink.drink_Size,
         menu_Status:
-          req.body.menuStatus !== undefined
-            ? req.body.menuStatus === "1"
+          req.body.menu_Status !== undefined
+            ? req.body.menu_Status === "1"
             : existingDrink.menu_Status,
       },
     });

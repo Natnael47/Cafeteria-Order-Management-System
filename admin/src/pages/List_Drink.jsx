@@ -16,13 +16,13 @@ const List_Drink = () => {
     const [selectedFoodId, setSelectedFoodId] = useState(null);
     const [editIndex, setEditIndex] = useState(null);
     const [editFood, setEditFood] = useState({
-        name: "",
-        category: "",
-        price: "",
+        drink_Name: "",
+        drink_Category: "",
+        drink_Price: "",
         image: "",
-        description: "",
-        menuStatus: "",
-        prepTime: ""
+        drink_Description: "",
+        menu_Status: "",
+        drink_Size: ""
     });
     const [originalFood, setOriginalFood] = useState(null);
     const [image, setImage] = useState(false);
@@ -37,7 +37,6 @@ const List_Drink = () => {
         if (response.data.success) {
             setList(response.data.data);
             console.log(response.data.data);
-
         } else {
             toast.error("Error fetching list");
         }
@@ -75,12 +74,12 @@ const List_Drink = () => {
     const cancelEdit = () => {
         setEditIndex(null);
         setEditFood({
-            name: "",
-            category: "",
-            price: "",
+            drink_Name: "",
+            drink_Category: "",
+            drink_Price: "",
             image: "",
-            description: "",
-            menuStatus: false,
+            drink_Description: "",
+            menu_Status: false,
         });
         setOriginalFood(null);
         setImage(false);
@@ -96,7 +95,7 @@ const List_Drink = () => {
     };
 
     const handleInputChange = (e) => {
-        const { name, value, type, checked, prepTime } = e.target;
+        const { name, value, type, checked, drink_Size } = e.target;
         const newValue = type === "checkbox" ? checked : value;
         setEditFood((prevState) => {
             const updatedFood = { ...prevState, [name]: newValue };
@@ -117,20 +116,20 @@ const List_Drink = () => {
 
     const updateFood = async () => {
         const formData = new FormData();
-        formData.append("id", editFood.id);
-        formData.append("name", editFood.name);
-        formData.append("category", editFood.category);
-        formData.append("price", editFood.price);
-        formData.append("description", editFood.description);
-        formData.append("menuStatus", editFood.menuStatus ? "1" : "0");
-        formData.append("prepTime", editFood.prepTime);
+        formData.append("id", editFood.drink_Id);
+        formData.append("drink_Name", editFood.drink_Name);
+        formData.append("drink_Category", editFood.drink_Category);
+        formData.append("drink_Price", editFood.drink_Price);
+        formData.append("drink_Description", editFood.drink_Description);
+        formData.append("menu_Status", editFood.menu_Status ? "1" : "0");
+        formData.append("drink_Size", editFood.drink_Size);
         if (editFood.image instanceof File) {
             formData.append("image", editFood.image);
         }
 
         try {
             const response = await axios.post(
-                backendUrl + "/api/food/update",
+                backendUrl + "/api/drink/update",
                 formData,
                 {
                     headers: {
@@ -154,7 +153,7 @@ const List_Drink = () => {
 
     const removeFood = async () => {
         const response = await axios.post(
-            backendUrl + "/api/food/remove",
+            backendUrl + "/api/drink/remove",
             { id: selectedFoodId },
             { headers: { token } }
         );
@@ -172,13 +171,6 @@ const List_Drink = () => {
     }, []);
 
     const [searchTerm, setSearchTerm] = useState('');
-
-    // Function to get the formatted date
-    const getFormattedDate = () => {
-        const today = new Date();
-        const options = { weekday: 'short', day: '2-digit', year: 'numeric' };
-        return today.toLocaleDateString('en-US', options);
-    };
 
     // Filter and sort the inventory list based on the search term
     const filteredFoodList = list
@@ -256,11 +248,11 @@ const List_Drink = () => {
                                         className="w-20 h-[70px] rounded object-cover"
                                     />
                                     <p className="truncate font-medium text-gray-700">{item.drink_Name}</p>
-                                    <p className="text-gray-600">{item.category}</p>
-                                    <p className="text-gray-700 font-semibold">${item.price}</p>
+                                    <p className="text-gray-600">{item.drink_Category}</p>
+                                    <p className="text-gray-700 font-semibold">${item.drink_Price}</p>
                                     <Trash2
                                         size={28}
-                                        onClick={() => openModal(item.id)}
+                                        onClick={() => openModal(item.drink_Id)}
                                         className="cursor-pointer text-red-500 hover:text-red-600 ml-5"
                                     />
                                     <Pencil
@@ -296,7 +288,7 @@ const List_Drink = () => {
                                                                 src={
                                                                     image
                                                                         ? URL.createObjectURL(image)
-                                                                        : `${backendUrl}/images/${editFood.image}`
+                                                                        : `${backendUrl}/drink-images/${editFood.drink_Image}`
                                                                 }
                                                                 alt=""
                                                             />
@@ -315,8 +307,8 @@ const List_Drink = () => {
                                                         </label>
                                                         <input
                                                             type="checkbox"
-                                                            name="menuStatus"
-                                                            checked={editFood.menuStatus}
+                                                            name="menu_Status"
+                                                            checked={editFood.menu_Status}
                                                             onChange={handleInputChange}
                                                             className="ml-2 w-5 h-5"
                                                         />
@@ -326,8 +318,8 @@ const List_Drink = () => {
                                                     Description
                                                 </label>
                                                 <textarea
-                                                    name="description"
-                                                    value={editFood.description}
+                                                    name="drink_Description"
+                                                    value={editFood.drink_Description}
                                                     onChange={handleInputChange}
                                                     className="w-full border p-2 rounded-lg"
                                                     rows="4"
@@ -339,8 +331,8 @@ const List_Drink = () => {
                                                 <label className="block text-sm font-medium mb-1">Name</label>
                                                 <input
                                                     type="text"
-                                                    name="name"
-                                                    value={editFood.name}
+                                                    name="drink_Name"
+                                                    value={editFood.drink_Name}
                                                     onChange={handleInputChange}
                                                     className="w-full border p-2 rounded-lg"
                                                 />
@@ -349,8 +341,8 @@ const List_Drink = () => {
                                                     Category
                                                 </label>
                                                 <select
-                                                    name="category"
-                                                    value={editFood.category}
+                                                    name="drink_Category"
+                                                    value={editFood.drink_Category}
                                                     onChange={handleInputChange}
                                                     className="w-full border p-2 rounded-lg"
                                                 >
@@ -369,8 +361,8 @@ const List_Drink = () => {
                                                     </label>
                                                     <input
                                                         type="number"
-                                                        name="price"
-                                                        value={editFood.price}
+                                                        name="drink_Price"
+                                                        value={editFood.drink_Price}
                                                         onChange={handleInputChange}
                                                         className="w-full border p-2 rounded-lg"
                                                     />
@@ -381,9 +373,9 @@ const List_Drink = () => {
                                                         Prep Time (mins)
                                                     </label>
                                                     <input
-                                                        type="number"
-                                                        name="prepTime"
-                                                        value={editFood.prepTime}
+                                                        type="text"
+                                                        name="drink_Size"
+                                                        value={editFood.drink_Size}
                                                         onChange={handleInputChange}
                                                         className="w-full border p-2 rounded-lg"
                                                     />
