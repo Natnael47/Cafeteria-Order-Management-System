@@ -5,6 +5,7 @@ import 'react-toastify/dist/ReactToastify.css';
 import Navbar from './components/Navbar';
 import Sidebar from './components/Sidebar';
 import { AdminContext } from './context/AdminContext';
+import Add_Drink from './pages/Add_Drink';
 import AddEmployee from './pages/Add_Employee';
 import Add from './pages/Add_Food';
 import Dashboard from './pages/Dashboard';
@@ -31,6 +32,7 @@ const App = () => {
         <Routes>
           <Route path='/' element={<Dashboard />} />
           <Route path='/add' element={<Add />} />
+          <Route path='/add-drink' element={<Add_Drink />} />
           <Route path='/list' element={<List />} />
           <Route path='/list-drink' element={<List_Drink />} />
           <Route path='/orders' element={<Orders />} />
