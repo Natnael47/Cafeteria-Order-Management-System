@@ -31,11 +31,13 @@ const List_Drink = () => {
     const editRef = useRef(null);
 
     const fetchList = async () => {
-        const response = await axios.get(backendUrl + "/api/food/list", {
+        const response = await axios.get(backendUrl + "/api/drink/list", {
             headers: { token },
         });
         if (response.data.success) {
             setList(response.data.data);
+            console.log(response.data.data);
+
         } else {
             toast.error("Error fetching list");
         }
@@ -181,9 +183,9 @@ const List_Drink = () => {
     // Filter and sort the inventory list based on the search term
     const filteredFoodList = list
         .filter((item) =>
-            item.name.toLowerCase().includes(searchTerm.toLowerCase())
+            item.drink_Name.toLowerCase().includes(searchTerm.toLowerCase())
         )
-        .sort((a, b) => a.name.localeCompare(b.name));
+        .sort((a, b) => a.drink_Name.localeCompare(b.drink_Name));
 
     return (
         <div className="m-5 w-full max-w-6.5xl max-h-[90vh]">
@@ -245,15 +247,15 @@ const List_Drink = () => {
                             <div key={index}>
                                 {/* Food Item */}
                                 <div
-                                    className={`grid grid-cols-[0.5fr_1fr_1fr_0.8fr_0.5fr_0.5fr] items-center gap-4 p-4 border-b sm:grid ${item.menuStatus === false ? "bg-red-50" : "bg-white"
+                                    className={`grid grid-cols-[0.5fr_1fr_1fr_0.8fr_0.5fr_0.5fr] items-center gap-4 p-4 border-b sm:grid ${item.menu_Status === false ? "bg-red-50" : "bg-white"
                                         } hover:bg-blue-50`}
                                 >
                                     <img
-                                        src={`${backendUrl}/images/${item.image}`}
+                                        src={`${backendUrl}/drink-images/${item.drink_Image}`}
                                         alt="Food"
                                         className="w-20 h-[70px] rounded object-cover"
                                     />
-                                    <p className="truncate font-medium text-gray-700">{item.name}</p>
+                                    <p className="truncate font-medium text-gray-700">{item.drink_Name}</p>
                                     <p className="text-gray-600">{item.category}</p>
                                     <p className="text-gray-700 font-semibold">${item.price}</p>
                                     <Trash2

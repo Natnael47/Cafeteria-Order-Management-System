@@ -25,7 +25,7 @@ const upload = multer({ storage: storage });
 
 drinkRouter.post("/add", adminAuth, upload.single("image"), addDrink);
 
-drinkRouter.get("/list", listDrinks);
+drinkRouter.get("/list", adminAuth, listDrinks);
 drinkRouter.get("/list-menu", listMenuDrinks);
 
 drinkRouter.post("/remove", adminAuth, removeDrink);
