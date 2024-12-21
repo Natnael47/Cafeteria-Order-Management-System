@@ -153,9 +153,12 @@ const StoreContextProvider = (props) => {
     };
 
     const getCartItems = (type) => {
-        return Object.keys(cartItems)
-            .filter((key) => key.startsWith(`${type}-`) && cartItems[key] > 0)
-            .reduce((acc, key) => acc + cartItems[key], 0);  // Count total items of the given type
+        return Object.keys(cartItems).reduce((count, key) => {
+            if (cartItems[key] > 0) {
+                count += 1; // Increment count for each non-zero item
+            }
+            return count;
+        }, 0);
     };
 
     const getTotalCartAmount = () => {
