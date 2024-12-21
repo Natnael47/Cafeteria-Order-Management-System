@@ -87,6 +87,7 @@ const PlaceOrder = () => {
                         name: foodItem.name,
                         price: foodItem.price,
                         image: foodItem.image,
+                        prepTime: foodItem.prepTime,
                         quantity: count,
                         status: 'NULL',
                     };

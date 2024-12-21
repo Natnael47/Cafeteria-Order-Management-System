@@ -313,7 +313,7 @@ const List_Drink = () => {
                                                                 src={
                                                                     image
                                                                         ? URL.createObjectURL(image)
-                                                                        : `${backendUrl}/drink-images/${editFood.drink_Image}`
+                                                                        : `${backendUrl}/images/${editFood.drink_Image}`
                                                                 }
                                                                 alt=""
                                                             />
