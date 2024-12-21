@@ -76,13 +76,26 @@ const PlaceOrder = () => {
     const placeOrder = async (event) => {
         event.preventDefault();
         try {
-            const orderItems = food_list
-                .filter((item) => cartItems[item.id] > 0)
-                .map((item) => ({
-                    ...item,
-                    quantity: cartItems[item.id],
-                    status: 'NULL',
-                }));
+            // Filter cartItems for food items only
+            const orderItems = Object.entries(cartItems)
+                .filter(([key, count]) => key.startsWith('food-') && count > 0)
+                .map(([key, count]) => {
+                    const foodId = parseInt(key.replace('food-', ''), 10); // Extract food ID
+                    const foodItem = food_list.find((item) => item.id === foodId);
+                    return {
+                        id: foodItem.id,
+                        name: foodItem.name,
+                        price: foodItem.price,
+                        image: foodItem.image,
+                        quantity: count,
+                        status: 'NULL',
+                    };
+                });
+
+            if (orderItems.length === 0) {
+                toast.info("Your cart doesn't contain any food items.");
+                return;
+            }
 
             const orderData = {
                 address: {
@@ -93,10 +106,9 @@ const PlaceOrder = () => {
                     email: data.email,                 // Include email in address
                     phone: data.phone.startsWith('+251') ? data.phone : `+251${data.phone}`,  // Ensure phone is in correct format
                 },
-                items: orderItems,
-                amount: getTotalCartAmount() + 2,  // Adding delivery fee
+                items: orderItems, // Food items only
+                amount: getTotalCartAmount() + 2, // Adding delivery fee
             };
-
 
             let response;
             if (method === 'cod') {
@@ -110,7 +122,7 @@ const PlaceOrder = () => {
 
             if (response?.data?.success) {
                 toast.success('Order placed successfully!');
-                clearCart();
+                clearCart(); // Clears the cart
                 navigate('/myorders');
             } else {
                 toast.error(response?.data?.message || 'Order placement failed.');

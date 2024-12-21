@@ -3,10 +3,10 @@ import React, { useContext } from "react";
 import { backendUrl } from "../App";
 import { StoreContext } from "../context/StoreContext";
 
-const FoodItem = ({ id, name, price, description, image, rating }) => {
+const DrinkItem = ({ id, name, price, description, image, rating }) => {
     const { cartItems, addToCart, removeFromCart, navigate } = useContext(StoreContext);
 
-    // Function to generate star elements for the rating
+    // Generate star elements for the rating
     const renderStars = (rating) => {
         const fullStars = Math.floor(rating);
         const halfStar = rating % 1 !== 0;
@@ -41,8 +41,8 @@ const FoodItem = ({ id, name, price, description, image, rating }) => {
         return stars;
     };
 
-    // Construct the cart item key using 'food' as type and the ID of the item
-    const cartItemKey = `food-${id}`;
+    // Construct the cart item key using 'drink' as type and the ID of the item
+    const cartItemKey = `drink-${id}`;
     const cartItemCount = cartItems[cartItemKey] || 0;  // Default to 0 if not found
 
     return (
@@ -57,7 +57,7 @@ const FoodItem = ({ id, name, price, description, image, rating }) => {
                 {cartItemCount === 0 ? (
                     <div
                         className="absolute bottom-4 right-4 flex items-center justify-center rounded-full bg-green-500 w-9 h-9 cursor-pointer hover:bg-green-600 shadow-md transition"
-                        onClick={() => addToCart(id, 'food')} // Pass 'food' as type
+                        onClick={() => addToCart(id, 'drink')} // Pass true for drinks
                     >
                         <Plus className="text-white w-5 h-5" />
                     </div>
@@ -65,14 +65,14 @@ const FoodItem = ({ id, name, price, description, image, rating }) => {
                     <div className="absolute bottom-4 right-4 flex items-center gap-2 p-2 rounded-full bg-white shadow-md">
                         <div
                             className="w-8 h-8 flex items-center justify-center rounded-full bg-red-100 cursor-pointer hover:bg-red-200 transition"
-                            onClick={() => removeFromCart(id, 'food')} // Pass 'food' as type
+                            onClick={() => removeFromCart(id, 'drink')} // Pass true for drinks
                         >
                             <Minus className="text-red-700 w-4 h-4" />
                         </div>
                         <p className="text-base font-medium">{cartItemCount}</p>
                         <div
                             className="w-8 h-8 flex items-center justify-center rounded-full bg-green-100 cursor-pointer hover:bg-green-200 transition"
-                            onClick={() => addToCart(id, 'food')} // Pass 'food' as type
+                            onClick={() => addToCart(id, 'drink')} // Pass true for drinks
                         >
                             <Plus className="text-green-700 w-4 h-4" />
                         </div>
@@ -80,7 +80,7 @@ const FoodItem = ({ id, name, price, description, image, rating }) => {
                 )}
             </div>
 
-            {/* Food Details */}
+            {/* Drink Details */}
             <div
                 onClick={() => navigate(`/food-detail/${id}`)}
                 className="p-4 hover:bg-gray-100 cursor-pointer"
@@ -98,4 +98,4 @@ const FoodItem = ({ id, name, price, description, image, rating }) => {
     );
 };
 
-export default FoodItem;
+export default DrinkItem;

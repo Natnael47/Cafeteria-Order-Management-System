@@ -86,7 +86,7 @@ const removeDrink = async (req, res) => {
 
     // Delete the associated image if it exists
     if (drink.drink_Image) {
-      fs.unlink(`uploads2/${drink.drink_Image}`, (fsErr) => {
+      fs.unlink(`uploads/${drink.drink_Image}`, (fsErr) => {
         if (fsErr) console.error("Error deleting image:", fsErr);
         res.json({ success: true, message: "Drink removed" });
       });
@@ -122,7 +122,7 @@ const updateDrink = async (req, res) => {
     let imageFilename = existingDrink.drink_Image;
     if (req.file) {
       if (existingDrink.drink_Image) {
-        fs.unlink(`uploads2/${existingDrink.drink_Image}`, (fsErr) => {
+        fs.unlink(`uploads/${existingDrink.drink_Image}`, (fsErr) => {
           if (fsErr) console.error("Error deleting old image:", fsErr);
         });
       }

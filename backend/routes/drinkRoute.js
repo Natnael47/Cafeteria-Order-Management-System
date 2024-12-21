@@ -15,7 +15,7 @@ const drinkRouter = express.Router();
 
 //Image storage engine
 const storage = multer.diskStorage({
-  destination: "uploads2",
+  destination: "uploads",
   filename: (req, file, cb) => {
     return cb(null, `${Date.now()}${file.originalname}`);
   },

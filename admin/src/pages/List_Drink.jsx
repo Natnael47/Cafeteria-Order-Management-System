@@ -250,7 +250,7 @@ const List_Drink = () => {
                                 >
                                     {/* Drink Image */}
                                     <img
-                                        src={`${backendUrl}/drink-images/${item.drink_Image}`}
+                                        src={`${backendUrl}/images/${item.drink_Image}`}
                                         alt="Drink"
                                         className="w-20 h-[70px] rounded object-cover"
                                     />
