@@ -326,7 +326,7 @@ const addDrinkFavorite = async (req, res) => {
       return res.json({ success: false, message: "Missing required fields" });
     }
 
-    const favorite = await prisma.drinkFavorite.create({
+    const favorite = await prisma.favorite.create({
       data: {
         userId: parseInt(userId),
         drinkId: parseInt(drinkId),
@@ -354,12 +354,25 @@ const removeDrinkFavorite = async (req, res) => {
       return res.json({ success: false, message: "Missing required fields" });
     }
 
-    await prisma.drinkFavorite.delete({
+    // Find the favorite record
+    const favorite = await prisma.favorite.findFirst({
       where: {
-        userId_drinkId: {
-          userId: parseInt(userId),
-          drinkId: parseInt(drinkId),
-        },
+        userId: parseInt(userId),
+        drinkId: parseInt(drinkId),
+      },
+    });
+
+    if (!favorite) {
+      return res.json({
+        success: false,
+        message: "Favorite record not found",
+      });
+    }
+
+    // Delete the favorite record
+    await prisma.favorite.delete({
+      where: {
+        id: favorite.id,
       },
     });
 

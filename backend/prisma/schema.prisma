@@ -134,31 +134,32 @@ model rating {
 model favorite {
   id          Int       @id @default(autoincrement()) // Unique identifier for each favorite entry
   userId      Int // Foreign key to User table
-  foodId      Int // Foreign key to Food table
-  addedAt     DateTime  @default(now()) // Date when the food was marked as favorite
+  foodId      Int? // Foreign key to Food table
+  drinkId     Int? // Foreign key to Drink table
+  addedAt     DateTime  @default(now()) // Date when the item was marked as favorite
   lastUpdated DateTime? @updatedAt // Tracks last update timestamp
 
-  user          user   @relation(fields: [userId], references: [id], map: "Favorite_userId_fkey")
-  food          food   @relation(fields: [foodId], references: [id], map: "Favorite_foodId_fkey")
-  Drink         Drink? @relation(fields: [drinkDrink_Id], references: [drink_Id])
-  drinkDrink_Id Int?
+  user  user   @relation(fields: [userId], references: [id], map: "Favorite_userId_fkey")
+  food  food?  @relation(fields: [foodId], references: [id], map: "Favorite_foodId_fkey")
+  Drink Drink? @relation(fields: [drinkId], references: [drink_Id], map: "Favorite_drinkId_fkey") // Fixed relation mapping
 
-  @@unique([userId, foodId], map: "Unique_user_food_favorite")
+  // Removed the unique constraint that conflicts with allowing the same foodId and drinkId
+  @@unique([userId, foodId, drinkId], map: "Unique_user_food_drink_favorite")
 }
 
 // Customization model - Represents user's customizations for food items
 model customization {
   id          Int       @id @default(autoincrement()) // Unique identifier for each customization entry
   userId      Int // Foreign key to User table
-  foodId      Int // Foreign key to Food table
+  foodId      Int? // Foreign key to Food table
   customNote  String    @db.VarChar(255) // Note describing the customization (e.g., "No pickles", "Extra cheese")
   createdAt   DateTime  @default(now()) // Date when customization was added
   lastUpdated DateTime? @updatedAt // Tracks last update timestamp
 
-  user          user   @relation(fields: [userId], references: [id], map: "Customization_userId_fkey")
-  food          food   @relation(fields: [foodId], references: [id], map: "Customization_foodId_fkey")
-  Drink         Drink? @relation(fields: [drinkDrink_Id], references: [drink_Id])
-  drinkDrink_Id Int?
+  user    user   @relation(fields: [userId], references: [id], map: "Customization_userId_fkey")
+  food    food?  @relation(fields: [foodId], references: [id], map: "Customization_foodId_fkey")
+  Drink   Drink? @relation(fields: [drinkId], references: [drink_Id])
+  drinkId Int?
 
   @@index([userId], map: "Customization_userId_fkey")
   @@index([foodId], map: "Customization_foodId_fkey")
@@ -212,10 +213,10 @@ model orderItem {
   startedAt     DateTime? // When cooking started
   completedAt   DateTime? // When cooking was completed
 
-  order         order  @relation(fields: [orderId], references: [id], onDelete: Cascade)
-  food          food   @relation(fields: [foodId], references: [id], onDelete: Cascade)
-  Drink         Drink? @relation(fields: [drinkDrink_Id], references: [drink_Id])
-  drinkDrink_Id Int?
+  order   order  @relation(fields: [orderId], references: [id], onDelete: Cascade)
+  food    food   @relation(fields: [foodId], references: [id], onDelete: Cascade)
+  Drink   Drink? @relation(fields: [drinkId], references: [drink_Id])
+  drinkId Int?
 }
 
 // Payment model - Represents order payments

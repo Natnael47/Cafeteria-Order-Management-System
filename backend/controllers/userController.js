@@ -425,13 +425,13 @@ const getUserDrinkDetails = async (req, res) => {
 
     // Fetch user's favorite drinks
     const favoriteDrinks = await prisma.favorite.findMany({
-      where: { userId: userIdInt, drinkDrink_Id: { not: null } }, // Exclude null drinkDrink_Id
+      where: { userId: userIdInt, drinkId: { not: null } }, // Exclude null drinkDrink_Id
       include: { Drink: true }, // Include related drink details
     });
 
     // Fetch user's customizations for drinks
     const drinkCustomizations = await prisma.customization.findMany({
-      where: { userId: userIdInt, drinkDrink_Id: { not: null } }, // Exclude null drinkDrink_Id
+      where: { userId: userIdInt, drinkId: { not: null } }, // Exclude null drinkDrink_Id
       include: { Drink: true }, // Include related drink details
     });
 
@@ -447,7 +447,7 @@ const getUserDrinkDetails = async (req, res) => {
       message: "Fetched user drink details successfully",
       data: {
         favorites: favoriteDrinks.map((favorite) => ({
-          drinkId: favorite.drinkDrink_Id,
+          drinkId: favorite.drinkId,
           drinkName: favorite.Drink.drink_Name,
           drinkDescription: favorite.Drink.drink_Description,
           drinkCategory: favorite.Drink.drink_Category,
@@ -457,7 +457,7 @@ const getUserDrinkDetails = async (req, res) => {
           isAlcoholic: favorite.Drink.is_Alcoholic,
         })),
         customizations: drinkCustomizations.map((customization) => ({
-          drinkId: customization.drinkDrink_Id,
+          drinkId: customization.drinkId,
           drinkName: customization.Drink.drink_Name,
           customNote: customization.customNote,
         })),

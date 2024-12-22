@@ -348,19 +348,35 @@ const removeFavorite = async (req, res) => {
       return res.json({ success: false, message: "Missing required fields" });
     }
 
+    // Find the favorite record
+    const favorite = await prisma.favorite.findFirst({
+      where: {
+        userId: parseInt(userId),
+        foodId: parseInt(foodId),
+      },
+    });
+
+    if (!favorite) {
+      return res.json({
+        success: false,
+        message: "Favorite record not found",
+      });
+    }
+
+    // Delete the favorite record
     await prisma.favorite.delete({
       where: {
-        userId_foodId: {
-          userId: parseInt(userId),
-          foodId: parseInt(foodId),
-        },
+        id: favorite.id,
       },
     });
 
     res.json({ success: true, message: "Food removed from favorites" });
   } catch (error) {
-    console.error("Error removing from favorites:", error);
-    res.json({ success: false, message: "Error removing from favorites" });
+    console.error("Error removing food from favorites:", error);
+    res.json({
+      success: false,
+      message: "Error removing food from favorites",
+    });
   }
 };
 
