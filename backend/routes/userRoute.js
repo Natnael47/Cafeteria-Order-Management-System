@@ -2,6 +2,7 @@ import express from "express";
 import {
   allUsers,
   changePassword,
+  getUserDrinkDetails,
   getUserFavoritesAndCustomizations,
   getUserProfile,
   loginUser,
@@ -25,5 +26,6 @@ userRouter.post("/change-password", authUser, changePassword);
 userRouter.post("/update-account-status", adminAuth, updateAccountStatus);
 
 userRouter.get("/get-favorite", authUser, getUserFavoritesAndCustomizations);
+userRouter.get("/get-drink-details", authUser, getUserDrinkDetails);
 
 export default userRouter;

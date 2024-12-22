@@ -7,7 +7,7 @@ import { StoreContext } from "../context/StoreContext";
 
 const Drink_Details = () => {
     const { drink_list, addToCart, removeFromCart, cartItems, token } = useContext(StoreContext);
-    const { id } = useParams(); // Get food id from URL
+    const { id } = useParams(); // Get drink id from URL
     const navigate = useNavigate();
 
     const [currentFood, setCurrentFood] = useState(null);
@@ -24,28 +24,28 @@ const Drink_Details = () => {
         const fetchFoodDetails = async () => {
             try {
                 if (drink_list.length > 0) {
-                    const foodItem = drink_list.find((food) => food.drink_Id === Number(id));
+                    const foodItem = drink_list.find((drink) => drink.drink_Id === Number(id));
                     if (foodItem) {
                         setCurrentFood(foodItem);
 
                         // Fetch customizations, ratings, and favorite status
-                        const response = await axios.get(`${backendUrl}/api/user/get-favorite`, {
+                        const response = await axios.get(`${backendUrl}/api/user/get-drink-details`, {
                             headers: { token },
                         });
-
+                        console.log(response.data.data);
                         if (response.data.success) {
                             const { customizations, ratings, favorites } = response.data.data;
 
-                            // Apply customization (customNote) for this food
-                            const foodCustomization = customizations.find((c) => c.foodId === Number(id));
+                            // Apply customization (customNote) for this drink
+                            const foodCustomization = customizations.find((c) => c.drinkId === Number(id));
                             setCustomizations(foodCustomization ? foodCustomization.customNote : "");
 
-                            // Apply rating for this food
-                            const foodRating = ratings.find((r) => r.foodId === Number(id));
+                            // Apply rating for this drink
+                            const foodRating = ratings.find((r) => r.drinkId === Number(id));
                             setRating(foodRating ? foodRating.userRating : 0);
 
-                            // Apply favorite status for this food
-                            const favoriteFood = favorites.find((f) => f.foodId === Number(id));
+                            // Apply favorite status for this drink
+                            const favoriteFood = favorites.find((f) => f.drinkId === Number(id));
                             setIsFavorite(!!favoriteFood);
                         }
                     } else {
@@ -53,7 +53,7 @@ const Drink_Details = () => {
                     }
                 }
             } catch (error) {
-                console.error("Error fetching food details:", error);
+                console.error("Error fetching drink details:", error);
             } finally {
                 setLoading(false);
             }
@@ -63,27 +63,27 @@ const Drink_Details = () => {
     }, [id, drink_list, navigate, token]);
 
     const handleNext = () => {
-        const currentIndex = drink_list.findIndex((food) => food.id === Number(id));
+        const currentIndex = drink_list.findIndex((drink) => drink.drink_Id === Number(id));
         const nextIndex = (currentIndex + 1) % drink_list.length;
-        navigate(`/food-detail/${drink_list[nextIndex].id}`);
+        navigate(`/drink-detail/${drink_list[nextIndex].drink_Id}`);
     };
 
     const handlePrevious = () => {
-        const currentIndex = drink_list.findIndex((food) => food.id === Number(id));
+        const currentIndex = drink_list.findIndex((drink) => drink.drink_Id === Number(id));
         const prevIndex = (currentIndex - 1 + drink_list.length) % drink_list.length;
-        navigate(`/food-detail/${drink_list[prevIndex].id}`);
+        navigate(`/drink-detail/${drink_list[prevIndex].drink_Id}`);
     };
 
     const toggleFavorite = async () => {
         try {
             if (isFavorite) {
-                await axios.post(`${backendUrl}/api/food/remove-favorite`, {
-                    foodId: currentFood.id,
+                await axios.post(`${backendUrl}/api/drink/remove-favorite`, {
+                    drinkId: currentFood.drink_Id,
                     userId: token.userId,
                 }, { headers: { token } });
             } else {
-                await axios.post(`${backendUrl}/api/food/add-favorite`, {
-                    foodId: currentFood.id,
+                await axios.post(`${backendUrl}/api/drink/add-favorite`, {
+                    drinkId: currentFood.drink_Id,
                     userId: token.userId,
                 }, { headers: { token } });
             }
@@ -97,9 +97,9 @@ const Drink_Details = () => {
         try {
             setRating(value); // Update rating locally
             const response = await axios.post(
-                `${backendUrl}/api/food/rate-food`,
+                `${backendUrl}/api/drink/rate-drink`,
                 {
-                    foodId: currentFood.drink_Id,
+                    drinkId: currentFood.drink_Id,
                     userId: token.userId,
                     rating: value,
                 }, { headers: { token } }
@@ -115,9 +115,9 @@ const Drink_Details = () => {
     const saveCustomizations = async () => {
         try {
             const response = await axios.post(
-                `${backendUrl}/api/food/save-customization`,
+                `${backendUrl}/api/drink/save-customization`,
                 {
-                    foodId: currentFood.drink_Id,
+                    drinkId: currentFood.drink_Id,
                     userId: token.userId,
                     customNote: customizations,
                 }, { headers: { token } }
@@ -132,8 +132,8 @@ const Drink_Details = () => {
 
     const deleteCustomizations = async () => {
         try {
-            const response = await axios.post(`${backendUrl}/api/food/remove-customization`, {
-                foodId: currentFood.drink_Id,
+            const response = await axios.post(`${backendUrl}/api/drink/remove-customization`, {
+                drinkId: currentFood.drink_Id,
             }, { headers: { token } });
 
             if (response.data.success) {

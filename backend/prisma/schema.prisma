@@ -118,14 +118,14 @@ model Drink {
 model rating {
   id        Int      @id @default(autoincrement())
   userId    Int
-  foodId    Int
+  foodId    Int?
   rating    Float
   createdAt DateTime @default(now())
 
-  user          user   @relation(fields: [userId], references: [id])
-  food          food   @relation(fields: [foodId], references: [id])
-  Drink         Drink? @relation(fields: [drinkDrink_Id], references: [drink_Id])
-  drinkDrink_Id Int?
+  user    user   @relation(fields: [userId], references: [id])
+  food    food?  @relation(fields: [foodId], references: [id])
+  Drink   Drink? @relation(fields: [drinkId], references: [drink_Id])
+  drinkId Int?
 
   @@unique([userId, foodId], map: "Unique_user_food_rating") // Ensure one rating per user-food combination
 }

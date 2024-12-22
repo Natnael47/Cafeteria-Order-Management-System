@@ -358,19 +358,19 @@ const getUserFavoritesAndCustomizations = async (req, res) => {
 
     // Fetch user's favorite foods
     const favorites = await prisma.favorite.findMany({
-      where: { userId: userIdInt },
+      where: { userId: userIdInt, foodId: { not: null, not: 0 } },
       include: { food: true }, // Include related food details
     });
 
     // Fetch user's customizations
     const customizations = await prisma.customization.findMany({
-      where: { userId: userIdInt },
+      where: { userId: userIdInt, foodId: { not: null, not: 0 } },
       include: { food: true }, // Include related food details
     });
 
     // Fetch user's ratings
     const ratings = await prisma.rating.findMany({
-      where: { userId: userIdInt },
+      where: { userId: userIdInt, foodId: { not: null, not: 0 } },
       include: { food: true }, // Include related food details
     });
 
@@ -411,9 +411,76 @@ const getUserFavoritesAndCustomizations = async (req, res) => {
   }
 };
 
+// Get user drink favorites, customizations, and ratings
+const getUserDrinkDetails = async (req, res) => {
+  try {
+    const { userId } = req.body;
+
+    // Validate input
+    if (!userId) {
+      return res.json({ success: false, message: "Missing required fields" });
+    }
+
+    const userIdInt = parseInt(userId);
+
+    // Fetch user's favorite drinks
+    const favoriteDrinks = await prisma.favorite.findMany({
+      where: { userId: userIdInt, drinkDrink_Id: { not: null } }, // Exclude null drinkDrink_Id
+      include: { Drink: true }, // Include related drink details
+    });
+
+    // Fetch user's customizations for drinks
+    const drinkCustomizations = await prisma.customization.findMany({
+      where: { userId: userIdInt, drinkDrink_Id: { not: null } }, // Exclude null drinkDrink_Id
+      include: { Drink: true }, // Include related drink details
+    });
+
+    // Fetch user's ratings for drinks
+    const drinkRatings = await prisma.rating.findMany({
+      where: { userId: userIdInt, drinkId: { not: null } }, // Exclude null drinkId
+      include: { Drink: true }, // Include related drink details
+    });
+
+    // Map and organize the data
+    res.json({
+      success: true,
+      message: "Fetched user drink details successfully",
+      data: {
+        favorites: favoriteDrinks.map((favorite) => ({
+          drinkId: favorite.drinkDrink_Id,
+          drinkName: favorite.Drink.drink_Name,
+          drinkDescription: favorite.Drink.drink_Description,
+          drinkCategory: favorite.Drink.drink_Category,
+          drinkPrice: favorite.Drink.drink_Price,
+          drinkImage: favorite.Drink.drink_Image,
+          drinkSize: favorite.Drink.drink_Size,
+          isAlcoholic: favorite.Drink.is_Alcoholic,
+        })),
+        customizations: drinkCustomizations.map((customization) => ({
+          drinkId: customization.drinkDrink_Id,
+          drinkName: customization.Drink.drink_Name,
+          customNote: customization.customNote,
+        })),
+        ratings: drinkRatings.map((rating) => ({
+          drinkId: rating.drinkId,
+          drinkName: rating.Drink.drink_Name,
+          userRating: rating.rating,
+        })),
+      },
+    });
+  } catch (error) {
+    console.error("Error fetching drink details:", error);
+    res.json({
+      success: false,
+      message: "Error fetching drink details",
+    });
+  }
+};
+
 export {
   allUsers,
   changePassword,
+  getUserDrinkDetails,
   getUserFavoritesAndCustomizations,
   getUserProfile,
   loginUser,

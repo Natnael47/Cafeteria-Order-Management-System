@@ -171,16 +171,22 @@ const rateDrink = async (req, res) => {
 
     const parsedRating = parseFloat(rating);
 
+    // Check if the user has already rated this drink
     const existingRating = await prisma.rating.findFirst({
-      where: { userId: parseInt(userId), drinkId: parseInt(drinkId) },
+      where: {
+        userId: parseInt(userId),
+        drinkId: parseInt(drinkId),
+      },
     });
 
     if (existingRating) {
+      // Update the existing rating
       await prisma.rating.update({
         where: { id: existingRating.id },
         data: { rating: parsedRating },
       });
     } else {
+      // Create a new rating for the drink
       await prisma.rating.create({
         data: {
           userId: parseInt(userId),
@@ -190,11 +196,13 @@ const rateDrink = async (req, res) => {
       });
     }
 
+    // Calculate the new average rating for the drink
     const averageRating = await prisma.rating.aggregate({
       _avg: { rating: true },
       where: { drinkId: parseInt(drinkId) },
     });
 
+    // Update the drink's average rating
     const updatedDrink = await prisma.drink.update({
       where: { drink_Id: parseInt(drinkId) },
       data: { average_Rating: averageRating._avg.rating || 0 },
@@ -211,11 +219,169 @@ const rateDrink = async (req, res) => {
   }
 };
 
+// Save or Update Drink Customization
+const saveOrUpdateDrinkCustomization = async (req, res) => {
+  try {
+    const { userId, drinkId, customNote } = req.body;
+
+    // Validate input
+    if (!userId || !drinkId || !customNote) {
+      return res.json({ success: false, message: "Missing required fields" });
+    }
+
+    // Check if a customization already exists for the user and drink
+    const existingCustomization = await prisma.drinkCustomization.findFirst({
+      where: {
+        userId: parseInt(userId),
+        drinkId: parseInt(drinkId),
+      },
+    });
+
+    let customization;
+    if (existingCustomization) {
+      // Update the existing customization
+      customization = await prisma.drinkCustomization.update({
+        where: { id: existingCustomization.id },
+        data: { customNote },
+      });
+      res.json({
+        success: true,
+        message: "Drink customization updated successfully",
+        data: customization,
+      });
+    } else {
+      // Create a new customization
+      customization = await prisma.drinkCustomization.create({
+        data: {
+          userId: parseInt(userId),
+          drinkId: parseInt(drinkId),
+          customNote,
+        },
+      });
+      res.json({
+        success: true,
+        message: "Drink customization saved successfully",
+        data: customization,
+      });
+    }
+  } catch (error) {
+    console.error("Error saving or updating drink customization:", error);
+    res.json({
+      success: false,
+      message: "Error saving or updating drink customization",
+    });
+  }
+};
+
+// Delete Drink Customization
+const deleteDrinkCustomization = async (req, res) => {
+  try {
+    const { userId, drinkId } = req.body;
+
+    // Validate input
+    if (!userId || !drinkId) {
+      return res.json({ success: false, message: "Missing required fields" });
+    }
+
+    // Check if a customization exists for the user and drink
+    const existingCustomization = await prisma.drinkCustomization.findFirst({
+      where: {
+        userId: parseInt(userId),
+        drinkId: parseInt(drinkId),
+      },
+    });
+
+    if (!existingCustomization) {
+      return res.json({
+        success: false,
+        message: "No customization found for this user and drink",
+      });
+    }
+
+    // Delete the customization
+    await prisma.drinkCustomization.delete({
+      where: { id: existingCustomization.id },
+    });
+
+    res.json({
+      success: true,
+      message: "Drink customization deleted successfully",
+    });
+  } catch (error) {
+    console.error("Error deleting drink customization:", error);
+    res.json({
+      success: false,
+      message: "Error deleting drink customization",
+    });
+  }
+};
+
+// Add Drink to Favorites
+const addDrinkFavorite = async (req, res) => {
+  try {
+    const { userId, drinkId } = req.body;
+
+    // Validate input
+    if (!userId || !drinkId) {
+      return res.json({ success: false, message: "Missing required fields" });
+    }
+
+    const favorite = await prisma.drinkFavorite.create({
+      data: {
+        userId: parseInt(userId),
+        drinkId: parseInt(drinkId),
+      },
+    });
+
+    res.json({
+      success: true,
+      message: "Drink added to favorites",
+      data: favorite,
+    });
+  } catch (error) {
+    console.error("Error adding drink to favorites:", error);
+    res.json({ success: false, message: "Error adding drink to favorites" });
+  }
+};
+
+// Remove Drink from Favorites
+const removeDrinkFavorite = async (req, res) => {
+  try {
+    const { userId, drinkId } = req.body;
+
+    // Validate input
+    if (!userId || !drinkId) {
+      return res.json({ success: false, message: "Missing required fields" });
+    }
+
+    await prisma.drinkFavorite.delete({
+      where: {
+        userId_drinkId: {
+          userId: parseInt(userId),
+          drinkId: parseInt(drinkId),
+        },
+      },
+    });
+
+    res.json({ success: true, message: "Drink removed from favorites" });
+  } catch (error) {
+    console.error("Error removing drink from favorites:", error);
+    res.json({
+      success: false,
+      message: "Error removing drink from favorites",
+    });
+  }
+};
+
 export {
   addDrink,
+  addDrinkFavorite,
+  deleteDrinkCustomization,
   listDrinks,
   listMenuDrinks,
   rateDrink,
   removeDrink,
+  removeDrinkFavorite,
+  saveOrUpdateDrinkCustomization,
   updateDrink,
 };
