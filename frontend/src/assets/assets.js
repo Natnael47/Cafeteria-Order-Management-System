@@ -155,35 +155,35 @@ export const menu_list = [
 
 export const menu_list_drink = [
   {
-    menu_name: "Salad",
+    menu_name: "Cocktails",
     menu_image: menu_1,
   },
   {
-    menu_name: "Rolls",
+    menu_name: "Milkshake",
     menu_image: menu_2,
   },
   {
-    menu_name: "Deserts",
+    menu_name: "Hot Beverages",
     menu_image: menu_3,
   },
   {
-    menu_name: "Sandwich",
+    menu_name: "Soda",
     menu_image: menu_4,
   },
   {
-    menu_name: "Cake",
+    menu_name: "Smoothies",
     menu_image: menu_5,
   },
   {
-    menu_name: "Pure Veg",
+    menu_name: "Juices",
     menu_image: menu_6,
   },
   {
-    menu_name: "Pasta",
+    menu_name: "Iced Drinks",
     menu_image: menu_7,
   },
   {
-    menu_name: "Noodles",
+    menu_name: "Mocktails",
     menu_image: menu_8,
   },
 ];
