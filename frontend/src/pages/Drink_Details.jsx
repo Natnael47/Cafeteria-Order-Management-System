@@ -5,8 +5,8 @@ import { useNavigate, useParams } from "react-router-dom";
 import { backendUrl } from "../App";
 import { StoreContext } from "../context/StoreContext";
 
-const Food_Detail = () => {
-    const { food_list, addToCart, removeFromCart, cartItems, token } = useContext(StoreContext);
+const Drink_Details = () => {
+    const { drink_list, addToCart, removeFromCart, cartItems, token } = useContext(StoreContext);
     const { id } = useParams(); // Get food id from URL
     const navigate = useNavigate();
 
@@ -16,15 +16,15 @@ const Food_Detail = () => {
     const [rating, setRating] = useState(0);
     const [isFavorite, setIsFavorite] = useState(false);
 
-    // Construct the cart item key using 'food' as type and the ID of the item
-    const cartItemKey = `food-${id}`;
+    // Construct the cart item key using 'drink' as type and the ID of the item
+    const cartItemKey = `drink-${id}`;
     const cartItemCount = cartItems[cartItemKey] || 0;  // Default to 0 if not found
 
     useEffect(() => {
         const fetchFoodDetails = async () => {
             try {
-                if (food_list.length > 0) {
-                    const foodItem = food_list.find((food) => food.id === Number(id));
+                if (drink_list.length > 0) {
+                    const foodItem = drink_list.find((food) => food.drink_Id === Number(id));
                     if (foodItem) {
                         setCurrentFood(foodItem);
 
@@ -60,18 +60,18 @@ const Food_Detail = () => {
         };
 
         fetchFoodDetails();
-    }, [id, food_list, navigate, token]);
+    }, [id, drink_list, navigate, token]);
 
     const handleNext = () => {
-        const currentIndex = food_list.findIndex((food) => food.id === Number(id));
-        const nextIndex = (currentIndex + 1) % food_list.length;
-        navigate(`/food-detail/${food_list[nextIndex].id}`);
+        const currentIndex = drink_list.findIndex((food) => food.id === Number(id));
+        const nextIndex = (currentIndex + 1) % drink_list.length;
+        navigate(`/food-detail/${drink_list[nextIndex].id}`);
     };
 
     const handlePrevious = () => {
-        const currentIndex = food_list.findIndex((food) => food.id === Number(id));
-        const prevIndex = (currentIndex - 1 + food_list.length) % food_list.length;
-        navigate(`/food-detail/${food_list[prevIndex].id}`);
+        const currentIndex = drink_list.findIndex((food) => food.id === Number(id));
+        const prevIndex = (currentIndex - 1 + drink_list.length) % drink_list.length;
+        navigate(`/food-detail/${drink_list[prevIndex].id}`);
     };
 
     const toggleFavorite = async () => {
@@ -99,7 +99,7 @@ const Food_Detail = () => {
             const response = await axios.post(
                 `${backendUrl}/api/food/rate-food`,
                 {
-                    foodId: currentFood.id,
+                    foodId: currentFood.drink_Id,
                     userId: token.userId,
                     rating: value,
                 }, { headers: { token } }
@@ -117,7 +117,7 @@ const Food_Detail = () => {
             const response = await axios.post(
                 `${backendUrl}/api/food/save-customization`,
                 {
-                    foodId: currentFood.id,
+                    foodId: currentFood.drink_Id,
                     userId: token.userId,
                     customNote: customizations,
                 }, { headers: { token } }
@@ -133,7 +133,7 @@ const Food_Detail = () => {
     const deleteCustomizations = async () => {
         try {
             const response = await axios.post(`${backendUrl}/api/food/remove-customization`, {
-                foodId: currentFood.id,
+                foodId: currentFood.drink_Id,
             }, { headers: { token } });
 
             if (response.data.success) {
@@ -177,7 +177,7 @@ const Food_Detail = () => {
                 {/* Food Image */}
                 <div className="relative w-full lg:w-[45%]">
                     <img
-                        src={`${backendUrl}/images/${currentFood.image}`}
+                        src={`${backendUrl}/images/${currentFood.drink_Image}`}
                         alt={currentFood.name}
                         className="w-full h-[400px] object-cover rounded-lg"
                     />
@@ -198,9 +198,9 @@ const Food_Detail = () => {
                 {/* Food Details */}
                 <div className="flex-1 flex flex-col justify-between">
                     <div className="mb-6">
-                        <h1 className="text-5xl font-extrabold text-green-700 mb-2">{currentFood.name}</h1>
-                        <p className="text-gray-600 text-lg leading-relaxed mb-4">{currentFood.description}</p>
-                        <p className="text-3xl font-bold text-green-700 mb-6">{currentFood.price} Birr</p>
+                        <h1 className="text-5xl font-extrabold text-green-700 mb-2">{currentFood.drink_Name}</h1>
+                        <p className="text-gray-600 text-lg leading-relaxed mb-4">{currentFood.drink_Description}</p>
+                        <p className="text-3xl font-bold text-green-700 mb-6">{currentFood.drink_Price} Birr</p>
                     </div>
 
                     {/* Add to Cart Controls */}
@@ -208,14 +208,14 @@ const Food_Detail = () => {
                         <label className="block text-gray-800 font-semibold mb-2">Add/Remove from Cart:</label>
                         <div className="flex items-center gap-4">
                             <button
-                                onClick={() => removeFromCart(currentFood.id, 'food')}
+                                onClick={() => removeFromCart(currentFood.drink_Id, 'drink')}
                                 className="bg-red-500 hover:bg-red-600 text-white px-5 py-3 rounded-full transition-transform hover:scale-105 shadow-md"
                             >
                                 <Minus size={20} />
                             </button>
                             <p className="text-2xl font-semibold">{cartItemCount || 0}</p>
                             <button
-                                onClick={() => addToCart(currentFood.id, 'food')}
+                                onClick={() => addToCart(currentFood.drink_Id, 'drink')}
                                 className="bg-green-500 hover:bg-green-600 text-white px-5 py-3 rounded-full transition-transform hover:scale-105 shadow-md"
                             >
                                 <Plus size={20} />
@@ -272,7 +272,6 @@ const Food_Detail = () => {
             </div>
         </div>
     );
+}
 
-};
-
-export default Food_Detail;
+export default Drink_Details

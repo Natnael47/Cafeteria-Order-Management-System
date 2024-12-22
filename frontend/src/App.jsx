@@ -10,6 +10,7 @@ import SearchBar from "./components/SearchBar";
 import About from "./pages/About";
 import Cart from './pages/Cart';
 import Contact from "./pages/Contact";
+import Drink_Details from "./pages/Drink_Details";
 import Food_Detail from "./pages/Food_Detail";
 import Home from './pages/Home';
 import Login from "./pages/Login";
@@ -47,6 +48,7 @@ const App = () => {
           <Route path="/contact" element={<Contact />} />
           <Route path="/login" element={<Login />} />
           <Route path="/food-detail/:id" element={<Food_Detail />} />
+          <Route path="/drink-detail/:id" element={<Drink_Details />} />
         </Routes>
       </div>
 
