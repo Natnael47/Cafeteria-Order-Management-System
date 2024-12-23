@@ -419,7 +419,6 @@ const List = () => {
                 </div>
             </div>
 
-
             <Modal
                 isOpen={modalIsOpen}
                 onRequestClose={closeModal}

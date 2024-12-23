@@ -193,7 +193,7 @@ const Add_Drink = () => {
                     </button>
                     <button
                         type="button"
-                        onClick={() => navigate("/list")}
+                        onClick={() => navigate("/list-drink")}
                         className="bg-gray-300 hover:bg-gray-400 text-gray-700 font-semibold px-6 py-3 rounded-lg shadow-md transition-all"
                     >
                         Cancel

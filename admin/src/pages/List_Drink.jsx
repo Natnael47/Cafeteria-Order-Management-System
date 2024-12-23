@@ -228,7 +228,7 @@ const List_Drink = () => {
             <div className="bg-gray-100 rounded-lg w-full max-h-[84vh] overflow-scroll shadow-lg">
                 <div>
                     {/* Table Header */}
-                    <div className="max-w-6.5xl grid grid-cols-[0.5fr_1fr_1fr_1fr_0.8fr_0.5fr_0.5fr_0.8fr_0.8fr] items-center gap-6 p-4 border-b bg-[#22C55E] text-white text-base font-semibold">
+                    <div className="grid grid-cols-[0.5fr_1fr_1fr_1fr_1fr_0.8fr_0.5fr_0.5fr] items-center gap-4 p-4 border-b bg-[#22C55E] text-white text-base font-semibold">
                         <b>Image</b>
                         <b>Name</b>
                         <b>Category</b>
@@ -245,7 +245,7 @@ const List_Drink = () => {
                             <div key={index}>
                                 {/* List Items */}
                                 <div
-                                    className={`max-w-6.5xl grid grid-cols-[0.5fr_1fr_1fr_1fr_0.8fr_0.5fr_0.5fr_0.8fr_0.8fr] items-center gap-6 p-4 border-b sm:grid ${item.menu_Status === false ? "bg-red-50" : "bg-white"
+                                    className={`grid grid-cols-[0.5fr_1fr_1fr_1fr_1fr_0.8fr_0.5fr_0.5fr] items-center gap-4 p-4 border-b sm:grid ${item.menu_Status === false ? "bg-red-50" : "bg-white"
                                         } hover:bg-blue-50`}
                                 >
                                     {/* Drink Image */}
@@ -268,7 +268,10 @@ const List_Drink = () => {
                                     <p className="text-gray-600">{item.drink_Size || "N/A"}</p>
 
                                     {/* Alcoholic Status */}
-                                    <p className={`text-sm font-medium ${item.is_Alcoholic ? "text-red-600" : "text-green-600"}`}>
+                                    <p
+                                        className={`text-sm ml-6 font-medium ${item.is_Alcoholic ? "text-red-600" : "text-green-600"
+                                            }`}
+                                    >
                                         {item.is_Alcoholic ? "Yes" : "No"}
                                     </p>
 
