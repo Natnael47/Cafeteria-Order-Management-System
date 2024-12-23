@@ -15,11 +15,12 @@ const Add = () => {
         price: "",
         category: "Salad",
         prepTime: "",
+        isFasting: false,
     });
 
     const onChangeHandler = (event) => {
         const name = event.target.name;
-        const value = event.target.value;
+        const value = name === "isFasting" ? event.target.value === "true" : event.target.value;
         setData(data => ({ ...data, [name]: value }));
     }
 
@@ -30,7 +31,8 @@ const Add = () => {
         formData.append("description", data.description);
         formData.append("price", Number(data.price));
         formData.append("category", data.category);
-        formData.append("prepTime", data.prepTime); // Added prepTime to formData
+        formData.append("prepTime", data.prepTime);
+        formData.append("isFasting", data.isFasting);
         formData.append("image", image);
 
         const response = await axios.post(backendUrl + "/api/food/add", formData, { headers: { token } });
@@ -41,6 +43,7 @@ const Add = () => {
                 price: "",
                 category: "Salad",
                 prepTime: "",
+                isFasting: false,
             });
             setImage(false);
             navigate('/list');
@@ -158,6 +161,20 @@ const Add = () => {
                             name="prepTime"
                             placeholder="30"
                         />
+                    </div>
+                    {/* is Fasting */}
+                    <div className="flex-1 min-w-[220px]">
+                        <p className="mb-2 font-semibold text-gray-700">Fasting</p>
+                        <select
+                            className="w-full px-4 py-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-green-400"
+                            onChange={onChangeHandler}
+                            value={data.isFasting}
+                            name="isFasting"
+                            required
+                        >
+                            <option value="false">Not Fasting</option>
+                            <option value="true">Fasting</option>
+                        </select>
                     </div>
                 </div>
 

@@ -15,7 +15,8 @@ const addFood = async (req, res) => {
         price: parseFloat(req.body.price),
         category: req.body.category,
         image: imageFilename,
-        prepTime: req.body.prepTime ? parseInt(req.body.prepTime) : 0, // Added prepTime
+        prepTime: req.body.prepTime ? parseInt(req.body.prepTime) : 0,
+        isFasting: req.body.isFasting === "true", // Convert "true" or "false" string to Boolean
       },
     });
 
@@ -147,6 +148,9 @@ const updateFood = async (req, res) => {
         image: imageFilename,
         menuStatus: menuStatus,
         prepTime: PrepTime,
+        isFasting: req.body.isFasting
+          ? req.body.isFasting === "true"
+          : existingFood.isFasting,
       },
     });
 

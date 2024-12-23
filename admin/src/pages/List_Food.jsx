@@ -21,7 +21,8 @@ const List = () => {
         image: "",
         description: "",
         menuStatus: "",
-        prepTime: ""
+        prepTime: "",
+        isFasting: "",
     });
     const [originalFood, setOriginalFood] = useState(null);
     const [image, setImage] = useState(false);
@@ -78,6 +79,7 @@ const List = () => {
             image: "",
             description: "",
             menuStatus: false,
+            isFasting: false
         });
         setOriginalFood(null);
         setImage(false);
@@ -121,6 +123,7 @@ const List = () => {
         formData.append("description", editFood.description);
         formData.append("menuStatus", editFood.menuStatus ? "1" : "0");
         formData.append("prepTime", editFood.prepTime);
+        formData.append("isFasting", editFood.isFasting ? "true" : "false");
         if (editFood.image instanceof File) {
             formData.append("image", editFood.image);
         }
@@ -229,11 +232,12 @@ const List = () => {
             <div className="bg-gray-100 rounded-lg w-full max-h-[84vh] overflow-scroll shadow-lg">
                 <div>
                     {/* Table Header */}
-                    <div className="grid grid-cols-[0.5fr_1fr_1fr_0.8fr_0.5fr_0.5fr] items-center gap-4 p-4 border-b bg-[#22C55E] text-white text-base font-semibold">
+                    <div className="grid grid-cols-[1fr_2fr_1fr_1fr_1fr_0.8fr_0.7fr] items-center gap-6 p-4 border-b bg-[#22C55E] text-white text-lg font-bold">
                         <b>Image</b>
                         <b>Name</b>
                         <b>Category</b>
                         <b>Price</b>
+                        <b>Fasting</b>
                         <b>Remove</b>
                         <b>Modify</b>
                     </div>
@@ -244,26 +248,31 @@ const List = () => {
                             <div key={index}>
                                 {/* Food Item */}
                                 <div
-                                    className={`grid grid-cols-[0.5fr_1fr_1fr_0.8fr_0.5fr_0.5fr] items-center gap-4 p-4 border-b sm:grid ${item.menuStatus === false ? "bg-red-50" : "bg-white"
-                                        } hover:bg-blue-50`}
+                                    className={`grid grid-cols-[1fr_2fr_1fr_1fr_1fr_1fr_0.5fr] items-center gap-6 p-4 border-b rounded-md shadow-sm sm:grid ${item.menuStatus === false ? "bg-red-50" : "bg-white"} hover:bg-blue-50`}
                                 >
                                     <img
                                         src={`${backendUrl}/images/${item.image}`}
                                         alt="Food"
-                                        className="w-20 h-[70px] rounded object-cover"
+                                        className="w-16 h-16 rounded-md object-cover shadow"
                                     />
-                                    <p className="truncate font-medium text-gray-700">{item.name}</p>
-                                    <p className="text-gray-600">{item.category}</p>
-                                    <p className="text-gray-700 font-semibold">${item.price}</p>
+                                    <p className="truncate font-medium text-gray-700 text-base">{item.name}</p>
+                                    <p className="text-gray-600 text-sm">{item.category}</p>
+                                    <p className="text-gray-700 font-semibold text-base">${item.price}</p>
+                                    <p
+                                        className={`text-sm font-medium text-center ${item.isFasting ? "text-green-700 bg-green-100 px-2 py-1 rounded" : "text-red-700 bg-red-100 px-2 py-1 rounded"
+                                            }`}
+                                    >
+                                        {item.isFasting ? "Fasting" : "Non-Fasting"}
+                                    </p>
                                     <Trash2
-                                        size={28}
+                                        size={24}
                                         onClick={() => openModal(item.id)}
-                                        className="cursor-pointer text-red-500 hover:text-red-600 ml-5"
+                                        className="cursor-pointer text-red-500 hover:text-red-600"
                                     />
                                     <Pencil
-                                        size={28}
+                                        size={24}
                                         onClick={() => handleEditClick(item, index)}
-                                        className="cursor-pointer text-blue-500 hover:text-blue-600 ml-3"
+                                        className="cursor-pointer text-blue-500 hover:text-blue-600"
                                     />
                                 </div>
 
@@ -314,6 +323,18 @@ const List = () => {
                                                             type="checkbox"
                                                             name="menuStatus"
                                                             checked={editFood.menuStatus}
+                                                            onChange={handleInputChange}
+                                                            className="ml-2 w-5 h-5"
+                                                        />
+                                                    </div>
+                                                    <div className="mb-4">
+                                                        <label className="block text-sm font-medium mb-1">
+                                                            Fasting
+                                                        </label>
+                                                        <input
+                                                            type="checkbox"
+                                                            name="isFasting"
+                                                            checked={editFood.isFasting}
                                                             onChange={handleInputChange}
                                                             className="ml-2 w-5 h-5"
                                                         />
