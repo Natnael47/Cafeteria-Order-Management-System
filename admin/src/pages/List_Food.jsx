@@ -248,28 +248,56 @@ const List = () => {
                             <div key={index}>
                                 {/* Food Item */}
                                 <div
-                                    className={`grid grid-cols-[0.6fr_1.5fr_1fr_1fr_1.2fr_0.6fr_0.4fr] items-center gap-6 p-4 border-b rounded-md shadow-lg sm:grid transition-all duration-300 ${item.menuStatus === false ? "bg-red-50 hover:bg-red-100" : "bg-white hover:bg-gray-50"
+                                    className={`grid grid-cols-[0.6fr_1.1fr_1.4fr_1fr_1.2fr_0.6fr_0.4fr] items-center gap-6 p-4 border-b rounded-md shadow-lg sm:grid transition-all duration-300 ${item.menuStatus === false ? "bg-red-50 hover:bg-red-100" : "bg-white hover:bg-gray-50"
                                         }`}
                                 >
+                                    {/* Food Image */}
                                     <img
                                         src={`${backendUrl}/images/${item.image}`}
                                         alt="Food"
                                         className="w-20 h-[70px] rounded object-cover"
                                     />
-                                    <p className="truncate font-semibold text-gray-800 text-base hover:text-green-600">{item.name}</p>
-                                    <p className="text-gray-600 text-sm italic">{item.category}</p>
+
+                                    {/* Food Name */}
+                                    <p className="truncate font-semibold text-gray-800 text-base hover:text-green-600">
+                                        {item.name}
+                                    </p>
+
+                                    {/* Food Category with Unique Background Color */}
+                                    <p
+                                        className={`text-black text-base font-semibold px-3 py-1 rounded text-center ${item.category === "Salad" ? "bg-green-200"
+                                            : item.category === "Rolls" ? "bg-yellow-200"
+                                                : item.category === "Desserts" ? "bg-pink-200 "
+                                                    : item.category === "Sandwich" ? "bg-blue-200 "
+                                                        : item.category === "Cake" ? "bg-purple-200"
+                                                            : item.category === "Pure Veg" ? "bg-lime-200"
+                                                                : item.category === "Pasta" ? "bg-orange-200 "
+                                                                    : item.category === "Noodles" ? "bg-teal-200 "
+                                                                        : "bg-gray-200"
+                                            }`}
+                                    >
+                                        {item.category}
+                                    </p>
+
+                                    {/* Food Price */}
                                     <p className="text-gray-800 font-bold text-lg text-center">${item.price}</p>
+
+                                    {/* Fasting Status */}
                                     <p
                                         className={`text-sm font-medium text-center max-w-[160px] px-3 py-1 rounded ${item.isFasting ? "text-green-700 bg-green-100" : "text-red-700 bg-red-100"
                                             }`}
                                     >
                                         {item.isFasting ? "Fasting" : "Non-Fasting"}
                                     </p>
+
+                                    {/* Remove Button */}
                                     <Trash2
                                         size={28}
                                         onClick={() => openModal(item.id)}
                                         className="cursor-pointer text-red-500 hover:text-red-700 transition-transform transform hover:scale-110"
                                     />
+
+                                    {/* Edit Button */}
                                     <Pencil
                                         size={28}
                                         onClick={() => handleEditClick(item, index)}

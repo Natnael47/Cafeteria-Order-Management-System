@@ -386,8 +386,8 @@ const List_Drink = () => {
                                                     onChange={handleInputChange}
                                                     className="w-full border p-2 rounded-lg"
                                                 >
-                                                    <option value="Salad">Salad</option>
-                                                    <option value="Rolls">Rolls</option>
+                                                    <option value="Soda">Soda</option>
+                                                    <option value="Hot Beverages">Hot Beverages</option>
                                                     <option value="Desserts">Desserts</option>
                                                     <option value="Sandwich">Sandwich</option>
                                                     <option value="Cake">Cake</option>
