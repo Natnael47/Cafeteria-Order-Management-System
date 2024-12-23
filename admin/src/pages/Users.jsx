@@ -1,4 +1,5 @@
 import axios from 'axios';
+import { Star } from 'lucide-react';
 import React, { useContext, useEffect, useState } from 'react';
 import { toast } from "react-toastify";
 import { backendUrl } from "../App";
@@ -284,7 +285,7 @@ const Users = () => {
                     </div>
                 )}
 
-                {/*Feedback page*/}
+                {/* Feedback page */}
                 {currentView === "feedback" && (
                     <div className="p-6 bg-white shadow rounded-lg">
                         {/* Feedback Content */}
@@ -309,17 +310,18 @@ const Users = () => {
                                             className={`rounded-lg p-4 shadow-md transition-all hover:shadow-lg ${bgColor}`}
                                         >
                                             <div className="flex items-start space-x-4">
-                                                {/* Customer Avatar */}
-                                                <img
-                                                    src={assets.person}
-                                                    alt="Customer Avatar"
-                                                    className="w-16 h-16 rounded-full object-cover"
-                                                />
+                                                {/* Customer Initial (Replaced Image) */}
+                                                <div className="w-16 h-16 bg-gray-300 text-gray-800 text-xl font-bold rounded-full mx-auto flex items-center justify-center">
+                                                    {feedback.username.charAt(0).toUpperCase()}
+                                                </div>
+
                                                 <div className="flex-1">
                                                     <div className="flex justify-between items-center mb-2">
-                                                        <h3 className="font-semibold text-gray-800 text-xl">{feedback.username}</h3>
+                                                        <h3 className="font-semibold text-gray-800 text-xl">
+                                                            {feedback.username}
+                                                        </h3>
                                                         <p className="text-sm text-gray-500">
-                                                            {/* Format the date to the required style */}
+                                                            {/* Format the date */}
                                                             {new Date(feedback.date).toLocaleDateString('en-US', {
                                                                 weekday: 'long',
                                                                 year: 'numeric',
@@ -337,7 +339,9 @@ const Users = () => {
                                                     {/* Rating */}
                                                     <div className="flex items-center space-x-1 text-yellow-500 text-lg">
                                                         {Array.from({ length: Math.round(feedback.rating) }).map((_, i) => (
-                                                            <span key={i}>⭐</span>
+                                                            <div key={i}>
+                                                                <Star color="#facc15" fill="#facc15" size={18} />
+                                                            </div>
                                                         ))}
                                                     </div>
                                                 </div>
