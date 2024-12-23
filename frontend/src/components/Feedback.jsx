@@ -1,7 +1,8 @@
 import axios from 'axios';
+import { AnimatePresence, motion } from 'framer-motion';
+import { ChevronLeft, ChevronRight, Star } from 'lucide-react';
 import React, { useEffect, useState } from 'react';
 import { backendUrl } from '../App';
-import { assets } from '../assets/assets';
 
 const Feedback = () => {
     const [feedbackList, setFeedbackList] = useState([]);
@@ -39,55 +40,74 @@ const Feedback = () => {
 
     return (
         <div className="mt-12 text-center p-5">
-            <h2 className="text-2xl font-bold mb-5">What Our Customers Say?</h2>
+            <h2 className="text-3xl font-bold mb-8 text-gray-800">What Our Customers Say</h2>
             <div className="relative flex items-center justify-center">
-                {/* Left button */}
-                <button onClick={handlePrevious} className="absolute left-0 text-xl p-2 bg-gray-300 rounded-full">
-                    ◀
+                {/* Left Button */}
+                <button
+                    onClick={handlePrevious}
+                    className="absolute left-0 p-3 bg-gray-200 hover:bg-gray-300 rounded-lg transition duration-300 shadow-lg z-20"
+                >
+                    <ChevronLeft size={28} />
                 </button>
 
-                {/* Feedback items */}
-                <div className="flex space-x-5 overflow-hidden">
-                    {visibleFeedback.map((feedback, index) => (
-                        <div
-                            key={index}
-                            className={`bg-[#D7F6DA] rounded-lg shadow-md p-5 w-64 text-center transition-transform ${index === 1 ? 'transform scale-105' : 'scale-100'
-                                }`}
-                        >
-                            <img
-                                src={assets.person}
-                                alt="Customer"
-                                className="w-24 h-24 rounded-full object-cover mx-auto mb-2.5"
-                            />
-                            <h3 className="mt-2.5 mb-2.5 text-lg text-gray-800">{feedback.username}</h3>
+                {/* Feedback Items */}
+                <div className="flex space-x-8 overflow-hidden w-full max-w-4xl py-8 gap-x-5 relative">
+                    <AnimatePresence>
+                        {visibleFeedback.map((feedback, index) => (
+                            <motion.div
+                                key={index}
+                                initial={{ opacity: 0, scale: 0.9 }}
+                                animate={{
+                                    opacity: 1,
+                                    scale: index === 1 ? 1.1 : 1,
+                                    transition: { duration: 0.5 },
+                                }}
+                                exit={{ opacity: 0, scale: 0.9 }}
+                                className={`border border-gray-300 bg-white ${index === 1 ? 'rounded-lg h-auto' : 'rounded-lg'
+                                    } shadow-lg p-6 text-center transform transition-all duration-500 ${index === 1 ? 'scale-110 z-10' : 'z-0'
+                                    } w-72`}
+                            >
+                                <div className="w-16 h-16 bg-gray-300 text-gray-800 text-xl font-bold rounded-full mx-auto flex items-center justify-center mb-4">
+                                    {feedback.username.charAt(0).toUpperCase()}
+                                </div>
+                                <h3 className="text-lg font-semibold text-gray-700 mb-2">
+                                    {feedback.username}
+                                </h3>
 
-                            {/* Comment section */}
-                            <p className="text-sm text-gray-600 leading-relaxed">
-                                {feedback.comment.length > 100 && expandedComment !== index
-                                    ? `${feedback.comment.slice(0, 100)}...`
-                                    : feedback.comment}
-                                {feedback.comment.length > 100 && (
-                                    <span
-                                        onClick={() => toggleCommentExpansion(index)}
-                                        className="text-blue-500 cursor-pointer ml-1"
-                                    >
-                                        {expandedComment === index ? 'show less' : 'more'}
-                                    </span>
-                                )}
-                            </p>
+                                {/* Comment Section */}
+                                <p className="text-sm text-gray-600 leading-relaxed">
+                                    {expandedComment === index
+                                        ? feedback.comment
+                                        : `${feedback.comment.slice(0, 100)}${feedback.comment.length > 100 ? '...' : ''
+                                        }`}
+                                    {feedback.comment.length > 100 && (
+                                        <span
+                                            onClick={() => toggleCommentExpansion(index)}
+                                            className="text-blue-500 cursor-pointer ml-1"
+                                        >
+                                            {expandedComment === index ? 'Show Less' : 'Read More'}
+                                        </span>
+                                    )}
+                                </p>
 
-                            <div className="flex justify-center mt-2.5 space-x-1 text-yellow-500 text-xl">
-                                {Array.from({ length: Math.round(feedback.rating) }).map((_, i) => (
-                                    <span key={i}>⭐</span>
-                                ))}
-                            </div>
-                        </div>
-                    ))}
+                                <div className="flex justify-center mt-4 space-x-1">
+                                    {Array.from({ length: Math.round(feedback.rating) }).map((_, i) => (
+                                        <div key={i} className="bg-white rounded-lg p-1">
+                                            <Star color="#facc15" fill="#facc15" size={18} />
+                                        </div>
+                                    ))}
+                                </div>
+                            </motion.div>
+                        ))}
+                    </AnimatePresence>
                 </div>
 
-                {/* Right button */}
-                <button onClick={handleNext} className="absolute right-0 text-xl p-2 bg-gray-300 rounded-full">
-                    ▶
+                {/* Right Button */}
+                <button
+                    onClick={handleNext}
+                    className="absolute right-0 p-3 bg-gray-200 hover:bg-gray-300 rounded-lg transition duration-300 shadow-lg z-20"
+                >
+                    <ChevronRight size={28} />
                 </button>
             </div>
         </div>
