@@ -232,14 +232,14 @@ const List = () => {
             <div className="bg-gray-100 rounded-lg w-full max-h-[84vh] overflow-scroll shadow-lg">
                 <div>
                     {/* Table Header */}
-                    <div className="grid grid-cols-[1fr_2fr_1fr_1fr_1fr_0.8fr_0.7fr] items-center gap-6 p-4 border-b bg-[#22C55E] text-white text-lg font-bold">
-                        <b>Image</b>
-                        <b>Name</b>
-                        <b>Category</b>
-                        <b>Price</b>
-                        <b>Fasting</b>
-                        <b>Remove</b>
-                        <b>Modify</b>
+                    <div className="grid grid-cols-[0.6fr_1.5fr_1fr_1fr_1fr_0.6fr_0.6fr] items-center gap-6 p-4 border-b bg-[#22C55E] text-white text-base font-semibold rounded-t-md shadow-md">
+                        <b className="text-center">Image</b>
+                        <b className="text-left">Name</b>
+                        <b className="text-left">Category</b>
+                        <b className="text-center">Price</b>
+                        <b className="text-center">Fasting</b>
+                        <b className="text-center">Remove</b>
+                        <b className="text-center">Modify</b>
                     </div>
 
                     {/* Food List */}
@@ -248,31 +248,32 @@ const List = () => {
                             <div key={index}>
                                 {/* Food Item */}
                                 <div
-                                    className={`grid grid-cols-[1fr_2fr_1fr_1fr_1fr_1fr_0.5fr] items-center gap-6 p-4 border-b rounded-md shadow-sm sm:grid ${item.menuStatus === false ? "bg-red-50" : "bg-white"} hover:bg-blue-50`}
+                                    className={`grid grid-cols-[0.6fr_1.5fr_1fr_1fr_1.2fr_0.6fr_0.4fr] items-center gap-6 p-4 border-b rounded-md shadow-lg sm:grid transition-all duration-300 ${item.menuStatus === false ? "bg-red-50 hover:bg-red-100" : "bg-white hover:bg-gray-50"
+                                        }`}
                                 >
                                     <img
                                         src={`${backendUrl}/images/${item.image}`}
                                         alt="Food"
-                                        className="w-16 h-16 rounded-md object-cover shadow"
+                                        className="w-20 h-[70px] rounded object-cover"
                                     />
-                                    <p className="truncate font-medium text-gray-700 text-base">{item.name}</p>
-                                    <p className="text-gray-600 text-sm">{item.category}</p>
-                                    <p className="text-gray-700 font-semibold text-base">${item.price}</p>
+                                    <p className="truncate font-semibold text-gray-800 text-base hover:text-green-600">{item.name}</p>
+                                    <p className="text-gray-600 text-sm italic">{item.category}</p>
+                                    <p className="text-gray-800 font-bold text-lg text-center">${item.price}</p>
                                     <p
-                                        className={`text-sm font-medium text-center ${item.isFasting ? "text-green-700 bg-green-100 px-2 py-1 rounded" : "text-red-700 bg-red-100 px-2 py-1 rounded"
+                                        className={`text-sm font-medium text-center max-w-[160px] px-3 py-1 rounded ${item.isFasting ? "text-green-700 bg-green-100" : "text-red-700 bg-red-100"
                                             }`}
                                     >
                                         {item.isFasting ? "Fasting" : "Non-Fasting"}
                                     </p>
                                     <Trash2
-                                        size={24}
+                                        size={28}
                                         onClick={() => openModal(item.id)}
-                                        className="cursor-pointer text-red-500 hover:text-red-600"
+                                        className="cursor-pointer text-red-500 hover:text-red-700 transition-transform transform hover:scale-110"
                                     />
                                     <Pencil
-                                        size={24}
+                                        size={28}
                                         onClick={() => handleEditClick(item, index)}
-                                        className="cursor-pointer text-blue-500 hover:text-blue-600"
+                                        className="cursor-pointer text-blue-500 hover:text-blue-700 transition-transform transform hover:scale-110"
                                     />
                                 </div>
 

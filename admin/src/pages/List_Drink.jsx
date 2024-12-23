@@ -269,10 +269,10 @@ const List_Drink = () => {
 
                                     {/* Alcoholic Status */}
                                     <p
-                                        className={`text-sm ml-6 font-medium ${item.is_Alcoholic ? "text-red-600" : "text-green-600"
+                                        className={`text-sm font-medium text-center ${item.is_Alcoholic ? "text-red-600 bg-red-100 px-2 py-1 rounded" : "text-green-600 bg-green-100 px-2 py-1 rounded"
                                             }`}
                                     >
-                                        {item.is_Alcoholic ? "Yes" : "No"}
+                                        {item.is_Alcoholic ? "Alcoholic" : "Non-Alcoholic"}
                                     </p>
 
                                     {/* Remove Button */}
