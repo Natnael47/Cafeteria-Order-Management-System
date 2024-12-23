@@ -41,9 +41,18 @@ const FoodItem = ({ id, name, price, description, image, rating }) => {
         return stars;
     };
 
+    // Helper function to truncate the description
+    const truncateDescription = (desc) => {
+        const words = desc.split(" ");
+        if (words.length > 9) {
+            return `${words.slice(0, 9).join(" ")}...more`;
+        }
+        return desc;
+    };
+
     // Construct the cart item key using 'food' as type and the ID of the item
     const cartItemKey = `food-${id}`;
-    const cartItemCount = cartItems[cartItemKey] || 0;  // Default to 0 if not found
+    const cartItemCount = cartItems[cartItemKey] || 0; // Default to 0 if not found
 
     return (
         <div className="w-full mx-auto border rounded-lg shadow-lg transition duration-300 hover:shadow-xl bg-white overflow-hidden">
@@ -57,7 +66,7 @@ const FoodItem = ({ id, name, price, description, image, rating }) => {
                 {cartItemCount === 0 ? (
                     <div
                         className="absolute bottom-4 right-4 flex items-center justify-center rounded-full bg-green-500 w-9 h-9 cursor-pointer hover:bg-green-600 shadow-md transition"
-                        onClick={() => addToCart(id, 'food')} // Pass 'food' as type
+                        onClick={() => addToCart(id, "food")} // Pass 'food' as type
                     >
                         <Plus className="text-white w-5 h-5" />
                     </div>
@@ -65,14 +74,14 @@ const FoodItem = ({ id, name, price, description, image, rating }) => {
                     <div className="absolute bottom-4 right-4 flex items-center gap-2 p-2 rounded-full bg-white shadow-md">
                         <div
                             className="w-8 h-8 flex items-center justify-center rounded-full bg-red-100 cursor-pointer hover:bg-red-200 transition"
-                            onClick={() => removeFromCart(id, 'food')} // Pass 'food' as type
+                            onClick={() => removeFromCart(id, "food")} // Pass 'food' as type
                         >
                             <Minus className="text-red-700 w-4 h-4" />
                         </div>
                         <p className="text-base font-medium">{cartItemCount}</p>
                         <div
                             className="w-8 h-8 flex items-center justify-center rounded-full bg-green-100 cursor-pointer hover:bg-green-200 transition"
-                            onClick={() => addToCart(id, 'food')} // Pass 'food' as type
+                            onClick={() => addToCart(id, "food")} // Pass 'food' as type
                         >
                             <Plus className="text-green-700 w-4 h-4" />
                         </div>
@@ -87,11 +96,9 @@ const FoodItem = ({ id, name, price, description, image, rating }) => {
             >
                 <div className="flex justify-between items-center mb-2">
                     <p className="text-lg font-semibold text-gray-800">{name}</p>
-                    <div className="flex items-center gap-1">
-                        {renderStars(rating)}
-                    </div>
+                    <div className="flex items-center gap-1">{renderStars(rating)}</div>
                 </div>
-                <p className="text-sm text-gray-600">{description}</p>
+                <p className="text-sm text-gray-600">{truncateDescription(description)}</p>
                 <p className="text-lg font-semibold text-green-600 mt-2">{price} Birr</p>
             </div>
         </div>

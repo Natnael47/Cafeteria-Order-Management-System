@@ -45,9 +45,9 @@ const Feedback = () => {
                 {/* Left Button */}
                 <button
                     onClick={handlePrevious}
-                    className="absolute left-0 p-3 bg-gray-200 hover:bg-gray-300 rounded-lg transition duration-300 shadow-lg z-20"
+                    className="absolute left-0 p-3 bg-gray-300 hover:bg-green-500 rounded-lg transition duration-300 shadow-lg z-20 group"
                 >
-                    <ChevronLeft size={28} />
+                    <ChevronLeft size={28} className="text-gray-700 group-hover:text-white transition duration-300" />
                 </button>
 
                 {/* Feedback Items */}
@@ -105,9 +105,9 @@ const Feedback = () => {
                 {/* Right Button */}
                 <button
                     onClick={handleNext}
-                    className="absolute right-0 p-3 bg-gray-200 hover:bg-gray-300 rounded-lg transition duration-300 shadow-lg z-20"
+                    className="absolute right-0 p-3 bg-gray-300 hover:bg-green-500 rounded-lg transition duration-100 shadow-lg z-20 group"
                 >
-                    <ChevronRight size={28} />
+                    <ChevronRight size={28} className="text-gray-700 group-hover:text-white transition duration-100" />
                 </button>
             </div>
         </div>

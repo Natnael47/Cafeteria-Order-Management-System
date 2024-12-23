@@ -45,6 +45,15 @@ const DrinkItem = ({ id, name, price, description, image, rating }) => {
     const cartItemKey = `drink-${id}`;
     const cartItemCount = cartItems[cartItemKey] || 0;  // Default to 0 if not found
 
+    // Helper function to truncate the description
+    const truncateDescription = (desc) => {
+        const words = desc.split(" ");
+        if (words.length > 9) {
+            return `${words.slice(0, 9).join(" ")}...more`;
+        }
+        return desc;
+    };
+
     return (
         <div className="w-full mx-auto border rounded-lg shadow-lg transition duration-300 hover:shadow-xl bg-white overflow-hidden">
             <div className="relative group">
@@ -91,7 +100,7 @@ const DrinkItem = ({ id, name, price, description, image, rating }) => {
                         {renderStars(rating)}
                     </div>
                 </div>
-                <p className="text-sm text-gray-600">{description}</p>
+                <p className="text-sm text-gray-600">{truncateDescription(description)}</p>
                 <p className="text-lg font-semibold text-green-600 mt-2">{price} Birr</p>
             </div>
         </div>
