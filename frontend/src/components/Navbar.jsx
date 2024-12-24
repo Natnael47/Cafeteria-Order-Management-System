@@ -1,4 +1,4 @@
-import { HandPlatter, LogOut, MessageSquareMore, Search, User } from 'lucide-react';
+import { ChevronDown, HandPlatter, LogOut, MessageSquareMore, Search, User } from 'lucide-react';
 import React, { useContext, useEffect, useState } from "react";
 import { Link, useLocation } from "react-router-dom";
 import { assets } from "../assets/assets";
@@ -6,7 +6,7 @@ import { StoreContext } from "../context/StoreContext";
 
 export const Navbar = ({ setShowFeedback }) => {
     const location = useLocation();
-    const { getTotalCartAmount, token, setToken, navigate, setShowSearch, getCartItems } = useContext(StoreContext);
+    const { getTotalCartAmount, token, userData, setToken, navigate, setShowSearch, getCartItems } = useContext(StoreContext);
 
     const [menu, setMenu] = useState("");
     const [hasShadow, setHasShadow] = useState(false);
@@ -139,36 +139,58 @@ export const Navbar = ({ setShowFeedback }) => {
                     </button>
                 ) : (
                     <div className='relative flex items-center gap-2 cursor-pointer group'>
-                        <img src={assets.profile_icon} alt='Profile' className='w-7 transition-transform duration-300 hover:scale-110' />
-                        <img src={assets.drop_down_icon} alt='Dropdown' className='w-2.5' />
+                        {/* Profile Section */}
+                        <div className='bg-primary rounded-full flex items-center gap-2 px-2 py-1 shadow-md hover:shadow-lg transition-all duration-300 cursor-pointer'>
+                            <div className="w-10 h-10 bg-gray-100 text-green-800 text-lg font-semibold rounded-full flex items-center justify-center border-2 border-green-500">
+                                {userData?.firstName?.charAt(0).toUpperCase()}
+                            </div>
+                            <ChevronDown className="text-black transition-transform duration-300 group-hover:rotate-180" />
+                        </div>
 
                         {/* Dropdown Menu */}
-                        <div className='absolute right-0 top-0 pt-14 z-20 hidden group-hover:block'>
-                            <div className='bg-white rounded-lg shadow-lg border border-green-300 p-4 flex flex-col gap-4 min-w-[160px]'>
-                                <p
-                                    onClick={() => navigate('/myprofile')}
-                                    className='flex items-center gap-2 cursor-pointer hover:text-green-500 transition-colors'
-                                >
-                                    <User /> Profile
-                                </p>
-                                <p
-                                    onClick={() => navigate('/myorders')}
-                                    className='flex items-center gap-2 cursor-pointer hover:text-green-500 transition-colors'
-                                >
-                                    <HandPlatter /> Orders
-                                </p>
-                                <p
-                                    onClick={() => setShowFeedback(true)}
-                                    className='flex items-center gap-2 cursor-pointer hover:text-green-500 transition-colors'
-                                >
-                                    <MessageSquareMore /> Feedback
-                                </p>
-                                <p
-                                    onClick={logout}
-                                    className='flex items-center gap-2 cursor-pointer text-red-500 hover:text-red-700 transition-colors'
-                                >
-                                    <LogOut /> Logout
-                                </p>
+                        <div className='absolute right-0 top-0 pt-14 z-30 hidden group-hover:block'>
+                            <div className='bg-white rounded-lg shadow-2xl border border-gray-200 p-5 w-64 flex flex-col gap-4'>
+                                {/* Profile Section */}
+                                <div className='flex items-center gap-4 border-b pb-4'>
+                                    <div className="w-14 h-14 bg-green-100 text-green-600 text-2xl font-bold rounded-full flex items-center justify-center shadow-sm">
+                                        {userData?.firstName?.charAt(0).toUpperCase()}
+                                    </div>
+                                    <div>
+                                        <p className="text-lg font-semibold text-gray-800">{userData?.firstName} {userData?.lastName}</p>
+                                        <p className="text-sm text-gray-500">{userData?.email}</p>
+                                    </div>
+                                </div>
+                                {/* Menu Options */}
+                                <div className='flex flex-col gap-4'>
+                                    <div
+                                        onClick={() => navigate('/myprofile')}
+                                        className='flex items-center gap-3 cursor-pointer hover:bg-green-100 p-3 rounded-lg transition-all'
+                                    >
+                                        <User className="text-green-600 w-6 h-6" />
+                                        <span className="text-gray-800 font-medium">Profile</span>
+                                    </div>
+                                    <div
+                                        onClick={() => navigate('/myorders')}
+                                        className='flex items-center gap-3 cursor-pointer hover:bg-green-100 p-3 rounded-lg transition-all'
+                                    >
+                                        <HandPlatter className="text-green-600 w-6 h-6" />
+                                        <span className="text-gray-800 font-medium">Orders</span>
+                                    </div>
+                                    <div
+                                        onClick={() => setShowFeedback(true)}
+                                        className='flex items-center gap-3 cursor-pointer hover:bg-green-100 p-3 rounded-lg transition-all'
+                                    >
+                                        <MessageSquareMore className="text-green-600 w-6 h-6" />
+                                        <span className="text-gray-800 font-medium">Feedback</span>
+                                    </div>
+                                    <div
+                                        onClick={logout}
+                                        className='flex items-center gap-3 cursor-pointer hover:bg-red-100 p-3 rounded-lg transition-all'
+                                    >
+                                        <LogOut className="text-red-600 w-6 h-6" />
+                                        <span className="text-red-600 font-medium">Logout</span>
+                                    </div>
+                                </div>
                             </div>
                         </div>
                     </div>
