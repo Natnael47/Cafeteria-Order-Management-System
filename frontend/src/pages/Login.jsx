@@ -60,18 +60,18 @@ const Login = ({ setShowLogin }) => {
     };
 
     return (
-        <form onSubmit={onLogin} className="min-h-[80vh] flex items-center">
-            <div className="flex flex-col gap-4 m-auto items-start p-8 min-w-[340px] sm:min-w-96 border rounded-xl text-zinc-600 text-sm shadow-2xl bg-gradient-to-br from-white via-zinc-100 to-gray-50">
-                <h2 className="text-3xl font-bold text-primary">
+        <form onSubmit={onLogin} className="min-h-[80vh]  flex items-center">
+            <div className="flex flex-col gap-6 m-auto items-start p-8 min-w-[340px] sm:min-w-96 border rounded-xl text-zinc-600 text-sm shadow-xl bg-gradient-to-br from-white via-gray-100 to-gray-200">
+                <h2 className="text-4xl font-extrabold text-primary text-center w-full">
                     {currState === 'Sign Up' ? "Create Account" : "Login"}
                 </h2>
-                <p className="text-gray-500">
+                <p className="text-gray-600 text-center w-full">
                     Please {currState === 'Sign Up' ? "sign up" : "log in"} to order food.
                 </p>
 
                 {currState === "Sign Up" && (
                     <div className="w-full">
-                        <label htmlFor="fullName" className="text-gray-700 mb-1 font-semibold">
+                        <label htmlFor="fullName" className="text-gray-700 mb-1 font-medium">
                             Full Name
                         </label>
                         <input
@@ -81,13 +81,13 @@ const Login = ({ setShowLogin }) => {
                             type="text"
                             placeholder="Full Name"
                             required
-                            className="border border-zinc-300 rounded w-full p-2 mt-1 focus:outline-none focus:ring-2 focus:ring-primary transition-shadow"
+                            className="border border-gray-300 rounded-lg w-full p-3 mt-1 focus:outline-none focus:ring-2 focus:ring-primary transition-shadow"
                         />
                     </div>
                 )}
 
                 <div className="w-full">
-                    <label htmlFor="email" className="text-gray-700 mb-1 font-semibold">
+                    <label htmlFor="email" className="text-gray-700 mb-1 font-medium">
                         Email
                     </label>
                     <input
@@ -97,12 +97,12 @@ const Login = ({ setShowLogin }) => {
                         type="email"
                         placeholder="Your Email"
                         required
-                        className="border border-zinc-300 rounded w-full p-2 mt-1 focus:outline-none focus:ring-2 focus:ring-primary transition-shadow"
+                        className="border border-gray-300 rounded-lg w-full p-3 mt-1 focus:outline-none focus:ring-2 focus:ring-primary transition-shadow"
                     />
                 </div>
 
                 <div className="w-full">
-                    <label htmlFor="password" className="text-gray-700 mb-1 font-semibold">
+                    <label htmlFor="password" className="text-gray-700 mb-1 font-medium">
                         Password
                     </label>
                     <div className="relative">
@@ -113,26 +113,26 @@ const Login = ({ setShowLogin }) => {
                             type={showPassword ? "text" : "password"}
                             placeholder="Password"
                             required
-                            className="border border-zinc-300 rounded w-full p-2 pr-10 focus:outline-none focus:ring-2 focus:ring-primary transition-shadow"
+                            className="border border-gray-300 rounded-lg w-full p-3 pr-12 focus:outline-none focus:ring-2 focus:ring-primary transition-shadow"
                         />
                         <button
                             type="button"
                             onClick={() => setShowPassword(!showPassword)}
-                            className="absolute right-3 top-2 text-gray-500 hover:text-primary transition-colors"
+                            className="absolute right-3 top-3 text-gray-500 hover:text-primary transition-colors"
                         >
-                            {showPassword ? <Eye size={20} /> : <EyeOff size={20} />}
+                            {showPassword ? <Eye size={24} /> : <EyeOff size={24} />}
                         </button>
                     </div>
                 </div>
 
                 <button
                     type="submit"
-                    className="bg-primary text-white py-2 rounded-md font-semibold hover:bg-black text-base transition-all w-full shadow-md hover:scale-[1.02]"
+                    className="bg-primary text-white py-3 rounded-lg font-semibold hover:bg-primary-dark text-lg transition-transform transform hover:scale-105 w-full shadow-lg"
                 >
                     {currState === 'Sign Up' ? "Sign Up" : "Login"}
                 </button>
 
-                <p className="text-center w-full text-gray-500 mt-1">
+                <p className="text-center w-full text-gray-600 mt-2">
                     {currState === "Login" ? (
                         <>Don't have an account?{" "}
                             <span
@@ -140,7 +140,8 @@ const Login = ({ setShowLogin }) => {
                                 className="text-primary font-medium cursor-pointer hover:underline"
                             >
                                 Sign up
-                            </span></>
+                            </span>
+                        </>
                     ) : (
                         <>Already have an account?{" "}
                             <span
@@ -148,21 +149,22 @@ const Login = ({ setShowLogin }) => {
                                 className="text-primary font-medium cursor-pointer hover:underline"
                             >
                                 Login here
-                            </span></>
+                            </span>
+                        </>
                     )}
                 </p>
 
-                <div className="relative w-full flex items-center my-2">
+                <div className="relative w-full flex items-center my-4">
                     <div className="flex-grow border-t border-gray-300"></div>
-                    <span className="mx-2 text-gray-400">Or</span>
+                    <span className="mx-3 text-gray-400">Or</span>
                     <div className="flex-grow border-t border-gray-300"></div>
                 </div>
 
                 <button
                     type="button"
-                    className="flex items-center justify-center gap-2 w-full border border-gray-300 py-2 rounded-md font-semibold text-gray-700 hover:bg-gray-100 transition-all"
+                    className="flex items-center justify-center gap-3 w-full border border-gray-300 py-3 rounded-lg font-semibold text-gray-700 hover:bg-gray-100 transition-transform transform hover:scale-105"
                 >
-                    <img src="https://www.svgrepo.com/show/475656/google-color.svg" alt="Google" className="w-5 h-5" />
+                    <img src="https://www.svgrepo.com/show/475656/google-color.svg" alt="Google" className="w-6 h-6" />
                     {currState === 'Sign Up' ? "Sign up with Google" : "Login with Google"}
                 </button>
             </div>

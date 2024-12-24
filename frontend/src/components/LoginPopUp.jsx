@@ -80,28 +80,26 @@ const LoginPopUp = ({ setShowLogin }) => {
                     <X size={24} />
                 </button>
 
-                <h2 className="text-2xl font-semibold text-center mb-4">
-                    {currState === "Sign Up" ? "Create Account" : "Login"}
+                <h2 className="text-4xl font-semibold text-primary text-center mb-4 w-full">
+                    {currState === 'Sign Up' ? "Create Account" : "Login"}
                 </h2>
-                <p className="text-center text-sm text-gray-500 mb-6">
-                    Please {currState === "Sign Up" ? "sign up" : "log in"} to continue.
+                <p className="text-gray-600 text-sm text-center w-full mb-4">
+                    Please {currState === 'Sign Up' ? "sign up" : "log in"} to order food.
                 </p>
 
                 {currState === "Sign Up" && (
-                    <div className="mb-4">
-                        <label
-                            htmlFor="fullName"
-                            className="block text-sm font-medium text-gray-700"
-                        >
+                    <div className="w-full mb-4">
+                        <label htmlFor="fullName" className="text-gray-700 mb-1 font-medium">
                             Full Name
                         </label>
                         <input
                             name="fullName"
                             onChange={onChangeHandler}
+                            value={data.fullName}
                             type="text"
                             placeholder="Full Name"
                             required
-                            className="mt-1  block w-full rounded-md border border-black shadow-sm focus:ring-primary focus:border-primary sm:text-base px-4 py-3"
+                            className="border border-gray-400 rounded-lg w-full p-3 mt-1 focus:outline-none focus:ring-2 focus:ring-primary transition-shadow"
                         />
                     </div>
                 )}
@@ -120,15 +118,12 @@ const LoginPopUp = ({ setShowLogin }) => {
                         type="email"
                         placeholder="Your Email"
                         required
-                        className="mt-1 block w-full rounded-md border border-black shadow-sm focus:ring-primary focus:border-primary sm:text-base px-4 py-3"
+                        className="border border-gray-400 rounded-lg w-full p-3 mt-1 focus:outline-none focus:ring-2 focus:ring-primary transition-shadow"
                     />
                 </div>
 
-                <div className="mb-6">
-                    <label
-                        htmlFor="password"
-                        className="block text-sm font-medium text-gray-700"
-                    >
+                <div className="w-full mb-4">
+                    <label htmlFor="password" className="text-gray-700 mb-1 font-medium">
                         Password
                     </label>
                     <div className="relative">
@@ -139,23 +134,23 @@ const LoginPopUp = ({ setShowLogin }) => {
                             type={showPassword ? "text" : "password"}
                             placeholder="Password"
                             required
-                            className="mt-1 block w-full rounded-md border border-black shadow-sm focus:ring-primary focus:border-primary sm:text-base px-4 py-3"
+                            className="border border-gray-400 rounded-lg w-full p-3 pr-12 focus:outline-none focus:ring-2 focus:ring-primary transition-shadow"
                         />
                         <button
                             type="button"
                             onClick={() => setShowPassword(!showPassword)}
-                            className="absolute inset-y-0 right-4 text-gray-400 hover:text-gray-600"
+                            className="absolute right-3 top-3 text-gray-500 hover:text-primary transition-colors"
                         >
-                            {showPassword ? <Eye size={20} /> : <EyeOff size={20} />}
+                            {showPassword ? <Eye size={24} /> : <EyeOff size={24} />}
                         </button>
                     </div>
                 </div>
 
                 <button
                     type="submit"
-                    className="w-full py-3 rounded-md bg-primary text-white font-medium hover:bg-primary-dark transition"
+                    className="bg-primary text-white py-3 rounded-lg font-semibold hover:bg-primary-dark text-lg transition-transform transform hover:bg-green-500 hover:scale-105 w-full shadow-lg"
                 >
-                    {currState === "Sign Up" ? "Sign Up" : "Login"}
+                    {currState === 'Sign Up' ? "Sign Up" : "Login"}
                 </button>
 
                 <p className="mt-4 text-sm text-center text-gray-500">
@@ -190,7 +185,7 @@ const LoginPopUp = ({ setShowLogin }) => {
 
                 <button
                     type="button"
-                    className="flex items-center justify-center gap-2 w-full border border-gray-300 py-3 rounded-md font-semibold text-gray-700 hover:bg-gray-100 transition-all"
+                    className="flex items-center justify-center gap-2 w-full border border-gray-400 py-3 rounded-md font-semibold text-gray-700 hover:bg-gray-100 transition-all"
                 >
                     <img
                         src="https://www.svgrepo.com/show/475656/google-color.svg"

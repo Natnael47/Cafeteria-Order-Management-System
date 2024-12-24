@@ -3,6 +3,7 @@ import React, { useContext, useEffect, useState } from "react";
 import { Link, useLocation } from "react-router-dom";
 import { assets } from "../assets/assets";
 import { StoreContext } from "../context/StoreContext";
+import LoginPopUp from './LoginPopup';
 
 export const Navbar = ({ setShowFeedback }) => {
     const location = useLocation();
@@ -10,6 +11,7 @@ export const Navbar = ({ setShowFeedback }) => {
 
     const [menu, setMenu] = useState("");
     const [hasShadow, setHasShadow] = useState(false);
+    const [showLogin, setShowLogin] = useState(false);
 
     useEffect(() => {
         if (location.pathname !== "/") {
@@ -55,7 +57,8 @@ export const Navbar = ({ setShowFeedback }) => {
     };
 
     const handleSignInClick = () => {
-        navigate('/login'); // Navigate to login page
+        setShowLogin(true);
+        // navigate('/login'); // Navigate to login page
     };
 
     return (
@@ -63,6 +66,7 @@ export const Navbar = ({ setShowFeedback }) => {
             className={`fixed top-0 w-full bg-gradient-to-r bg-[#F0F9F1] z-50 transition-shadow duration-300 ${hasShadow ? 'shadow-lg' : ''
                 } flex justify-between items-center py-4 px-10 md:px-20 lg:px-40`}
         >
+            {showLogin && <LoginPopUp setShowLogin={setShowLogin} />}
             {/* Logo */}
             <Link to='/'>
                 <img
