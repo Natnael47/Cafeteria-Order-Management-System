@@ -1,6 +1,6 @@
+import { CircleX } from 'lucide-react';
 import React, { useContext, useEffect, useState } from 'react';
 import { useLocation } from 'react-router-dom';
-import { assets } from '../assets/assets';
 import { StoreContext } from '../context/StoreContext';
 
 const SearchBar = () => {
@@ -52,7 +52,7 @@ const SearchBar = () => {
                     <div className="absolute w-full h-full flex items-center pointer-events-none">
                         {/* User's typed text */}
                         <span
-                            className="text-gray-800"
+                            className="text-gray-800 font-medium"
                             style={{
                                 fontFamily: 'inherit',
                                 fontSize: 'inherit',
@@ -64,7 +64,7 @@ const SearchBar = () => {
                         {/* Suggestion text */}
                         {suggestion && search && suggestion.toLowerCase() !== search.toLowerCase() && (
                             <span
-                                className="text-gray-400"
+                                className="text-gray-400 font-light"
                                 style={{
                                     fontFamily: 'inherit',
                                     fontSize: 'inherit',
@@ -81,7 +81,7 @@ const SearchBar = () => {
                         onChange={handleInputChange}
                         onKeyDown={handleKeyPress}
                         type="text"
-                        placeholder="Search"
+                        placeholder="Search for items or categories"
                         autoComplete="off"
                         style={{
                             caretColor: '#000',
@@ -91,15 +91,11 @@ const SearchBar = () => {
                         }}
                     />
                 </div>
-                <img
-                    className="inline w-4 cursor-pointer"
+                <CircleX className="inline w-8 cursor-pointer text-gray-500 hover:text-red-500 transition-colors"
                     onClick={() => {
                         setSearch(''); // Clear search
                         setShowSearch(false); // Hide search bar
-                    }}
-                    src={assets.cross_icon}
-                    alt=""
-                />
+                    }} />
             </div>
             {/* Clear search input when closing the search bar */}
 
