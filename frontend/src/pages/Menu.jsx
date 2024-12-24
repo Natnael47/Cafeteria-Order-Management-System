@@ -25,70 +25,72 @@ const Menu = () => {
         : drink_list.filter((item) => category === "All" || category === item.drink_Category);
 
     return (
-        <div>
-            {/* Toggle Menu Type */}
-            <div className="flex justify-center mt-5">
+        <div className="p-6 min-h-screen">
+            {/* Top Navigation */}
+            <div className="flex items-center justify-between bg-white shadow-md rounded-lg px-6 py-4">
+                <h2 className="text-4xl font-extrabold text-gray-800">
+                    {category === "All"
+                        ? `Our ${menuType} Menu`
+                        : `${category} (${menuType})`}
+                </h2>
                 <button
-                    className="bg-green-500 text-white px-5 py-2 rounded-md font-semibold hover:bg-green-600 transition"
+                    className="bg-green-500 text-white px-5 py-2 rounded-lg font-semibold hover:bg-green-600 transition"
                     onClick={toggleMenuType}
                 >
                     {menuType === "Food" ? "Switch to Drinks" : "Switch to Food"}
                 </button>
             </div>
 
-            {/* Header with category browsing */}
-            <div className="flex justify-center items-center mt-5">
-                <h2 className="text-[max(2vw,24px)] font-bold text-center">
-                    {category === "All"
-                        ? `OUR ${menuType.toUpperCase()} MENU`
-                        : `${category.toUpperCase()} (${menuType})`}
-                </h2>
+            {/* Header */}
+            <div className="text-center mt-6">
+                <p className="text-gray-600 mt-2">
+                    Browse through our handpicked selection of {menuType.toLowerCase()}.
+                </p>
             </div>
 
-            <p className="text-gray-600 text-center mt-2">Browse through the {menuType} categories.</p>
-            <div className="flex flex-col sm:flex-row items-start gap-5 mt-5">
-                {/* Category selection menu */}
-                <div className="flex flex-col gap-2 text-sm text-gray-700">
+            {/* Categories Horizontal Scroll */}
+            <div className="mt-8">
+                <div className="flex overflow-x-auto gap-4 scrollbar-hide">
                     {(menuType === "Food" ? foodCategories : drinkCategories).map((cat) => (
-                        <p
+                        <button
                             key={cat}
                             onClick={() => handleCategoryClick(cat)}
-                            className={`w-[94vw sm:w-auto pl-3 py-1.5 pr-16 border border-gray-300 rounded transition-all cursor-pointer ${category === cat ? 'bg-green-500 text-white' : ''
+                            className={`whitespace-nowrap px-6 py-2 rounded-full text-sm font-medium transition-all ${category === cat
+                                ? "bg-green-500 text-white shadow-md"
+                                : "bg-gray-200 text-black hover:bg-gray-300"
                                 }`}
                         >
                             {cat}
-                        </p>
+                        </button>
                     ))}
                 </div>
+            </div>
 
-                {/* Display items based on menu type and category */}
-                <div className="w-full grid grid-cols-auto gap-4 gap-y-6">
-                    <div className="grid grid-cols-[repeat(auto-fill,minmax(240px,1fr))] gap-[30px] row-gap-[50px]">
-                        {filteredItems.map((item, index) =>
-                            menuType === "Food" ? (
-                                <FoodItem
-                                    key={index}
-                                    id={item.id}
-                                    name={item.name}
-                                    description={item.description}
-                                    price={item.price}
-                                    image={item.image}
-                                    rating={item.rating}
-                                />
-                            ) : (
-                                <DrinkItem
-                                    key={index}
-                                    id={item.drink_Id}
-                                    name={item.drink_Name}
-                                    description={item.drink_Description}
-                                    price={item.drink_Price}
-                                    image={item.drink_Image}
-                                    rating={item.average_Rating}
-                                />
-                            )
-                        )}
-                    </div>
-                </div>
+            {/* Menu Items */}
+            <div className="mt-8 grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
+                {filteredItems.map((item, index) =>
+                    menuType === "Food" ? (
+                        <FoodItem
+                            key={index}
+                            id={item.id}
+                            name={item.name}
+                            description={item.description}
+                            price={item.price}
+                            image={item.image}
+                            rating={item.rating}
+                        />
+                    ) : (
+                        <DrinkItem
+                            key={index}
+                            id={item.drink_Id}
+                            name={item.drink_Name}
+                            description={item.drink_Description}
+                            price={item.drink_Price}
+                            image={item.drink_Image}
+                            rating={item.average_Rating}
+                        />
+                    )
+                )}
             </div>
         </div>
     );

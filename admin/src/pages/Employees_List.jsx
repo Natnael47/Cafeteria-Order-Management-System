@@ -25,7 +25,7 @@ const EmployeesList = () => {
                         className="px-4 py-2 bg-green-500 text-white rounded-md shadow hover:bg-green-600"
                         onClick={() => navigate('/add-employees')}
                     >
-                        + New Employee
+                        + Register Employee
                     </button>
                 </div>
             </div>
@@ -48,7 +48,7 @@ const EmployeesList = () => {
             </div>
             <div className="rounded-lg w-full max-h-[81vh] overflow-y-scroll">
                 {/* Employee Cards */}
-                <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6 pt-1">
+                <div className="grid grid-cols-1 sm:grid-cols-2  md:grid-cols-3 lg:grid-cols-4 gap-6 pt-1">
                     {employees.map((item) => (
                         <div
                             className="border border-gray-200 bg-white rounded-xl cursor-pointer group hover:shadow-lg hover:bg-indigo-50 transition-all duration-300"

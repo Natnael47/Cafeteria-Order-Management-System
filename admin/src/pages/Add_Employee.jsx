@@ -88,7 +88,7 @@ const AddEmployee = () => {
     return (
         <form onSubmit={onSubmitHandler} className='m-5 w-full'>
 
-            <p className="mb-3 text-lg font-semibold">Add Employees</p>
+            <p className="mb-2 text-2xl font-bold text-gray-800">Add Staff Member</p>
 
             <div className='bg-white px-8 py-8 border rounded w-full max-w-5.3xl max-h-[88vh] overflow-scroll'>
                 <div className='flex items-center gap-4 mb-8 text-gray-500'>

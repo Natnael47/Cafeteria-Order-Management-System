@@ -1,4 +1,4 @@
-import { BookUser, ClipboardList, CupSoda, HandPlatter, House, Users, Utensils } from 'lucide-react';
+import { BookUser, ClipboardList, HandPlatter, House, Pizza, Users, Wine } from 'lucide-react';
 import React from 'react';
 import { NavLink } from 'react-router-dom';
 
@@ -57,7 +57,7 @@ const Sidebar = () => {
                 >
                     {({ isActive }) => (
                         <>
-                            <Utensils
+                            <Pizza
                                 size={isActive ? 32 : 28}
                                 color={isActive ? activeColors.foodItems : defaultColors.foodItems}
                                 strokeWidth={isActive ? 2.5 : 2}
@@ -65,7 +65,7 @@ const Sidebar = () => {
                             <p
                                 className={`hidden md:block transition-colors duration-300 ease-in-out ${isActive ? 'text-white font-bold' : 'text-black'}`}
                             >
-                                Food Items
+                                Dishes
                             </p>
                         </>
                     )}
@@ -79,7 +79,7 @@ const Sidebar = () => {
                 >
                     {({ isActive }) => (
                         <>
-                            <CupSoda
+                            <Wine
                                 size={isActive ? 32 : 28}
                                 color={isActive ? activeColors.foodItems : defaultColors.foodItems}
                                 strokeWidth={isActive ? 2.5 : 2}
@@ -87,7 +87,7 @@ const Sidebar = () => {
                             <p
                                 className={`hidden md:block transition-colors duration-300 ease-in-out ${isActive ? 'text-white font-bold' : 'text-black'}`}
                             >
-                                Drink Items
+                                Drinks
                             </p>
                         </>
                     )}
@@ -109,7 +109,7 @@ const Sidebar = () => {
                             <p
                                 className={`hidden md:block transition-colors duration-300 ease-in-out ${isActive ? 'text-white font-bold' : 'text-black'}`}
                             >
-                                Orders
+                                Order List
                             </p>
                         </>
                     )}
@@ -131,7 +131,7 @@ const Sidebar = () => {
                             <p
                                 className={`hidden md:block transition-colors duration-300 ease-in-out ${isActive ? 'text-white font-bold' : 'text-black'}`}
                             >
-                                Employee List
+                                Staff Records
                             </p>
                         </>
                     )}

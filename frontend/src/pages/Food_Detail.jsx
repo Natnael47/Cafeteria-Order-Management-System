@@ -153,7 +153,7 @@ const Food_Detail = () => {
     }
 
     return (
-        <div className="relative min-h-[80vh] flex flex-col items-center p-6 bg-gradient-to-br from-gray-100 to-gray-300">
+        <div className="relative min-h-[80vh] flex flex-col items-center p-6 ">
             {/* Navigation Arrows */}
             <button
                 className="absolute -top-4 mt-5 right-1/2 transform translate-x-1/2 bg-green-500 text-white p-4 rounded-full hover:bg-green-600 transition-all shadow-lg hover:scale-105"
@@ -164,7 +164,7 @@ const Food_Detail = () => {
             </button>
 
             <button
-                className="absolute -bottom-4 mt-5 right-1/2 transform translate-x-1/2 bg-green-500 text-white p-4 rounded-full hover:bg-green-600 transition-all shadow-lg hover:scale-105"
+                className="absolute -bottom-4 right-1/2 transform translate-x-1/2 bg-green-500 text-white p-4 rounded-full hover:bg-green-600 transition-all shadow-lg hover:scale-105"
                 onClick={handleNext}
                 aria-label="Next Food"
             >
@@ -172,7 +172,7 @@ const Food_Detail = () => {
             </button>
 
             {/* Food Card */}
-            <div className="w-full mt-[35px] mb-[35px] max-w-7xl flex flex-col lg:flex-row bg-white rounded-3xl shadow-2xl overflow-hidden hover:shadow-3xl transition-all p-6 max-h-[80vh] gap-6">
+            <div className="w-full mt-[35px] max-w-7xl flex flex-col lg:flex-row bg-white rounded-3xl shadow-2xl overflow-hidden hover:shadow-3xl transition-all p-6 max-h-[80vh] gap-6">
                 {/* Left Section */}
                 <div className="flex flex-col items-start w-full lg:w-[45%] gap-6">
                     {/* Food Name and Rating */}

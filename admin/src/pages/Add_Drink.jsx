@@ -60,7 +60,7 @@ const Add_Drink = () => {
             onSubmit={onSubmitHandler}
         >
             {/* Form Title */}
-            <p className="mb-2 text-2xl font-bold text-gray-800">Add Food / Drink</p>
+            <p className="mb-2 text-2xl font-bold text-gray-800">Add Drink Option</p>
 
             {/* Form Container */}
             <div className="bg-white px-8 py-6 border shadow-lg rounded-lg w-full max-w-4xl">

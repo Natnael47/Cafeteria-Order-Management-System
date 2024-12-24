@@ -194,7 +194,7 @@ const List_Drink = () => {
                         className="px-4 py-2 bg-green-500 text-white rounded hover:bg-green-600"
                         onClick={() => navigate('/add-drink')}
                     >
-                        + New
+                        + New Drink
                     </button>
                     {/* Icon Button */}
                     <button className="p-2 bg-gray-200 rounded hover:bg-gray-300">
