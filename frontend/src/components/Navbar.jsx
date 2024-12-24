@@ -161,7 +161,7 @@ export const Navbar = ({ setShowFeedback }) => {
                                     </div>
                                 </div>
                                 {/* Menu Options */}
-                                <div className='flex flex-col gap-4'>
+                                <div className='flex flex-col gap-1'>
                                     <div
                                         onClick={() => navigate('/myprofile')}
                                         className='flex items-center gap-3 cursor-pointer hover:bg-green-100 p-3 rounded-lg transition-all'

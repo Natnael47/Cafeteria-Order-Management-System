@@ -92,7 +92,7 @@ const Feedback = () => {
 
                                 <div className="flex justify-center mt-4 space-x-1">
                                     {Array.from({ length: Math.round(feedback.rating) }).map((_, i) => (
-                                        <div key={i} className="bg-white rounded-lg p-1">
+                                        <div key={i} className="bg-gray-100 rounded-lg p-1">
                                             <Star color="#facc15" fill="#facc15" size={18} />
                                         </div>
                                     ))}

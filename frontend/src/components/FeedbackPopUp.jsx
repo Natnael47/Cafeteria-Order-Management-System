@@ -1,11 +1,12 @@
 import axios from 'axios';
-import React, { useContext, useState } from 'react';
+import { Star, X } from 'lucide-react';
+import React, { useContext, useEffect, useState } from 'react';
 import { toast } from 'react-toastify'; // Import toast for notifications
 import { backendUrl } from '../App'; // Make sure this path is correct
 import { StoreContext } from '../context/StoreContext';
 
 const FeedbackPopUp = ({ setShowFeedback }) => {
-    const { token } = useContext(StoreContext)// Get token from context
+    const { token } = useContext(StoreContext); // Get token from context
     const [feedback, setFeedback] = useState({
         rating: 0,
         comment: ''
@@ -23,72 +24,77 @@ const FeedbackPopUp = ({ setShowFeedback }) => {
     const submitFeedback = async (event) => {
         event.preventDefault();
         try {
-            // Construct the feedback data object
             const feedbackData = {
                 rating: feedback.rating,
                 comment: feedback.comment,
             };
 
-            // Send feedback to the backend
-            const response = await axios.post(backendUrl + '/api/feedback/feedback', feedbackData, {
-                headers: { token } // Include the token in the headers
+            const response = await axios.post(`${backendUrl}/api/feedback/feedback`, feedbackData, {
+                headers: { token },
             });
 
             if (response.data.success) {
-                toast.success('Feedback submitted successfully!'); // Notify success
-                setShowFeedback(false); // Close the popup
+                toast.success('Feedback submitted successfully!');
+                setShowFeedback(false);
             } else {
-                toast.error('Failed to submit feedback'); // Notify failure
+                toast.error('Failed to submit feedback');
             }
         } catch (error) {
-            toast.error('An error occurred while submitting feedback'); // Notify error
-            console.error(error); // Log the error
+            toast.error('An error occurred while submitting feedback');
+            console.error(error);
         }
     };
 
+    useEffect(() => {
+        document.body.style.overflow = "hidden";
+        return () => {
+            document.body.style.overflow = "auto";
+        };
+    }, []);
+
     return (
-        <div className="absolute z-20 w-full h-full bg-gray-800/80 grid place-items-center backdrop-blur-sm">
+        <div className="absolute z-20 w-full h-full bg-black/40 grid place-items-center backdrop-blur-sm">
             <form
                 onSubmit={submitFeedback}
-                className="w-[max(30vw, 330px)] bg-white shadow-2xl rounded-lg p-6 animate-slideIn text-gray-600 max-w-[95vw] text-center"
+                className="w-[max(30vw, 330px)] bg-white shadow-2xl rounded-2xl mb-40 p-6 animate-slideIn text-gray-700 max-w-[95vw] text-center"
             >
                 {/* Header */}
-                <div className="flex justify-between items-center mb-4">
-                    <h2 className="text-2xl font-bold text-green-700">We Appreciate Your Feedback</h2>
+                <div className="flex justify-between items-center mb-6">
+                    <h2 className="text-2xl font-extrabold text-green-700">We Value Your Feedback</h2>
                     <button
                         type="button"
                         onClick={() => setShowFeedback(false)}
                         className="text-2xl text-red-500 hover:text-red-600 transition-transform transform hover:scale-110 cursor-pointer"
                     >
-                        ✖
+                        <X />
                     </button>
                 </div>
 
                 {/* Description */}
-                <p className="text-gray-700 mb-6 leading-relaxed">
-                    We are always looking for ways to improve your experience. Please take a moment to share your thoughts with us.
+                <p className="text-gray-600 mb-6 leading-relaxed">
+                    Help us improve by sharing your thoughts. We appreciate your feedback!
                 </p>
 
                 {/* Star Rating */}
-                <div className="flex justify-center space-x-2 mb-6">
+                <div className="flex justify-center space-x-3 mb-6">
                     {[1, 2, 3, 4, 5].map((star) => (
                         <span
                             key={star}
                             onClick={() => handleRatingChange(star)}
-                            className={`text-3xl cursor-pointer transition-transform transform hover:scale-110 ${feedback.rating >= star ? 'text-yellow-400' : 'text-gray-300'
+                            className={`text-4xl cursor-pointer transition-transform transform hover:scale-110 ${feedback.rating >= star ? 'text-yellow-400' : 'text-gray-300'
                                 }`}
                         >
-                            ★
+                            <Star fill={feedback.rating >= star ? 'currentColor' : 'none'} />
                         </span>
                     ))}
                 </div>
 
                 {/* Text Area */}
                 <textarea
-                    placeholder="What can we do to improve your experience?"
+                    placeholder="Tell us how we can improve your experience..."
                     value={feedback.comment}
                     onChange={handleCommentChange}
-                    className="border border-gray-300 w-full p-3 rounded-md mb-6 focus:outline-none focus:ring-2 focus:ring-green-400 transition-shadow"
+                    className="border border-gray-300 w-full p-3 rounded-lg mb-6 focus:outline-none focus:ring-2 focus:ring-green-400 transition-shadow resize-none"
                     rows={4}
                 ></textarea>
 
@@ -97,7 +103,7 @@ const FeedbackPopUp = ({ setShowFeedback }) => {
                     type="submit"
                     className="bg-gradient-to-r from-green-400 to-green-500 text-white py-3 w-full rounded-lg font-bold text-lg shadow-md hover:from-green-500 hover:to-green-600 hover:shadow-lg transition-all duration-300"
                 >
-                    Send My Feedback
+                    Submit Feedback
                 </button>
             </form>
         </div>
