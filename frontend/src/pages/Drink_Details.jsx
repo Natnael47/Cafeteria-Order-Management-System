@@ -32,7 +32,7 @@ const Drink_Details = () => {
                         const response = await axios.get(`${backendUrl}/api/user/get-drink-details`, {
                             headers: { token },
                         });
-                        console.log(response.data.data);
+                        //console.log(response.data.data);
                         if (response.data.success) {
                             const { customizations, ratings, favorites } = response.data.data;
 

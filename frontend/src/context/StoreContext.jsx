@@ -232,6 +232,32 @@ const StoreContextProvider = (props) => {
         loadData();
     }, [token]);
 
+    const fetchFavorites = async () => {
+        try {
+            const response = await axios.get(`${backendUrl}/api/user/get-favorite`, {
+                headers: { token },
+            });
+            if (response.data.success) {
+                const { favorites } = response.data.data;
+
+                // Filter and extract favorite food and drinks
+                const favoriteFoods = food_list.filter((food) =>
+                    favorites.some((fav) => fav.foodId === food.id)
+                );
+
+                return { favoriteFoods };
+
+            } else {
+                toast.error("Failed to fetch favorites: " + response.data.message);
+                return { favoriteFoods: [] };
+            }
+        } catch (error) {
+            console.error("Error fetching favorites:", error);
+            toast.error("Failed to fetch favorites.");
+            return { favoriteFoods: [] };
+        }
+    };
+
     const contextValue = {
         food_list,
         drink_list,
@@ -255,6 +281,7 @@ const StoreContextProvider = (props) => {
         loadUserProfileData,
         filteredFoodList: prioritizedFoodList, // Use prioritized list
         autocompleteSuggestions,
+        fetchFavorites,
     };
 
     return (

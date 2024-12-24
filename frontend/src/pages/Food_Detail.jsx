@@ -32,7 +32,7 @@ const Food_Detail = () => {
                         const response = await axios.get(`${backendUrl}/api/user/get-favorite`, {
                             headers: { token },
                         });
-                        console.log(response.data.data);
+                        //console.log(response.data.data);
 
                         if (response.data.success) {
                             const { customizations, ratings, favorites } = response.data.data;
