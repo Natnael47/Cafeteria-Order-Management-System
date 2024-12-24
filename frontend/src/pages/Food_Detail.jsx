@@ -234,12 +234,13 @@ const Food_Detail = () => {
                     {/* Food Description */}
                     <div className="flex flex-col gap-2">
                         <label className="text-gray-800 font-semibold">Description:</label>
-                        <div className="overflow-y-auto max-h-[120px] p-3 border rounded-lg bg-gray-100 shadow-inner">
-                            <p className="text-gray-600 text-sm lg:text-base">
+                        <div className="p-3 border rounded-lg bg-gray-100 shadow-inner h-[6rem]">
+                            <p className="text-gray-600 text-sm lg:text-base line-clamp-4 overflow-hidden">
                                 {currentFood.description}
                             </p>
                         </div>
                     </div>
+
 
                     {/* Price and Add/Remove from Cart */}
                     <div className="flex justify-between items-center gap-4">
