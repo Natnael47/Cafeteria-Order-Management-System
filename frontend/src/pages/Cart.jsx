@@ -101,11 +101,15 @@ const Cart = () => {
             {/* Display Drink Items */}
             {filter === 'all' || filter === 'drink' ? (
                 <div>
-                    <div className="flex items-center gap-2 my-4">
-                        <hr className="flex-grow h-[1px] bg-gray-400" />
-                        <p className="text-gray-500 font-medium items-start">Drink Items</p>
-                        <hr className="flex-grow h-[1px] bg-gray-400" />
-                    </div>
+                    {/* Show "Drink Items" line only if displaying all items or if there are drink items */}
+                    {filter === 'all' && drink_list.some(item => cartItems[`drink-${item.drink_Id}`] > 0) && (
+                        <div className="flex items-center gap-2">
+                            <hr className="flex-grow h-[1px] bg-gray-600" />
+                            <p className="text-gray-500 font-medium">Drink Items</p>
+                            <hr className="flex-grow h-[1px] bg-gray-600" />
+                        </div>
+                    )}
+
                     {drink_list.filter(item => cartItems[`drink-${item.drink_Id}`] > 0).map(item => {
                         const cartKey = `drink-${item.drink_Id}`;
                         const count = cartItems[cartKey] || 0;
