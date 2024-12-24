@@ -144,7 +144,7 @@ export const Navbar = ({ setShowFeedback }) => {
                             <div className="w-10 h-10 bg-gray-100 text-green-800 text-lg font-semibold rounded-full flex items-center justify-center border-2 border-green-500">
                                 {userData?.firstName?.charAt(0).toUpperCase()}
                             </div>
-                            <ChevronDown className="text-black transition-transform duration-300 group-hover:rotate-180" />
+                            <ChevronDown className="text-white transition-transform duration-300 group-hover:rotate-180" />
                         </div>
 
                         {/* Dropdown Menu */}
