@@ -28,6 +28,7 @@ const DrinkDisplay = ({ category }) => {
                         price={item.drink_Price}
                         image={item.drink_Image}
                         rating={item.average_Rating}
+                        isAlcoholic={item.is_Alcoholic}
                     />
                 ))}
             </div>

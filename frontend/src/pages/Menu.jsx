@@ -78,6 +78,7 @@ const Menu = () => {
                             price={item.price}
                             image={item.image}
                             rating={item.rating}
+                            isFasting={item.isFasting}
                         />
                     ) : (
                         <DrinkItem
@@ -88,6 +89,7 @@ const Menu = () => {
                             price={item.drink_Price}
                             image={item.drink_Image}
                             rating={item.average_Rating}
+                            isAlcoholic={item.is_Alcoholic}
                         />
                     )
                 )}

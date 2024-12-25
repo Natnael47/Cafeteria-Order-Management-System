@@ -3,7 +3,7 @@ import React, { useContext } from "react";
 import { backendUrl } from "../App";
 import { StoreContext } from "../context/StoreContext";
 
-const FoodItem = ({ id, name, price, description, image, rating }) => {
+const FoodItem = ({ id, name, price, description, image, rating, isFasting }) => {
     const { cartItems, addToCart, removeFromCart, navigate } = useContext(StoreContext);
 
     // Function to generate star elements for the rating
@@ -99,7 +99,15 @@ const FoodItem = ({ id, name, price, description, image, rating }) => {
                     <div className="flex items-center gap-1">{renderStars(rating)}</div>
                 </div>
                 <p className="text-sm text-gray-600">{truncateDescription(description)}</p>
-                <p className="text-lg font-semibold text-green-600 mt-2">{price} Birr</p>
+                <div className="flex justify-between items-center mt-2">
+                    <p className="text-lg font-semibold text-green-600">{price} Birr</p>
+                    <span
+                        className={`text-xs font-medium px-2 py-1 rounded-md ${isFasting === true ? "bg-green-100 text-green-700" : "bg-red-100 text-red-700"
+                            }`}
+                    >
+                        {isFasting === true ? "Fasting" : "Non-Fasting"}
+                    </span>
+                </div>
             </div>
         </div>
     );

@@ -50,6 +50,7 @@ const FoodDisplay = ({ category }) => {
                         price={item.price}
                         image={item.image}
                         rating={item.rating}
+                        isFasting={item.isFasting}
                     />
                 ))}
             </div>
