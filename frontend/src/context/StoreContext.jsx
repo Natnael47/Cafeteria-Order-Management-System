@@ -99,6 +99,7 @@ const StoreContextProvider = (props) => {
             const response = await axios.get(`${backendUrl}/api/food/list-menu`);
             if (response.data.success) {
                 setFoodList(response.data.data);
+                //console.log(response.data.data)
             } else {
                 toast.error(response.data.message);
             }
@@ -170,10 +171,10 @@ const StoreContextProvider = (props) => {
                 if (type === "food") {
                     itemInfo = food_list.find((product) => product.id === Number(id));
                 } else if (type === "drink") {
-                    itemInfo = drink_list.find((product) => product.id === Number(id));
+                    itemInfo = drink_list.find((product) => product.drink_Id === Number(id));
                 }
                 if (itemInfo) {
-                    const price = parseFloat(itemInfo.price);
+                    const price = type === "food" ? parseFloat(itemInfo.price) : parseFloat(itemInfo.drink_Price);
                     if (!isNaN(price)) {
                         totalAmount += price * cartItems[key];
                     }
@@ -182,6 +183,7 @@ const StoreContextProvider = (props) => {
         }
         return totalAmount;
     };
+
 
     const loadCartData = async () => {
         try {

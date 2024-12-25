@@ -9,7 +9,7 @@ const Menu = () => {
     const { filteredFoodList, drink_list } = useContext(StoreContext);
 
     const foodCategories = ["All", "Salad", "Rolls", "Deserts", "Sandwich", "Cake", "Pure Veg", "Pasta", "Noodles"];
-    const drinkCategories = ["All", "Cocktails", "Mocktails", "Smoothies", "Soft Drinks", "Hot Beverages"];
+    const drinkCategories = ["All", "Cocktails", "Mocktails", "Smoothies", "Soda", "Hot Beverages"];
 
     const handleCategoryClick = (cat) => {
         setCategory(prevCategory => (prevCategory === cat ? "All" : cat));
