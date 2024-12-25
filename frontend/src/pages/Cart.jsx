@@ -7,7 +7,7 @@ import Title from '../components/Title';
 import { StoreContext } from '../context/StoreContext';
 
 const Cart = () => {
-    const { cartItems, food_list, drink_list, removeFromCart, navigate, token } = useContext(StoreContext);
+    const { cartItems, food_list, drink_list, removeFromCart, navigate, token, clearCart } = useContext(StoreContext);
     const [showLogin, setShowLogin] = useState(false);
     const [filter, setFilter] = useState('all'); // 'all', 'food', 'drink'
 
@@ -101,14 +101,16 @@ const Cart = () => {
             {/* Display Drink Items */}
             {filter === 'all' || filter === 'drink' ? (
                 <div>
-                    {/* Show "Drink Items" line only if displaying all items or if there are drink items */}
-                    {filter === 'all' && drink_list.some(item => cartItems[`drink-${item.drink_Id}`] > 0) && (
-                        <div className="flex items-center gap-2">
-                            <hr className="flex-grow h-[1px] bg-gray-600" />
-                            <p className="text-gray-500 font-medium">Drink Items</p>
-                            <hr className="flex-grow h-[1px] bg-gray-600" />
-                        </div>
-                    )}
+                    {/* Show "Drink Items" line only if both food and drink items are present */}
+                    {filter === 'all' &&
+                        food_list.some(item => cartItems[`food-${item.id}`] > 0) &&
+                        drink_list.some(item => cartItems[`drink-${item.drink_Id}`] > 0) && (
+                            <div className="flex items-center gap-2">
+                                <hr className="flex-grow h-[1px] bg-gray-600" />
+                                <p className="text-gray-500 font-medium">Drink Items</p>
+                                <hr className="flex-grow h-[1px] bg-gray-600" />
+                            </div>
+                        )}
 
                     {drink_list.filter(item => cartItems[`drink-${item.drink_Id}`] > 0).map(item => {
                         const cartKey = `drink-${item.drink_Id}`;
@@ -143,12 +145,22 @@ const Cart = () => {
             <div className="mt-[80px] flex justify-between gap-[max(12vw,20px)] flex-col lg:flex-row">
                 <div className="flex-1">
                     <CartTotal />
-                    <button
-                        className="bg-primary text-white px-16 py-3 mt-4 text-sm border rounded hover:bg-black transition-all"
-                        onClick={handleProceedToCheckout}
-                    >
-                        PROCEED TO CHECKOUT
-                    </button>
+                    <div className="flex flex-col gap-4 mt-4">
+                        {Object.values(cartItems).some(count => count > 0) && (
+                            <button
+                                className="bg-red-500 text-white px-8 py-2 text-sm border rounded hover:bg-red-600 transition-all"
+                                onClick={clearCart}
+                            >
+                                CLEAR CART
+                            </button>
+                        )}
+                        <button
+                            className="bg-primary text-white px-16 py-3 text-sm border rounded hover:bg-black transition-all"
+                            onClick={handleProceedToCheckout}
+                        >
+                            PROCEED TO CHECKOUT
+                        </button>
+                    </div>
                 </div>
                 <div className="flex-1">
                     <p className="text-gray-600">If you have a promo code, enter it here:</p>

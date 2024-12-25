@@ -185,20 +185,20 @@ const StoreContextProvider = (props) => {
     };
 
 
-    const loadCartData = async () => {
-        try {
-            const response = await axios.post(`${backendUrl}/api/cart/get`, {}, { headers: { token } });
-            if (response.data.cartData) {
-                const localCart = JSON.parse(localStorage.getItem("cartItems")) || {};
-                const mergedCart = { ...localCart, ...response.data.cartData };
-                setCartItems(mergedCart);
-                localStorage.setItem("cartItems", JSON.stringify(mergedCart));
-            }
-        } catch (error) {
-            console.error("Error loading cart data:", error);
-            toast.error("Failed to load cart items.");
-        }
-    };
+    // const loadCartData = async () => {
+    //     try {
+    //         const response = await axios.post(`${backendUrl}/api/cart/get`, {}, { headers: { token } });
+    //         if (response.data.cartData) {
+    //             const localCart = JSON.parse(localStorage.getItem("cartItems")) || {};
+    //             const mergedCart = { ...localCart, ...response.data.cartData };
+    //             setCartItems(mergedCart);
+    //             localStorage.setItem("cartItems", JSON.stringify(mergedCart));
+    //         }
+    //     } catch (error) {
+    //         console.error("Error loading cart data:", error);
+    //         toast.error("Failed to load cart items.");
+    //     }
+    // };
 
     const loadUserProfileData = async () => {
         try {
@@ -227,7 +227,6 @@ const StoreContextProvider = (props) => {
             await fetchFoodList();
             await fetchDrinkList();
             if (token) {
-                await loadCartData();
                 await loadUserProfileData();
             }
         }
