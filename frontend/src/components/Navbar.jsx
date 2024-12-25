@@ -7,7 +7,7 @@ import LoginPopUp from './LoginPopup';
 
 export const Navbar = ({ setShowFeedback }) => {
     const location = useLocation();
-    const { getTotalCartAmount, token, userData, setToken, navigate, setShowSearch, getCartItems } = useContext(StoreContext);
+    const { getTotalCartAmount, token, userData, setToken, navigate, setShowSearch, getCartItems, clearCart } = useContext(StoreContext);
 
     const [menu, setMenu] = useState("");
     const [hasShadow, setHasShadow] = useState(false);
@@ -44,8 +44,7 @@ export const Navbar = ({ setShowFeedback }) => {
     const logout = () => {
         localStorage.removeItem("token");
         setToken("");
-        setCartItems({});
-        localStorage.clear();
+        clearCart();
         navigate("/");
     };
 
