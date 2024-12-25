@@ -284,8 +284,7 @@ const List = () => {
 
                                     {/* Fasting Status */}
                                     <p
-                                        className={`text-sm font-medium text-center max-w-[160px] px-3 py-1 rounded ${item.isFasting ? "text-green-700 bg-green-100" : "text-red-700 bg-red-100"
-                                            }`}
+                                        className={`text-sm font-medium text-center px-3 py-1 rounded inline-block ${item.isFasting ? "text-green-700 bg-green-100" : "text-red-700 bg-red-100"}`}
                                     >
                                         {item.isFasting ? "Fasting" : "Non-Fasting"}
                                     </p>
