@@ -39,8 +39,10 @@ const Cart = () => {
     return (
         <div className="mt-[100px]">
             {showLogin && <LoginPopUp setShowLogin={setShowLogin} />}
-            <div className="flex justify-between items-center">
-                <Title text1="CART" text2="ITEMS" />
+            <div className="flex flex-row justify-between items-center">
+                <div className='text-2xl items-center'>
+                    <Title text1={'CART'} text2={'ITEMS'} />
+                </div>
 
                 {/* Dropdown for Category Selection */}
                 <select

@@ -19,7 +19,7 @@ const EmployeesList = () => {
         <div className="flex flex-col m-5 w-full max-w-6.5xl overflow-scroll">
             {/* Header */}
             <div className="flex items-center justify-between mb-2">
-                <h1 className="text-3xl font-bold text-gray-800">Employee List</h1>
+                <h1 className="text-3xl font-bold text-gray-800">Staff Records</h1>
                 <div className="flex items-center space-x-4">
                     <button
                         className="px-4 py-2 bg-green-500 text-white rounded-md shadow hover:bg-green-600"

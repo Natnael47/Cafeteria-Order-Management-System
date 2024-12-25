@@ -79,7 +79,7 @@ model user {
 model food {
   id             Int             @id @default(autoincrement()) // Unique identifier for each food item
   name           String          @db.VarChar(255) // Name of the food item
-  description    String          @db.VarChar(255) // Description of the food item
+  description    String          @db.Text // Description of the food item
   price          Float // Price of the food item
   image          String          @db.VarChar(255) // URL or path to food item image
   category       String          @db.VarChar(255) // Category of the food item (e.g., appetizer, dessert)
