@@ -1,4 +1,4 @@
-import { ChevronDown, LogOut, MessageSquareMore, Search, ShoppingBag, User } from 'lucide-react';
+import { ChevronDown, LogOut, MessageSquareText, Search, ShoppingBag, User } from 'lucide-react';
 import React, { useContext, useEffect, useState } from "react";
 import { Link, useLocation } from "react-router-dom";
 import { assets } from "../assets/assets";
@@ -180,12 +180,11 @@ export const Navbar = ({ setShowFeedback }) => {
                                         <ShoppingBag className="text-green-600 w-6 h-6" />
                                         <span className="text-gray-800 font-medium">Orders</span>
                                     </div>
-
                                     <div
                                         onClick={() => setShowFeedback(true)}
                                         className='flex items-center gap-3 cursor-pointer hover:bg-green-100 p-3 rounded-lg transition-all'
                                     >
-                                        <MessageSquareMore className="text-green-600 w-6 h-6" />
+                                        <MessageSquareText className="text-green-600 w-6 h-6" />
                                         <span className="text-gray-800 font-medium">Feedback</span>
                                     </div>
                                     <div
