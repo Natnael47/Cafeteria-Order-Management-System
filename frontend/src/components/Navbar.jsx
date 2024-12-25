@@ -44,6 +44,8 @@ export const Navbar = ({ setShowFeedback }) => {
     const logout = () => {
         localStorage.removeItem("token");
         setToken("");
+        setCartItems({});
+        localStorage.clear();
         navigate("/");
     };
 
