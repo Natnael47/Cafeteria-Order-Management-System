@@ -77,40 +77,62 @@ const PlaceOrder = () => {
     const placeOrder = async (event) => {
         event.preventDefault();
         try {
-            // Filter cartItems for food items only
+            // Filter cartItems for food and drink items
             const orderItems = Object.entries(cartItems)
-                .filter(([key, count]) => key.startsWith('food-') && count > 0)
+                .filter(([key, count]) => count > 0) // Include only items with count > 0
                 .map(([key, count]) => {
-                    const foodId = parseInt(key.replace('food-', ''), 10); // Extract food ID
-                    const foodItem = food_list.find((item) => item.id === foodId);
-                    return {
-                        id: foodItem.id,
-                        name: foodItem.name,
-                        price: foodItem.price,
-                        image: foodItem.image,
-                        prepTime: foodItem.prepTime,
-                        quantity: count,
-                        status: 'NULL',
-                    };
-                });
+                    if (key.startsWith('food-')) {
+                        const foodId = parseInt(key.replace('food-', ''), 10); // Extract food ID
+                        const foodItem = food_list.find((item) => item.id === foodId);
+                        if (foodItem) {
+                            return {
+                                id: foodItem.id,
+                                name: foodItem.name,
+                                price: foodItem.price,
+                                image: foodItem.image,
+                                prepTime: foodItem.prepTime,
+                                quantity: count,
+                                status: 'NULL',
+                                type: 'food', // Add type to differentiate
+                            };
+                        }
+                    } else if (key.startsWith('drink-')) {
+                        const drinkId = parseInt(key.replace('drink-', ''), 10); // Extract drink ID
+                        const drinkItem = drink_list.find((item) => item.drink_Id === drinkId);
+                        if (drinkItem) {
+                            return {
+                                id: drinkItem.drink_Id,
+                                name: drinkItem.drink_Name,
+                                price: drinkItem.drink_Price,
+                                image: drinkItem.drink_Image,
+                                quantity: count,
+                                status: 'NULL',
+                                type: 'drink', // Add type to differentiate
+                            };
+                        }
+                    }
+                    return null;
+                })
+                .filter(Boolean); // Remove null entries
 
             if (orderItems.length === 0) {
-                toast.info("Your cart doesn't contain any food items.");
+                toast.info("Your cart doesn't contain any items.");
                 return;
             }
 
             const orderData = {
                 address: {
-                    line1: data.address.neighborhood,  // Map neighborhood to line1
-                    line2: data.address.landmark,      // Map landmark to line2
-                    firstName: data.firstName,         // Include firstName in address
-                    lastName: data.lastName,           // Include lastName in address
-                    email: data.email,                 // Include email in address
-                    phone: data.phone.startsWith('+251') ? data.phone : `+251${data.phone}`,  // Ensure phone is in correct format
+                    line1: data.address.neighborhood, // Map neighborhood to line1
+                    line2: data.address.landmark,     // Map landmark to line2
+                    firstName: data.firstName,        // Include firstName in address
+                    lastName: data.lastName,          // Include lastName in address
+                    email: data.email,                // Include email in address
+                    phone: data.phone.startsWith('+251') ? data.phone : `+251${data.phone}`, // Ensure phone is in correct format
                 },
-                items: orderItems, // Food items only
+                items: orderItems, // Include both food and drink items                                
                 amount: getTotalCartAmount() + 2, // Adding delivery fee
             };
+            //console.log(orderItems);
 
             let response;
             if (method === 'cod') {

@@ -98,24 +98,56 @@ const completeOrderItem = async (req, res) => {
       },
     });
 
-    // Check if there are any other items in the same order still being prepared
-    const remainingItems = await prisma.orderItem.findMany({
+    // Check if there are any other food items in the same order still being prepared
+    const remainingFoodItems = await prisma.orderItem.findMany({
       where: {
         orderId,
         cookingStatus: {
           not: "Done", // Find items not yet marked as "Done"
         },
+        foodId: {
+          not: null, // Ensure it's a food item
+        },
       },
     });
 
-    if (remainingItems.length === 0) {
-      // If all items are done, mark the order as complete
-      await prisma.order.update({
-        where: { id: orderId },
+    if (remainingFoodItems.length === 0) {
+      // Mark all drink items in the order as complete
+      await prisma.orderItem.updateMany({
+        where: {
+          orderId,
+          drinkId: {
+            not: null, // Ensure it's a drink item
+          },
+          cookingStatus: {
+            not: "Done", // Only update drinks not already marked as "Done"
+          },
+        },
         data: {
-          status: "Complete",
+          cookingStatus: "Done",
+          completedAt: new Date(),
         },
       });
+
+      // Check if all items (food and drinks) are complete
+      const remainingItems = await prisma.orderItem.findMany({
+        where: {
+          orderId,
+          cookingStatus: {
+            not: "Done", // Find items not yet marked as "Done"
+          },
+        },
+      });
+
+      if (remainingItems.length === 0) {
+        // If all items are done, mark the order as complete
+        await prisma.order.update({
+          where: { id: orderId },
+          data: {
+            status: "Complete",
+          },
+        });
+      }
     }
 
     res.json({
@@ -159,6 +191,7 @@ const PlaceOrder = async (req, res) => {
         orderItem: {
           include: {
             food: true, // Ensure the food data is included for each order item
+            Drink: true, // Ensure the drink data is included for each order item
           },
         },
       },
@@ -171,6 +204,7 @@ const PlaceOrder = async (req, res) => {
         if (item.food && item.food.prepTime) {
           totalPreviousOrdersPrepTime += parseInt(item.food.prepTime, 10) || 0;
         }
+        // Drinks don't usually have prep times but can be extended if necessary
       });
     });
 
@@ -185,9 +219,9 @@ const PlaceOrder = async (req, res) => {
     const newOrder = await prisma.order.create({
       data: {
         userId,
-        items,
-        address,
+        address: JSON.stringify(address), // Store address as JSON
         amount,
+        items,
         paymentMethod: "COD",
         isPaid: false,
         date: currentTime,
@@ -198,13 +232,28 @@ const PlaceOrder = async (req, res) => {
     });
 
     // Insert items into the orderItem table
-    const orderItems = items.map((item) => ({
-      orderId: newOrder.id,
-      foodId: item.id,
-      quantity: item.quantity,
-      price: item.price,
-      cookingStatus: "Not Started", // Default cooking status
-    }));
+    const orderItems = items
+      .map((item) => {
+        if (item.type === "food") {
+          return {
+            orderId: newOrder.id,
+            foodId: item.id, // Save as foodId
+            quantity: item.quantity,
+            price: item.price,
+            cookingStatus: "Not Started", // Default cooking status
+          };
+        } else if (item.type === "drink") {
+          return {
+            orderId: newOrder.id,
+            drinkId: item.id, // Save as drinkId
+            quantity: item.quantity,
+            price: item.price,
+            cookingStatus: "Not Started", // Default cooking status for drinks
+          };
+        }
+        return null; // Ignore invalid item types
+      })
+      .filter(Boolean); // Remove any null values
 
     await prisma.orderItem.createMany({
       data: orderItems,
@@ -216,9 +265,9 @@ const PlaceOrder = async (req, res) => {
       data: { cartData: {} },
     });
 
-    res.json({ success: true, message: "Order Placed successfully" });
+    res.json({ success: true, message: "Order placed successfully" });
   } catch (error) {
-    console.error(error);
+    console.error("Error placing order:", error);
     res.json({ success: false, message: "Error placing order" });
   }
 };
@@ -400,7 +449,7 @@ const cancelOrder = async (req, res) => {
   }
 };
 
-// Function to fetch order items for a specific order
+// Function to fetch order items for a specific order (only food items)
 const getOrderItemsForChef = async (req, res) => {
   try {
     const { orderId } = req.body;
@@ -412,9 +461,12 @@ const getOrderItemsForChef = async (req, res) => {
       });
     }
 
-    // Fetch order items for the given order ID
+    // Fetch order items for the given order ID, filtering only food items
     const orderItems = await prisma.orderItem.findMany({
-      where: { orderId: parseInt(orderId) },
+      where: {
+        orderId: parseInt(orderId),
+        foodId: { not: null }, // Ensure only food items are included
+      },
       include: {
         food: true, // Include food details
       },
@@ -423,7 +475,7 @@ const getOrderItemsForChef = async (req, res) => {
     if (!orderItems.length) {
       return res.json({
         success: false,
-        message: "No items found for this order",
+        message: "No food items found for this order",
       });
     }
 

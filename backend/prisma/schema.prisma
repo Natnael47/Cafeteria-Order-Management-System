@@ -207,7 +207,7 @@ model order {
 model orderItem {
   id            Int       @id @default(autoincrement())
   orderId       Int // Foreign key to the order table
-  foodId        Int // Foreign key to the food table
+  foodId        Int? // Foreign key to the food table
   quantity      Int // Quantity of the food item
   price         Float // Price of the food item at the time of order
   cookingStatus String    @default("Not Started") // Cooking status of the item
@@ -215,7 +215,7 @@ model orderItem {
   completedAt   DateTime? // When cooking was completed
 
   order   order  @relation(fields: [orderId], references: [id], onDelete: Cascade)
-  food    food   @relation(fields: [foodId], references: [id], onDelete: Cascade)
+  food    food?  @relation(fields: [foodId], references: [id], onDelete: Cascade)
   Drink   Drink? @relation(fields: [drinkId], references: [drink_Id])
   drinkId Int?
 }

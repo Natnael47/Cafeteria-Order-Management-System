@@ -1,5 +1,5 @@
 import axios from "axios";
-import { Check, ChefHat, CookingPot, Timer, Utensils } from 'lucide-react';
+import { Check, ChefHat, CookingPot, CupSoda, Timer, Utensils } from 'lucide-react';
 import React, { useContext, useEffect, useState } from "react";
 import { backendUrl } from "../../App";
 import { ChefContext } from "../../Context/ChefContext";
@@ -21,6 +21,8 @@ const ChefOrders = () => {
             });
             if (response.data.success) {
                 setOrders(response.data.orders);
+                console.log(response.data.orders);
+
             } else {
                 console.error("Failed to fetch orders.");
             }
@@ -140,16 +142,17 @@ const ChefOrders = () => {
                             currentOrderItems.map((item) => (
                                 <div
                                     key={item.id}
-                                    className="flex justify-between items-center border rounded-lg p-4 my-3 bg-white shadow-sm hover:shadow-md transition-shadow"
+                                    className={`flex justify-between items-center border rounded-lg p-4 my-3 shadow-sm hover:shadow-md transition-shadow ${item.type === "drink" ? "bg-blue-100" : "bg-white"
+                                        }`}
                                 >
                                     <div>
                                         <p className="font-semibold text-lg text-gray-800 flex items-center">
                                             <span className="mr-2 text-green-600">
                                                 <Utensils />
                                             </span>
-                                            {item.foodName}
+                                            {item.name}
                                         </p>
-                                        <p className="text-sm text-gray-600">{item.description}</p>
+                                        <p className="text-sm text-gray-600">{item.description || "No description available"}</p>
                                         <p className="font-medium text-gray-700 mt-1">Quantity: {item.quantity}</p>
                                     </div>
                                     {item.cookingStatus === "Done" ? (
@@ -199,8 +202,17 @@ const ChefOrders = () => {
                                     <div>
                                         <div>
                                             {order.items.map((item, index) => (
-                                                <p className="text-lg font-medium text-gray-800 mb-1 flex items-center" key={index}>
-                                                    <span className="mr-2 text-blue-500"><CookingPot /></span>
+                                                <p
+                                                    className={`text-lg font-medium mb-1 flex items-center ${item.type === "drink" ? "bg-blue-50 p-2 rounded-md" : "bg-white"}`}
+                                                    key={index}
+                                                >
+                                                    <span className="mr-2">
+                                                        {item.type === "drink" ? (
+                                                            <CupSoda className="text-blue-500" />
+                                                        ) : (
+                                                            <CookingPot className="text-blue-500" />
+                                                        )}
+                                                    </span>
                                                     {item.name}
                                                     <span className="mx-2 text-gray-500">x</span>
                                                     <span className="font-semibold">{item.quantity}</span>
@@ -247,6 +259,7 @@ const ChefOrders = () => {
                         ) : (
                             <p className="text-center text-gray-700">No orders to display.</p>
                         )}
+
                     </div>
                 </div>
             )}
