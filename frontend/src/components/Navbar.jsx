@@ -3,7 +3,7 @@ import React, { useContext, useEffect, useState } from "react";
 import { Link, useLocation } from "react-router-dom";
 import { assets } from "../assets/assets";
 import { StoreContext } from "../context/StoreContext";
-import LoginPopUp from './LoginPopup';
+import LoginPopUp from './LoginPopUp';
 
 export const Navbar = ({ setShowFeedback }) => {
     const location = useLocation();
@@ -157,7 +157,7 @@ export const Navbar = ({ setShowFeedback }) => {
                             <div className='bg-white rounded-lg shadow-2xl border border-gray-200 p-5 w-64 flex flex-col gap-4'>
                                 {/* Profile Section */}
                                 <div className='flex items-center gap-4 border-b pb-4'>
-                                    <div className="w-14 h-14 bg-green-100 text-green-600 text-2xl font-bold rounded-full flex items-center justify-center shadow-sm">
+                                    <div className="w-14 h-14 bg-green-100 border-2 border-green-600 text-green-600 text-2xl font-bold rounded-full flex items-center justify-center shadow-sm">
                                         {userData?.firstName?.charAt(0).toUpperCase()}
                                     </div>
                                     <div>

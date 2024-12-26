@@ -16,6 +16,9 @@ const LoginPopUp = ({ setShowLogin }) => {
     });
 
     const [showPassword, setShowPassword] = useState(false);
+    const [confirmPassword, setConfirmPassword] = useState("");
+    const [showConfirmPassword, setShowConfirmPassword] = useState(false);
+    const [passwordMismatch, setPasswordMismatch] = useState(false);
 
     const onChangeHandler = (event) => {
         const { name, value } = event.target;
@@ -24,6 +27,8 @@ const LoginPopUp = ({ setShowLogin }) => {
             const [firstName = "", ...rest] = value.trim().split(" ");
             const lastName = rest.join(" ");
             setData((prevData) => ({ ...prevData, firstName, lastName }));
+        } else if (name === "confirmPassword") {
+            setConfirmPassword(value);
         } else {
             setData((prevData) => ({ ...prevData, [name]: value }));
         }
@@ -31,8 +36,13 @@ const LoginPopUp = ({ setShowLogin }) => {
 
     const onLogin = async (event) => {
         event.preventDefault();
-        let url = `${backendUrl}/api/user/`;
 
+        if (currState === "Sign Up" && data.password !== confirmPassword) {
+            setPasswordMismatch(true); // Set the flag to display the error
+            return; // Prevent further submission
+        }
+
+        let url = `${backendUrl}/api/user/`;
         url += currState === "Login" ? "login" : "register";
 
         try {
@@ -81,10 +91,10 @@ const LoginPopUp = ({ setShowLogin }) => {
                 </button>
 
                 <h2 className="text-4xl font-semibold text-primary text-center mb-4 w-full">
-                    {currState === 'Sign Up' ? "Create Account" : "Login"}
+                    {currState === "Sign Up" ? "Create Account" : "Login"}
                 </h2>
                 <p className="text-gray-600 text-sm text-center w-full mb-4">
-                    Please {currState === 'Sign Up' ? "sign up" : "log in"} to order food.
+                    Please {currState === "Sign Up" ? "sign up" : "log in"} to order food.
                 </p>
 
                 {currState === "Sign Up" && (
@@ -107,7 +117,7 @@ const LoginPopUp = ({ setShowLogin }) => {
                 <div className="mb-4">
                     <label
                         htmlFor="email"
-                        className="block text-sm font-medium text-gray-700"
+                        className="text-gray-700 mb-1 font-medium"
                     >
                         Email
                     </label>
@@ -146,11 +156,46 @@ const LoginPopUp = ({ setShowLogin }) => {
                     </div>
                 </div>
 
+                {currState === "Sign Up" && (
+                    <div className="w-full mb-4">
+                        <label htmlFor="confirmPassword" className="text-gray-700 mb-1 font-medium">
+                            Confirm Password
+                        </label>
+                        <div className="relative">
+                            <input
+                                name="confirmPassword"
+                                onChange={onChangeHandler}
+                                value={confirmPassword}
+                                type={showConfirmPassword ? "text" : "password"}
+                                placeholder="Confirm Password"
+                                required
+                                className="border border-gray-400 rounded-lg w-full p-3 pr-12 focus:outline-none focus:ring-2 focus:ring-primary transition-shadow"
+                            />
+                            <button
+                                type="button"
+                                onClick={() => setShowConfirmPassword(!showConfirmPassword)}
+                                className="absolute right-3 top-3 text-gray-500 hover:text-primary transition-colors"
+                            >
+                                {showConfirmPassword ? <Eye size={24} /> : <EyeOff size={24} />}
+                            </button>
+                        </div>
+                        {passwordMismatch && (
+                            <p className="text-red-500 text-sm mt-1">Passwords do not match</p>
+                        )}
+                    </div>
+                )}
+
+                {currState === "Login" && (
+                    <p className="mt-2 mb-2 text-sm text-start text-blue-400 hover:underline cursor-pointer">
+                        Forgot Password?
+                    </p>
+                )}
+
                 <button
                     type="submit"
                     className="bg-primary text-white py-3 rounded-lg font-semibold hover:bg-primary-dark text-lg transition-transform transform hover:bg-green-500 hover:scale-105 w-full shadow-lg"
                 >
-                    {currState === 'Sign Up' ? "Sign Up" : "Login"}
+                    {currState === "Sign Up" ? "Sign Up" : "Login"}
                 </button>
 
                 <p className="mt-4 text-sm text-center text-gray-500">
