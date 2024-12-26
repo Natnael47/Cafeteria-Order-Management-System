@@ -12,6 +12,7 @@ const PlaceOrder = () => {
     const {
         token,
         food_list,
+        drink_list,
         cartItems,
         clearCart,
         navigate,
