@@ -65,25 +65,25 @@ const FoodItem = ({ id, name, price, description, image, rating, isFasting }) =>
                 {/* Add to cart button or quantity controls */}
                 {cartItemCount === 0 ? (
                     <div
-                        className="absolute bottom-4 right-4 flex items-center justify-center rounded-full bg-green-500 w-9 h-9 cursor-pointer hover:bg-green-600 shadow-md transition"
+                        className="absolute bottom-4 right-4 flex items-center justify-center rounded-full bg-white w-9 h-9 cursor-pointer hover:bg-gray-100 shadow-md transition"
                         onClick={() => addToCart(id, "food")} // Pass 'food' as type
                     >
-                        <Plus className="text-white w-5 h-5" />
+                        <Plus className="text-black w-5 h-5" />
                     </div>
                 ) : (
                     <div className="absolute bottom-4 right-4 flex items-center gap-2 p-2 rounded-full bg-white shadow-md">
                         <div
-                            className="w-8 h-8 flex items-center justify-center rounded-full bg-red-100 cursor-pointer hover:bg-red-200 transition"
+                            className="w-8 h-8 flex items-center justify-center rounded-full bg-[#FFD1D1] cursor-pointer hover:bg-red-200 transition"
                             onClick={() => removeFromCart(id, "food")} // Pass 'food' as type
                         >
-                            <Minus className="text-red-700 w-4 h-4" />
+                            <Minus className="text-red-500 w-4 h-4" strokeWidth={4} />
                         </div>
                         <p className="text-base font-medium">{cartItemCount}</p>
                         <div
-                            className="w-8 h-8 flex items-center justify-center rounded-full bg-green-100 cursor-pointer hover:bg-green-200 transition"
+                            className="w-8 h-8 flex items-center justify-center rounded-full bg-[#D4FFD6] cursor-pointer hover:bg-green-200 transition"
                             onClick={() => addToCart(id, "food")} // Pass 'food' as type
                         >
-                            <Plus className="text-green-700 w-4 h-4" />
+                            <Plus className="text-green-700 w-4 h-4" strokeWidth={4} />
                         </div>
                     </div>
                 )}
