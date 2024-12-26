@@ -283,7 +283,7 @@ const Drink_Details = () => {
                                 onClick={deleteCustomizations}
                                 className="bg-red-500 hover:bg-red-600 text-white px-4 py-2 rounded-full transition-transform hover:scale-105 shadow-md"
                             >
-                                Delete
+                                Remove
                             </button>
                         </div>
                     </div>
