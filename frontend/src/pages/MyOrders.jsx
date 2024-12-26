@@ -48,6 +48,8 @@ const MyOrders = () => {
                 });
 
                 setOrders(orders);
+                console.log(orders);
+
                 setCountdowns(countdownTimers);
             }
         } catch (error) {
@@ -269,18 +271,31 @@ const MyOrders = () => {
                                                     {item.quantity} {item.name}{item.quantity > 1 ? "'s" : ""}
                                                 </p>
                                                 <p>Price: ${item.price * item.quantity}</p>
-                                                <p className='font-semibold'>
-                                                    Cooking Status:_
+                                                <p className="font-semibold">
+                                                    Cooking Status:
                                                     <span
-                                                        className={`${order.orderItem.find(orderItem => orderItem.foodId === item.id)?.cookingStatus === 'Done'
-                                                            ? 'text-green-600'
-                                                            : 'text-red-600'
-                                                            }`}
+                                                        className={`
+      ${order.orderItem.find(
+                                                            (orderItem) => orderItem.foodId === item.id
+                                                        )?.cookingStatus === 'Done' ||
+                                                                order.orderItem.find(
+                                                                    (orderItem) => orderItem.drinkId === item.id
+                                                                )?.cookingStatus === 'Done'
+                                                                ? 'text-green-600'
+                                                                : 'text-red-600'}
+  `}
                                                     >
-                                                        {order.orderItem.find(orderItem => orderItem.foodId === item.id)?.cookingStatus || 'Not Available'}
+                                                        {
+                                                            order.orderItem.find((orderItem) => orderItem.foodId === item.id)
+                                                                ? order.orderItem.find(
+                                                                    (orderItem) => orderItem.foodId === item.id
+                                                                )?.cookingStatus || 'Not Available'
+                                                                : order.orderItem.find(
+                                                                    (orderItem) => orderItem.drinkId === item.id
+                                                                )?.cookingStatus || 'Not Available'
+                                                        }
                                                     </span>
                                                 </p>
-
 
                                             </div>
                                         </div>

@@ -375,13 +375,38 @@ const userOrders = async (req, res) => {
         orderItem: {
           select: {
             foodId: true,
+            drinkId: true,
             cookingStatus: true,
           },
         },
       },
     });
 
-    res.json({ success: true, orders });
+    // Format the order items to return foodId or drinkId based on the type
+    const formattedOrders = orders.map((order) => {
+      const formattedItems = order.orderItem.map((item) => {
+        if (item.foodId) {
+          // If the item is food, return foodId and cookingStatus
+          return {
+            foodId: item.foodId,
+            cookingStatus: item.cookingStatus,
+          };
+        } else if (item.drinkId) {
+          // If the item is a drink, return drinkId and cookingStatus
+          return {
+            drinkId: item.drinkId,
+            cookingStatus: item.cookingStatus,
+          };
+        }
+      });
+
+      return {
+        ...order,
+        orderItem: formattedItems,
+      };
+    });
+
+    res.json({ success: true, orders: formattedOrders });
   } catch (error) {
     console.error("Error fetching user orders:", error);
     res.json({ success: false, message: error.message });
