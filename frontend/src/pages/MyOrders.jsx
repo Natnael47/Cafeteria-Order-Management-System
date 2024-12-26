@@ -48,8 +48,7 @@ const MyOrders = () => {
                 });
 
                 setOrders(orders);
-                console.log(orders);
-
+                //console.log(orders);
                 setCountdowns(countdownTimers);
             }
         } catch (error) {
