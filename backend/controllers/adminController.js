@@ -1,6 +1,7 @@
 import bcrypt from "bcryptjs";
 import fs from "fs";
 import jwt from "jsonwebtoken";
+import { parsePhoneNumberFromString } from "libphonenumber-js";
 import validator from "validator";
 
 import { PrismaClient } from "@prisma/client";
@@ -189,6 +190,13 @@ const addEmployee = async (req, res) => {
     //
     // const imageUrl = imageUpload.secure_url;
 
+    // Validate and format phone number
+    const parsedPhoneNumber = parsePhoneNumberFromString(phone, "ET"); // Replace "ET" with the country code
+    if (!parsedPhoneNumber || !parsedPhoneNumber.isValid()) {
+      return res.json({ success: false, message: "Invalid phone number" });
+    }
+    const formattedPhone = parsedPhoneNumber.format("E.164"); // Save in E.164 format
+
     const imageFilename = req.file ? req.file.filename : null;
 
     // Parsing the address JSON
@@ -203,7 +211,7 @@ const addEmployee = async (req, res) => {
         email,
         password: hashedPassword,
         image: imageFilename,
-        phone,
+        phone: formattedPhone,
         position: Position,
         shift,
         education,
@@ -248,7 +256,19 @@ const allEmployees = async (req, res) => {
         date: true,
       },
     });
-    res.json({ success: true, employees });
+
+    // Format phone numbers for display
+    const formattedEmployees = employees.map((employee) => {
+      if (employee.phone) {
+        const phoneNumber = parsePhoneNumberFromString(employee.phone);
+        if (phoneNumber && phoneNumber.isValid()) {
+          employee.phone = phoneNumber.formatInternational(); // e.g., "+251 963 698 568"
+        }
+      }
+      return employee;
+    });
+
+    res.json({ success: true, employees: formattedEmployees });
   } catch (error) {
     console.log("Error retrieving employees:", error);
     res.json({ success: false, message: error.message });
@@ -293,6 +313,14 @@ const employee_Profile = async (req, res) => {
       return res
         .status(404)
         .json({ success: false, message: "Employee not found" });
+    }
+
+    // Format the phone number for display
+    if (employeeProfile.phone) {
+      const phoneNumber = parsePhoneNumberFromString(employeeProfile.phone);
+      if (phoneNumber && phoneNumber.isValid()) {
+        employeeProfile.phone = phoneNumber.formatInternational(); // e.g., "+251 963 698 568"
+      }
     }
 
     // Respond with success and employee data
@@ -356,6 +384,18 @@ const updateEmployee = async (req, res) => {
         .json({ success: false, message: "Invalid address format" });
     }
 
+    let updatedPhone = req.body.phone || existingEmployee.phone;
+
+    if (updatedPhone) {
+      const parsedPhone = parsePhoneNumberFromString(updatedPhone, "ET"); // Replace "ET" with the default country code
+      if (!parsedPhone || !parsedPhone.isValid()) {
+        return res
+          .status(400)
+          .json({ success: false, message: "Invalid phone number" });
+      }
+      updatedPhone = parsedPhone.format("E.164"); // Save in E.164 format
+    }
+
     // Update employee data
     const updatedEmployee = await prisma.employee.update({
       where: { id: employeeId },
@@ -364,7 +404,7 @@ const updateEmployee = async (req, res) => {
         lastName: req.body.lastName || existingEmployee.lastName,
         gender: req.body.gender || existingEmployee.gender,
         email: req.body.email || existingEmployee.email,
-        phone: req.body.phone || existingEmployee.phone,
+        phone: updatedPhone,
         position: req.body.position || existingEmployee.position,
         shift: req.body.shift || existingEmployee.shift,
         education: req.body.education || existingEmployee.education,

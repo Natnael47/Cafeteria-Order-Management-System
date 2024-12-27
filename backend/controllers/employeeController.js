@@ -2,6 +2,7 @@ import { PrismaClient } from "@prisma/client";
 import bcrypt from "bcryptjs";
 import fs from "fs";
 import jwt from "jsonwebtoken";
+import { parsePhoneNumberFromString } from "libphonenumber-js";
 
 const prisma = new PrismaClient();
 
@@ -103,7 +104,6 @@ export const logoutEmployee = async (req, res) => {
 // API to get employee profile
 export const employee_Profile = async (req, res) => {
   const { empId } = req.body; // Fetching empId from the request body
-  // console.log("Employee ID:", empId); // Log empId to check its value
 
   try {
     // Fetching employee data from the database using Prisma
@@ -133,12 +133,19 @@ export const employee_Profile = async (req, res) => {
       return res.json({ success: false, message: "Employee not found" });
     }
 
+    // Format the phone number for display
+    if (profileData.phone) {
+      const phoneNumber = parsePhoneNumberFromString(profileData.phone);
+      if (phoneNumber && phoneNumber.isValid()) {
+        profileData.phone = phoneNumber.formatInternational(); // e.g., "+251 963 698 568"
+      }
+    }
+
     // Respond with success and employee data
     res.json({ success: true, profileData });
-    //console.log(employeeData);
   } catch (error) {
-    console.log(error);
-    res.json({ success: false, message: "Internal server error" });
+    console.log("Error fetching employee profile:", error);
+    res.status(500).json({ success: false, message: "Internal server error" });
   }
 };
 
@@ -207,6 +214,14 @@ export const get_Single_Employee_Profile = async (req, res) => {
       return res
         .status(404)
         .json({ success: false, message: "Employee not found" });
+    }
+
+    // Format the phone number for display
+    if (employeeProfile.phone) {
+      const phoneNumber = parsePhoneNumberFromString(employeeProfile.phone);
+      if (phoneNumber && phoneNumber.isValid()) {
+        employeeProfile.phone = phoneNumber.formatInternational(); // e.g., "+251 963 698 568"
+      }
     }
 
     // Respond with success and employee data
