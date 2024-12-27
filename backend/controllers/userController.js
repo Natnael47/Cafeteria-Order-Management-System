@@ -1,6 +1,7 @@
 import { PrismaClient } from "@prisma/client";
 import bcrypt from "bcryptjs";
 import jwt from "jsonwebtoken";
+import { parsePhoneNumberFromString } from "libphonenumber-js";
 import validator from "validator";
 
 const prisma = new PrismaClient();
@@ -110,7 +111,7 @@ const loginUser = async (req, res) => {
   }
 };
 
-// Get user profile by ID
+//get user profile
 const getUserProfile = async (req, res) => {
   const { userId } = req.body;
   try {
@@ -132,9 +133,17 @@ const getUserProfile = async (req, res) => {
       return res.json({ success: false, message: "User not found" });
     }
 
+    // Format the phone number for display
+    if (userData.phone) {
+      const phoneNumber = parsePhoneNumberFromString(userData.phone);
+      if (phoneNumber && phoneNumber.isValid()) {
+        userData.phone = phoneNumber.formatInternational(); // Format as "+251 963 698 568"
+      }
+    }
+
     res.json({ success: true, userData });
   } catch (error) {
-    console.log("Error in getUserProfile:", error);
+    console.error("Error in getUserProfile:", error);
     res.json({ success: false, message: "Error fetching user profile" });
   }
 };
@@ -175,14 +184,27 @@ const updateUserProfile = async (req, res) => {
       }
     }
 
+    // Validate and format phone number
+    let formattedPhone = existingUser.phone; // Default to the existing phone
+    if (phone) {
+      const phoneNumber = parsePhoneNumberFromString(phone, "ET"); // Replace "ET" with your default country code
+      if (!phoneNumber || !phoneNumber.isValid()) {
+        return res.status(400).json({
+          success: false,
+          message: "Invalid phone number",
+        });
+      }
+      formattedPhone = phoneNumber.format("E.164");
+    }
+
     // Merge existing data with new data, prioritizing new data
     const updatedData = {
       firstName: firstName || existingUser.firstName,
       lastName: lastName || existingUser.lastName,
-      email: email || existingUser.email, // Update email if provided
+      email: email || existingUser.email,
       gender: gender || existingUser.gender,
       dob: dob || existingUser.dob,
-      phone: phone || existingUser.phone,
+      phone: formattedPhone,
       address:
         address !== undefined
           ? typeof address === "string"
@@ -266,6 +288,7 @@ const changePassword = async (req, res) => {
   }
 };
 
+//get all the users
 const allUsers = async (req, res) => {
   try {
     // Fetch all users sorted by ID in descending order
@@ -288,7 +311,18 @@ const allUsers = async (req, res) => {
       },
     });
 
-    res.json({ success: true, data: users });
+    // Format phone numbers for display
+    const formattedUsers = users.map((user) => {
+      if (user.phone) {
+        const phoneNumber = parsePhoneNumberFromString(user.phone);
+        if (phoneNumber && phoneNumber.isValid()) {
+          user.phone = phoneNumber.formatInternational(); // Format as "+251 963 698 568"
+        }
+      }
+      return user;
+    });
+
+    res.json({ success: true, data: formattedUsers });
   } catch (error) {
     console.error("Error retrieving users:", error);
     res.status(500).json({

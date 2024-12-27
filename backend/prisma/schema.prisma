@@ -62,7 +62,7 @@ model user {
   gender         String?         @default("not selected") @db.VarChar(50) // User's gender with default
   address        Json? // User's address information in JSON format
   dob            String?         @default("not selected") @db.VarChar(100) // Date of birth
-  phone          String?         @default("+251 911524856") @db.VarChar(20) // User's phone number
+  phone          String?         @db.VarChar(15) // Adjusted length for E.164 format
   createdAt      DateTime        @default(now()) // Timestamp of record creation
   updatedAt      DateTime?       @updatedAt // Automatically updated timestamp for modifications
   lastUpdated    DateTime?       @updatedAt // Tracks last update timestamp
