@@ -243,14 +243,42 @@ const Inventory_Dashboard = () => {
                                             legend: {
                                                 position: 'bottom',
                                                 labels: {
-                                                    color: '#4B5563',
-                                                    font: { size: 14 }
-                                                }
-                                            }
+                                                    color: '#1F2937', // Darker modern color
+                                                    font: {
+                                                        size: 16, // Slightly larger text for better readability
+                                                        weight: 'bold', // Bold font for a modern look
+                                                        family: 'Inter, sans-serif', // A clean modern font
+                                                    },
+                                                    padding: 20, // Add padding between legend items
+                                                    boxWidth: 20, // Larger colored boxes for better visibility
+                                                },
+                                            },
+                                            tooltip: {
+                                                backgroundColor: '#111827', // Dark background for tooltips
+                                                titleColor: '#F9FAFB', // White text for tooltip titles
+                                                bodyColor: '#D1D5DB', // Light gray for body text
+                                                titleFont: { size: 16, weight: 'bold' },
+                                                bodyFont: { size: 14 },
+                                                padding: 12, // Comfortable padding inside tooltips
+                                                boxPadding: 6, // Padding around the tooltip box
+                                                displayColors: true, // Show color indicators
+                                            },
                                         },
-                                        maintainAspectRatio: false
+                                        maintainAspectRatio: false,
+                                        responsive: true,
+                                        layout: {
+                                            padding: 10, // Adds padding inside the chart for a cleaner layout
+                                        },
+                                        borderWidth: 2, // Adds borders to the pie slices for better separation
+                                        elements: {
+                                            arc: {
+                                                borderWidth: 2,
+                                                hoverBorderWidth: 4, // Thicker borders on hover for a polished look
+                                            },
+                                        },
                                     }}
                                 />
+
                             </div>
                         </div>
                     </div>
@@ -305,6 +333,11 @@ const Inventory_Dashboard = () => {
                                             },
                                         },
                                         maintainAspectRatio: false,
+                                        elements: {
+                                            line: {
+                                                tension: 0.5,
+                                            }
+                                        }
                                     }}
                                 />
                             </div>
