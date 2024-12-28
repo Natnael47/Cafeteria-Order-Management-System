@@ -54,25 +54,27 @@ enum AccountStatus {
 
 // User model - Represents customers or system users
 model user {
-  id             Int             @id @default(autoincrement()) // Unique identifier for each user
-  firstName      String          @db.VarChar(255) // User's first name
-  lastName       String?         @db.VarChar(255) // User's last name
-  email          String          @unique(map: "User_email_key") @db.VarChar(255) // Unique email address
-  password       String          @db.VarChar(255) // User's password
-  gender         String?         @default("not selected") @db.VarChar(50) // User's gender with default
-  address        Json? // User's address information in JSON format
-  dob            String?         @default("not selected") @db.VarChar(100) // Date of birth
-  phone          String?         @db.VarChar(15) // Adjusted length for E.164 format
-  createdAt      DateTime        @default(now()) // Timestamp of record creation
-  updatedAt      DateTime?       @updatedAt // Automatically updated timestamp for modifications
-  lastUpdated    DateTime?       @updatedAt // Tracks last update timestamp
-  cartData       Json? // User's shopping cart data in JSON format
-  feedback       feedback[] // Relation to feedback table
-  order          order[] // Relation to order table
-  favorites      favorite[] // Relation to user's favorite food items
-  customizations customization[] // Relation to food customizations
-  accountStatus  AccountStatus   @default(ACTIVE) // User's account status
-  rating         rating[]
+  id                       Int             @id @default(autoincrement()) // Unique identifier for each user
+  firstName                String          @db.VarChar(255) // User's first name
+  lastName                 String?         @db.VarChar(255) // User's last name
+  email                    String          @unique(map: "User_email_key") @db.VarChar(255) // Unique email address
+  password                 String          @db.VarChar(255) // User's password
+  gender                   String?         @default("not selected") @db.VarChar(50) // User's gender with default
+  address                  Json? // User's address information in JSON format
+  dob                      String?         @default("not selected") @db.VarChar(100) // Date of birth
+  phone                    String?         @db.VarChar(15) // Adjusted length for E.164 format
+  createdAt                DateTime        @default(now()) // Timestamp of record creation
+  updatedAt                DateTime?       @updatedAt // Automatically updated timestamp for modifications
+  lastUpdated              DateTime?       @updatedAt // Tracks last update timestamp
+  cartData                 Json? // User's shopping cart data in JSON format
+  passwordResetToken       String? // Nullable for non-reset cases
+  passwordResetTokenExpiry DateTime? // Nullable for non-reset cases
+  feedback                 feedback[] // Relation to feedback table
+  order                    order[] // Relation to order table
+  favorites                favorite[] // Relation to user's favorite food items
+  customizations           customization[] // Relation to food customizations
+  accountStatus            AccountStatus   @default(ACTIVE) // User's account status
+  rating                   rating[]
 }
 
 // Food model - Represents food items

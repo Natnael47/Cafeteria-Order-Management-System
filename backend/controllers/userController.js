@@ -288,50 +288,6 @@ const changePassword = async (req, res) => {
   }
 };
 
-//get all the users
-const allUsers = async (req, res) => {
-  try {
-    // Fetch all users sorted by ID in descending order
-    const users = await prisma.user.findMany({
-      orderBy: {
-        id: "desc", // Sort by ID in descending order
-      },
-      select: {
-        id: true,
-        firstName: true,
-        lastName: true,
-        email: true,
-        gender: true,
-        dob: true,
-        phone: true,
-        address: true,
-        createdAt: true,
-        updatedAt: true,
-        accountStatus: true,
-      },
-    });
-
-    // Format phone numbers for display
-    const formattedUsers = users.map((user) => {
-      if (user.phone) {
-        const phoneNumber = parsePhoneNumberFromString(user.phone);
-        if (phoneNumber && phoneNumber.isValid()) {
-          user.phone = phoneNumber.formatInternational(); // Format as "+251 963 698 568"
-        }
-      }
-      return user;
-    });
-
-    res.json({ success: true, data: formattedUsers });
-  } catch (error) {
-    console.error("Error retrieving users:", error);
-    res.status(500).json({
-      success: false,
-      message: "An error occurred while retrieving users",
-    });
-  }
-};
-
 // Update user account status
 const updateAccountStatus = async (req, res) => {
   const { userId, accountStatus } = req.body;
@@ -374,6 +330,50 @@ const updateAccountStatus = async (req, res) => {
     res.status(500).json({
       success: false,
       message: "An error occurred while updating the account status",
+    });
+  }
+};
+
+//get all the users
+const allUsers = async (req, res) => {
+  try {
+    // Fetch all users sorted by ID in descending order
+    const users = await prisma.user.findMany({
+      orderBy: {
+        id: "desc", // Sort by ID in descending order
+      },
+      select: {
+        id: true,
+        firstName: true,
+        lastName: true,
+        email: true,
+        gender: true,
+        dob: true,
+        phone: true,
+        address: true,
+        createdAt: true,
+        updatedAt: true,
+        accountStatus: true,
+      },
+    });
+
+    // Format phone numbers for display
+    const formattedUsers = users.map((user) => {
+      if (user.phone) {
+        const phoneNumber = parsePhoneNumberFromString(user.phone);
+        if (phoneNumber && phoneNumber.isValid()) {
+          user.phone = phoneNumber.formatInternational(); // Format as "+251 963 698 568"
+        }
+      }
+      return user;
+    });
+
+    res.json({ success: true, data: formattedUsers });
+  } catch (error) {
+    console.error("Error retrieving users:", error);
+    res.status(500).json({
+      success: false,
+      message: "An error occurred while retrieving users",
     });
   }
 };
@@ -511,6 +511,84 @@ const getUserDrinkDetails = async (req, res) => {
   }
 };
 
+import crypto from "crypto";
+import nodemailer from "nodemailer";
+
+// Password recovery function
+const passwordRecovery = async (req, res) => {
+  const { email } = req.body;
+
+  try {
+    // Check if the user exists
+    const user = await prisma.user.findUnique({ where: { email } });
+    if (!user) {
+      return res.json({ success: false, message: "User not found" });
+    }
+
+    // Generate a unique confirmation token
+    const token = crypto.randomBytes(16).toString("hex");
+
+    // Calculate the token expiry time (e.g., 1 hour from now)
+    const tokenExpiry = new Date();
+    tokenExpiry.setHours(tokenExpiry.getHours() + 1);
+
+    // Update user with the reset token and expiry
+    await prisma.user.update({
+      where: { email },
+      data: {
+        passwordResetToken: token,
+        passwordResetTokenExpiry: tokenExpiry,
+      },
+    });
+
+    // Generate the confirmation URL
+    const confirmationUrl = `http://localhost:5174/lost_password?confirm=${token}`;
+
+    // Set up the email transport
+    const transporter = nodemailer.createTransport({
+      service: "gmail", // Or your preferred email service
+      auth: {
+        user: process.env.EMAIL_USER, // Your email
+        pass: process.env.EMAIL_PASS, // Your email password
+      },
+    });
+
+    // Email options
+    const mailOptions = {
+      from: process.env.EMAIL_USER,
+      to: email,
+      subject: "Password Recovery",
+      text: `Click the link to reset your password: ${confirmationUrl}`,
+    };
+
+    // Send the email
+
+    transporter.sendMail(mailOptions, (error, info) => {
+      if (error) {
+        console.error("Error sending email:", error);
+        res.json({ success: false, message: "Failed to send email" });
+      } else {
+        console.log("Email sent:", info.response);
+        res.json({
+          success: true,
+          message: "Password recovery email sent. Check your inbox.",
+        });
+      }
+    });
+
+    res.json({
+      success: true,
+      message: "Password recovery email sent. Check your inbox.",
+    });
+  } catch (error) {
+    console.error("Error in passwordRecovery:", error);
+    res.status(500).json({
+      success: false,
+      message: "An error occurred while processing your request.",
+    });
+  }
+};
+
 export {
   allUsers,
   changePassword,
@@ -518,6 +596,7 @@ export {
   getUserFavoritesAndCustomizations,
   getUserProfile,
   loginUser,
+  passwordRecovery,
   registerUser,
   updateAccountStatus,
   updateUserProfile,

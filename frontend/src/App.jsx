@@ -17,6 +17,7 @@ import Login from "./pages/Login";
 import Menu from "./pages/Menu";
 import MyOrders from "./pages/MyOrders";
 import MyProfile from "./pages/MyProfile";
+import Password_Recovery from "./pages/Password_Recovery";
 import PlaceOrder from './pages/PlaceOrder';
 import Verify from "./pages/Verify/Verify";
 
@@ -49,6 +50,7 @@ const App = () => {
           <Route path="/login" element={<Login />} />
           <Route path="/food-detail/:id" element={<Food_Detail />} />
           <Route path="/drink-detail/:id" element={<Drink_Details />} />
+          <Route path="/lost_password" element={<Password_Recovery />} />
         </Routes>
       </div>
 

@@ -6,6 +6,7 @@ import {
   getUserFavoritesAndCustomizations,
   getUserProfile,
   loginUser,
+  passwordRecovery,
   registerUser,
   updateAccountStatus,
   updateUserProfile,
@@ -27,5 +28,7 @@ userRouter.post("/update-account-status", adminAuth, updateAccountStatus);
 
 userRouter.get("/get-favorite", authUser, getUserFavoritesAndCustomizations);
 userRouter.get("/get-drink-details", authUser, getUserDrinkDetails);
+
+userRouter.post("/password-recovery", passwordRecovery);
 
 export default userRouter;
