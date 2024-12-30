@@ -9,23 +9,52 @@ const ExploreMenu = ({ category, setCategory, type, setType }) => {
         <div className="flex flex-col gap-6 px-4 py-2" id="explore-menu">
             <hr className="my-2 h-[2px] bg-gray-300 border-none" />
             <div className="flex justify-between items-center">
-                <h1 className="text-[#262626] font-bold text-3xl">Explore our menu</h1>
-                <div className="flex gap-4">
-                    <button
-                        onClick={() => setType("food")}
-                        className={`px-5 py-2 rounded-lg font-medium text-lg transition-all duration-200 ${type === "food" ? "bg-green-500 text-white shadow-lg" : "bg-gray-200 text-gray-800 hover:bg-gray-300"
+                {/* Heading with Dynamic Text */}
+                <h1 className="text-[#262626] font-bold text-3xl text-center">
+                    {type === "drink" ? "Explore our Drink Menu" : "Explore our Food Menu"}
+                </h1>
+
+                {/* Toggle Switch */}
+                <div className="relative flex flex-col items-center gap-4">
+                    {/* Switch Container */}
+                    <div
+                        className={`relative w-36 h-12 rounded-full cursor-pointer shadow-inner transition-all duration-300 ${type === "drink" ? "bg-blue-500" : "bg-green-500"
                             }`}
+                        onClick={() => setType((prevType) => (prevType === "food" ? "drink" : "food"))}
                     >
-                        Food
-                    </button>
-                    <button
-                        onClick={() => setType("drink")}
-                        className={`px-5 py-2 rounded-lg font-medium text-lg transition-all duration-200 ${type === "drink" ? "bg-blue-500 text-white shadow-lg" : "bg-gray-200 text-gray-800 hover:bg-gray-300"
-                            }`}
-                    >
-                        Drinks
-                    </button>
+                        {/* Switch Handle */}
+                        <div
+                            className={`absolute top-1 left-1 w-16 h-10 bg-white rounded-full shadow-md flex items-center justify-center transform transition-transform duration-300 ${type === "drink" ? "translate-x-[112%]" : "translate-x-0"
+                                }`}
+                        >
+                            <p className="text-sm font-semibold text-black">{type === "drink" ? "Drink" : "Food"}</p>
+                        </div>
+                        {/* Switch Labels */}
+                        <div className="absolute inset-0 flex justify-between items-center text-white font-bold px-4">
+                            <span
+                                className={`text-sm cursor-pointer transition-opacity duration-300 ${type === "food" ? "opacity-0" : "opacity-100"
+                                    }`}
+                                onClick={(e) => {
+                                    e.stopPropagation();
+                                    setType("food");
+                                }}
+                            >
+                                Food
+                            </span>
+                            <span
+                                className={`text-sm cursor-pointer transition-opacity duration-300 ${type === "drink" ? "opacity-0" : "opacity-100"
+                                    }`}
+                                onClick={(e) => {
+                                    e.stopPropagation();
+                                    setType("drink");
+                                }}
+                            >
+                                Drinks
+                            </span>
+                        </div>
+                    </div>
                 </div>
+
             </div>
             <p className="text-[#808080] text-base md:text-lg max-w-[100%]">
                 Choose from a diverse menu featuring a delectable array of dishes and drinks. Our mission is to satisfy your cravings and elevate your dining experience, one delicious meal at a time.
