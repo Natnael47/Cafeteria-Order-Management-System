@@ -92,7 +92,7 @@ const FoodItem = ({ id, name, price, description, image, rating, isFasting }) =>
             {/* Food Details */}
             <div
                 onClick={() => navigate(`/food-detail/${id}`)}
-                className="p-4 hover:bg-blue-100 cursor-pointer"
+                className="p-4 hover:bg-green-50 cursor-pointer"
             >
                 <div className="flex justify-between items-center mb-2">
                     <p className="text-lg font-semibold text-gray-800">{name}</p>
