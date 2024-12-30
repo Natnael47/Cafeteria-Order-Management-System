@@ -59,7 +59,7 @@ const ExploreMenu = ({ category, setCategory, type, setType }) => {
             <p className="text-[#808080] text-base md:text-lg max-w-[100%]">
                 Choose from a diverse menu featuring a delectable array of dishes and drinks. Our mission is to satisfy your cravings and elevate your dining experience, one delicious meal at a time.
             </p>
-            <div className="flex justify-between items-center gap-5 text-center my-5 overflow-x-scroll no-scrollbar">
+            <div className="flex justify-between items-center gap-5 text-center my-1 overflow-x-scroll no-scrollbar">
                 {currentMenuList.map((item, index) => (
                     <div
                         key={index}
@@ -67,7 +67,7 @@ const ExploreMenu = ({ category, setCategory, type, setType }) => {
                         className="flex flex-col items-center cursor-pointer"
                     >
                         <img
-                            className={`w-[7.5vw] min-w-[80px] rounded-full transition-all duration-200 ${category === item.menu_name ? "border-[4px] border-green-500 shadow-lg p-[2px]" : "border-[2px] border-gray-200 hover:border-gray-400"
+                            className={`w-[7vw] min-w-[80px] rounded-full transition-all duration-200 ${category === item.menu_name ? "border-[4px] border-green-500 shadow-lg p-[2px]" : "border-[2px] border-gray-200 hover:border-gray-400"
                                 }`}
                             src={item.menu_image}
                             alt={item.menu_name}
