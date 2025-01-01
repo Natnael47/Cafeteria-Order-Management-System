@@ -1,6 +1,7 @@
 import axios from "axios";
 import { KeyRound } from "lucide-react";
 import React, { useState } from "react";
+import { toast } from 'react-toastify';
 import { backendUrl } from "../App";
 
 const LostPassword = () => {
@@ -12,7 +13,7 @@ const LostPassword = () => {
         event.preventDefault();
 
         if (!email) {
-            setMessage("Please enter a valid email address.");
+            toast.error("Please enter a valid email address.");
             return;
         }
 
@@ -22,13 +23,14 @@ const LostPassword = () => {
         try {
             const response = await axios.post(`${backendUrl}/api/user/password-recovery`, { email });
             if (response.data.success) {
-                setMessage("Password recovery email sent. Please check your inbox.");
+                toast.success("Password recovery email sent. Please check your inbox.");
             } else {
                 setMessage(response.data.message || "Failed to send recovery email.");
+                toast.error("Failed to send recovery email.");
             }
         } catch (error) {
             console.error("Error during password recovery:", error);
-            setMessage("An error occurred. Please try again later.");
+            toast.error("An error occurred. Please try again later.");
         } finally {
             setLoading(false);
         }
