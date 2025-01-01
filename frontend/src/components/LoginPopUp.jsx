@@ -6,7 +6,7 @@ import { StoreContext } from "../context/StoreContext";
 
 const LoginPopUp = ({ setShowLogin }) => {
     const [currState, setCurrState] = useState("Login");
-    const { setToken } = useContext(StoreContext);
+    const { setToken, navigate } = useContext(StoreContext);
 
     const [data, setData] = useState({
         firstName: "",
@@ -186,10 +186,17 @@ const LoginPopUp = ({ setShowLogin }) => {
                 )}
 
                 {currState === "Login" && (
-                    <p className="mt-2 mb-2 text-sm text-start text-blue-400 hover:underline cursor-pointer">
+                    <p
+                        className="mt-2 mb-2 text-sm text-start text-blue-400 hover:underline cursor-pointer"
+                        onClick={() => {
+                            setShowLogin(false); // Close the login popup
+                            navigate('/recover-password'); // Navigate to the "lost-password" page
+                        }}
+                    >
                         Forgot Password?
                     </p>
                 )}
+
 
                 <button
                     type="submit"

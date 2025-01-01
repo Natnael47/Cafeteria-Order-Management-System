@@ -600,6 +600,79 @@ const passwordRecovery = async (req, res) => {
   }
 };
 
+const resetPassword = async (req, res) => {
+  if (req.method !== "POST") {
+    return res
+      .status(405)
+      .json({ success: false, message: "Method not allowed" });
+  }
+
+  const { passwordResetToken, newPassword } = req.body;
+
+  if (!passwordResetToken || !newPassword) {
+    return res.status(400).json({
+      success: false,
+      message: "Token and new password are required",
+    });
+  }
+
+  try {
+    // Find the user by the reset token
+    const user = await prisma.user.findFirst({
+      where: { passwordResetToken },
+    });
+
+    if (!user) {
+      return res.status(404).json({
+        success: false,
+        message: "Invalid or expired token",
+      });
+    }
+
+    // Check if the token has expired
+    const currentTime = new Date();
+    if (user.passwordResetTokenExpiry < currentTime) {
+      return res.status(400).json({
+        success: false,
+        message: "Token has expired",
+      });
+    }
+
+    // Validate the new password
+    if (newPassword.length < 8) {
+      return res.status(400).json({
+        success: false,
+        message: "New password must be at least 8 characters long",
+      });
+    }
+
+    // Hash the new password
+    const salt = await bcrypt.genSalt(10);
+    const hashedPassword = await bcrypt.hash(newPassword, salt);
+
+    // Update the user's password and clear the reset token
+    await prisma.user.update({
+      where: { id: user.id },
+      data: {
+        password: hashedPassword,
+        passwordResetToken: null,
+        passwordResetTokenExpiry: null,
+      },
+    });
+
+    res.json({
+      success: true,
+      message: "Password updated successfully",
+    });
+  } catch (error) {
+    console.error("Error in resetPassword:", error);
+    res.status(500).json({
+      success: false,
+      message: "An error occurred while resetting the password",
+    });
+  }
+};
+
 export {
   allUsers,
   changePassword,
@@ -609,6 +682,7 @@ export {
   loginUser,
   passwordRecovery,
   registerUser,
+  resetPassword,
   updateAccountStatus,
   updateUserProfile,
 };

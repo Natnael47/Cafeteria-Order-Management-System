@@ -8,6 +8,7 @@ import {
   loginUser,
   passwordRecovery,
   registerUser,
+  resetPassword,
   updateAccountStatus,
   updateUserProfile,
 } from "../controllers/userController.js";
@@ -30,5 +31,6 @@ userRouter.get("/get-favorite", authUser, getUserFavoritesAndCustomizations);
 userRouter.get("/get-drink-details", authUser, getUserDrinkDetails);
 
 userRouter.post("/password-recovery", passwordRecovery);
+userRouter.post("/reset-password", resetPassword);
 
 export default userRouter;

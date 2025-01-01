@@ -14,6 +14,7 @@ import Drink_Details from "./pages/Drink_Details";
 import Food_Detail from "./pages/Food_Detail";
 import Home from './pages/Home';
 import Login from "./pages/Login";
+import Lost_Password from "./pages/Lost_Password";
 import Menu from "./pages/Menu";
 import MyOrders from "./pages/MyOrders";
 import MyProfile from "./pages/MyProfile";
@@ -50,6 +51,7 @@ const App = () => {
           <Route path="/login" element={<Login />} />
           <Route path="/food-detail/:id" element={<Food_Detail />} />
           <Route path="/drink-detail/:id" element={<Drink_Details />} />
+          <Route path="/recover-password" element={<Lost_Password />} />
           <Route path="/lost_password" element={<Password_Recovery />} />
         </Routes>
       </div>
