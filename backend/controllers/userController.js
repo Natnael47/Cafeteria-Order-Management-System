@@ -516,13 +516,28 @@ import nodemailer from "nodemailer";
 
 // Password recovery function
 const passwordRecovery = async (req, res) => {
+  // Allow only POST requests
+  if (req.method !== "POST") {
+    return res
+      .status(405)
+      .json({ success: false, message: "Method not allowed" });
+  }
+
   const { email } = req.body;
+
+  if (!email) {
+    return res
+      .status(400)
+      .json({ success: false, message: "Email is required" });
+  }
 
   try {
     // Check if the user exists
     const user = await prisma.user.findUnique({ where: { email } });
     if (!user) {
-      return res.json({ success: false, message: "User not found" });
+      return res
+        .status(404)
+        .json({ success: false, message: "User not found" });
     }
 
     // Generate a unique confirmation token
@@ -546,10 +561,10 @@ const passwordRecovery = async (req, res) => {
 
     // Set up the email transport
     const transporter = nodemailer.createTransport({
-      service: "gmail", // Or your preferred email service
+      service: "gmail", // Use your preferred email service
       auth: {
         user: process.env.EMAIL_USER, // Your email
-        pass: process.env.EMAIL_PASS, // Your email password
+        pass: process.env.EMAIL_PASS, // App-specific password
       },
     });
 
@@ -558,31 +573,27 @@ const passwordRecovery = async (req, res) => {
       from: process.env.EMAIL_USER,
       to: email,
       subject: "Password Recovery",
-      text: `Click the link to reset your password: ${confirmationUrl}`,
+      html: `
+        <div style="font-family: Arial, sans-serif; max-width: 600px; margin: auto;">
+          <h1>Password Recovery</h1>
+          <p>Hello,</p>
+          <p>Click the link below to reset your password:</p>
+          <a href="${confirmationUrl}" style="color: #4A90E2;">Reset Password</a>
+          <p>If you did not request this, please ignore this email.</p>
+        </div>
+      `,
     };
 
     // Send the email
+    await transporter.sendMail(mailOptions);
 
-    transporter.sendMail(mailOptions, (error, info) => {
-      if (error) {
-        console.error("Error sending email:", error);
-        res.json({ success: false, message: "Failed to send email" });
-      } else {
-        console.log("Email sent:", info.response);
-        res.json({
-          success: true,
-          message: "Password recovery email sent. Check your inbox.",
-        });
-      }
-    });
-
-    res.json({
+    return res.json({
       success: true,
       message: "Password recovery email sent. Check your inbox.",
     });
   } catch (error) {
     console.error("Error in passwordRecovery:", error);
-    res.status(500).json({
+    return res.status(500).json({
       success: false,
       message: "An error occurred while processing your request.",
     });
