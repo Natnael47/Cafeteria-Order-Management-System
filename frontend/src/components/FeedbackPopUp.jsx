@@ -53,10 +53,13 @@ const FeedbackPopUp = ({ setShowFeedback }) => {
     }, []);
 
     return (
-        <div className="absolute z-20 w-full h-full bg-black/40 grid place-items-center backdrop-blur-sm">
+        <div
+            className="fixed inset-0 z-50 bg-black/50 grid place-items-center"
+            aria-hidden="true"
+        >
             <form
                 onSubmit={submitFeedback}
-                className="w-[max(30vw, 330px)] bg-white shadow-2xl rounded-2xl mb-40 p-6 animate-slideIn text-gray-700 max-w-[95vw] text-center"
+                className="relative bg-white shadow-lg rounded-lg p-6 w-[90%] max-w-md text-gray-700 text-center animate-slideIn"
             >
                 {/* Header */}
                 <div className="flex justify-between items-center mb-6">
