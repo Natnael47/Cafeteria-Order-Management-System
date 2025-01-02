@@ -188,7 +188,7 @@ const Inventory_Dashboard = () => {
                     </div>
                     <div className="text-center mt-4">
                         <button
-                            className="bg-blue-500 hover:bg-blue-600 text-white font-semibold px-4 py-2 rounded-full shadow-md transition-transform transform hover:scale-105"
+                            className="bg-blue-500 hover:bg-blue-600 text-white font-semibold px-4 py-2 rounded-full shadow-md"
                             onClick={() => setShowAllInventory(!showAllInventory)}
                         >
                             {showAllInventory ? 'Show Latest 6' : 'Show All'}
@@ -204,7 +204,7 @@ const Inventory_Dashboard = () => {
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
 
                         {/* Pending Requests Section */}
-                        <div className="p-6 bg-white shadow-lg rounded-lg transition-transform hover:scale-105">
+                        <div className="p-6 bg-white shadow-lg rounded-lg">
                             <h2 className="text-xl font-bold mb-4 text-gray-700 flex items-center">
                                 <span className="mr-2"><List /></span> Pending Requests
                             </h2>
@@ -231,7 +231,7 @@ const Inventory_Dashboard = () => {
                         </div>
 
                         {/* Inventory by Category Chart */}
-                        <div className="p-6 bg-white shadow-lg rounded-lg transition-transform hover:scale-105">
+                        <div className="p-6 bg-white shadow-lg rounded-lg">
                             <h2 className="text-xl font-bold text-gray-700 mb-4 flex items-center">
                                 <span className="mr-2"><ChartPie /></span> Inventory by Category
                             </h2>
@@ -287,7 +287,7 @@ const Inventory_Dashboard = () => {
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
 
                         {/* Stock Trends Line Chart */}
-                        <div className="p-6 bg-white shadow-xl rounded-lg transition-transform hover:scale-105 hover:shadow-2xl">
+                        <div className="p-6 bg-white shadow-xl rounded-lg hover:shadow-2xl">
                             <h2 className="text-2xl font-bold text-black mb-4 flex items-center">
                                 <span className="mr-3 text-black">
                                     <ChartNoAxesCombined />
@@ -344,7 +344,7 @@ const Inventory_Dashboard = () => {
                         </div>
 
                         {/* Expenditure by Supplier Bar Chart */}
-                        <div className="p-6 bg-white shadow-xl rounded-lg transform transition duration-300 hover:scale-105 hover:shadow-2xl">
+                        <div className="p-6 bg-white shadow-xl rounded-lg hover:shadow-2xl">
                             <h2 className="text-2xl font-extrabold text-gray-800 mb-6 flex items-center justify-between">
                                 <span className="flex items-center">
                                     <CircleDollarSign className="text-green-500 w-8 h-8 mr-3" />
