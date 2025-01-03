@@ -8,6 +8,7 @@ import {
   cancelOrder,
   completeOrderItem,
   displayOrdersForChef,
+  getCustomizationNotes,
   getOrderItemsForChef,
   updateStatus,
   userOrders,
@@ -40,5 +41,7 @@ orderRouter.post("/complete-item", empAuth, completeOrderItem);
 orderRouter.post("/accept", empAuth, acceptOrder);
 orderRouter.get("/chef-orders", empAuth, displayOrdersForChef);
 orderRouter.post("/order-items", empAuth, getOrderItemsForChef);
+
+orderRouter.get("/customization-notes", getCustomizationNotes);
 
 export default orderRouter;

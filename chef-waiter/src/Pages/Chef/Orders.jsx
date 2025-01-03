@@ -10,6 +10,7 @@ const ChefOrders = () => {
     const [currentOrderItems, setCurrentOrderItems] = useState([]); // Items of the current accepted order
     const [currentOrderId, setCurrentOrderId] = useState(null); // ID of the current accepted order
     const [timeLeft, setTimeLeft] = useState(null); // Time left for the current order in seconds
+    const [userCustomization, setUserCustomization] = useState([]);
 
     const { cToken } = useContext(ChefContext);
 
@@ -22,7 +23,6 @@ const ChefOrders = () => {
             if (response.data.success) {
                 setOrders(response.data.orders);
                 console.log(response.data.orders);
-
             } else {
                 console.error("Failed to fetch orders.");
             }
@@ -31,9 +31,27 @@ const ChefOrders = () => {
         }
     };
 
+    // Fetch customization notes
+    const fetchCustomization = async () => {
+        try {
+            const response = await axios.get(`${backendUrl}/api/order/customization-notes`);
+            //console.log("Customization API Response:", response.data); // Log full response
+            if (response.data.success) {
+                setUserCustomization(response.data.customizations); // Use correct key
+                console.log("Customizations:", response.data.customizations);
+            } else {
+                console.error("Failed to fetch customizations.");
+            }
+        } catch (error) {
+            console.error("Error fetching customizations:", error.message);
+        }
+    };
+
+
     // Fetch orders when component mounts
     useEffect(() => {
         fetchOrders();
+        fetchCustomization();
     }, [cToken]);
 
     // Accept the order and fetch its items
@@ -55,8 +73,21 @@ const ChefOrders = () => {
                 if (itemsResponse.data.success) {
                     const acceptedOrder = orders.find(order => order.id === orderId); // Find the accepted order
                     setTimeLeft(acceptedOrder.totalPrepTime * 60); // Convert minutes to seconds
-                    setCurrentOrderItems(itemsResponse.data.items);
-                    console.log(itemsResponse.data.items);
+
+                    const itemsWithCustomizations = itemsResponse.data.items.map((item) => {
+                        const matchingCustomization = userCustomization.find(
+                            (custom) =>
+                                (custom.type === "food" && custom.foodId === item.id) ||
+                                (custom.type === "drink" && custom.drinkId === item.id)
+                        );
+                        return {
+                            ...item,
+                            customNote: matchingCustomization?.customNote || null, // Add custom note if exists
+                        };
+                    });
+
+                    setCurrentOrderItems(itemsWithCustomizations);
+                    console.log("setCurrentOrderItems", itemsWithCustomizations);
 
                     setCurrentOrderId(orderId);
                 } else {
@@ -69,6 +100,7 @@ const ChefOrders = () => {
             console.error("Error accepting order:", error.message);
         }
     };
+
 
     useEffect(() => {
         let timer;
@@ -154,6 +186,9 @@ const ChefOrders = () => {
                                         </p>
                                         <p className="text-sm text-gray-600">{item.description || "No description available"}</p>
                                         <p className="font-medium text-gray-700 mt-1">Quantity: {item.quantity}</p>
+                                        {item.customNote && (
+                                            <p className="text-sm text-red-600 mt-1">Customization: {item.customNote}</p>
+                                        )}
                                     </div>
                                     {item.cookingStatus === "Done" ? (
                                         <div className="p-2 text-green-600 font-semibold flex items-center">

@@ -28,6 +28,35 @@ const displayOrdersForChef = async (req, res) => {
   }
 };
 
+// Function to get customization notes for food or drinks
+const getCustomizationNotes = async (req, res) => {
+  try {
+    const customizations = await prisma.customization.findMany({
+      select: {
+        id: true,
+        userId: true,
+        customNote: true,
+        createdAt: true,
+        lastUpdated: true,
+        foodId: true,
+        drinkId: true,
+      },
+      orderBy: { createdAt: "desc" },
+    });
+
+    // Process the data to determine type (food or drink)
+    const processedCustomizations = customizations.map((item) => ({
+      ...item,
+      type: item.foodId ? "food" : item.drinkId ? "drink" : "unknown",
+    }));
+
+    res.json({ success: true, customizations: processedCustomizations });
+  } catch (error) {
+    console.error("Error fetching customizations:", error);
+    res.status(500).json({ success: false, message: error.message });
+  }
+};
+
 // Function for chef to accept an order and start preparing it
 const acceptOrder = async (req, res) => {
   try {
@@ -535,6 +564,7 @@ export {
   cancelOrder,
   completeOrderItem,
   displayOrdersForChef,
+  getCustomizationNotes,
   getOrderItemsForChef,
   PlaceOrder,
   PlaceOrderRazorpay,
