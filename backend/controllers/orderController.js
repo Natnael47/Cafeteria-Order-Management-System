@@ -533,9 +533,10 @@ const getOrderItemsForChef = async (req, res) => {
       });
     }
 
-    // Format the response with food item details and cooking status
+    // Format the response with food item details and cooking status, including the foodId
     const formattedOrderItems = orderItems.map((item) => ({
       id: item.id,
+      foodId: item.foodId, // Send the foodId as well
       foodName: item.food.name,
       description: item.food.description,
       price: item.price,

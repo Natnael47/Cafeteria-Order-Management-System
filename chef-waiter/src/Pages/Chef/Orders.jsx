@@ -54,9 +54,9 @@ const ChefOrders = () => {
         fetchCustomization();
     }, [cToken]);
 
-    // Accept the order and fetch its items
     const acceptOrder = async (orderId) => {
         try {
+            // Accept the order
             const response = await axios.post(
                 `${backendUrl}/api/order/accept`,
                 { orderId },
@@ -64,6 +64,7 @@ const ChefOrders = () => {
             );
 
             if (response.data.success) {
+                // Fetch the order items
                 const itemsResponse = await axios.post(
                     `${backendUrl}/api/order/order-items`,
                     { orderId },
@@ -71,24 +72,37 @@ const ChefOrders = () => {
                 );
 
                 if (itemsResponse.data.success) {
-                    const acceptedOrder = orders.find(order => order.id === orderId); // Find the accepted order
-                    setTimeLeft(acceptedOrder.totalPrepTime * 60); // Convert minutes to seconds
+                    // Fetch the accepted order details
+                    const acceptedOrder = orders.find(order => order.id === orderId);
+
+                    // Calculate the time left for preparation
+                    setTimeLeft(acceptedOrder.totalPrepTime * 60);
 
                     const itemsWithCustomizations = itemsResponse.data.items.map((item) => {
+                        // Check if the order's userId matches the userId in customizations
                         const matchingCustomization = userCustomization.find(
                             (custom) =>
-                                (custom.type === "food" && custom.foodId === item.id) ||
-                                (custom.type === "drink" && custom.drinkId === item.id)
+                                custom.userId === acceptedOrder.userId &&  // Match the userId of the order with the customization's userId
+                                (
+                                    (custom.type === "food" && custom.foodId === item.foodId) ||  // Match foodId for food items
+                                    (custom.type === "drink" && custom.drinkId === item.id)    // Match drinkId for drink items
+                                )
                         );
+
+                        // Return the item with its corresponding custom note (if any)
                         return {
                             ...item,
-                            customNote: matchingCustomization?.customNote || null, // Add custom note if exists
+                            customNote: matchingCustomization?.customNote || null,  // If a match is found, add the custom note; otherwise, null
                         };
                     });
 
+
+
+                    // Update the current order items
                     setCurrentOrderItems(itemsWithCustomizations);
                     console.log("setCurrentOrderItems", itemsWithCustomizations);
 
+                    // Set the current order ID
                     setCurrentOrderId(orderId);
                 } else {
                     console.error("Failed to fetch order items.");
@@ -100,7 +114,6 @@ const ChefOrders = () => {
             console.error("Error accepting order:", error.message);
         }
     };
-
 
     useEffect(() => {
         let timer;
