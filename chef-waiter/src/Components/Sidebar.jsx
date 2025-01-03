@@ -33,7 +33,7 @@ const SideBar = () => {
                         className={({ isActive }) =>
                             `flex items-center gap-3 py-3.5 px-3 md:px-9 md:min-w-72 cursor-pointer transition-transform duration-300 ease-in-out ${isActive
                                 ? "bg-[#22C55E] scale-95 border-r-4 rounded-md shadow-lg border-[#22C55E]"
-                                : ""
+                                : "hover:bg-gray-100  hover:scale-95 hover:rounded-md "
                             }`
                         }
                     >
@@ -59,7 +59,7 @@ const SideBar = () => {
                         className={({ isActive }) =>
                             `flex items-center gap-3 py-3.5 px-3 md:px-9 md:min-w-72 cursor-pointer transition-transform duration-300 ease-in-out ${isActive
                                 ? "bg-[#22C55E] scale-95 border-r-4 rounded-md shadow-lg border-[#22C55E]"
-                                : ""
+                                : "hover:bg-gray-100  hover:scale-95 hover:rounded-md "
                             }`
                         }
                     >
@@ -85,7 +85,7 @@ const SideBar = () => {
                         className={({ isActive }) =>
                             `flex items-center gap-3 py-3.5 px-3 md:px-9 md:min-w-72 cursor-pointer transition-transform duration-300 ease-in-out ${isActive
                                 ? "bg-[#22C55E] scale-95 border-r-4 rounded-md shadow-lg border-[#22C55E]"
-                                : ""
+                                : "hover:bg-gray-100  hover:scale-95 hover:rounded-md "
                             }`
                         }
                     >
@@ -111,7 +111,7 @@ const SideBar = () => {
                         className={({ isActive }) =>
                             `flex items-center gap-3 py-3.5 px-3 md:px-9 md:min-w-72 cursor-pointer transition-transform duration-300 ease-in-out ${isActive
                                 ? "bg-[#22C55E] scale-95 border-r-4 rounded-md shadow-lg border-[#22C55E]"
-                                : ""
+                                : "hover:bg-gray-100  hover:scale-95 hover:rounded-md"
                             }`
                         }
                     >
@@ -141,7 +141,7 @@ const SideBar = () => {
                         className={({ isActive }) =>
                             `flex items-center gap-3 py-3.5 px-3 md:px-9 md:min-w-72 cursor-pointer transition-transform duration-300 ease-in-out ${isActive
                                 ? "bg-[#22C55E] scale-95 border-r-4 rounded-md shadow-lg border-[#22C55E]"
-                                : ""
+                                : "hover:bg-gray-100  hover:scale-95 hover:rounded-md"
                             }`
                         }
                     >
@@ -167,7 +167,7 @@ const SideBar = () => {
                         className={({ isActive }) =>
                             `flex items-center gap-3 py-3.5 px-3 md:px-9 md:min-w-72 cursor-pointer transition-transform duration-300 ease-in-out ${isActive
                                 ? "bg-[#22C55E] scale-95 border-r-4 rounded-md shadow-lg border-[#22C55E]"
-                                : ""
+                                : "hover:bg-gray-100  hover:scale-95 hover:rounded-md"
                             }`
                         }
                     >
@@ -193,7 +193,7 @@ const SideBar = () => {
                         className={({ isActive }) =>
                             `flex items-center gap-3 py-3.5 px-3 md:px-9 md:min-w-72 cursor-pointer transition-transform duration-300 ease-in-out ${isActive
                                 ? "bg-[#22C55E] scale-95 border-r-4 rounded-md shadow-lg border-[#22C55E]"
-                                : ""
+                                : "hover:bg-gray-100  hover:scale-95 hover:rounded-md"
                             }`
                         }
                     >
@@ -219,7 +219,7 @@ const SideBar = () => {
                         className={({ isActive }) =>
                             `flex items-center gap-3 py-3.5 px-3 md:px-9 md:min-w-72 cursor-pointer transition-transform duration-300 ease-in-out ${isActive
                                 ? "bg-[#22C55E] scale-95 border-r-4 rounded-md shadow-lg border-[#22C55E]"
-                                : ""
+                                : "hover:bg-gray-100  hover:scale-95 hover:rounded-md"
                             }`
                         }
                     >
@@ -245,7 +245,7 @@ const SideBar = () => {
                         className={({ isActive }) =>
                             `flex items-center gap-3 py-3.5 px-3 md:px-9 md:min-w-72 cursor-pointer transition-transform duration-300 ease-in-out ${isActive
                                 ? "bg-[#22C55E] scale-95 border-r-4 rounded-md shadow-lg border-[#22C55E]"
-                                : ""
+                                : "hover:bg-gray-100  hover:scale-95 hover:rounded-md "
                             }`
                         }
                     >
@@ -270,7 +270,7 @@ const SideBar = () => {
                         className={({ isActive }) =>
                             `flex items-center gap-3 py-3.5 px-3 md:px-9 md:min-w-72 cursor-pointer transition-transform duration-300 ease-in-out ${isActive
                                 ? "bg-[#22C55E] scale-95 border-r-4 rounded-md shadow-lg border-[#22C55E]"
-                                : ""
+                                : "hover:bg-gray-100  hover:scale-95 hover:rounded-md "
                             }`
                         }
                     >
@@ -295,7 +295,7 @@ const SideBar = () => {
                         className={({ isActive }) =>
                             `flex items-center gap-3 py-3.5 px-3 md:px-9 md:min-w-72 cursor-pointer transition-transform duration-300 ease-in-out ${isActive
                                 ? "bg-[#22C55E] scale-95 border-r-4 rounded-md shadow-lg border-[#22C55E]"
-                                : ""
+                                : "hover:bg-gray-100  hover:scale-95 hover:rounded-md "
                             }`
                         }
                     >
