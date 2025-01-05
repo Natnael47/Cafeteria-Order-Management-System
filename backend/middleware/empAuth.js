@@ -15,6 +15,7 @@ const empAuth = async (req, res, next) => {
     // Verify and decode the token
     const token_decode = jwt.verify(token, process.env.JWT_SECRET);
     req.body.empId = token_decode.id; // Store the decoded employee ID for future use
+    //console.log(req.body.empId);
     next();
   } catch (error) {
     console.log(error);

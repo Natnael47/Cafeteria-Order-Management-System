@@ -181,14 +181,6 @@ const adminLogin = async (req, res) => {
       return res.json({ success: false, message: "Password incorrect" });
     }
 
-    // Create a workLog entry for the admin login
-    await prisma.workLog.create({
-      data: {
-        employeeId: admin.id,
-        loginTime: new Date(), // Record current login time
-      },
-    });
-
     // Generate token using the admin's employee ID
     const token = jwt.sign({ id: admin.id }, process.env.JWT_SECRET);
 

@@ -85,7 +85,6 @@ export const logoutEmployee = async (req, res) => {
         message: "No active session found for this employee",
       });
     }
-
     // Update the workLog entry with the current logout time
     await prisma.workLog.update({
       where: { id: latestWorkLog.id },
