@@ -8,10 +8,9 @@ import { AdminContext } from '../context/AdminContext';
 
 const Navbar = () => {
     const { token, setToken, navigate } = useContext(AdminContext);
-    const [profile, setProfile] = useState(null); // Handle single profile object
-    const [showDropdown, setShowDropdown] = useState(false); // Toggle dropdown menu
+    const [profile, setProfile] = useState(null);
+    const [showDropdown, setShowDropdown] = useState(false);
 
-    // Fetch the admin profile data when the component mounts
     useEffect(() => {
         if (token) {
             getProfile();
@@ -21,11 +20,11 @@ const Navbar = () => {
     const getProfile = async () => {
         try {
             const { data } = await axios.get(
-                `${backendUrl}/api/admin/get-profile`,  // Ensure the correct endpoint
+                `${backendUrl}/api/admin/get-profile`,
                 { headers: { token } }
             );
             if (data.success) {
-                setProfile(data.admin);  // Set the admin profile data
+                setProfile(data.admin);
             } else {
                 toast.error(data.message);
             }
@@ -36,12 +35,11 @@ const Navbar = () => {
 
     const logout = () => {
         navigate('/');
-        setToken(''); // Clear token
+        setToken('');
         localStorage.removeItem('token');
         localStorage.removeItem('currentView');
     };
 
-    // Get the first letter of the admin's first name
     const getFirstLetter = (name) => name && name[0].toUpperCase();
 
     return (
@@ -53,33 +51,50 @@ const Navbar = () => {
                 </p>
             </div>
             <div className="relative flex items-center gap-2">
-                {/* Profile section with first letter */}
                 {profile ? (
                     <div
-                        onClick={() => setShowDropdown(!showDropdown)} // Toggle dropdown on click
-                        className="w-10 h-10 flex items-center justify-center rounded-full bg-gray-800 text-white font-bold text-lg cursor-pointer"
+                        onClick={() => setShowDropdown(!showDropdown)}
+                        className="relative w-12 h-12 flex items-center justify-center rounded-full bg-gray-800 text-white font-bold text-lg cursor-pointer"
                     >
-                        {getFirstLetter(profile.firstName)} {/* Display first letter */}
-                        <ChevronDown className="text-white ml-2 transition-transform duration-300 group-hover:rotate-180" />
+                        <div className='bg-black rounded-full flex items-center gap-2 px-2 py-1 shadow-md hover:shadow-lg transition-all duration-300 cursor-pointer'>
+                            <div className="w-10 h-10 bg-gray-100 text-green-800 text-lg font-semibold rounded-full flex items-center justify-center border-2 border-green-500">
+                                {profile.image ? (
+                                    <img
+                                        src={`${backendUrl}/empIMG/${profile.image}`}
+                                        alt="Admin"
+                                        className="w-full h-full object-cover rounded-full"
+                                    />
+                                ) : (
+                                    getFirstLetter(profile.firstName)
+                                )}
+                            </div>
+                            <ChevronDown className="text-white transition-transform duration-300 group-hover:rotate-180" />
+                        </div>
                     </div>
+
                 ) : (
-                    <span>Loading...</span> // Loading state if profile is not yet fetched
+                    <span>Loading...</span>
                 )}
 
-                {/* Dropdown Menu */}
                 {showDropdown && (
                     <div className="absolute right-0 top-12 z-30 bg-white rounded-lg shadow-2xl border border-gray-200 p-5 w-64 flex flex-col gap-4">
-                        {/* Profile Section */}
                         <div className="flex items-center gap-4 border-b pb-4">
-                            <div className="w-14 h-14 bg-green-100 border-2 border-green-600 text-green-600 text-2xl font-bold rounded-full flex items-center justify-center shadow-sm">
-                                {profile?.firstName?.charAt(0).toUpperCase()}
-                            </div>
+                            {profile.image ? (
+                                <img
+                                    src={`${backendUrl}/empIMG/${profile.image}`}
+                                    alt="Admin"
+                                    className="w-14 h-14 object-cover rounded-full border-2 border-green-600"
+                                />
+                            ) : (
+                                <div className="w-14 h-14 bg-green-100 border-2 border-green-600 text-green-600 text-2xl font-bold rounded-full flex items-center justify-center shadow-sm">
+                                    {getFirstLetter(profile.firstName)}
+                                </div>
+                            )}
                             <div>
-                                <p className="text-lg font-semibold text-gray-800">{profile?.firstName} {profile?.lastName}</p>
-                                <p className="text-sm text-gray-500">{profile?.email}</p>
+                                <p className="text-lg font-semibold text-gray-800">{profile.firstName} {profile.lastName}</p>
+                                <p className="text-sm text-gray-500">{profile.email}</p>
                             </div>
                         </div>
-                        {/* Menu Options */}
                         <div className="flex flex-col gap-1">
                             <div
                                 onClick={() => navigate('/profile')}
