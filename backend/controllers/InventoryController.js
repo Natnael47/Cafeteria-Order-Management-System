@@ -479,9 +479,133 @@ const withdrawItem = async (req, res) => {
   }
 };
 
-// Update inventory attributes
-const updateInventoryAttributes = async (req, res) => {
-  // Update fields for a specific inventory item
+// Withdraw item from inventory using LIFO logic
+const withdrawItemFresh = async (req, res) => {
+  try {
+    const { inventoryId, reason, quantity, empId } = req.body;
+
+    // Input validation
+    if (
+      !inventoryId ||
+      !reason ||
+      !quantity ||
+      !empId ||
+      isNaN(quantity) ||
+      quantity <= 0
+    ) {
+      return res.status(400).json({
+        success: false,
+        message: "Invalid input: Ensure all required fields are valid",
+      });
+    }
+
+    // Find inventory item
+    const inventoryItem = await prisma.inventory.findUnique({
+      where: { id: inventoryId },
+    });
+
+    if (!inventoryItem) {
+      return res.status(404).json({
+        success: false,
+        message: "Inventory item not found",
+      });
+    }
+
+    if (inventoryItem.quantity < quantity) {
+      return res.status(400).json({
+        success: false,
+        message: "Insufficient stock available for withdrawal",
+      });
+    }
+
+    let remainingQuantity = quantity;
+    const batchesToUpdate = [];
+
+    // Fetch newest batches with remaining stock (LIFO: Newest batches first)
+    const stockBatches = await prisma.stockBatch.findMany({
+      where: {
+        inventoryId,
+        quantityRemaining: { gt: 0 },
+      },
+      orderBy: { purchaseDate: "desc" },
+    });
+
+    for (const batch of stockBatches) {
+      if (remainingQuantity <= 0) break;
+
+      const deductQuantity = Math.min(
+        batch.quantityRemaining,
+        remainingQuantity
+      );
+      remainingQuantity -= deductQuantity;
+
+      batchesToUpdate.push({
+        id: batch.id,
+        quantityRemaining: batch.quantityRemaining - deductQuantity,
+      });
+    }
+
+    if (remainingQuantity > 0) {
+      return res.status(400).json({
+        success: false,
+        message: "Not enough stock available to fulfill the withdrawal",
+      });
+    }
+
+    // Update the affected batches
+    for (const batch of batchesToUpdate) {
+      await prisma.stockBatch.update({
+        where: { id: batch.id },
+        data: { quantityRemaining: batch.quantityRemaining },
+      });
+    }
+
+    // Update inventory total quantity
+    const updatedInventory = await prisma.inventory.update({
+      where: { id: inventoryId },
+      data: {
+        quantity: inventoryItem.quantity - quantity,
+        dateUpdated: new Date(),
+      },
+    });
+
+    // Update stock percentage and status
+    await calculateStockPercentageAndStoreInStatus(inventoryId);
+
+    // Fetch the updated inventory item to ensure correct status
+    const updatedInventoryStatus = await prisma.inventory.findUnique({
+      where: { id: inventoryId },
+    });
+
+    // Call orderInventory with the updated status
+    if (updatedInventoryStatus) {
+      await orderInventory(inventoryId);
+    }
+
+    // Log the withdrawal
+    const withdrawalLog = await prisma.withdrawallog.create({
+      data: {
+        inventoryId,
+        reason,
+        employeeId: empId,
+        quantity,
+        dateWithdrawn: new Date(),
+      },
+    });
+
+    res.json({
+      success: true,
+      message: "Item withdrawn successfully",
+      updatedInventory,
+      withdrawalLog,
+    });
+  } catch (error) {
+    console.error("Error processing withdrawal:", error);
+    res.status(500).json({
+      success: false,
+      message: "Error processing withdrawal",
+    });
+  }
 };
 
 // Generate usage report for a specified time period
@@ -1839,7 +1963,7 @@ export {
   removeSupplier,
   requestInventoryItem,
   updateInventory,
-  updateInventoryAttributes,
   updateSupplier,
   withdrawItem,
+  withdrawItemFresh,
 };

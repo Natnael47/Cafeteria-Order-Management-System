@@ -134,17 +134,17 @@ const Stock = () => {
                 dateWithdrawn: formData.dateWithdrawn || new Date().toISOString(),
             };
 
+            const apiEndpoint = formData.isFresh
+                ? backendUrl + "/api/inventory/withdraw-item-fresh"
+                : backendUrl + "/api/inventory/remove-stock";
+
             try {
-                const response = await axios.post(
-                    backendUrl + "/api/inventory/remove-stock",
-                    formDataToSend,
-                    {
-                        headers: {
-                            "Content-Type": "application/json",
-                            iToken,
-                        },
-                    }
-                );
+                const response = await axios.post(apiEndpoint, formDataToSend, {
+                    headers: {
+                        "Content-Type": "application/json",
+                        iToken,
+                    },
+                });
 
                 if (response.data.success) {
                     toast.success("Stock removed successfully");
@@ -569,14 +569,14 @@ const Stock = () => {
 
                                 {/* Remove Stock Form */}
                                 {stockAction === "out" && selectedItem === item && (
-                                    <div className="mt-2 mb-2 p-4 bg-white shadow-md rounded-lg border border-gray-200">
+                                    <div className="mt-2 mb-2 p-6 bg-white shadow-lg rounded-lg border border-gray-300">
                                         {/* Header */}
-                                        <p className="font-bold text-lg text-gray-800 border-b pb-2 mb-4">
+                                        <p className="font-bold text-xl text-gray-900 border-b pb-3 mb-5">
                                             Remove Stock
                                         </p>
                                         {/* Form */}
-                                        <form onSubmit={onRemoveStockHandler} className="space-y-4">
-                                            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                                        <form onSubmit={onRemoveStockHandler} className="space-y-5">
+                                            <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
                                                 {/* Stock Amount */}
                                                 <div>
                                                     <label
@@ -591,7 +591,7 @@ const Stock = () => {
                                                         name="stockAmount"
                                                         value={formData.stockAmount}
                                                         onChange={onChangeHandler}
-                                                        className="p-3 border rounded-md w-full focus:ring focus:ring-red-300 focus:outline-none"
+                                                        className="p-3 border rounded-md w-full focus:ring focus:ring-blue-300 focus:outline-none"
                                                         placeholder="Enter amount"
                                                         min="1"
                                                         max={selectedItem.quantity}
@@ -611,7 +611,7 @@ const Stock = () => {
                                                         name="dateWithdrawn"
                                                         value={formData.dateWithdrawn}
                                                         onChange={onChangeHandler}
-                                                        className="p-3 border rounded-md w-full focus:ring focus:ring-red-300 focus:outline-none"
+                                                        className="p-3 border rounded-md w-full focus:ring focus:ring-blue-300 focus:outline-none"
                                                     />
                                                 </div>
                                                 {/* Withdraw Reason */}
@@ -627,7 +627,7 @@ const Stock = () => {
                                                         name="reason"
                                                         value={formData.reason}
                                                         onChange={onChangeHandler}
-                                                        className="p-3 border rounded-md w-full focus:ring focus:ring-red-300 focus:outline-none"
+                                                        className="p-3 border rounded-md w-full focus:ring focus:ring-blue-300 focus:outline-none"
                                                     >
                                                         <option value="" disabled>
                                                             Select reason
@@ -638,20 +638,52 @@ const Stock = () => {
                                                         <option value="other">Other</option>
                                                     </select>
                                                 </div>
-
+                                                {/* Fresh or Normal Item Selection */}
+                                                <div className="sm:col-span-2">
+                                                    <label
+                                                        htmlFor="isFresh"
+                                                        className="block text-sm font-medium text-gray-700 mb-1"
+                                                    >
+                                                        Stock Type
+                                                    </label>
+                                                    <div className="flex items-center gap-4">
+                                                        <label className="inline-flex items-center">
+                                                            <input
+                                                                type="radio"
+                                                                name="isFresh"
+                                                                value={false}
+                                                                checked={!formData.isFresh}
+                                                                onChange={() => setFormData({ ...formData, isFresh: false })}
+                                                                className="form-radio text-blue-500"
+                                                            />
+                                                            <span className="ml-2 text-gray-700">Normal</span>
+                                                        </label>
+                                                        <label className="inline-flex items-center">
+                                                            <input
+                                                                type="radio"
+                                                                name="isFresh"
+                                                                value={true}
+                                                                checked={formData.isFresh}
+                                                                onChange={() => setFormData({ ...formData, isFresh: true })}
+                                                                className="form-radio text-blue-500"
+                                                            />
+                                                            <span className="ml-2 text-gray-700">Fresh</span>
+                                                        </label>
+                                                    </div>
+                                                </div>
                                             </div>
                                             {/* Action Buttons */}
-                                            <div className="flex justify-end gap-3 mt-4">
+                                            <div className="flex justify-end gap-4 mt-6">
                                                 <button
                                                     type="button"
                                                     onClick={cancelEdit}
-                                                    className="bg-gray-200 text-gray-800 px-4 py-2 rounded-md border hover:bg-gray-300 transition-all"
+                                                    className="bg-gray-300 text-gray-800 px-5 py-2 rounded-md border hover:bg-gray-400 transition-all"
                                                 >
                                                     Cancel
                                                 </button>
                                                 <button
                                                     type="submit"
-                                                    className="bg-red-500 text-white px-4 py-2 rounded-md hover:bg-red-600 transition-all"
+                                                    className="bg-blue-500 text-white px-5 py-2 rounded-md hover:bg-blue-600 transition-all"
                                                 >
                                                     Remove
                                                 </button>

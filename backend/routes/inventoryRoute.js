@@ -21,6 +21,7 @@ import {
   updateInventory,
   updateSupplier,
   withdrawItem,
+  withdrawItemFresh,
 } from "../controllers/InventoryController.js";
 import empAuth from "../middleware/empAuth.js";
 
@@ -47,6 +48,7 @@ inventoryRoute.get("/list-inventory", empAuth, listInventory);
 inventoryRoute.post("/remove-inventory", empAuth, removeInventory);
 inventoryRoute.post("/add-stock", empAuth, addStock);
 inventoryRoute.post("/remove-stock", empAuth, withdrawItem);
+inventoryRoute.post("/withdraw-item-fresh", empAuth, withdrawItemFresh);
 inventoryRoute.get("/inv-orders", empAuth, getSupplierOrders);
 inventoryRoute.post("/inv-request", empAuth, requestInventoryItem);
 inventoryRoute.post(
