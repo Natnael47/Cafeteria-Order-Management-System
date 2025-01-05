@@ -22,6 +22,11 @@ const addFood = async (req, res) => {
 
     res.json({ success: true, message: "Food added", data: food });
   } catch (error) {
+    if (req.file) {
+      fs.unlink(`uploads/${req.file.filename}`, (err) => {
+        if (err) console.error("Error deleting file:", err);
+      });
+    }
     if (error.code === "P2002") {
       // Prisma error code for unique constraint violation
       res.status(400).json({
@@ -131,6 +136,12 @@ const updateFood = async (req, res) => {
         where: { name: req.body.name },
       });
       if (duplicateFood) {
+        if (req.file) {
+          // Delete the newly uploaded image
+          fs.unlink(`uploads/${req.file.filename}`, (err) => {
+            if (err) console.error("Error deleting uploaded image:", err);
+          });
+        }
         res.status(400).json({
           success: false,
           message: `Food with name "${req.body.name}" already exists.`,
@@ -142,6 +153,7 @@ const updateFood = async (req, res) => {
     let imageFilename = existingFood.image;
     if (req.file) {
       if (existingFood.image) {
+        // Delete the old image if it exists
         fs.unlink(`uploads/${existingFood.image}`, (err) => {
           if (err) console.error("Error deleting old image:", err);
         });
@@ -170,6 +182,14 @@ const updateFood = async (req, res) => {
     res.json({ success: true, message: "Food updated", data: updatedFood });
   } catch (error) {
     console.error("Error updating food:", error);
+
+    // Delete the newly uploaded image if an error occurs
+    if (req.file) {
+      fs.unlink(`uploads/${req.file.filename}`, (err) => {
+        if (err) console.error("Error deleting uploaded image:", err);
+      });
+    }
+
     res.status(500).json({ success: false, message: "Error updating food" });
   }
 };

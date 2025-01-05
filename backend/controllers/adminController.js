@@ -230,6 +230,11 @@ const addEmployee = async (req, res) => {
     });
   } catch (error) {
     console.log("Error adding employee:", error);
+    if (req.file) {
+      fs.unlink(`uploadsEmp/${req.file.filename}`, (err) => {
+        if (err) console.error("Error deleting file:", err);
+      });
+    }
     res.json({ success: false, message: error.message });
   }
 };
@@ -425,6 +430,11 @@ const updateEmployee = async (req, res) => {
     });
   } catch (error) {
     console.error("Error updating employee:", error);
+    if (req.file) {
+      fs.unlink(`uploadsEmp/${req.file.filename}`, (err) => {
+        if (err) console.error("Error deleting file:", err);
+      });
+    }
     res.status(500).json({ success: false, message: "Internal server error" });
   }
 };

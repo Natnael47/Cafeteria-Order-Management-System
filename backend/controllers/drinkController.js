@@ -22,6 +22,11 @@ const addDrink = async (req, res) => {
 
     res.json({ success: true, message: "Drink added", data: drink });
   } catch (error) {
+    if (req.file) {
+      fs.unlink(`uploads/${req.file.filename}`, (err) => {
+        if (err) console.error("Error deleting file:", err);
+      });
+    }
     if (error.code === "P2002") {
       res.status(400).json({
         success: false,
@@ -133,6 +138,12 @@ const updateDrink = async (req, res) => {
         where: { drink_Name: req.body.drink_Name },
       });
       if (duplicateDrink) {
+        if (req.file) {
+          // Delete the newly uploaded image
+          fs.unlink(`uploads/${req.file.filename}`, (err) => {
+            if (err) console.error("Error deleting uploaded image:", err);
+          });
+        }
         res.status(400).json({
           success: false,
           message: `Drink with name "${req.body.drink_Name}" already exists.`,
@@ -177,6 +188,12 @@ const updateDrink = async (req, res) => {
     res.json({ success: true, message: "Drink updated", data: updatedDrink });
   } catch (error) {
     console.error("Error updating drink:", error);
+    // Delete the newly uploaded image if an error occurs
+    if (req.file) {
+      fs.unlink(`uploads/${req.file.filename}`, (err) => {
+        if (err) console.error("Error deleting uploaded image:", err);
+      });
+    }
     res.status(500).json({ success: false, message: "Error updating drink" });
   }
 };

@@ -33,6 +33,11 @@ const addInventory = async (req, res) => {
       data: inventoryItem,
     });
   } catch (error) {
+    if (req.file) {
+      fs.unlink(`upload_inv/${req.file.filename}`, (err) => {
+        if (err) console.error("Error deleting file:", err);
+      });
+    }
     if (error.code === "P2002") {
       res.status(400).json({
         success: false,
@@ -93,6 +98,12 @@ const updateInventory = async (req, res) => {
         where: { name: req.body.name },
       });
       if (duplicateItem) {
+        if (req.file) {
+          // Delete the newly uploaded image
+          fs.unlink(`upload_inv/${req.file.filename}`, (err) => {
+            if (err) console.error("Error deleting uploaded image:", err);
+          });
+        }
         res.status(400).json({
           success: false,
           message: `Inventory item with name "${req.body.name}" already exists.`,
@@ -104,7 +115,7 @@ const updateInventory = async (req, res) => {
     let imageFilename = existingItem.image;
     if (req.file) {
       if (existingItem.image) {
-        fs.unlink(`uploads/${existingItem.image}`, (err) => {
+        fs.unlink(`upload_inv/${existingItem.image}`, (err) => {
           if (err) console.error("Error deleting old image:", err);
         });
       }
@@ -146,6 +157,12 @@ const updateInventory = async (req, res) => {
     });
   } catch (error) {
     console.error("Error updating inventory item:", error);
+    // Delete the newly uploaded image if an error occurs
+    if (req.file) {
+      fs.unlink(`upload_inv/${req.file.filename}`, (err) => {
+        if (err) console.error("Error deleting uploaded image:", err);
+      });
+    }
     res.status(500).json({ success: false, message: "Error updating item" });
   }
 };
