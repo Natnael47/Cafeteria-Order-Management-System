@@ -517,6 +517,116 @@ const updateEmployee = async (req, res) => {
   }
 };
 
+export const change_Admin_Password = async (req, res) => {
+  const { oldPassword, newPassword } = req.body;
+
+  if (!oldPassword || !newPassword) {
+    return res.status(400).json({
+      success: false,
+      message: "Both old and new passwords are required",
+    });
+  }
+
+  try {
+    // Fetch the admin ID from the decoded token
+    const adminId = req.adminId;
+
+    if (!adminId) {
+      return res
+        .status(401)
+        .json({ success: false, message: "Admin not authorized" });
+    }
+
+    // Find the admin by ID
+    const admin = await prisma.employee.findUnique({
+      where: { id: adminId },
+    });
+
+    if (!admin || admin.position !== "admin") {
+      return res
+        .status(404)
+        .json({ success: false, message: "Admin account not found" });
+    }
+
+    // Compare the old password with the stored hashed password
+    const isMatch = await bcrypt.compare(oldPassword, admin.password);
+    if (!isMatch) {
+      return res
+        .status(400)
+        .json({ success: false, message: "Old password is incorrect" });
+    }
+
+    // Hash the new password
+    const salt = await bcrypt.genSalt(10);
+    const hashedPassword = await bcrypt.hash(newPassword, salt);
+
+    // Update the admin's password
+    await prisma.employee.update({
+      where: { id: adminId },
+      data: { password: hashedPassword },
+    });
+
+    res.json({ success: true, message: "Password updated successfully" });
+  } catch (error) {
+    console.error("Error changing password:", error);
+    res.status(500).json({ success: false, message: "Internal server error" });
+  }
+};
+
+export const update_Admin_Profile = async (req, res) => {
+  try {
+    const { updatedData } = req.body;
+
+    // Ensure that the updated data is provided
+    if (!updatedData) {
+      return res.status(400).json({
+        success: false,
+        message: "Updated data is required",
+      });
+    }
+
+    // Fetch the admin ID from the decoded token
+    const adminId = req.adminId;
+
+    if (!adminId) {
+      return res.status(401).json({
+        success: false,
+        message: "Admin not authorized",
+      });
+    }
+
+    // Find the admin by ID
+    const admin = await prisma.employee.findUnique({
+      where: { id: adminId },
+    });
+
+    if (!admin || admin.position !== "admin") {
+      return res.status(404).json({
+        success: false,
+        message: "Admin account not found",
+      });
+    }
+
+    // Update the admin's profile
+    const updatedProfile = await prisma.employee.update({
+      where: { id: adminId },
+      data: updatedData,
+    });
+
+    res.json({
+      success: true,
+      message: "Profile updated successfully",
+      updatedProfile,
+    });
+  } catch (error) {
+    console.log("Error updating profile:", error);
+    res.status(500).json({
+      success: false,
+      message: "Internal server error",
+    });
+  }
+};
+
 export {
   addEmployee,
   adminDashboard,
