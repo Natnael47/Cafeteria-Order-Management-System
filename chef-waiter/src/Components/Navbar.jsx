@@ -1,21 +1,23 @@
-import axios from 'axios'; // Import axios for making API calls
-import { LogOut } from 'lucide-react';
-import React, { useContext } from 'react';
-import { useNavigate } from 'react-router-dom';
+import axios from 'axios';
+import { ChevronDown, LogOut, User } from 'lucide-react';
+import React, { useContext, useEffect, useState } from 'react';
+import { toast } from 'react-toastify';
 import { assets } from '../../../admin/src/assets/assets';
 import { backendUrl } from '../App';
-import { ChefContext } from '../Context/ChefContext';
-import { InventoryContext } from '../Context/InventoryContext';
+import { AppContext } from '../Context/AppContext';
 
 const Navbar = () => {
-    const { cToken, setCToken } = useContext(ChefContext);
-    const { iToken, setIToken } = useContext(InventoryContext);
+    const { cToken, iToken, profileData, get_Profile_Data, setCToken, setIToken, navigate } = useContext(AppContext);
+    const [showDropdown, setShowDropdown] = useState(false);
 
-    const navigate = useNavigate();
+    useEffect(() => {
+        if (cToken || iToken) {
+            get_Profile_Data();
+        }
+    }, [cToken, iToken]);
 
     const logout = async (token, setToken, tokenType) => {
         try {
-            // Send the logout request to the backend with the token in the correct header
             const headers = {};
             if (tokenType === 'cToken') {
                 headers.ctoken = token;
@@ -26,30 +28,24 @@ const Navbar = () => {
             const response = await axios.post(
                 `${backendUrl}/api/employee/logout-employee`,
                 {},
-                {
-                    headers: headers, // Send ctoken or itoken as per the type
-                }
+                { headers: headers, }
             );
 
             if (response.data.success) {
-                // Successfully logged out on the backend
-                // Clear the token and localStorage
                 setToken('');
                 localStorage.removeItem(tokenType);
-
-                // Clear sorting data from localStorage
                 localStorage.removeItem('sortAttribute');
                 localStorage.removeItem('sortOrder');
-
-                // Navigate to the homepage or login page
                 navigate('/');
             } else {
-                console.error('Logout failed:', response.data.message);
+                toast.error(response.data.message);
             }
         } catch (error) {
-            console.error('Error logging out:', error);
+            toast.error('Error logging out');
         }
     };
+
+    const getFirstLetter = (name) => name && name[0].toUpperCase();
 
     return (
         <div className="flex justify-between items-center px-4 sm:px-10 py-3 border-b-2 border-black bg-gradient-to-r from-[#F1FAF2] via-[#E8F5E9] to-[#F1FAF2] shadow-md">
@@ -65,36 +61,68 @@ const Navbar = () => {
                 </p>
             </div>
 
-            {/* Center Section */}
-            <div>
-                <p className="text-black font-medium text-sm flex items-center gap-2">
-                    <span className="w-2 h-2 bg-red-500 rounded-full animate-pulse"></span>
-                    Notification
-                </p>
-            </div>
-
             {/* Right Section */}
-            <div className="flex gap-4">
-                {/* Logout Button for cToken (Chef) */}
-                {cToken && (
-                    <button
-                        onClick={() => logout(cToken, setCToken, 'cToken')}
-                        className="flex items-center gap-2 bg-black text-white text-sm px-6 py-2 rounded-full font-semibold shadow-lg hover:bg-gradient-to-r hover:from-red-500 hover:to-orange-500 hover:scale-105 transition-all duration-300"
+            <div className="relative flex items-center gap-2">
+                {profileData ? (
+                    <div
+                        onClick={() => setShowDropdown(!showDropdown)}
+                        className="relative w-12 h-12 flex items-center justify-center rounded-full bg-gray-800 text-white font-bold text-lg cursor-pointer"
                     >
-                        <LogOut className="w-5 h-5" />
-                        <span>Logout</span>
-                    </button>
+                        <div className='bg-black rounded-full flex items-center gap-2 px-2 py-1 shadow-md hover:shadow-lg transition-all duration-300 cursor-pointer'>
+                            <div className="w-10 h-10 bg-gray-100 text-green-800 text-lg font-semibold rounded-full flex items-center justify-center border-2 border-green-500">
+                                {profileData.image ? (
+                                    <img
+                                        src={`${backendUrl}/empIMG/${profileData.image}`}
+                                        alt="Employee"
+                                        className="w-full h-full object-cover rounded-full"
+                                    />
+                                ) : (
+                                    getFirstLetter(profileData.firstName)
+                                )}
+                            </div>
+                            <ChevronDown className="text-white transition-transform duration-300 group-hover:rotate-180" />
+                        </div>
+                    </div>
+                ) : (
+                    <span>Loading...</span>
                 )}
 
-                {/* Logout Button for iToken (Inventory) */}
-                {iToken && (
-                    <button
-                        onClick={() => logout(iToken, setIToken, 'iToken')}
-                        className="flex items-center gap-2 bg-black text-white text-sm px-6 py-2 rounded-full font-semibold shadow-lg hover:bg-gradient-to-r hover:from-red-500 hover:to-orange-500 hover:scale-105 transition-all duration-300"
-                    >
-                        <LogOut className="w-5 h-5" />
-                        <span>Logout</span>
-                    </button>
+                {showDropdown && (
+                    <div className="absolute right-0 top-12 z-30 bg-white rounded-lg shadow-2xl border border-gray-200 p-5 w-64 flex flex-col gap-4">
+                        <div className="flex items-center gap-4 border-b pb-4">
+                            {profileData.image ? (
+                                <img
+                                    src={`${backendUrl}/empIMG/${profileData.image}`}
+                                    alt="Employee"
+                                    className="w-14 h-14 object-cover rounded-full border-2 border-green-600"
+                                />
+                            ) : (
+                                <div className="w-14 h-14 bg-green-100 border-2 border-green-600 text-green-600 text-2xl font-bold rounded-full flex items-center justify-center shadow-sm">
+                                    {getFirstLetter(profileData.firstName)}
+                                </div>
+                            )}
+                            <div>
+                                <p className="text-lg font-semibold text-gray-800">{profileData.firstName} {profileData.lastName}</p>
+                                <p className="text-sm text-gray-500">{profileData.email}</p>
+                            </div>
+                        </div>
+                        <div className="flex flex-col gap-1">
+                            <div
+                                onClick={() => navigate('/profile')}
+                                className="flex items-center gap-3 cursor-pointer hover:bg-green-100 p-3 rounded-lg transition-all"
+                            >
+                                <User className="text-green-600 w-6 h-6" />
+                                <span className="text-gray-800 font-medium">Profile</span>
+                            </div>
+                            <div
+                                onClick={() => logout(cToken || iToken, cToken ? setCToken : setIToken, cToken ? 'cToken' : 'iToken')}
+                                className="flex items-center gap-3 cursor-pointer hover:bg-red-100 p-3 rounded-lg transition-all"
+                            >
+                                <LogOut className="text-red-600 w-6 h-6" />
+                                <span className="text-red-600 font-medium">Logout</span>
+                            </div>
+                        </div>
+                    </div>
                 )}
             </div>
         </div>
