@@ -22,7 +22,6 @@ const Login = () => {
                 localStorage.setItem('token', response.data.token);
                 setToken(response.data.token);
                 //console.log(response.data.data);
-
             } else {
                 toast.error(response.data.message);
             }

@@ -107,22 +107,95 @@ const adminDashboard = async (req, res) => {
   }
 };
 
-//API for Admin Login
-const adminLogin = async (req, res) => {
+const initializeAdminAccount = async () => {
   try {
-    const { email, password } = req.body;
-    if (
-      email === process.env.ADMIN_EMAIL &&
-      password === process.env.ADMIN_PASSWORD
-    ) {
-      const token = jwt.sign(email + password, process.env.JWT_SECRET);
-      res.json({ success: true, token });
-    } else {
-      res.json({ success: false, message: "Invalid credentials" });
+    // Check if an admin account already exists
+    const existingAdmin = await prisma.employee.findFirst({
+      where: { position: "admin" },
+    });
+
+    if (existingAdmin) {
+      console.log("Admin account already exists. Initialization skipped.");
+      return { success: false, message: "Admin account already exists." };
     }
+
+    // Admin account details
+    const adminEmail = "admin@coms.com";
+    const adminPassword = "1q2w3e4r";
+
+    // Hash the admin password
+    const salt = await bcrypt.genSalt(10);
+    const hashedPassword = await bcrypt.hash(adminPassword, salt);
+
+    // Create the admin account
+    const newAdmin = await prisma.employee.create({
+      data: {
+        firstName: "Admin",
+        lastName: "admin",
+        gender: "Other",
+        email: adminEmail,
+        password: hashedPassword,
+        image: "N/A", // No profile image
+        phone: "N/A", // Admin phone not needed
+        position: "admin", // Role is set to admin
+        shift: "N/A",
+        education: "N/A",
+        experience: "N/A",
+        salary: 0, // No salary for admin
+        address: {}, // Empty JSON
+        about: "System administrator",
+        date: new Date(),
+      },
+    });
+
+    console.log("Admin account created successfully:", newAdmin);
+    return { success: true, message: "Admin account created successfully." };
   } catch (error) {
-    console.log(error);
-    res.json({ success: false, message: "Error" });
+    console.error("Error initializing admin account:", error);
+    return { success: false, message: error.message };
+  }
+};
+
+// Call the function to initialize the admin account
+initializeAdminAccount();
+
+// API for Admin Login
+const adminLogin = async (req, res) => {
+  const { email, password } = req.body;
+  try {
+    // Find the admin employee by email and check if position is 'admin'
+    const admin = await prisma.employee.findFirst({
+      where: {
+        email,
+        position: "admin",
+      },
+    });
+
+    if (!admin) {
+      return res.json({ success: false, message: "Admin account not found" });
+    }
+
+    // Compare the provided password with the hashed password in the database
+    const isMatch = await bcrypt.compare(password, admin.password);
+    if (!isMatch) {
+      return res.json({ success: false, message: "Password incorrect" });
+    }
+
+    // Create a workLog entry for the admin login
+    await prisma.workLog.create({
+      data: {
+        employeeId: admin.id,
+        loginTime: new Date(), // Record current login time
+      },
+    });
+
+    // Generate token using the admin's employee ID
+    const token = jwt.sign({ id: admin.id }, process.env.JWT_SECRET);
+
+    res.json({ success: true, token });
+  } catch (error) {
+    console.error("Error logging in:", error);
+    res.status(500).json({ success: false, message: "Internal server error" });
   }
 };
 
@@ -239,10 +312,15 @@ const addEmployee = async (req, res) => {
   }
 };
 
-// API to get All Employee list for Admin
+// API to get All Employee list for Admin (excluding admin role)
 const allEmployees = async (req, res) => {
   try {
     const employees = await prisma.employee.findMany({
+      where: {
+        position: {
+          not: "admin", // Exclude employees with the 'admin' role
+        },
+      },
       select: {
         id: true,
         firstName: true,
