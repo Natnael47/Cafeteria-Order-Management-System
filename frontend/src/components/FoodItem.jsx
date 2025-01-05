@@ -15,14 +15,14 @@ const FoodItem = ({ id, name, price, description, image, rating, isFasting }) =>
         const stars = [];
         for (let i = 0; i < fullStars; i++) {
             stars.push(
-                <Star key={`full-${i}`} className="text-black w-4 h-4" fill="currentColor" />
+                <Star key={`full-${i}`} className="text-yellow-400 w-4 h-4" fill="currentColor" />
             );
         }
         if (halfStar) {
             stars.push(
                 <Star
                     key="half"
-                    className="text-black w-4 h-4"
+                    className="text-yellow-400 w-4 h-4"
                     fill="url(#half-star-gradient)"
                 >
                     <defs>

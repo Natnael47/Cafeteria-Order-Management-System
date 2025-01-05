@@ -31,7 +31,7 @@ const Menu = () => {
                 <h2 className="text-4xl font-extrabold text-gray-800">
                     {category === "All"
                         ? `Our ${menuType} Menu`
-                        : `${category} (${menuType})`}
+                        : `${category}`}
                 </h2>
                 <button
                     className="bg-green-500 text-white px-5 py-2 rounded-lg font-semibold hover:bg-green-600 transition"

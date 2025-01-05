@@ -152,7 +152,7 @@ const Drink_Details = () => {
     }
 
     return (
-        <div className="relative min-h-[80vh] flex flex-col items-center p-6 bg-gradient-to-br from-gray-100 to-gray-300">
+        <div className="relative min-h-[80vh] flex flex-col items-center p-6">
             {/* Navigation Arrows */}
             <button
                 className="absolute -top-4 mt-5 right-1/2 transform translate-x-1/2 bg-green-500 text-white p-4 rounded-full hover:bg-green-600 transition-all shadow-lg hover:scale-105"
