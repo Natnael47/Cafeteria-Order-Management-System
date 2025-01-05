@@ -7,6 +7,7 @@ import {
   allEmployees,
   change_Admin_Password,
   employee_Profile,
+  get_Admin_Profile,
   updateEmployee,
   update_Admin_Profile,
 } from "../controllers/adminController.js";
@@ -43,12 +44,12 @@ adminRouter.post(
 );
 
 adminRouter.post("/change-password", adminAuth, change_Admin_Password);
-
 adminRouter.post(
   "/update-admin-profile",
   adminAuth,
   upload.single("image"),
   update_Admin_Profile
 );
+adminRouter.get("/get-profile", adminAuth, get_Admin_Profile);
 
 export default adminRouter;

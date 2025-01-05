@@ -15,6 +15,7 @@ import List_Drink from './pages/List_Drink';
 import List from './pages/List_Food';
 import Login from './pages/Login';
 import Orders from './pages/Orders';
+import Profile from './pages/Profile';
 import Reports from './pages/Reports';
 import Users from './pages/Users';
 
@@ -40,7 +41,8 @@ const App = () => {
           <Route path='/users' element={<Users />} />
           <Route path='/add-employees' element={<AddEmployee />} />
           <Route path='/employees-list' element={<EmployeesList />} />
-          <Route path='/employee-profile/:employeeId' element={<EmployeeProfile />} /> {/* Updated route */}
+          <Route path='/employee-profile/:employeeId' element={<EmployeeProfile />} />
+          <Route path='/profile' element={<Profile />} />
         </Routes>
       </div>
     </div>

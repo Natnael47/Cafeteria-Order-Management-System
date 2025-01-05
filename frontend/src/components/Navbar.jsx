@@ -3,7 +3,7 @@ import React, { useContext, useEffect, useState } from "react";
 import { Link, useLocation } from "react-router-dom";
 import { assets } from "../assets/assets";
 import { StoreContext } from "../context/StoreContext";
-import LoginPopUp from './LoginPopUp';
+import LoginPopUp from './LoginPopup';
 
 export const Navbar = ({ setShowFeedback }) => {
     const location = useLocation();

@@ -627,6 +627,64 @@ export const update_Admin_Profile = async (req, res) => {
   }
 };
 
+// Backend: Get Admin Profile
+export const get_Admin_Profile = async (req, res) => {
+  try {
+    // Fetch the admin ID from the decoded token
+    const adminId = req.adminId;
+
+    if (!adminId) {
+      return res.status(401).json({
+        success: false,
+        message: "Admin not authorized",
+      });
+    }
+
+    // Find the admin by ID
+    const admin = await prisma.employee.findUnique({
+      where: { id: adminId },
+    });
+
+    if (!admin || admin.position !== "admin") {
+      return res.status(404).json({
+        success: false,
+        message: "Admin account not found",
+      });
+    }
+
+    // Format the phone number for display
+    if (admin.phone) {
+      const phoneNumber = parsePhoneNumberFromString(admin.phone);
+      if (phoneNumber && phoneNumber.isValid()) {
+        admin.phone = phoneNumber.formatInternational(); // Format as "+251 963 698 568"
+      }
+    }
+
+    // Return the admin data
+    res.json({
+      success: true,
+      admin: {
+        id: admin.id,
+        firstName: admin.firstName,
+        lastName: admin.lastName,
+        email: admin.email,
+        phone: admin.phone,
+        position: admin.position,
+        image: admin.image,
+        about: admin.about,
+        address: admin.address,
+        date: admin.date,
+      },
+    });
+  } catch (error) {
+    console.log("Error retrieving admin profile:", error);
+    res.status(500).json({
+      success: false,
+      message: "Internal server error",
+    });
+  }
+};
+
 export {
   addEmployee,
   adminDashboard,
