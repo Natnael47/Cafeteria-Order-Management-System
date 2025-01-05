@@ -80,7 +80,7 @@ model user {
 // Food model - Represents food items
 model food {
   id             Int             @id @default(autoincrement()) // Unique identifier for each food item
-  name           String          @db.VarChar(255) // Name of the food item
+  name           String          @unique @db.VarChar(255) // Name of the food item
   description    String          @db.Text // Description of the food item
   price          Float // Price of the food item
   image          String          @db.VarChar(255) // URL or path to food item image
@@ -99,7 +99,7 @@ model food {
 
 model Drink {
   drink_Id          Int       @id @default(autoincrement()) // Unique identifier
-  drink_Name        String    @db.VarChar(255) // Name of the drink
+  drink_Name        String    @unique @db.VarChar(255) // Name of the drink
   drink_Description String    @db.VarChar(255) // Description
   drink_Price       Float // Price
   drink_Image       String    @db.VarChar(255) // URL or path to drink image
@@ -256,7 +256,7 @@ model orderLog {
 
 model inventory {
   id              Int       @id @default(autoincrement()) // Unique identifier for each inventory item
-  name            String    @db.VarChar(255) // Name of the inventory item
+  name            String    @unique @db.VarChar(255) // Name of the inventory item
   category        String    @db.VarChar(100) // Category of the inventory item
   description     String?   @db.VarChar(500) // Optional description
   quantity        Int       @default(0) // Current quantity

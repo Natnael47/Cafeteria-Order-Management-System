@@ -33,10 +33,17 @@ const addInventory = async (req, res) => {
       data: inventoryItem,
     });
   } catch (error) {
-    console.error("Error adding inventory item:", error);
-    res
-      .status(500)
-      .json({ success: false, message: "Error adding inventory item" });
+    if (error.code === "P2002") {
+      res.status(400).json({
+        success: false,
+        message: `Inventory item with name "${req.body.name}" already exists.`,
+      });
+    } else {
+      console.error("Error adding inventory item:", error);
+      res
+        .status(500)
+        .json({ success: false, message: "Error adding inventory item" });
+    }
   }
 };
 
@@ -65,15 +72,14 @@ const updateInventory = async (req, res) => {
   try {
     const itemId = parseInt(req.body.id, 10);
     if (isNaN(itemId)) {
-      res
-        .status(400)
-        .json({ success: false, message: "Invalid inventory item ID" });
+      res.status(400).json({ success: false, message: "Invalid inventory ID" });
       return;
     }
 
     const existingItem = await prisma.inventory.findUnique({
       where: { id: itemId },
     });
+
     if (!existingItem) {
       res
         .status(404)
@@ -81,10 +87,26 @@ const updateInventory = async (req, res) => {
       return;
     }
 
+    // Check for duplicate inventory name
+    if (req.body.name && req.body.name !== existingItem.name) {
+      const duplicateItem = await prisma.inventory.findUnique({
+        where: { name: req.body.name },
+      });
+      if (duplicateItem) {
+        res.status(400).json({
+          success: false,
+          message: `Inventory item with name "${req.body.name}" already exists.`,
+        });
+        return;
+      }
+    }
+
     let imageFilename = existingItem.image;
     if (req.file) {
       if (existingItem.image) {
-        deleteImage(path.join("upload_inv", existingItem.image));
+        fs.unlink(`uploads/${existingItem.image}`, (err) => {
+          if (err) console.error("Error deleting old image:", err);
+        });
       }
       imageFilename = req.file.filename;
     }
@@ -95,14 +117,12 @@ const updateInventory = async (req, res) => {
         name: req.body.name || existingItem.name,
         category: req.body.category || existingItem.category,
         description: req.body.description || existingItem.description,
-        quantity:
-          req.body.quantity !== undefined
-            ? parseInt(req.body.quantity)
-            : existingItem.quantity,
-        initialQuantity:
-          req.body.initialQuantity !== undefined
-            ? parseInt(req.body.initialQuantity)
-            : existingItem.initialQuantity, // Update initial quantity
+        quantity: req.body.quantity
+          ? parseInt(req.body.quantity, 10)
+          : existingItem.quantity,
+        initialQuantity: req.body.initialQuantity
+          ? parseInt(req.body.initialQuantity, 10)
+          : existingItem.initialQuantity,
         unit: req.body.unit || existingItem.unit,
         pricePerUnit: req.body.pricePerUnit
           ? parseFloat(req.body.pricePerUnit)
@@ -111,7 +131,7 @@ const updateInventory = async (req, res) => {
         dateReceived: req.body.dateReceived
           ? new Date(req.body.dateReceived)
           : existingItem.dateReceived,
-        supplierId: req.body.supplierId || existingItem.supplierId, // Update supplierId
+        supplierId: req.body.supplierId || existingItem.supplierId,
         expiryDate: req.body.expiryDate
           ? new Date(req.body.expiryDate)
           : existingItem.expiryDate,
@@ -126,9 +146,7 @@ const updateInventory = async (req, res) => {
     });
   } catch (error) {
     console.error("Error updating inventory item:", error);
-    res
-      .status(500)
-      .json({ success: false, message: "Error updating inventory item" });
+    res.status(500).json({ success: false, message: "Error updating item" });
   }
 };
 

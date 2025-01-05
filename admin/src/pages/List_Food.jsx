@@ -129,26 +129,25 @@ const List = () => {
         }
 
         try {
-            const response = await axios.post(
-                backendUrl + "/api/food/update",
-                formData,
-                {
-                    headers: {
-                        token,
-                        "Content-Type": "multipart/form-data",
-                    },
-                }
-            );
+            const response = await axios.post(`${backendUrl}/api/food/update`, formData, {
+                headers: { token, "Content-Type": "multipart/form-data" },
+            });
             if (response.data.success) {
                 toast.success("Food Updated");
                 fetchList();
                 cancelEdit();
             } else {
-                toast.error("Error updating food");
-                console.log(response.data.message);
+                toast.error(response.data.message || "Error updating food");
             }
         } catch (error) {
-            console.log("Error updating food:", error.message);
+            console.error("Error updating food:", error);
+            if (error.response) {
+                toast.error(` ${error.response.data.message || "Failed to update food"}`);
+            } else if (error.request) {
+                toast.error("Network Error: No response received from the server");
+            } else {
+                toast.error(`Error: ${error.message}`);
+            }
         }
     };
 

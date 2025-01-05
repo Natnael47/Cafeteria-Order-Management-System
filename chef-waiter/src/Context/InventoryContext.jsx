@@ -93,28 +93,28 @@ const InventoryContextProvide = (props) => {
         if (editInventory.image) formData.append("image", editInventory.image);
 
         try {
-            const response = await axios.post(
-                `${backendUrl}/api/inventory/update-inventory`,
-                formData,
-                {
-                    headers: {
-                        iToken,
-                        "Content-Type": "multipart/form-data",
-                    },
-                }
-            );
+            const response = await axios.post(`${backendUrl}/api/inventory/update-inventory`, formData, {
+                headers: { iToken, "Content-Type": "multipart/form-data" },
+            });
             if (response.data.success) {
                 toast.success("Inventory Updated");
                 fetchInventoryList();
                 cancelEdit();
             } else {
-                toast.error("Error updating inventory");
+                toast.error(response.data.message || "Error updating inventory");
             }
         } catch (error) {
-            console.error("Error updating inventory:", error.message);
-            toast.error("Error updating inventory");
+            console.error("Error updating inventory:", error);
+            if (error.response) {
+                toast.error(` ${error.response.data.message || "Failed to update inventory"}`);
+            } else if (error.request) {
+                toast.error("Network Error: No response received from the server");
+            } else {
+                toast.error(`Error: ${error.message}`);
+            }
         }
     };
+
 
     const removeInventory = async (selectedInventoryId, fetchInventoryList, closeModal) => {
         try {
@@ -156,18 +156,21 @@ const InventoryContextProvide = (props) => {
                 });
                 setImage(null);
                 toast.success("Inventory item added successfully");
+                return true; // Success
             } else {
                 toast.error(response.data.message || "Failed to add inventory item");
+                return false; // Failure
             }
         } catch (error) {
             console.error("Error adding inventory item:", error);
             if (error.response) {
-                toast.error(`Backend Error: ${error.response.data.message || "Failed to add inventory item"}`);
+                toast.error(`${error.response.data.message || "Failed to add inventory item"}`);
             } else if (error.request) {
                 toast.error("Network Error: No response received from the server");
             } else {
                 toast.error(`Error: ${error.message}`);
             }
+            return false; // Failure
         }
     };
 
@@ -208,7 +211,7 @@ const InventoryContextProvide = (props) => {
         } catch (error) {
             console.error("Error adding supplier:", error);
             if (error.response) {
-                toast.error(`Backend Error: ${error.response.data.message || "Failed to add supplier"}`);
+                toast.error(` ${error.response.data.message || "Failed to add supplier"}`);
             } else if (error.request) {
                 toast.error("Network Error: No response received from the server");
             } else {

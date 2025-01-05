@@ -22,8 +22,15 @@ const addDrink = async (req, res) => {
 
     res.json({ success: true, message: "Drink added", data: drink });
   } catch (error) {
-    console.error("Error adding drink:", error);
-    res.json({ success: false, message: "Error adding drink" });
+    if (error.code === "P2002") {
+      res.status(400).json({
+        success: false,
+        message: `Drink with name "${req.body.name}" already exists.`,
+      });
+    } else {
+      console.error("Error adding drink:", error);
+      res.status(500).json({ success: false, message: "Error adding drink" });
+    }
   }
 };
 
@@ -104,32 +111,46 @@ const updateDrink = async (req, res) => {
   try {
     const drinkId = parseInt(req.body.id, 10);
     if (isNaN(drinkId)) {
-      res.json({ success: false, message: "Invalid drink ID" });
+      res.status(400).json({ success: false, message: "Invalid drink ID" });
       return;
     }
 
-    // Find the drink item to get the current image filename
     const existingDrink = await prisma.drink.findUnique({
       where: { drink_Id: drinkId },
     });
 
     if (!existingDrink) {
-      res.json({ success: false, message: "Drink item not found" });
+      res.status(404).json({ success: false, message: "Drink not found" });
       return;
     }
 
-    // If a new image is uploaded, delete the old one and update the image filename
+    // Check for duplicate drink name
+    if (
+      req.body.drink_Name &&
+      req.body.drink_Name !== existingDrink.drink_Name
+    ) {
+      const duplicateDrink = await prisma.drink.findUnique({
+        where: { drink_Name: req.body.drink_Name },
+      });
+      if (duplicateDrink) {
+        res.status(400).json({
+          success: false,
+          message: `Drink with name "${req.body.drink_Name}" already exists.`,
+        });
+        return;
+      }
+    }
+
     let imageFilename = existingDrink.drink_Image;
     if (req.file) {
       if (existingDrink.drink_Image) {
-        fs.unlink(`uploads/${existingDrink.drink_Image}`, (fsErr) => {
-          if (fsErr) console.error("Error deleting old image:", fsErr);
+        fs.unlink(`uploads/${existingDrink.drink_Image}`, (err) => {
+          if (err) console.error("Error deleting old image:", err);
         });
       }
       imageFilename = req.file.filename;
     }
 
-    // Update the drink item in the database
     const updatedDrink = await prisma.drink.update({
       where: { drink_Id: drinkId },
       data: {
@@ -156,7 +177,7 @@ const updateDrink = async (req, res) => {
     res.json({ success: true, message: "Drink updated", data: updatedDrink });
   } catch (error) {
     console.error("Error updating drink:", error);
-    res.json({ success: false, message: "Error updating drink" });
+    res.status(500).json({ success: false, message: "Error updating drink" });
   }
 };
 

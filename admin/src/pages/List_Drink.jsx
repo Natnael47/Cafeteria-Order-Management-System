@@ -117,7 +117,7 @@ const List_Drink = () => {
         });
     };
 
-    const updateFood = async () => {
+    const updateDrink = async () => {
         const formData = new FormData();
         formData.append("id", editFood.drink_Id);
         formData.append("drink_Name", editFood.drink_Name);
@@ -132,28 +132,28 @@ const List_Drink = () => {
         }
 
         try {
-            const response = await axios.post(
-                backendUrl + "/api/drink/update",
-                formData,
-                {
-                    headers: {
-                        token,
-                        "Content-Type": "multipart/form-data",
-                    },
-                }
-            );
+            const response = await axios.post(`${backendUrl}/api/drink/update`, formData, {
+                headers: { token, "Content-Type": "multipart/form-data" },
+            });
             if (response.data.success) {
-                toast.success("Food Updated");
+                toast.success("Drink Updated");
                 fetchList();
                 cancelEdit();
             } else {
-                toast.error("Error updating food");
-                console.log(response.data.message);
+                toast.error(response.data.message || "Error updating drink");
             }
         } catch (error) {
-            console.log("Error updating food:", error.message);
+            console.error("Error updating drink:", error);
+            if (error.response) {
+                toast.error(` ${error.response.data.message || "Failed to update drink"}`);
+            } else if (error.request) {
+                toast.error("Network Error: No response received from the server");
+            } else {
+                toast.error(`Error: ${error.message}`);
+            }
         }
     };
+
 
     const removeFood = async () => {
         const response = await axios.post(
@@ -437,7 +437,7 @@ const List_Drink = () => {
                                                 Cancel
                                             </button>
                                             <button
-                                                onClick={updateFood}
+                                                onClick={updateDrink}
                                                 disabled={!hasChanges}
                                                 className={`px-4 py-2 rounded-lg ${hasChanges
                                                     ? "bg-[#22C55E] text-white hover:bg-primary"

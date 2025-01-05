@@ -35,23 +35,31 @@ const Add = () => {
         formData.append("isFasting", data.isFasting);
         formData.append("image", image);
 
-        const response = await axios.post(backendUrl + "/api/food/add", formData, { headers: { token } });
-        if (response.data.success) {
-            setData({
-                name: "",
-                description: "",
-                price: "",
-                category: "Salad",
-                prepTime: "",
-                isFasting: false,
+        try {
+            const response = await axios.post(`${backendUrl}/api/food/add`, formData, {
+                headers: { token },
             });
-            setImage(false);
-            navigate('/list');
-            toast.success("Food added successfully");
-        } else {
-            toast.error("Failed to add");
+
+            if (response.data.success) {
+                setData({
+                    name: "",
+                    description: "",
+                    price: "",
+                    category: "Salad",
+                    prepTime: "",
+                    isFasting: false,
+                });
+                setImage(false);
+                navigate("/list");
+                toast.success("Food added successfully");
+            } else {
+                toast.error(response.data.message || "Failed to add");
+            }
+        } catch (error) {
+            toast.error(error.response?.data?.message || "An error occurred");
         }
-    }
+    };
+
 
     return (
         <form

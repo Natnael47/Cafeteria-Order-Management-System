@@ -23,8 +23,14 @@ const AddInventory = () => {
 
     const onSubmitHandler = async (event) => {
         event.preventDefault();
-        await addInventory(data, image, setData, setImage);  // Ensure addInventory completes
-        navigate('/inventory');  // Navigate to /inventory after submission
+
+        // Wait for addInventory to complete and check its outcome
+        const result = await addInventory(data, image, setData, setImage);
+
+        // Only navigate if addInventory is successful
+        if (result) {
+            navigate('/inventory');
+        }
     };
 
     const onCancelHandler = () => {

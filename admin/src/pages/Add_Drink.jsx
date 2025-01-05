@@ -36,23 +36,28 @@ const Add_Drink = () => {
         formData.append("isAlcoholic", data.isAlcoholic);
         formData.append("image", image);
 
-        const response = await axios.post(backendUrl + "/api/drink/add", formData, { headers: { token } });
-        if (response.data.success) {
-            setData({
-                name: "",
-                description: "",
-                price: "",
-                category: "Salad",
-                size: "Small",
-                isAlcoholic: false,
-            });
-            setImage(false);
-            navigate('/list-drink');
-            toast.success("Food added successfully");
-        } else {
-            toast.error("Failed to add");
+        try {
+            const response = await axios.post(`${backendUrl}/api/drink/add`, formData, { headers: { token } });
+            if (response.data.success) {
+                setData({ name: "", description: "", price: "", category: "Salad", size: "Small", isAlcoholic: false });
+                setImage(false);
+                navigate('/list-drink');
+                toast.success("Drink added successfully");
+            } else {
+                toast.error(response.data.message || "Failed to add drink");
+            }
+        } catch (error) {
+            console.error("Error adding drink:", error);
+            if (error.response) {
+                toast.error(` ${error.response.data.message || "Failed to add drink"}`);
+            } else if (error.request) {
+                toast.error("Network Error: No response received from the server");
+            } else {
+                toast.error(`Error: ${error.message}`);
+            }
         }
     };
+
 
     return (
         <form

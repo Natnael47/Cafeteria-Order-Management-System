@@ -22,8 +22,16 @@ const addFood = async (req, res) => {
 
     res.json({ success: true, message: "Food added", data: food });
   } catch (error) {
-    console.error("Error adding food:", error);
-    res.json({ success: false, message: "Error adding food" });
+    if (error.code === "P2002") {
+      // Prisma error code for unique constraint violation
+      res.status(400).json({
+        success: false,
+        message: `Food with name "${req.body.name}" already exists.`,
+      });
+    } else {
+      console.error("Error adding food:", error);
+      res.status(500).json({ success: false, message: "Error adding food" });
+    }
   }
 };
 
@@ -104,40 +112,43 @@ const updateFood = async (req, res) => {
   try {
     const foodId = parseInt(req.body.id, 10);
     if (isNaN(foodId)) {
-      res.json({ success: false, message: "Invalid food ID" });
+      res.status(400).json({ success: false, message: "Invalid food ID" });
       return;
     }
 
-    // Find the food item to get the current image filename and menuStatus
     const existingFood = await prisma.food.findUnique({
       where: { id: foodId },
     });
 
     if (!existingFood) {
-      res.json({ success: false, message: "Food item not found" });
+      res.status(404).json({ success: false, message: "Food item not found" });
       return;
     }
 
-    // If a new image is uploaded, delete the old one and update the image filename
+    // Check for duplicate food name
+    if (req.body.name && req.body.name !== existingFood.name) {
+      const duplicateFood = await prisma.food.findUnique({
+        where: { name: req.body.name },
+      });
+      if (duplicateFood) {
+        res.status(400).json({
+          success: false,
+          message: `Food with name "${req.body.name}" already exists.`,
+        });
+        return;
+      }
+    }
+
     let imageFilename = existingFood.image;
     if (req.file) {
-      // Delete the old image if it exists
       if (existingFood.image) {
-        fs.unlink(`uploads/${existingFood.image}`, (fsErr) => {
-          if (fsErr) console.error("Error deleting old image:", fsErr);
+        fs.unlink(`uploads/${existingFood.image}`, (err) => {
+          if (err) console.error("Error deleting old image:", err);
         });
       }
       imageFilename = req.file.filename;
     }
 
-    const PrepTime = req.body.prepTime
-      ? parseInt(req.body.prepTime, 10)
-      : existingFood.prepTime;
-
-    // Update menuStatus based on "1" or "0" (string) value from the request
-    const menuStatus = req.body.menuStatus === "1";
-
-    // Update the food item in the database
     const updatedFood = await prisma.food.update({
       where: { id: foodId },
       data: {
@@ -146,8 +157,10 @@ const updateFood = async (req, res) => {
         price: req.body.price ? parseFloat(req.body.price) : existingFood.price,
         category: req.body.category || existingFood.category,
         image: imageFilename,
-        menuStatus: menuStatus,
-        prepTime: PrepTime,
+        menuStatus: req.body.menuStatus === "1",
+        prepTime: req.body.prepTime
+          ? parseInt(req.body.prepTime, 10)
+          : existingFood.prepTime,
         isFasting: req.body.isFasting
           ? req.body.isFasting === "true"
           : existingFood.isFasting,
@@ -157,7 +170,7 @@ const updateFood = async (req, res) => {
     res.json({ success: true, message: "Food updated", data: updatedFood });
   } catch (error) {
     console.error("Error updating food:", error);
-    res.json({ success: false, message: "Error updating food" });
+    res.status(500).json({ success: false, message: "Error updating food" });
   }
 };
 
