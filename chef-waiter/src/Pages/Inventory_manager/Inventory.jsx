@@ -298,44 +298,81 @@ const Inventory = () => {
 
                         {/* Selected Item Details */}
                         {selectedIndex === index && (
-                            <div className="p-6 border-t bg-white shadow-md rounded-lg mt-2 mb-2 flex items-center gap-6">
-                                {/* Item Image */}
-                                <div className="w-40 h-40 flex-shrink-0">
-                                    <img
-                                        className="w-full h-full object-cover rounded-lg border border-gray-200"
-                                        src={item.image ? `${backendUrl}/Inv_img/${item.image}` : "placeholder.jpg"}
-                                        alt={item.name}
-                                    />
+                            <div className="p-6 border-t bg-white shadow-md rounded-lg mt-2 mb-2 grid grid-cols-1 md:grid-cols-2 gap-6">
+                                {/* Left Column: Item Details */}
+                                <div className="flex items-center gap-6">
+                                    {/* Item Image */}
+                                    <div className="w-40 h-40 flex-shrink-0">
+                                        <img
+                                            className="w-full h-full object-cover rounded-lg border border-gray-200"
+                                            src={item.image ? `${backendUrl}/Inv_img/${item.image}` : "placeholder.jpg"}
+                                            alt={item.name}
+                                        />
+                                    </div>
+
+                                    {/* Item Details */}
+                                    <div className="flex-grow space-y-2 text-gray-700">
+                                        <h3 className="text-xl font-bold text-gray-800 mb-4">{item.name}</h3>
+                                        <p className="text-sm flex">
+                                            <span className="w-28 font-semibold text-gray-800">Category:</span>
+                                            <span>{item.category}</span>
+                                        </p>
+                                        <p className="text-sm flex">
+                                            <span className="w-28 font-semibold text-gray-800">Quantity:</span>
+                                            <span>
+                                                {item.quantity} {item.unit}
+                                            </span>
+                                        </p>
+                                        <p className="text-sm flex">
+                                            <span className="w-28 font-semibold text-gray-800">Price/Unit:</span>
+                                            <span>${item.pricePerUnit}</span>
+                                        </p>
+                                        <p className="text-sm flex">
+                                            <span className="w-28 font-semibold text-gray-800">Status:</span>
+                                            <span
+                                                className={`px-2 py-1 rounded-full text-sm font-medium ${item.status === "out of stock"
+                                                    ? "bg-red-100 text-red-700"
+                                                    : "bg-green-100 text-green-700"
+                                                    }`}
+                                            >
+                                                {item.status}
+                                            </span>
+                                        </p>
+                                    </div>
                                 </div>
 
-                                {/* Item Details */}
-                                <div className="flex-grow space-y-2 text-gray-700">
-                                    <h3 className="text-xl font-bold text-gray-800 mb-4">{item.name}</h3>
-                                    <p className="text-sm flex">
-                                        <span className="w-28 font-semibold text-gray-800">Category:</span>
-                                        <span>{item.category}</span>
-                                    </p>
-                                    <p className="text-sm flex">
-                                        <span className="w-28 font-semibold text-gray-800">Quantity:</span>
-                                        <span>
-                                            {item.quantity} {item.unit}
-                                        </span>
-                                    </p>
-                                    <p className="text-sm flex">
-                                        <span className="w-28 font-semibold text-gray-800">Price/Unit:</span>
-                                        <span>${item.pricePerUnit}</span>
-                                    </p>
-                                    <p className="text-sm flex">
-                                        <span className="w-28 font-semibold text-gray-800">Status:</span>
-                                        <span
-                                            className={`px-2 py-1 rounded-full text-sm font-medium ${item.status === "out of stock"
-                                                ? "bg-red-100 text-red-700"
-                                                : "bg-green-100 text-green-700"
-                                                }`}
-                                        >
-                                            {item.status}
-                                        </span>
-                                    </p>
+                                {/* Right Column: Stock Batch Details */}
+                                <div className="flex-grow">
+                                    <h4 className="text-lg font-semibold text-gray-800 mb-2">Stock Batch Details</h4>
+                                    <div className="flex gap-4 overflow-x-auto scrollbar-thin scrollbar-thumb-gray-300 scrollbar-track-gray-100">
+                                        {item.StockBatch && item.StockBatch.length > 0 ? (
+                                            item.StockBatch.map((batch, batchIndex) => (
+                                                <div
+                                                    key={batchIndex}
+                                                    className="min-w-[200px] p-4 border rounded-lg shadow-sm bg-gray-50 flex-shrink-0 hover:shadow-md transition-shadow"
+                                                >
+                                                    <p className="text-sm flex">
+                                                        <span className="font-semibold text-gray-800">Batch:</span>&nbsp;
+                                                        <span>{batch.batchNumber}</span>
+                                                    </p>
+                                                    <p className="text-sm flex">
+                                                        <span className="font-semibold text-gray-800">Remaining:</span>&nbsp;
+                                                        <span>{batch.quantityRemaining}</span>
+                                                    </p>
+                                                    <p className="text-sm flex">
+                                                        <span className="font-semibold text-gray-800">Expiry:</span>&nbsp;
+                                                        <span>
+                                                            {batch.expiryDate
+                                                                ? new Date(batch.expiryDate).toLocaleDateString()
+                                                                : "N/A"}
+                                                        </span>
+                                                    </p>
+                                                </div>
+                                            ))
+                                        ) : (
+                                            <p className="text-gray-500 text-sm">No active batches available.</p>
+                                        )}
+                                    </div>
                                 </div>
                             </div>
                         )}

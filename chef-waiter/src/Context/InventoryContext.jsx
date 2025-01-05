@@ -21,6 +21,8 @@ const InventoryContextProvide = (props) => {
             });
             if (response.data.success) {
                 setInventoryList(response.data.data);
+                console.log(response.data.data);
+
             } else {
                 toast.error("Error fetching inventory list");
             }

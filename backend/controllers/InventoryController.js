@@ -57,12 +57,27 @@ const addInventoryBulk = async (req, res) => {
   // Code to add multiple items at once
 };
 
-// List all inventory items
+// List all inventory items with batch details (excluding batches with zero quantity)
 const listInventory = async (req, res) => {
   try {
     const inventoryItems = await prisma.inventory.findMany({
       orderBy: { id: "desc" },
+      include: {
+        StockBatch: {
+          where: {
+            quantityRemaining: {
+              gt: 0, // Only include batches where quantityRemaining is greater than 0
+            },
+          },
+          select: {
+            batchNumber: true,
+            quantityRemaining: true,
+            expiryDate: true,
+          },
+        },
+      },
     });
+
     res.json({ success: true, data: inventoryItems });
   } catch (error) {
     console.error("Error retrieving inventory items:", error);
