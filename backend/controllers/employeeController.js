@@ -94,7 +94,7 @@ export const logoutEmployee = async (req, res) => {
       });
     }
 
-    console.log("Latest workLog found:", latestWorkLog);
+    //console.log("Latest workLog found:", latestWorkLog);
 
     // Update the workLog entry with the current logout time
     try {
@@ -105,7 +105,7 @@ export const logoutEmployee = async (req, res) => {
         },
       });
 
-      console.log("Updated workLog:", updatedLog);
+      //console.log("Updated workLog:", updatedLog);
       return res
         .status(200)
         .json({ success: true, message: "Logout successful" });

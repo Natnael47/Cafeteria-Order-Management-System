@@ -48,11 +48,11 @@ const Login = () => {
     return (
         <form
             onSubmit={onSubmitHandler}
-            className="min-h-screen flex items-center justify-center bg-gradient-to-br from-[#22c55edc] via-primary to-[#22c571] px-4"
+            className="min-h-screen flex items-center justify-center bg-gradient-to-br from-[#22c55edc] via-primary to-[#22c571] px-6 sm:px-10"
         >
-            <div className="flex flex-col gap-6 p-8 sm:p-10 bg-white rounded-xl shadow-2xl max-w-sm w-full">
+            <div className="flex flex-col gap-6 p-8 sm:p-10 bg-white rounded-xl shadow-2xl max-w-lg w-full">
                 {/* Title */}
-                <h1 className="text-2xl font-extrabold text-gray-800 text-center">
+                <h1 className="text-3xl font-extrabold text-gray-800 text-center">
                     <span className="text-green-600">{state}</span> Login
                 </h1>
 
@@ -125,6 +125,7 @@ const Login = () => {
             </div>
         </form>
     );
+
 
 };
 
