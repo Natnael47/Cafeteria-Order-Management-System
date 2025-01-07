@@ -10,6 +10,7 @@ const AdminContextProvider = (props) => {
     const navigate = useNavigate();
 
     const [token, setToken] = useState(localStorage.getItem('token') || '');
+    const [profile, setProfile] = useState(null);
     const [employees, setEmployees] = useState([]);
     const [employeeProfile, setEmployeeProfile] = useState({}); // Initialize as an object
     const [dashboardData, setDashData] = useState({
@@ -29,6 +30,23 @@ const AdminContextProvider = (props) => {
             );
             if (data.success) {
                 setEmployees(data.employees);
+            } else {
+                toast.error(data.message);
+            }
+        } catch (error) {
+            toast.error(error.message);
+        }
+    };
+
+    const getProfile = async () => {
+        try {
+            const { data } = await axios.get(
+                `${backendUrl}/api/admin/get-profile`,
+                { headers: { token } }
+            );
+            if (data.success) {
+                setProfile(data.admin);
+                //console.log(data.admin);
             } else {
                 toast.error(data.message);
             }
@@ -131,6 +149,8 @@ const AdminContextProvider = (props) => {
         deleteEmployee,
         dashboardData,
         getDashData,
+        getProfile,
+        profile, setProfile
     };
 
     return (
