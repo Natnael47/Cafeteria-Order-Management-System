@@ -4,6 +4,7 @@ import {
   addEmployee,
   adminDashboard,
   adminLogin,
+  adminLogout,
   allEmployees,
   change_Admin_Password,
   employee_Profile,
@@ -34,6 +35,7 @@ adminRouter.post(
 );
 adminRouter.get("/dashboard", adminAuth, adminDashboard);
 adminRouter.post("/login", adminLogin);
+adminRouter.post("/logout", adminAuth, adminLogout);
 adminRouter.post("/get-employees", adminAuth, allEmployees);
 adminRouter.get("/employee-profile/:empId", adminAuth, employee_Profile);
 adminRouter.post(

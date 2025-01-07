@@ -1,5 +1,6 @@
 import axios from "axios";
 import { createContext, useContext, useState } from "react";
+import { useNavigate } from "react-router-dom";
 import { toast } from "react-toastify";
 import { backendUrl } from "../App";
 import { ChefContext } from "./ChefContext";
@@ -8,9 +9,10 @@ import { InventoryContext } from "./InventoryContext";
 export const AppContext = createContext(null);
 
 const AppContextProvider = (props) => {
+    const navigate = useNavigate();
 
-    const { cToken } = useContext(ChefContext);
-    const { iToken } = useContext(InventoryContext);
+    const { cToken, setCToken } = useContext(ChefContext);
+    const { iToken, setIToken } = useContext(InventoryContext);
 
     const [profileData, setProfileData] = useState(false);
 
@@ -81,7 +83,7 @@ const AppContextProvider = (props) => {
 
     const value = {
         profileData, setProfileData, get_Profile_Data, cToken, iToken,
-        changePassword
+        changePassword, navigate, setIToken, setCToken
     }
 
     return (

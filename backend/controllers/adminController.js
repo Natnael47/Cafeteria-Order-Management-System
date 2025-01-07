@@ -181,12 +181,58 @@ const adminLogin = async (req, res) => {
       return res.json({ success: false, message: "Password incorrect" });
     }
 
+    // Create a workLog entry for admin login
+    await prisma.workLog.create({
+      data: {
+        employeeId: admin.id,
+        loginTime: new Date(), // Record current login time
+      },
+    });
+
     // Generate token using the admin's employee ID
     const token = jwt.sign({ id: admin.id }, process.env.JWT_SECRET);
 
     res.json({ success: true, token });
   } catch (error) {
     console.error("Error logging in:", error);
+    res.status(500).json({ success: false, message: "Internal server error" });
+  }
+};
+
+// API for Admin Logout
+const adminLogout = async (req, res) => {
+  try {
+    const adminId = req.adminId; // Use the adminId attached by adminAuth
+
+    // Find the latest workLog entry without a logoutTime
+    const latestWorkLog = await prisma.workLog.findFirst({
+      where: {
+        employeeId: adminId, // Ensure employeeId is an integer
+        logoutTime: null,
+      },
+      orderBy: {
+        loginTime: "desc",
+      },
+    });
+
+    if (!latestWorkLog) {
+      return res.json({
+        success: false,
+        message: "No active session found for this admin",
+      });
+    }
+
+    // Update the workLog entry with the current logout time
+    await prisma.workLog.update({
+      where: { id: latestWorkLog.id },
+      data: {
+        logoutTime: new Date(), // Record current logout time
+      },
+    });
+
+    res.json({ success: true, message: "Logout successful" });
+  } catch (error) {
+    console.error("Error logging out:", error);
     res.status(500).json({ success: false, message: "Internal server error" });
   }
 };
@@ -681,6 +727,7 @@ export {
   addEmployee,
   adminDashboard,
   adminLogin,
+  adminLogout,
   allEmployees,
   employee_Profile,
   updateEmployee,

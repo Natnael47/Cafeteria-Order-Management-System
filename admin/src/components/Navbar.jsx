@@ -33,12 +33,38 @@ const Navbar = () => {
         }
     };
 
-    const logout = () => {
-        navigate('/');
-        setToken('');
-        localStorage.removeItem('token');
-        localStorage.removeItem('currentView');
+    const logout = async () => {
+        try {
+            // Send a POST request to the logout endpoint with the token in the headers
+            const response = await axios.post(
+                `${backendUrl}/api/admin/logout`,
+                {}, // Empty body as the token is passed in headers
+                {
+                    headers: {
+                        token
+                    },
+                }
+            );
+
+            // Check if the logout was successful
+            if (response.data.success) {
+                // Navigate to the home page and clear token-related storage
+                navigate('/');
+                setToken('');
+                localStorage.removeItem('token');
+                localStorage.removeItem('currentView');
+                toast.success('Logout successful');
+            } else {
+                // Show error message if the response indicates failure
+                toast.error(response.data.message);
+            }
+        } catch (error) {
+            // Handle any unexpected errors
+            console.error('Error logging out:', error);
+            toast.error('Something went wrong. Please try again.');
+        }
     };
+
 
     const getFirstLetter = (name) => name && name[0].toUpperCase();
 

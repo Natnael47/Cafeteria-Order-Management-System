@@ -66,13 +66,21 @@ export const login_InventoryManager = (req, res) =>
 
 // Employee Logout Function
 export const logoutEmployee = async (req, res) => {
-  const { empId } = req.body;
   try {
-    // Find the latest workLog entry without a logoutTime for the given employee
+    const empId = parseInt(req.body.empId, 10);
+
+    if (!empId) {
+      return res.status(400).json({
+        success: false,
+        message: "Employee ID is required for logout",
+      });
+    }
+
+    // Find the latest workLog entry without a logoutTime
     const latestWorkLog = await prisma.workLog.findFirst({
       where: {
-        employeeId: parseInt(empId),
-        logoutTime: null, // Ensure we only target the ongoing login session
+        employeeId: empId,
+        logoutTime: null,
       },
       orderBy: {
         loginTime: "desc",
@@ -80,23 +88,43 @@ export const logoutEmployee = async (req, res) => {
     });
 
     if (!latestWorkLog) {
-      return res.json({
+      return res.status(404).json({
         success: false,
         message: "No active session found for this employee",
       });
     }
-    // Update the workLog entry with the current logout time
-    await prisma.workLog.update({
-      where: { id: latestWorkLog.id },
-      data: {
-        logoutTime: new Date(), // Record current logout time
-      },
-    });
 
-    res.json({ success: true, message: "Logout successful" });
+    console.log("Latest workLog found:", latestWorkLog);
+
+    // Update the workLog entry with the current logout time
+    try {
+      const updatedLog = await prisma.workLog.update({
+        where: { id: latestWorkLog.id },
+        data: {
+          logoutTime: new Date(),
+        },
+      });
+
+      console.log("Updated workLog:", updatedLog);
+      return res
+        .status(200)
+        .json({ success: true, message: "Logout successful" });
+    } catch (updateError) {
+      console.error("Error during update operation:", updateError);
+      return res.status(500).json({
+        success: false,
+        message: "Failed to update logout time",
+        error: updateError.message,
+      });
+    }
   } catch (error) {
     console.error("Error logging out:", error);
-    res.status(500).json({ success: false, message: "Internal server error" });
+
+    return res.status(500).json({
+      success: false,
+      message: "Internal server error",
+      error: error.message,
+    });
   }
 };
 

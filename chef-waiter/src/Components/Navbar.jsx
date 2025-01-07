@@ -19,29 +19,32 @@ const Navbar = () => {
     const logout = async (token, setToken, tokenType) => {
         try {
             const headers = {};
-            if (tokenType === 'cToken') {
+            if (tokenType === "cToken") {
                 headers.ctoken = token;
-            } else if (tokenType === 'iToken') {
+            } else if (tokenType === "iToken") {
                 headers.itoken = token;
             }
 
             const response = await axios.post(
                 `${backendUrl}/api/employee/logout-employee`,
                 {},
-                { headers: headers, }
+                { headers: headers }
             );
 
             if (response.data.success) {
-                setToken('');
+                console.log(response.data, "Successfully logged out");
+                setToken(""); // Reset token in context
                 localStorage.removeItem(tokenType);
-                localStorage.removeItem('sortAttribute');
-                localStorage.removeItem('sortOrder');
+                localStorage.removeItem("sortAttribute");
+                localStorage.removeItem("sortOrder");
+                localStorage.removeItem("currentView");
                 navigate('/');
             } else {
-                toast.error(response.data.message);
+                toast.error(response.data.message || "Unknown error occurred");
             }
         } catch (error) {
-            toast.error('Error logging out');
+            console.error("Logout API error:", error);
+            toast.error(error.response?.data?.message || "Error logging out");
         }
     };
 
@@ -114,13 +117,28 @@ const Navbar = () => {
                                 <User className="text-green-600 w-6 h-6" />
                                 <span className="text-gray-800 font-medium">Profile</span>
                             </div>
-                            <div
-                                onClick={() => logout(cToken || iToken, cToken ? setCToken : setIToken, cToken ? 'cToken' : 'iToken')}
-                                className="flex items-center gap-3 cursor-pointer hover:bg-red-100 p-3 rounded-lg transition-all"
-                            >
-                                <LogOut className="text-red-600 w-6 h-6" />
-                                <span className="text-red-600 font-medium">Logout</span>
-                            </div>
+
+                            {/* Logout Button for cToken (Chef) */}
+                            {cToken && (
+                                <div
+                                    onClick={() => logout(cToken, setCToken, 'cToken')}
+                                    className="flex items-center gap-3 cursor-pointer hover:bg-red-100 p-3 rounded-lg transition-all"
+                                >
+                                    <LogOut className="text-red-600 w-6 h-6" />
+                                    <span className="text-red-600 font-medium">Logout</span>
+                                </div>
+                            )}
+
+                            {/* Logout Button for iToken (Inventory) */}
+                            {iToken && (
+                                <div
+                                    onClick={() => logout(iToken, setIToken, 'iToken')}
+                                    className="flex items-center gap-3 cursor-pointer hover:bg-red-100 p-3 rounded-lg transition-all"
+                                >
+                                    <LogOut className="text-red-600 w-6 h-6" />
+                                    <span className="text-red-600 font-medium">Logout</span>
+                                </div>
+                            )}
                         </div>
                     </div>
                 )}
