@@ -93,7 +93,11 @@ const AddEmployee = () => {
             <div className='bg-white px-8 py-8 border rounded w-full max-w-5.3xl max-h-[88vh] overflow-scroll'>
                 <div className='flex items-center gap-4 mb-8 text-gray-500'>
                     <label htmlFor="emp-img">
-                        <img className='w-16 border-2 border-blue-300 bg-gray-100 rounded-full cursor-pointer' src={empImg ? URL.createObjectURL(empImg) : assets.upload_area2} alt="" />
+                        <img
+                            className='w-20 h-20 border-2 border-blue-300 bg-gray-100 rounded-full cursor-pointer object-cover'
+                            src={empImg ? URL.createObjectURL(empImg) : assets.upload_area2}
+                            alt="Employee"
+                        />
                     </label>
                     <input onChange={(e) => setEmpImg(e.target.files[0])} type="file" id='emp-img' hidden />
                     <p>Upload Employee <br /> Picture</p>
