@@ -8,7 +8,7 @@ const prisma = new PrismaClient();
 const stripe = new Stripe(process.env.STRIPE_SECRET_KEY);
 
 // Global Variables
-const currency = "USD";
+const currency = "ETB";
 const delivery_charge = 10;
 
 // Function to display all orders with "Order Placed" status for chef
@@ -314,7 +314,7 @@ const PlaceOrderStripe = async (req, res) => {
         address,
         amount,
         paymentMethod: "stripe",
-        isPaid: false,
+        isPaid: true,
         date: new Date(),
         status: "Order Placed", // Set initial status to "Order Placed"
       },

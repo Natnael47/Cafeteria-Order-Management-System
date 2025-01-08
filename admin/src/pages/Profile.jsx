@@ -64,34 +64,33 @@ const Profile = () => {
 
     const handleUpdateProfile = async () => {
         const formData = new FormData();
-        formData.append('firstName', updatedData.firstName);
-        formData.append('lastName', updatedData.lastName);
-        formData.append('email', updatedData.email);
-        formData.append('phone', updatedData.phone);
-        formData.append('address[line1]', updatedData.address.line1);
-        formData.append('address[line2]', updatedData.address.line2);
+        formData.append('updatedData[firstName]', updatedData.firstName);
+        formData.append('updatedData[lastName]', updatedData.lastName);
+        formData.append('updatedData[email]', updatedData.email);
+        formData.append('updatedData[phone]', updatedData.phone);
+        formData.append('updatedData[address][line1]', updatedData.address.line1);
+        formData.append('updatedData[address][line2]', updatedData.address.line2);
         if (updatedData.image) {
-            formData.append('image', updatedData.image);
-        }
-
-        // Log form data for debugging
-        for (let [key, value] of formData.entries()) {
-            console.log(`${key}:`, value);
+            formData.append('updatedData[image]', updatedData.image);
         }
 
         try {
-            const response = await axios.post(`${backendUrl}/api/admin/update-admin-profile`, formData, {
-                headers: {
-                    'Content-Type': 'multipart/form-data',
-                    token,
-                },
-            });
+            const response = await axios.post(
+                `${backendUrl}/api/admin/update-admin-profile`,
+                formData,
+                {
+                    headers: {
+                        'Content-Type': 'multipart/form-data',
+                        token,
+                    },
+                }
+            );
 
             if (response.data.success) {
                 alert('Profile updated successfully!');
                 setUserData(response.data.updatedProfile);
                 setEditMode(false);
-                loadUserProfileData(); // Ensure latest data is fetched
+                loadUserProfileData(); // Refresh data to ensure consistency
             } else {
                 alert(response.data.message || 'Failed to update profile.');
             }
@@ -100,7 +99,6 @@ const Profile = () => {
             alert('An error occurred while updating the profile.');
         }
     };
-
 
     return (
         <div className="m-5 w-full max-w-7xl mx-auto">
@@ -120,7 +118,11 @@ const Profile = () => {
                     <div className="flex items-center gap-6 mb-6">
                         <img
                             className="w-40 h-40 rounded-full border-4 border-blue-500 object-cover"
-                            src={updatedData.image ? URL.createObjectURL(updatedData.image) : `${backendUrl}/empIMG/${userData.image}`}
+                            src={
+                                updatedData.image
+                                    ? URL.createObjectURL(updatedData.image)
+                                    : `${backendUrl}/empIMG/${userData.image}`
+                            }
                             alt={`${updatedData.firstName}'s profile`}
                         />
                         <div>

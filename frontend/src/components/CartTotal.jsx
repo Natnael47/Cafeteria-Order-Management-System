@@ -15,21 +15,21 @@ const CartTotal = () => {
                 {/* SubTotal */}
                 <div className="flex justify-between text-gray-600">
                     <p className='text-[16px]'>Subtotal</p>
-                    <p className='text-[16px]'>${getTotalCartAmount()}</p>
+                    <p className='text-[16px]'>{getTotalCartAmount()} ETB</p>
                 </div>
                 <hr className='my-2' />
 
                 {/* Delivery Fee */}
                 <div className="flex justify-between text-gray-600">
                     <p className='text-[16px]'>Delivery Fee</p>
-                    <p className='text-[16px]'>${getTotalCartAmount() === 0 ? 0 : 2}</p>
+                    <p className='text-[16px]'>{getTotalCartAmount() === 0 ? 0 : 2} ETB</p>
                 </div>
                 <hr className='my-2' />
 
                 {/* Total */}
                 <div className="flex justify-between font-bold">
                     <b className='text-[16px]'>Total</b>
-                    <b className='text-[16px]'>${getTotalCartAmount() === 0 ? 0 : getTotalCartAmount() + 2}</b>
+                    <b className='text-[16px]'>{getTotalCartAmount() === 0 ? 0 : getTotalCartAmount() + 2} ETB</b>
                 </div>
             </div>
         </div>

@@ -614,6 +614,7 @@ export const change_Admin_Password = async (req, res) => {
 export const update_Admin_Profile = async (req, res) => {
   try {
     const { updatedData } = req.body;
+    console.log(updatedData);
 
     // Ensure that the updated data is provided
     if (!updatedData) {
