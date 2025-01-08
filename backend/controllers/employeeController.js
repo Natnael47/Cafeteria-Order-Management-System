@@ -191,6 +191,7 @@ export const update_Employee_Profile = async (req, res) => {
       where: { id: empId },
       data: updatedData,
     });
+    //console.log(updatedData);
 
     res.json({
       success: true,

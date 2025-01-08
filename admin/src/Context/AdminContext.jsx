@@ -55,6 +55,45 @@ const AdminContextProvider = (props) => {
         }
     };
 
+    const loadUserProfileData = async () => {
+        try {
+            const { data } = await axios.get(`${backendUrl}/api/admin/get-profile`, { headers: { token } });
+            if (data.success) {
+                setUserData({
+                    firstName: data.admin.firstName,
+                    lastName: data.admin.lastName,
+                    email: data.admin.email,
+                    phone: data.admin.phone,
+                    position: data.admin.position,
+                    image: data.admin.image,
+                    about: data.admin.about,
+                    address: {
+                        line1: data.admin.address.line1,
+                        line2: data.admin.address.line2
+                    },
+                    date: data.admin.date
+                });
+            } else {
+                toast.error(data.message);
+            }
+        } catch (error) {
+            console.error("Error loading profile data:", error);
+            toast.error(error.message);
+        }
+    };
+
+    const [userData, setUserData] = useState({
+        firstName: '',
+        lastName: '',
+        email: '',
+        phone: '',
+        position: '',
+        image: null,
+        about: '',
+        address: { line1: '', line2: '' },
+        date: ''
+    });
+
     const getEmployeeData = useCallback(
         async (empId) => {
             try {
@@ -150,7 +189,8 @@ const AdminContextProvider = (props) => {
         dashboardData,
         getDashData,
         getProfile,
-        profile, setProfile
+        profile, setProfile,
+        loadUserProfileData, setUserData, userData
     };
 
     return (
