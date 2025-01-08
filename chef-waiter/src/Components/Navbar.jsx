@@ -1,6 +1,6 @@
 import axios from 'axios';
 import { ChevronDown, LogOut, User } from 'lucide-react';
-import React, { useContext, useEffect, useState } from 'react';
+import React, { useContext, useEffect } from 'react';
 import { toast } from 'react-toastify';
 import { assets } from '../../../admin/src/assets/assets';
 import { backendUrl } from '../App';
@@ -8,7 +8,6 @@ import { AppContext } from '../Context/AppContext';
 
 const Navbar = () => {
     const { cToken, iToken, profileData, get_Profile_Data, setCToken, setIToken, navigate } = useContext(AppContext);
-    const [showDropdown, setShowDropdown] = useState(false);
 
     useEffect(() => {
         if (cToken || iToken) {
@@ -65,10 +64,9 @@ const Navbar = () => {
             </div>
 
             {/* Right Section */}
-            <div className="relative flex items-center gap-2">
+            <div className="relative flex items-center gap-2 group">
                 {profileData ? (
                     <div
-                        onClick={() => setShowDropdown(!showDropdown)}
                         className="relative w-12 h-12 flex items-center justify-center rounded-full bg-gray-800 text-white font-bold text-lg cursor-pointer"
                     >
                         <div className='bg-black rounded-full flex items-center gap-2 px-2 py-1 shadow-md hover:shadow-lg transition-all duration-300 cursor-pointer'>
@@ -90,58 +88,57 @@ const Navbar = () => {
                     <span>Loading...</span>
                 )}
 
-                {showDropdown && (
-                    <div className="absolute right-0 top-12 z-30 bg-white rounded-lg shadow-2xl border border-gray-200 p-5 w-64 flex flex-col gap-4">
-                        <div className="flex items-center gap-4 border-b pb-4">
-                            {profileData.image ? (
-                                <img
-                                    src={`${backendUrl}/empIMG/${profileData.image}`}
-                                    alt="Employee"
-                                    className="w-14 h-14 object-cover rounded-full border-2 border-green-600"
-                                />
-                            ) : (
-                                <div className="w-14 h-14 bg-green-100 border-2 border-green-600 text-green-600 text-2xl font-bold rounded-full flex items-center justify-center shadow-sm">
-                                    {getFirstLetter(profileData.firstName)}
-                                </div>
-                            )}
-                            <div>
-                                <p className="text-lg font-semibold text-gray-800">{profileData.firstName} {profileData.lastName}</p>
-                                <p className="text-sm text-gray-500">{profileData.email}</p>
+                {/* Dropdown menu - shows on hover */}
+                <div className="absolute right-0 top-12 z-30 bg-white rounded-lg shadow-2xl border border-gray-200 p-5 w-64 flex flex-col gap-4 group-hover:block hidden">
+                    <div className="flex items-center gap-4 border-b pb-4">
+                        {profileData.image ? (
+                            <img
+                                src={`${backendUrl}/empIMG/${profileData.image}`}
+                                alt="Employee"
+                                className="w-14 h-14 object-cover rounded-full border-2 border-green-600"
+                            />
+                        ) : (
+                            <div className="w-14 h-14 bg-green-100 border-2 border-green-600 text-green-600 text-2xl font-bold rounded-full flex items-center justify-center shadow-sm">
+                                {getFirstLetter(profileData.firstName)}
                             </div>
-                        </div>
-                        <div className="flex flex-col gap-1">
-                            <div
-                                onClick={() => navigate('/profile')}
-                                className="flex items-center gap-3 cursor-pointer hover:bg-green-100 p-3 rounded-lg transition-all"
-                            >
-                                <User className="text-green-600 w-6 h-6" />
-                                <span className="text-gray-800 font-medium">Profile</span>
-                            </div>
-
-                            {/* Logout Button for cToken (Chef) */}
-                            {cToken && (
-                                <div
-                                    onClick={() => logout(cToken, setCToken, 'cToken')}
-                                    className="flex items-center gap-3 cursor-pointer hover:bg-red-100 p-3 rounded-lg transition-all"
-                                >
-                                    <LogOut className="text-red-600 w-6 h-6" />
-                                    <span className="text-red-600 font-medium">Logout</span>
-                                </div>
-                            )}
-
-                            {/* Logout Button for iToken (Inventory) */}
-                            {iToken && (
-                                <div
-                                    onClick={() => logout(iToken, setIToken, 'iToken')}
-                                    className="flex items-center gap-3 cursor-pointer hover:bg-red-100 p-3 rounded-lg transition-all"
-                                >
-                                    <LogOut className="text-red-600 w-6 h-6" />
-                                    <span className="text-red-600 font-medium">Logout</span>
-                                </div>
-                            )}
+                        )}
+                        <div>
+                            <p className="text-lg font-semibold text-gray-800">{profileData.firstName} {profileData.lastName}</p>
+                            <p className="text-sm text-gray-500">{profileData.email}</p>
                         </div>
                     </div>
-                )}
+                    <div className="flex flex-col gap-1">
+                        <div
+                            onClick={() => navigate('/profile')}
+                            className="flex items-center gap-3 cursor-pointer hover:bg-green-100 p-3 rounded-lg transition-all"
+                        >
+                            <User className="text-green-600 w-6 h-6" />
+                            <span className="text-gray-800 font-medium">Profile</span>
+                        </div>
+
+                        {/* Logout Button for cToken (Chef) */}
+                        {cToken && (
+                            <div
+                                onClick={() => logout(cToken, setCToken, 'cToken')}
+                                className="flex items-center gap-3 cursor-pointer hover:bg-red-100 p-3 rounded-lg transition-all"
+                            >
+                                <LogOut className="text-red-600 w-6 h-6" />
+                                <span className="text-red-600 font-medium">Logout</span>
+                            </div>
+                        )}
+
+                        {/* Logout Button for iToken (Inventory) */}
+                        {iToken && (
+                            <div
+                                onClick={() => logout(iToken, setIToken, 'iToken')}
+                                className="flex items-center gap-3 cursor-pointer hover:bg-red-100 p-3 rounded-lg transition-all"
+                            >
+                                <LogOut className="text-red-600 w-6 h-6" />
+                                <span className="text-red-600 font-medium">Logout</span>
+                            </div>
+                        )}
+                    </div>
+                </div>
             </div>
         </div>
     );
