@@ -613,18 +613,7 @@ export const change_Admin_Password = async (req, res) => {
 
 export const update_Admin_Profile = async (req, res) => {
   try {
-    const { updatedData } = req.body;
-    console.log(updatedData);
-
-    // Ensure that the updated data is provided
-    if (!updatedData) {
-      return res.status(400).json({
-        success: false,
-        message: "Updated data is required",
-      });
-    }
-
-    // Fetch the admin ID from the decoded token (this assumes you're using JWT for authentication)
+    const { firstName, lastName, email, phone, address } = req.body;
     const adminId = req.adminId;
 
     if (!adminId) {
@@ -634,7 +623,6 @@ export const update_Admin_Profile = async (req, res) => {
       });
     }
 
-    // Find the admin by ID (you can change the model if needed)
     const admin = await prisma.employee.findUnique({
       where: { id: adminId },
     });
@@ -646,21 +634,23 @@ export const update_Admin_Profile = async (req, res) => {
       });
     }
 
-    // Validate and update the fields
-    const { email, phone, address, firstName, lastName, image } = updatedData;
-
-    // Validate email format
-    if (email && !validator.isEmail(email)) {
-      return res.status(400).json({
-        success: false,
-        message: "Invalid email format",
-      });
+    // Parse address if provided
+    let parsedAddress = admin.address;
+    if (address) {
+      try {
+        parsedAddress = JSON.parse(address);
+      } catch (err) {
+        return res.status(400).json({
+          success: false,
+          message: "Invalid address format",
+        });
+      }
     }
 
-    // Format phone number if provided
-    let formattedPhone = admin.phone; // Default to the existing phone
+    // Validate phone number
+    let formattedPhone = admin.phone;
     if (phone) {
-      const phoneNumber = parsePhoneNumberFromString(phone, "ET"); // Replace "ET" with your default country code
+      const phoneNumber = parsePhoneNumberFromString(phone, "ET");
       if (!phoneNumber || !phoneNumber.isValid()) {
         return res.status(400).json({
           success: false,
@@ -670,50 +660,38 @@ export const update_Admin_Profile = async (req, res) => {
       formattedPhone = phoneNumber.format("E.164");
     }
 
-    // Handle image update if a new image is provided
-    let imageFilename = admin.image; // Default to existing image
+    // Handle image upload
+    let imageFilename = admin.image;
     if (req.file) {
-      try {
-        // If a new image is uploaded, delete the old one
-        if (admin.image) {
-          fs.unlink(`uploadsEmp/${admin.image}`, (err) => {
-            if (err) {
-              console.error("Error deleting old image:", err);
-            } else {
-              console.log("Old image deleted successfully");
-            }
-          });
-        }
-        imageFilename = req.file.filename; // Use the new image filename
-      } catch (fsErr) {
-        console.error("Error handling file operations:", fsErr);
+      // Delete old image
+      if (admin.image) {
+        fs.unlink(`uploadsEmp/${admin.image}`, (err) => {
+          if (err) console.error("Error deleting old image:", err);
+        });
       }
+      imageFilename = req.file.filename;
     }
 
-    // Prepare the updated data object
-    const updatedAdminData = {
-      firstName: firstName || admin.firstName,
-      lastName: lastName || admin.lastName,
-      email: email || admin.email,
-      phone: formattedPhone,
-      address: address || admin.address,
-      image: imageFilename,
-    };
-
-    // Update the admin's profile in the database
+    // Update the admin profile
     const updatedProfile = await prisma.employee.update({
       where: { id: adminId },
-      data: updatedAdminData,
+      data: {
+        firstName: firstName || admin.firstName,
+        lastName: lastName || admin.lastName,
+        email: email || admin.email,
+        phone: formattedPhone,
+        address: parsedAddress,
+        image: imageFilename,
+      },
     });
 
-    // Respond with the updated profile data
     res.json({
       success: true,
       message: "Profile updated successfully",
       updatedProfile,
     });
   } catch (error) {
-    console.log("Error updating profile:", error);
+    console.error("Error updating profile:", error);
     res.status(500).json({
       success: false,
       message: "Internal server error",

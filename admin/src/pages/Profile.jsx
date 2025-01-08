@@ -1,8 +1,9 @@
 import axios from "axios";
-import { ArrowLeft } from "lucide-react";
+import { Eye, EyeOff } from "lucide-react";
 import React, { useContext, useEffect, useState } from "react";
 import Modal from "react-modal";
 import { useNavigate } from "react-router-dom";
+import { toast } from "react-toastify";
 import { backendUrl } from "../App";
 import { AdminContext } from "../context/AdminContext";
 
@@ -12,6 +13,10 @@ const Profile = () => {
     const navigate = useNavigate();
     const { token, userData, setUserData, loadUserProfileData } = useContext(AdminContext);
     const [isModalOpen, setIsModalOpen] = useState(false);
+    const [isPasswordModalOpen, setIsPasswordModalOpen] = useState(false);
+    const [showOldPassword, setShowOldPassword] = useState(false);
+    const [showNewPassword, setShowNewPassword] = useState(false);
+    const [showConfirmPassword, setShowConfirmPassword] = useState(false);
 
     // State for editable form data
     const [formData, setFormData] = useState({
@@ -73,14 +78,13 @@ const Profile = () => {
 
     const handleUpdateProfile = async () => {
         const formPayload = new FormData();
-        formPayload.append("updatedData[firstName]", formData.firstName);
-        formPayload.append("updatedData[lastName]", formData.lastName);
-        formPayload.append("updatedData[email]", formData.email);
-        formPayload.append("updatedData[phone]", formData.phone);
-        formPayload.append("updatedData[address][line1]", formData.address.line1);
-        formPayload.append("updatedData[address][line2]", formData.address.line2);
+        formPayload.append("firstName", formData.firstName);
+        formPayload.append("lastName", formData.lastName);
+        formPayload.append("email", formData.email);
+        formPayload.append("phone", formData.phone);
+        formPayload.append("address", JSON.stringify(formData.address)); // Pass address as a JSON string
         if (formData.image) {
-            formPayload.append("updatedData[image]", formData.image);
+            formPayload.append("image", formData.image); // Ensure the field is named 'image'
         }
 
         try {
@@ -96,12 +100,12 @@ const Profile = () => {
             );
 
             if (response.data.success) {
-                alert("Profile updated successfully!");
+                toast.success("Profile updated successfully!");
                 setUserData(response.data.updatedProfile);
                 setIsModalOpen(false);
                 loadUserProfileData(); // Refresh data to ensure consistency
             } else {
-                alert(response.data.message || "Failed to update profile.");
+                toast.error(response.data.message || "Failed to update profile.");
             }
         } catch (error) {
             console.error("Error updating profile:", error);
@@ -109,30 +113,67 @@ const Profile = () => {
         }
     };
 
+    const [passwordData, setPasswordData] = useState({
+        oldPassword: "",
+        newPassword: "",
+        confirmPassword: "",
+    });
+
+    const handlePasswordChange = (e) => {
+        const { name, value } = e.target;
+        setPasswordData((prev) => ({
+            ...prev,
+            [name]: value,
+        }));
+    };
+
+
+    const handleChangePassword = async () => {
+        if (passwordData.newPassword !== passwordData.confirmPassword) {
+            toast.error("New password and confirm password do not match.");
+            return;
+        }
+
+        try {
+            const response = await axios.post(
+                `${backendUrl}/api/admin/change-password`,
+                {
+                    oldPassword: passwordData.oldPassword,
+                    newPassword: passwordData.newPassword,
+                },
+                {
+                    headers: { token },
+                }
+            );
+
+            if (response.data.success) {
+                toast.success("Password updated successfully!");
+                setIsPasswordModalOpen(false);
+                setPasswordData({ oldPassword: "", newPassword: "", confirmPassword: "" });
+            } else {
+                toast.error(response.data.message || "Failed to change password.");
+            }
+        } catch (error) {
+            console.error("Error changing password:", error);
+            toast.error("An error occurred while changing the password.");
+        }
+    };
+
     return (
-        <div className="m-5 w-full max-w-7xl mx-auto">
+        <div className="m-5 w-full max-w-6xl">
+            {/* Header Section */}
             <div className="flex flex-row items-center justify-between mb-8">
                 <h1 className="text-4xl font-extrabold text-gray-800">Admin Profile</h1>
-                <button
-                    onClick={() => navigate(-1)}
-                    className="flex items-center gap-2 px-6 py-2 bg-blue-600 text-white font-medium rounded-lg shadow-lg hover:bg-blue-700 transition duration-300"
-                >
-                    <ArrowLeft className="w-5 h-5" />
-                    Back
-                </button>
             </div>
 
             {userData ? (
-                <div className="bg-white shadow-xl px-8 py-8 border rounded-lg w-full">
+                <div className="bg-white shadow-xl px-8 py-5 border rounded-lg w-full">
+                    {/* Profile Info */}
                     <div className="flex items-center gap-6 mb-6">
                         <img
-                            className="w-40 h-40 rounded-full border-4 border-blue-500 object-cover"
-                            src={
-                                formData.image
-                                    ? URL.createObjectURL(formData.image)
-                                    : `${backendUrl}/empIMG/${userData.image}`
-                            }
-                            alt={`${formData.firstName}'s profile`}
+                            className="w-32 h-32 rounded-full border-4 border-blue-500 object-cover"
+                            src={`${backendUrl}/empIMG/${userData.image}`}
+                            alt={`${userData.firstName}'s profile`}
                         />
                         <div>
                             <h2 className="text-3xl font-bold text-gray-800">
@@ -142,6 +183,7 @@ const Profile = () => {
                         </div>
                     </div>
 
+                    {/* Contact Details */}
                     <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
                         <div>
                             <h3 className="font-semibold text-lg">Phone</h3>
@@ -155,12 +197,19 @@ const Profile = () => {
                         </div>
                     </div>
 
-                    <div className="mt-6">
+                    {/* Action Buttons */}
+                    <div className="mt-6 flex gap-4">
                         <button
                             onClick={openModal}
-                            className="px-6 py-2 bg-blue-600 text-white font-medium rounded-lg"
+                            className="px-6 py-2 bg-blue-600 text-white font-medium rounded-lg shadow-lg hover:bg-blue-700"
                         >
                             Edit Profile
+                        </button>
+                        <button
+                            onClick={() => setIsPasswordModalOpen(true)}
+                            className="px-6 py-2 bg-red-600 text-white font-medium rounded-lg shadow-lg hover:bg-red-700"
+                        >
+                            Change Password
                         </button>
                     </div>
                 </div>
@@ -168,87 +217,229 @@ const Profile = () => {
                 <p>Loading profile...</p>
             )}
 
+            {/* Edit Profile Modal */}
             <Modal
                 isOpen={isModalOpen}
                 onRequestClose={() => setIsModalOpen(false)}
-                className="bg-white rounded-lg shadow-lg max-w-lg mx-auto p-6 outline-none"
+                className="bg-white rounded-lg shadow-xl w-[800px] mx-auto p-8 outline-none"
+                overlayClassName="fixed inset-0 bg-black bg-opacity-60 flex items-center justify-center"
+            >
+                <h2 className="text-2xl font-bold mb-6">Edit Profile</h2>
+                <form className="space-y-6">
+                    <div className="flex items-center gap-4 mb-8 text-gray-500">
+                        <label htmlFor="profile-img">
+                            <img
+                                className="w-24 h-24 border-2 border-blue-300 bg-gray-100 rounded-full cursor-pointer object-cover"
+                                src={
+                                    formData.image
+                                        ? URL.createObjectURL(formData.image)
+                                        : `${backendUrl}/empIMG/${userData.image}`
+                                }
+                                alt="Current Profile"
+                            />
+                        </label>
+                        <input
+                            id="profile-img"
+                            type="file"
+                            onChange={handleImageChange}
+                            hidden
+                        />
+                        <p>Upload New Picture</p>
+                    </div>
+
+                    <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                        {/* First Name */}
+                        <div>
+                            <label className="block mb-2 text-sm font-medium text-gray-700">First Name</label>
+                            <input
+                                type="text"
+                                name="firstName"
+                                value={formData.firstName}
+                                onChange={handleInputChange}
+                                className="w-full border rounded px-3 py-2"
+                                placeholder="First Name"
+                            />
+                        </div>
+
+                        {/* Last Name */}
+                        <div>
+                            <label className="block mb-2 text-sm font-medium text-gray-700">Last Name</label>
+                            <input
+                                type="text"
+                                name="lastName"
+                                value={formData.lastName}
+                                onChange={handleInputChange}
+                                className="w-full border rounded px-3 py-2"
+                                placeholder="Last Name"
+                            />
+                        </div>
+
+                        {/* Email */}
+                        <div>
+                            <label className="block mb-2 text-sm font-medium text-gray-700">Email</label>
+                            <input
+                                type="email"
+                                name="email"
+                                value={formData.email}
+                                onChange={handleInputChange}
+                                className="w-full border rounded px-3 py-2"
+                                placeholder="Email"
+                            />
+                        </div>
+
+                        {/* Phone */}
+                        <div>
+                            <label className="block mb-2 text-sm font-medium text-gray-700">Phone</label>
+                            <input
+                                type="text"
+                                name="phone"
+                                value={formData.phone}
+                                onChange={handleInputChange}
+                                className="w-full border rounded px-3 py-2"
+                                placeholder="Phone"
+                            />
+                        </div>
+
+                        {/* Address Line 1 */}
+                        <div>
+                            <label className="block mb-2 text-sm font-medium text-gray-700">Address Line 1</label>
+                            <input
+                                type="text"
+                                name="line1"
+                                value={formData.address.line1}
+                                onChange={handleAddressChange}
+                                className="w-full border rounded px-3 py-2"
+                                placeholder="Address Line 1"
+                            />
+                        </div>
+
+                        {/* Address Line 2 */}
+                        <div>
+                            <label className="block mb-2 text-sm font-medium text-gray-700">Address Line 2</label>
+                            <input
+                                type="text"
+                                name="line2"
+                                value={formData.address.line2}
+                                onChange={handleAddressChange}
+                                className="w-full border rounded px-3 py-2"
+                                placeholder="Address Line 2"
+                            />
+                        </div>
+                    </div>
+
+                    <div className="flex justify-end gap-4">
+                        {/* Save Changes Button */}
+                        <button
+                            onClick={handleUpdateProfile}
+                            type="button"
+                            className="px-4 py-2 bg-green-600 text-white rounded-lg shadow hover:bg-green-700"
+                        >
+                            Save Changes
+                        </button>
+
+                        {/* Cancel Button */}
+                        <button
+                            onClick={() => setIsModalOpen(false)}
+                            type="button"
+                            className="px-4 py-2 bg-gray-600 text-white rounded-lg shadow hover:bg-gray-700"
+                        >
+                            Cancel
+                        </button>
+                    </div>
+                </form>
+            </Modal>
+
+            {/* Change Password Modal */}
+            <Modal
+                isOpen={isPasswordModalOpen}
+                onRequestClose={() => setIsPasswordModalOpen(false)}
+                className="bg-white rounded-lg shadow-xl w-[800px] mx-auto p-8 outline-none"
                 overlayClassName="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center"
             >
-                <h2 className="text-2xl font-bold mb-4">Edit Profile</h2>
-                <div className="space-y-4">
-                    <input
-                        type="text"
-                        name="firstName"
-                        value={formData.firstName}
-                        onChange={handleInputChange}
-                        placeholder="First Name"
-                        className="w-full border p-2 rounded"
-                    />
-                    <input
-                        type="text"
-                        name="lastName"
-                        value={formData.lastName}
-                        onChange={handleInputChange}
-                        placeholder="Last Name"
-                        className="w-full border p-2 rounded"
-                    />
-                    <input
-                        type="email"
-                        name="email"
-                        value={formData.email}
-                        onChange={handleInputChange}
-                        placeholder="Email"
-                        className="w-full border p-2 rounded"
-                    />
-                    <input
-                        type="text"
-                        name="phone"
-                        value={formData.phone}
-                        onChange={handleInputChange}
-                        placeholder="Phone"
-                        className="w-full border p-2 rounded"
-                    />
-                    <div>
+                <h2 className="text-3xl font-bold text-green-700 mb-6 text-center">Change Password</h2>
+                <div className="space-y-6">
+                    {/* Old Password */}
+                    <div className="flex flex-col relative">
+                        <label className="block mb-2 text-sm font-medium text-gray-700">Old Password</label>
                         <input
-                            type="text"
-                            name="line1"
-                            value={formData.address.line1}
-                            onChange={handleAddressChange}
-                            placeholder="Address Line 1"
-                            className="w-full border p-2 rounded"
+                            type={showOldPassword ? "text" : "password"} // Toggle input type
+                            className="w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500 shadow-sm"
+                            value={passwordData.oldPassword}
+                            onChange={(e) => setPasswordData({ ...passwordData, oldPassword: e.target.value })}
+                            placeholder="Enter your current password"
                         />
-                        <input
-                            type="text"
-                            name="line2"
-                            value={formData.address.line2}
-                            onChange={handleAddressChange}
-                            placeholder="Address Line 2"
-                            className="w-full border p-2 rounded mt-2"
-                        />
+                        <button
+                            type="button"
+                            className="absolute top-10 right-3 text-[#22C55E] hover:text-green-700"
+                            onClick={() => setShowOldPassword(!showOldPassword)}
+                        >
+                            {showOldPassword ? <Eye /> : <EyeOff />}
+                        </button>
                     </div>
-                    <input
-                        type="file"
-                        onChange={handleImageChange}
-                        className="w-full border p-2 rounded"
-                    />
+
+                    {/* New Password and Confirm Password */}
+                    <div className="grid grid-cols-2 gap-4">
+                        {/* New Password */}
+                        <div className="flex flex-col relative">
+                            <label className="block mb-2 text-sm font-medium text-gray-700">New Password</label>
+                            <input
+                                type={showNewPassword ? "text" : "password"} // Toggle input type
+                                className="w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500 shadow-sm"
+                                value={passwordData.newPassword}
+                                onChange={(e) => setPasswordData({ ...passwordData, newPassword: e.target.value })}
+                                placeholder="Enter a new password"
+                            />
+                            <button
+                                type="button"
+                                className="absolute top-10 right-3 text-[#22C55E] hover:text-green-700"
+                                onClick={() => setShowNewPassword(!showNewPassword)}
+                            >
+                                {showNewPassword ? <Eye /> : <EyeOff />}
+                            </button>
+                        </div>
+
+                        {/* Confirm Password */}
+                        <div className="flex flex-col relative">
+                            <label className="block mb-2 text-sm font-medium text-gray-700">Confirm Password</label>
+                            <input
+                                type={showConfirmPassword ? "text" : "password"} // Toggle input type
+                                className="w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500 shadow-sm"
+                                value={passwordData.confirmPassword}
+                                onChange={(e) => setPasswordData({ ...passwordData, confirmPassword: e.target.value })}
+                                placeholder="Confirm your new password"
+                            />
+                            <button
+                                type="button"
+                                className="absolute top-10 right-3 text-[#22C55E] hover:text-green-700"
+                                onClick={() => setShowConfirmPassword(!showConfirmPassword)}
+                            >
+                                {showConfirmPassword ? <Eye /> : <EyeOff />}
+                            </button>
+                        </div>
+                    </div>
                 </div>
-                <div className="mt-6 flex justify-end gap-4">
+
+                {/* Buttons Section */}
+                <div className="flex justify-between gap-4 mt-8">
                     <button
-                        onClick={handleUpdateProfile}
-                        className="px-4 py-2 bg-green-600 text-white rounded-lg"
+                        onClick={handleChangePassword}
+                        className="w-1/2 bg-green-600 text-white py-3 px-6 rounded-lg text-lg font-semibold shadow-md hover:bg-green-700 transition duration-200 focus:outline-none focus:ring-2 focus:ring-green-500"
                     >
-                        Save Changes
+                        Change Password
                     </button>
                     <button
-                        onClick={() => setIsModalOpen(false)}
-                        className="px-4 py-2 bg-gray-600 text-white rounded-lg"
+                        onClick={() => setIsPasswordModalOpen(false)}
+                        className="w-1/2 bg-gray-200 text-gray-700 py-3 px-6 rounded-lg text-lg font-semibold shadow-md hover:bg-gray-300 transition duration-200 focus:outline-none focus:ring-2 focus:ring-gray-400"
                     >
                         Cancel
                     </button>
                 </div>
             </Modal>
+
         </div>
     );
+
+
 };
 
 export default Profile;

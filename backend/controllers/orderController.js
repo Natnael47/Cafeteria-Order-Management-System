@@ -1,4 +1,5 @@
 import { PrismaClient } from "@prisma/client";
+import { Chapa } from "chapa-nodejs";
 import Stripe from "stripe";
 
 // Prisma Client initialization
@@ -6,6 +7,17 @@ const prisma = new PrismaClient();
 
 // Stripe gateway initialization
 const stripe = new Stripe(process.env.STRIPE_SECRET_KEY);
+const chapa = new Chapa(process.env.CHAPA_SECRET_KEY);
+
+// const tx_ref = await chapa.genTxRef(); // result: TX-JHBUVLM7HYMSWDA
+
+// Or with options
+
+const tx_ref = await chapa.genTxRef({
+  removePrefix: false, // defaults to `false`
+  prefix: "TX", // defaults to `TX`
+  size: 20, // defaults to `15`
+});
 
 // Global Variables
 const currency = "ETB";
