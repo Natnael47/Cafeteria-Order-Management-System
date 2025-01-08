@@ -89,7 +89,7 @@ const Navbar = () => {
                 )}
 
                 {/* Dropdown menu - shows on hover */}
-                <div className="absolute right-0 top-12 z-30 bg-white rounded-lg shadow-2xl border border-gray-200 p-5 w-64 flex flex-col gap-4 group-hover:block hidden">
+                <div className="absolute right-0 top-12 z-30 bg-white rounded-lg shadow-2xl border border-gray-200 p-5 w-64 flex-col gap-4 group-hover:block hidden">
                     <div className="flex items-center gap-4 border-b pb-4">
                         {profileData.image ? (
                             <img

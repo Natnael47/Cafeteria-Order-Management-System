@@ -335,7 +335,7 @@ const Inventory = () => {
                                                     : "bg-green-100 text-green-700"
                                                     }`}
                                             >
-                                                {item.status}
+                                                {item.status} %
                                             </span>
                                         </p>
                                     </div>
