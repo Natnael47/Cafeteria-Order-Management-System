@@ -150,160 +150,128 @@ const MyOrders = () => {
         }));
     };
 
-
-
     return (
-        <div className='border-t pt-16'>
-            <div className='text-2xl'>
-                <Title text1='MY' text2='ORDERS' />
+        <div className="border-t pt-16">
+            <div className="text-2xl">
+                <Title text1="MY" text2="ORDERS" />
                 {/* Tabs */}
                 <div className="flex items-center space-x-4 mb-6">
-                    <button
-                        className={`px-4 py-2 rounded ${currentTab === "all" ? "bg-green-500 text-white" : "bg-gray-200 text-gray-700"} hover:bg-green-500 hover:text-white`}
-                        onClick={() => setCurrentTab("all")}
-                    >
-                        All
-                    </button>
-                    <button
-                        className={`relative px-4 py-2 rounded ${currentTab === "preparing" ? "bg-green-500 text-white" : "bg-gray-200 text-gray-700"} hover:bg-green-500 hover:text-white`}
-                        onClick={() => setCurrentTab("preparing")}
-                    >
-                        Preparing
-                        {!loading && orders.some(order => order.status.toLowerCase() === "preparing" && order.notificationDot) && (
-                            <span className="absolute top-0 right-0 w-2 h-2 rounded-full bg-red-600"></span>
-                        )}
-                    </button>
-                    <button
-                        className={`relative px-4 py-2 rounded ${currentTab === "complete" ? "bg-green-500 text-white" : "bg-gray-200 text-gray-700"} hover:bg-green-500 hover:text-white`}
-                        onClick={() => setCurrentTab("complete")}
-                    >
-                        Complete
-                        {!loading && orders.some(order => order.status.toLowerCase() === "complete" && order.notificationDot) && (
-                            <span className="absolute top-0 right-0 w-2 h-2 rounded-full bg-red-600"></span>
-                        )}
-                    </button>
-
-
-                    <button
-                        className={`px-4 py-2 rounded ${currentTab === "canceled" ? "bg-green-500 text-white" : "bg-gray-200 text-gray-700"} hover:bg-green-500 hover:text-white`}
-                        onClick={() => setCurrentTab("canceled")}
-                    >
-                        Canceled
-                    </button>
+                    {["all", "preparing", "complete", "canceled"].map((tab) => (
+                        <button
+                            key={tab}
+                            className={`px-4 py-2 rounded ${currentTab === tab ? "bg-green-500 text-white" : "bg-gray-200 text-gray-700"} hover:bg-green-500 hover:text-white`}
+                            onClick={() => setCurrentTab(tab)}
+                        >
+                            {tab.charAt(0).toUpperCase() + tab.slice(1)}
+                        </button>
+                    ))}
                 </div>
-
             </div>
 
             <div>
-                {getFilteredOrders().map((order, index) => (
-                    <div key={index} className="py-4 border-t border-b border-gray-600 text-black flex flex-col gap-4 hover:bg-green-50">
-                        <div className='flex flex-col md:flex-row md:items-center md:justify-between gap-4'>
-                            <div className='flex items-start gap-5 text-sm'>
-                                <img className='w-10 sm:w-16' src={assets.delivery_man_icon} alt='Parcel Icon' />
-                                <div>
-                                    <div className='sm:text-base font-medium'>
-                                        {order.items.slice(0, 2).map((item, idx) => (
-                                            <div className='py-0.5' key={idx}>
-                                                {item.quantity} {item.name}{item.quantity > 1 ? "'s" : ""}
+                {getFilteredOrders().map((order, index) => {
+                    // Parse order.items if it's a string
+                    const items = typeof order.items === "string" ? JSON.parse(order.items) : order.items;
+
+                    return (
+                        <div key={index} className="py-4 border-t border-b border-gray-600 text-black flex flex-col gap-4 hover:bg-green-50">
+                            <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
+                                <div className="flex items-start gap-5 text-sm">
+                                    <img className="w-10 sm:w-16" src={assets.delivery_man_icon} alt="Parcel Icon" />
+                                    <div>
+                                        <div className="sm:text-base font-medium">
+                                            {items.slice(0, 2).map((item, idx) => (
+                                                <div className="py-0.5" key={idx}>
+                                                    {item.quantity} {item.name}{item.quantity > 1 ? "'s" : ""}
+                                                </div>
+                                            ))}
+                                            {items.length > 2 && <span>and more...</span>}
+                                        </div>
+                                        <p className="mt-1">
+                                            Date: <span className="text-gray-800">{new Date(order.date).toDateString()}</span>
+                                        </p>
+                                        <p className="mt-1">
+                                            Payment: <span className="text-gray-800 font-semibold">{order.paymentMethod === "COD" ? "Cash on Delivery" : order.paymentMethod}</span>
+                                        </p>
+                                        <p className="mt-1">
+                                            Service Type: <span className="text-gray-800 font-semibold">{order.serviceType}</span>
+                                        </p>
+                                    </div>
+                                </div>
+
+                                <div className="md:w-[60%] flex justify-between">
+                                    <div className="flex items-center">
+                                        <p className="text-lg font-bold">${order.amount}.00</p>
+                                    </div>
+
+                                    <div className="flex items-center gap-2">
+                                        <span className="w-2 h-2 rounded-full bg-green-600"></span>
+                                        <p>
+                                            <b>{order.status}</b>
+                                        </p>
+                                    </div>
+
+                                    <div className="flex flex-col">
+                                        <button onClick={loadOrderData} className="border border-primary px-4 py-2 text-sm font-semibold rounded-sm hover:bg-green-200">
+                                            Track Order
+                                        </button>
+                                        {order.status === "Order Placed" && (
+                                            <button
+                                                onClick={() => openModal(order.id)}
+                                                className="border border-red-500 px-4 py-2 text-sm font-semibold rounded-sm mt-3 hover:bg-red-200"
+                                            >
+                                                Cancel Order
+                                            </button>
+                                        )}
+                                        <button onClick={() => toggleDetails(index)} className="border border-blue-500 px-4 py-2 text-sm font-semibold rounded-sm mt-3 hover:bg-blue-200">
+                                            {showDetails[index] ? "Hide" : "Show more"}
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+
+                            {showDetails[index] && (
+                                <div className="mt-2 pt-4 space-y-4">
+                                    {order.status.toLowerCase() === "preparing" && countdowns[order.id] !== undefined && (
+                                        <div className="text-center p-4 bg-green-300 text-lg font-bold">
+                                            {countdowns[order.id] >= 3600
+                                                ? `Time Remaining: ${Math.floor(countdowns[order.id] / 3600)}:${String(
+                                                    Math.floor((countdowns[order.id] % 3600) / 60)
+                                                ).padStart(2, "0")}:${String(countdowns[order.id] % 60).padStart(2, "0")}`
+                                                : `Time Remaining: ${Math.floor(countdowns[order.id] / 60)}:${String(countdowns[order.id] % 60).padStart(2, "0")}`}
+                                        </div>
+                                    )}
+                                    <h3 className="font-semibold">Order Details</h3>
+                                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                                        {items.map((item, idx) => (
+                                            <div key={idx} className="flex flex-col sm:flex-row gap-4 items-center">
+                                                <img className="w-20 rounded-[15px]" src={`${backendUrl}/images/${item.image || ""}`} alt={item.name} />
+                                                <div>
+                                                    <p className="font-semibold">
+                                                        {item.quantity} {item.name}{item.quantity > 1 ? "'s" : ""}
+                                                    </p>
+                                                    <p>Price: ${item.price * item.quantity}</p>
+                                                    <p className="font-semibold">
+                                                        Cooking Status:
+                                                        <span
+                                                            className={`${order.orderItem.find((orderItem) => orderItem.foodId === item.id)?.cookingStatus === "Done" ||
+                                                                order.orderItem.find((orderItem) => orderItem.drinkId === item.id)?.cookingStatus === "Done"
+                                                                ? "text-green-600"
+                                                                : "text-red-600"
+                                                                }`}
+                                                        >
+                                                            {order.orderItem.find((orderItem) => orderItem.foodId === item.id)?.cookingStatus || "Not Available"}
+                                                        </span>
+                                                    </p>
+                                                </div>
                                             </div>
                                         ))}
-                                        {order.items.length > 2 && <span>and more...</span>}
                                     </div>
-                                    <p className='mt-1'>Date: <span className='text-gray-800'>{new Date(order.date).toDateString()}</span></p>
-                                    <p className="mt-1">
-                                        Payment: <span className="text-gray-800 font-semibold">{order.paymentMethod === "COD" ? "Cash on Delivery" : order.paymentMethod}</span>
-                                    </p>
                                 </div>
-                            </div>
-
-                            <div className='md:w-[60%] flex justify-between'>
-                                <div className='flex items-center'>
-                                    <p className='text-lg font-bold'>${order.amount}.00</p>
-                                </div>
-
-                                <div className='flex items-center gap-2'>
-                                    <span className='w-2 h-2 rounded-full bg-green-600'></span>
-                                    <p><b>{order.status}</b></p>
-                                </div>
-
-                                <div className='flex flex-col'>
-                                    <button onClick={loadOrderData} className='border border-primary px-4 py-2 text-sm font-semibold rounded-sm hover:bg-green-200'>Track Order</button>
-                                    {order.status === 'Order Placed' && (
-                                        <button
-                                            onClick={() => openModal(order.id)}
-                                            className='border border-red-500 px-4 py-2 text-sm font-semibold rounded-sm mt-3 hover:bg-red-200'
-                                        >
-                                            Cancel Order
-                                        </button>
-                                    )}
-                                    <button onClick={() => toggleDetails(index)} className='border border-blue-500 px-4 py-2 text-sm font-semibold rounded-sm mt-3 hover:bg-blue-200'>
-                                        {showDetails[index] ? 'Hide' : 'Show more'}
-                                    </button>
-                                </div>
-                            </div>
+                            )}
                         </div>
-
-                        {showDetails[index] && (
-                            <div className="mt-2 pt-4 space-y-4">
-                                {order.status.toLowerCase() === "preparing" && countdowns[order.id] !== undefined && (
-                                    <div className="text-center p-4 bg-green-300 text-lg font-bold">
-                                        {countdowns[order.id] >= 3600
-                                            ? `Time Remaining: ${Math.floor(countdowns[order.id] / 3600)}:${String(
-                                                Math.floor((countdowns[order.id] % 3600) / 60)
-                                            ).padStart(2, '0')}:${String(countdowns[order.id] % 60).padStart(2, '0')}`
-                                            : `Time Remaining: ${Math.floor(countdowns[order.id] / 60)}:${String(
-                                                countdowns[order.id] % 60
-                                            ).padStart(2, '0')}`}
-                                    </div>
-                                )}
-                                <h3 className='font-semibold'>Order Details</h3>
-                                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                                    {order.items.map((item, idx) => (
-                                        <div key={idx} className='flex flex-col sm:flex-row gap-4 items-center'>
-                                            <img
-                                                className="w-20 rounded-[15px]"
-                                                src={`${backendUrl}/images/${item.image || ''}`}
-                                                alt={item.name}
-                                            />
-                                            <div>
-                                                <p className='font-semibold'>
-                                                    {item.quantity} {item.name}{item.quantity > 1 ? "'s" : ""}
-                                                </p>
-                                                <p>Price: ${item.price * item.quantity}</p>
-                                                <p className="font-semibold">
-                                                    Cooking Status:
-                                                    <span
-                                                        className={`
-      ${order.orderItem.find(
-                                                            (orderItem) => orderItem.foodId === item.id
-                                                        )?.cookingStatus === 'Done' ||
-                                                                order.orderItem.find(
-                                                                    (orderItem) => orderItem.drinkId === item.id
-                                                                )?.cookingStatus === 'Done'
-                                                                ? 'text-green-600'
-                                                                : 'text-red-600'}
-  `}
-                                                    >
-                                                        {
-                                                            order.orderItem.find((orderItem) => orderItem.foodId === item.id)
-                                                                ? order.orderItem.find(
-                                                                    (orderItem) => orderItem.foodId === item.id
-                                                                )?.cookingStatus || 'Not Available'
-                                                                : order.orderItem.find(
-                                                                    (orderItem) => orderItem.drinkId === item.id
-                                                                )?.cookingStatus || 'Not Available'
-                                                        }
-                                                    </span>
-                                                </p>
-
-                                            </div>
-                                        </div>
-                                    ))}
-                                </div>
-                            </div>
-                        )}
-                    </div>
-                ))}
+                    );
+                })}
             </div>
 
             {/* Modal for Cancel Order */}
@@ -312,28 +280,32 @@ const MyOrders = () => {
                 onRequestClose={closeModal}
                 style={{
                     content: {
-                        top: '50%',
-                        left: '50%',
-                        right: 'auto',
-                        bottom: 'auto',
-                        marginRight: '-50%',
-                        transform: 'translate(-50%, -50%)',
-                        padding: '20px',
-                        borderRadius: '10px',
-                        width: '400px',
-                        textAlign: 'center',
+                        top: "50%",
+                        left: "50%",
+                        right: "auto",
+                        bottom: "auto",
+                        marginRight: "-50%",
+                        transform: "translate(-50%, -50%)",
+                        padding: "20px",
+                        borderRadius: "10px",
+                        width: "400px",
+                        textAlign: "center",
                     },
                     overlay: {
-                        backgroundColor: 'rgba(0, 0, 0, 0.5)', // Semi-transparent black
-                        zIndex: 1000, // Ensure it appears above other content
+                        backgroundColor: "rgba(0, 0, 0, 0.5)",
+                        zIndex: 1000,
                     },
                 }}
             >
-                <h2 className='font-semibold'>Cancel Order</h2>
+                <h2 className="font-semibold">Cancel Order</h2>
                 <p>Are you sure you want to cancel this order?</p>
                 <div className="flex justify-between mt-4">
-                    <button onClick={cancelOrder} className="px-4 py-2 bg-red-500 text-white rounded hover:bg-red-600">Yes, Cancel</button>
-                    <button onClick={closeModal} className="px-4 py-2 bg-gray-300 rounded hover:bg-gray-400">No, Keep</button>
+                    <button onClick={cancelOrder} className="px-4 py-2 bg-red-500 text-white rounded hover:bg-red-600">
+                        Yes, Cancel
+                    </button>
+                    <button onClick={closeModal} className="px-4 py-2 bg-gray-300 rounded hover:bg-gray-400">
+                        No, Keep
+                    </button>
                 </div>
             </Modal>
         </div>
