@@ -22,6 +22,9 @@ const PlaceOrder = () => {
         loadUserProfileData
     } = useContext(StoreContext);
 
+    const [orderType, setOrderType] = useState('delivery'); // 'delivery' or 'dine-in'
+    const [dineInTime, setDineInTime] = useState(''); // Time selection for dine-in
+
     const [method, setMethod] = useState('cod');
     const [showLogin, setShowLogin] = useState(false);
     const [data, setData] = useState({
@@ -93,7 +96,7 @@ const PlaceOrder = () => {
                                 prepTime: foodItem.prepTime,
                                 quantity: count,
                                 status: 'NULL',
-                                type: 'food', // Add type to differentiate
+                                type: 'food',
                             };
                         }
                     } else if (key.startsWith('drink-')) {
@@ -107,7 +110,7 @@ const PlaceOrder = () => {
                                 image: drinkItem.drink_Image,
                                 quantity: count,
                                 status: 'NULL',
-                                type: 'drink', // Add type to differentiate
+                                type: 'drink',
                             };
                         }
                     }
@@ -120,19 +123,30 @@ const PlaceOrder = () => {
                 return;
             }
 
-            const orderData = {
-                address: {
-                    line1: data.address.neighborhood, // Map neighborhood to line1
-                    line2: data.address.landmark,     // Map landmark to line2
-                    firstName: data.firstName,        // Include firstName in address
-                    lastName: data.lastName,          // Include lastName in address
-                    email: data.email,                // Include email in address
-                    phone: data.phone.startsWith('+251') ? data.phone : `+251${data.phone}`, // Ensure phone is in correct format
-                },
-                items: orderItems, // Include both food and drink items                                
-                amount: getTotalCartAmount() + 2, // Adding delivery fee
+            if (orderType === 'dine-in' && (!dineInTime || dineInTime < "02:30" || dineInTime > "14:00")) {
+                toast.error('Please select a valid dine-in time within working hours (2:30 AM - 2:00 PM).');
+                return;
+            }
+
+            const address = {
+                firstName: data.firstName,
+                lastName: data.lastName,
+                email: data.email,
+                phone: data.phone,
+                ...(orderType === 'delivery' && {
+                    line1: data.address.neighborhood,
+                    line2: data.address.landmark,
+                }),
             };
-            //console.log(orderItems);
+
+            const orderData = {
+                items: orderItems,
+                amount: getTotalCartAmount() + (orderType === 'delivery' ? 2 : 0),
+                address,
+                serviceType: orderType === 'delivery' ? 'Delivery' : 'Dine-In',
+                ...(orderType === 'dine-in' && { dineInTime }),
+            };
+            //console.log(orderData);
 
             let response;
             if (method === 'cod') {
@@ -213,24 +227,71 @@ const PlaceOrder = () => {
                             />
 
                         </div>
-                        <input
-                            className="border border-gray-300 rounded py-1.5 px-3.5 w-full"
-                            name="address.neighborhood"
-                            onChange={onChangeHandler}
-                            value={data.address.neighborhood}
-                            type="text"
-                            placeholder="Neighborhood/Area Name"
-                            required
-                        />
-                        <input
-                            className="border border-gray-300 rounded py-1.5 px-3.5 w-full"
-                            name="address.landmark"
-                            onChange={onChangeHandler}
-                            value={data.address.landmark}
-                            type="text"
-                            placeholder="Nearby Landmark or Reference"
-                            required
-                        />
+                        <div className="mt-4">
+                            <p className="font-medium text-lg mb-2">Order Type</p>
+                            <div className="flex gap-6">
+                                <label className="flex items-center gap-2">
+                                    <input
+                                        type="radio"
+                                        name="orderType"
+                                        value="delivery"
+                                        checked={orderType === 'delivery'}
+                                        onChange={() => setOrderType('delivery')}
+                                    />
+                                    Delivery
+                                </label>
+                                <label className="flex items-center gap-2">
+                                    <input
+                                        type="radio"
+                                        name="orderType"
+                                        value="dine-in"
+                                        checked={orderType === 'dine-in'}
+                                        onChange={() => setOrderType('dine-in')}
+                                    />
+                                    Dine-In
+                                </label>
+                            </div>
+
+                            {/* Conditional Rendering for Delivery */}
+                            {orderType === 'delivery' && (
+                                <div className="mt-4">
+                                    <input
+                                        className="border border-gray-300 rounded py-1.5 px-3.5 w-full mb-2"
+                                        name="address.neighborhood"
+                                        onChange={onChangeHandler}
+                                        value={data.address.neighborhood}
+                                        type="text"
+                                        placeholder="Address Line 1"
+                                        required
+                                    />
+                                    <input
+                                        className="border border-gray-300 rounded py-1.5 px-3.5 w-full"
+                                        name="address.landmark"
+                                        onChange={onChangeHandler}
+                                        value={data.address.landmark}
+                                        type="text"
+                                        placeholder="Address Line 2"
+                                        required
+                                    />
+                                </div>
+                            )}
+
+                            {/* Conditional Rendering for Dine-In */}
+                            {orderType === 'dine-in' && (
+                                <div className="mt-4">
+                                    <p className="font-medium text-sm mb-2">Select Dine-In Time</p>
+                                    <input
+                                        className="border border-gray-300 rounded py-1.5 px-3.5 w-full"
+                                        type="time"
+                                        min="02:30" // Ethiopian working hours (2:30 AM)
+                                        max="14:00" // Ethiopian working hours (2:00 PM)
+                                        value={dineInTime}
+                                        onChange={(e) => setDineInTime(e.target.value)}
+                                        required
+                                    />
+                                </div>
+                            )}
+                        </div>
                     </div>
                     {/* Right side */}
                     <div className="mt-8">

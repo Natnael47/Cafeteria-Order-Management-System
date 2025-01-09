@@ -224,14 +224,39 @@ const PlaceOrder = async (req, res) => {
         .json({ success: false, message: "Invalid service type" });
     }
 
-    // If dine-in, ensure dineInTime is provided and valid
-    if (
-      serviceType === "Dine-In" &&
-      (!dineInTime || isNaN(Date.parse(dineInTime)))
-    ) {
-      return res
-        .status(400)
-        .json({ success: false, message: "Invalid dine-in time" });
+    // Handle dineInTime for Dine-In orders
+    let dineInTimestamp = null;
+    if (serviceType === "Dine-In") {
+      if (!dineInTime) {
+        return res
+          .status(400)
+          .json({ success: false, message: "Dine-in time is required" });
+      }
+
+      // Convert "HH:mm" format to ISO 8601 timestamp
+      const currentDate = new Date();
+      const [hours, minutes] = dineInTime.split(":").map(Number);
+
+      if (isNaN(hours) || isNaN(minutes)) {
+        return res
+          .status(400)
+          .json({ success: false, message: "Invalid dine-in time format" });
+      }
+
+      dineInTimestamp = new Date(
+        currentDate.getFullYear(),
+        currentDate.getMonth(),
+        currentDate.getDate(),
+        hours,
+        minutes
+      );
+
+      // Ensure the date is valid
+      if (isNaN(dineInTimestamp.getTime())) {
+        return res
+          .status(400)
+          .json({ success: false, message: "Invalid dine-in time" });
+      }
     }
 
     // Validate and calculate the total preparation time for the order
@@ -283,8 +308,20 @@ const PlaceOrder = async (req, res) => {
     // Prepare the address field based on service type
     const formattedAddress =
       serviceType === "Delivery"
-        ? JSON.stringify(address) // Full address for delivery
-        : JSON.stringify({ name: address.name }); // Name only for dine-in
+        ? JSON.stringify({
+            firstName: address.firstName,
+            lastName: address.lastName,
+            email: address.email,
+            phone: address.phone,
+            line1: address.line1, // Include line1 for delivery
+            line2: address.line2, // Include line2 for delivery
+          }) // Full address for delivery
+        : JSON.stringify({
+            firstName: address.firstName,
+            lastName: address.lastName,
+            email: address.email,
+            phone: address.phone,
+          }); // Basic info for dine-in
 
     // Create the order in the database
     const newOrder = await prisma.order.create({
@@ -292,7 +329,7 @@ const PlaceOrder = async (req, res) => {
         userId,
         address: formattedAddress,
         serviceType,
-        dineInTime: serviceType === "Dine-In" ? new Date(dineInTime) : null,
+        dineInTime: dineInTimestamp,
         amount,
         items: JSON.stringify(items), // Store items as JSON
         paymentMethod: "COD",
