@@ -156,6 +156,14 @@ const PlaceOrder = () => {
                 if (response.data.success) {
                     window.location.replace(response.data.session_url);
                 }
+            } else if (method === 'chapa') {
+                response = await axios.post(`${backendUrl}/api/order/chapa`, orderData, { headers: { token } });
+                if (response.data.success) {
+                    window.location.href = response.data.checkout_url; // Redirect to Chapa checkout
+                } else {
+                    console.error('Chapa Payment Error:', response.data.message);
+                    alert(response.data.message || "Failed to initialize payment.");
+                }
             }
 
             if (response?.data?.success) {
@@ -312,11 +320,11 @@ const PlaceOrder = () => {
                                     <img className="h-5 mx-4" src={assets.stripe_logo} alt="" />
                                 </div>
                                 <div
-                                    onClick={() => setMethod('razorpay')}
+                                    onClick={() => setMethod('chapa')}
                                     className="flex items-center gap-3 border border-gray-500 p-2 px-3 cursor-pointer"
                                 >
                                     <p
-                                        className={`min-w-3.5 h-3.5 border rounded-full ${method === 'razorpay' ? 'bg-green-500' : ''
+                                        className={`min-w-3.5 h-3.5 border rounded-full ${method === 'chapa' ? 'bg-green-500' : ''
                                             }`}
                                     ></p>
                                     <img className="h-5 mx-4" src={assets.razorpay_logo} alt="" />

@@ -7,21 +7,333 @@ const prisma = new PrismaClient();
 
 // Stripe gateway initialization
 const stripe = new Stripe(process.env.STRIPE_SECRET_KEY);
-const chapa = new Chapa(process.env.CHAPA_SECRET_KEY);
+const chapa = new Chapa({
+  secretKey: "CHASECK_TEST-4wYWgJax7I9mGoIxiv7YO6Pdu9QN8LOv",
+});
+//const chapa = new Chapa(process.env.CHAPA_SECRET_KEY);
 
 // const tx_ref = await chapa.genTxRef(); // result: TX-JHBUVLM7HYMSWDA
-
-// Or with options
-
-const tx_ref = await chapa.genTxRef({
-  removePrefix: false, // defaults to `false`
-  prefix: "TX", // defaults to `TX`
-  size: 20, // defaults to `15`
-});
 
 // Global Variables
 const currency = "ETB";
 const delivery_charge = 10;
+
+const PlaceOrderChapa = async (req, res) => {
+  try {
+    const { userId, items, amount, address } = req.body;
+    const { origin } = req.headers;
+
+    // Validate input data
+    if (!userId || !items || !amount || !address) {
+      return res
+        .status(400)
+        .json({ success: false, message: "Invalid input data" });
+    }
+
+    if (
+      !address?.firstName ||
+      !address?.lastName ||
+      !address?.email ||
+      !address?.phone ||
+      typeof address.firstName !== "string" ||
+      typeof address.lastName !== "string" ||
+      typeof address.email !== "string" ||
+      typeof address.phone !== "string"
+    ) {
+      return res
+        .status(400)
+        .json({ success: false, message: "Invalid address details" });
+    }
+
+    if (!amount || isNaN(amount)) {
+      return res
+        .status(400)
+        .json({ success: false, message: "Invalid amount" });
+    }
+
+    // Generate a transaction reference
+    const tx_ref = await chapa.genTxRef();
+
+    // Build payload for Chapa
+    const payload = {
+      first_name: address.firstName,
+      last_name: address.lastName,
+      email: "chapa@gmail.com",
+      phone_number: address.phone,
+      currency: "ETB",
+      amount: amount.toString(),
+      tx_ref: tx_ref,
+      callback_url: origin
+        ? `${origin}/verify-chapa?success=true`
+        : "https://example.com/",
+      return_url: "http://localhost:5174/myorders",
+      customization: {
+        title: "Your Order",
+        description: "Order payment description",
+      },
+    };
+
+    console.log("Chapa Payload:", JSON.stringify(payload, null, 2));
+
+    // Initialize the Chapa transaction
+    const response = await chapa.initialize(payload);
+
+    console.log("Chapa Response:", response);
+
+    if (response.status === "success") {
+      // Create the order in the database
+      const newOrder = await prisma.order.create({
+        data: {
+          userId,
+          address,
+          items,
+          amount,
+          paymentMethod: "chapa",
+          isPaid: false,
+          date: new Date(),
+          status: "Order Placed", // Set initial status to "Order Placed"
+        },
+      });
+
+      // Redirect user to Chapa checkout URL
+      const checkoutUrl = response.data.checkout_url;
+
+      return res.status(200).json({ success: true, checkout_url: checkoutUrl });
+    } else {
+      throw new Error(response.message || "Chapa initialization failed");
+    }
+  } catch (error) {
+    console.error("Error placing order with Chapa:", error);
+
+    res.status(500).json({
+      success: false,
+      message:
+        error.response?.data?.message ||
+        error.message ||
+        "Error placing order with Chapa",
+    });
+  }
+};
+
+// Placing orders using Stripe method
+const PlaceOrderStripe = async (req, res) => {
+  try {
+    const { userId, items, amount, address } = req.body;
+    const { origin } = req.headers;
+
+    const newOrder = await prisma.order.create({
+      data: {
+        userId,
+        items,
+        address,
+        amount,
+        paymentMethod: "stripe",
+        isPaid: true,
+        date: new Date(),
+        status: "Order Placed", // Set initial status to "Order Placed"
+      },
+    });
+
+    const line_items = items.map((item) => ({
+      price_data: {
+        currency,
+        product_data: { name: item.name },
+        unit_amount: item.price * 100,
+      },
+      quantity: item.quantity,
+    }));
+
+    line_items.push({
+      price_data: {
+        currency,
+        product_data: { name: "Delivery Charges" },
+        unit_amount: delivery_charge * 100,
+      },
+      quantity: 1,
+    });
+
+    const session = await stripe.checkout.sessions.create({
+      line_items: line_items,
+      mode: "payment",
+      success_url: `${origin}/verify?success=true&orderId=${newOrder.id}`,
+      cancel_url: `${origin}/verify?success=false&orderId=${newOrder.id}`,
+    });
+
+    res.json({ success: true, session_url: session.url });
+  } catch (error) {
+    console.log(error);
+    res.json({ success: false, message: "Error" });
+  }
+};
+
+// Placing orders with support for delivery and dine-in
+const PlaceOrder = async (req, res) => {
+  try {
+    const { userId, items, amount, address, serviceType, dineInTime } =
+      req.body;
+
+    // Validate the required fields
+    if (!userId || !items || !items.length || !amount || !serviceType) {
+      return res
+        .status(400)
+        .json({ success: false, message: "Invalid input data" });
+    }
+
+    // Validate service type
+    if (!["Delivery", "Dine-In"].includes(serviceType)) {
+      return res
+        .status(400)
+        .json({ success: false, message: "Invalid service type" });
+    }
+
+    // Handle dineInTime for Dine-In orders
+    let dineInTimestamp = null;
+    if (serviceType === "Dine-In") {
+      if (!dineInTime) {
+        return res
+          .status(400)
+          .json({ success: false, message: "Dine-in time is required" });
+      }
+
+      // Convert "HH:mm" format to ISO 8601 timestamp
+      const currentDate = new Date();
+      const [hours, minutes] = dineInTime.split(":").map(Number);
+
+      if (isNaN(hours) || isNaN(minutes)) {
+        return res
+          .status(400)
+          .json({ success: false, message: "Invalid dine-in time format" });
+      }
+
+      dineInTimestamp = new Date(
+        currentDate.getFullYear(),
+        currentDate.getMonth(),
+        currentDate.getDate(),
+        hours,
+        minutes
+      );
+
+      if (isNaN(dineInTimestamp.getTime())) {
+        return res
+          .status(400)
+          .json({ success: false, message: "Invalid dine-in time" });
+      }
+    }
+
+    // Validate and calculate the total preparation time for the order
+    const totalPrepTimeInMinutes = items.reduce((total, item) => {
+      const prepTime = parseInt(item.prepTime, 10);
+      return total + (isNaN(prepTime) ? 0 : prepTime);
+    }, 0);
+
+    const currentTime = new Date();
+
+    // Find all "Order Placed" and "Preparing" orders before the current order
+    const previousOrders = await prisma.order.findMany({
+      where: {
+        status: { in: ["Order Placed", "Preparing"] },
+        date: { lt: currentTime },
+      },
+      include: {
+        orderItem: {
+          include: { food: true, Drink: true },
+        },
+      },
+    });
+
+    let totalPreviousOrdersPrepTime = 0;
+    previousOrders.forEach((order) => {
+      order.orderItem.forEach((item) => {
+        if (item.food && item.food.prepTime) {
+          totalPreviousOrdersPrepTime += parseInt(item.food.prepTime, 10) || 0;
+        }
+      });
+    });
+
+    const totalTimeInMinutes =
+      totalPreviousOrdersPrepTime + totalPrepTimeInMinutes;
+    const estimatedCompletionTime = new Date(
+      currentTime.getTime() + totalTimeInMinutes * 60000
+    );
+
+    // Prepare the address field based on service type
+    const formattedAddress =
+      serviceType === "Delivery"
+        ? {
+            firstName: address.firstName,
+            lastName: address.lastName,
+            email: address.email,
+            phone: address.phone,
+            line1: address.line1,
+            line2: address.line2,
+          }
+        : {
+            firstName: address.firstName,
+            lastName: address.lastName,
+            email: address.email,
+            phone: address.phone,
+          };
+
+    // Create the order in the database
+    const newOrder = await prisma.order.create({
+      data: {
+        userId,
+        address: formattedAddress,
+        serviceType,
+        dineInTime: dineInTimestamp,
+        amount,
+        items, // Save items as an array
+        paymentMethod: "COD",
+        isPaid: false,
+        date: currentTime,
+        status: "Order Placed",
+        estimatedCompletionTime,
+        totalPrepTime: totalPrepTimeInMinutes,
+      },
+    });
+
+    // Insert items into the orderItem table
+    const orderItems = items
+      .map((item) => {
+        if (item.type === "food") {
+          return {
+            orderId: newOrder.id,
+            foodId: item.id,
+            quantity: item.quantity,
+            price: item.price,
+            cookingStatus: "Not Started",
+          };
+        } else if (item.type === "drink") {
+          return {
+            orderId: newOrder.id,
+            drinkId: item.id,
+            quantity: item.quantity,
+            price: item.price,
+            cookingStatus: "Not Started",
+          };
+        }
+        return null;
+      })
+      .filter(Boolean);
+
+    await prisma.orderItem.createMany({ data: orderItems });
+
+    // Clear the user's cart after placing the order
+    await prisma.user.update({
+      where: { id: userId },
+      data: { cartData: {} },
+    });
+
+    res.json({
+      success: true,
+      message: "Order placed successfully",
+      orderId: newOrder.id,
+    });
+  } catch (error) {
+    console.error("Error placing order:", error);
+    res.status(500).json({ success: false, message: "Error placing order" });
+  }
+};
 
 // Function to display all orders with "Order Placed" status for chef
 const displayOrdersForChef = async (req, res) => {
@@ -201,226 +513,6 @@ const completeOrderItem = async (req, res) => {
       success: false,
       message: error.message,
     });
-  }
-};
-
-// Placing orders with support for delivery and dine-in
-const PlaceOrder = async (req, res) => {
-  try {
-    const { userId, items, amount, address, serviceType, dineInTime } =
-      req.body;
-
-    // Validate the required fields
-    if (!userId || !items || !items.length || !amount || !serviceType) {
-      return res
-        .status(400)
-        .json({ success: false, message: "Invalid input data" });
-    }
-
-    // Validate service type
-    if (!["Delivery", "Dine-In"].includes(serviceType)) {
-      return res
-        .status(400)
-        .json({ success: false, message: "Invalid service type" });
-    }
-
-    // Handle dineInTime for Dine-In orders
-    let dineInTimestamp = null;
-    if (serviceType === "Dine-In") {
-      if (!dineInTime) {
-        return res
-          .status(400)
-          .json({ success: false, message: "Dine-in time is required" });
-      }
-
-      // Convert "HH:mm" format to ISO 8601 timestamp
-      const currentDate = new Date();
-      const [hours, minutes] = dineInTime.split(":").map(Number);
-
-      if (isNaN(hours) || isNaN(minutes)) {
-        return res
-          .status(400)
-          .json({ success: false, message: "Invalid dine-in time format" });
-      }
-
-      dineInTimestamp = new Date(
-        currentDate.getFullYear(),
-        currentDate.getMonth(),
-        currentDate.getDate(),
-        hours,
-        minutes
-      );
-
-      if (isNaN(dineInTimestamp.getTime())) {
-        return res
-          .status(400)
-          .json({ success: false, message: "Invalid dine-in time" });
-      }
-    }
-
-    // Validate and calculate the total preparation time for the order
-    const totalPrepTimeInMinutes = items.reduce((total, item) => {
-      const prepTime = parseInt(item.prepTime, 10);
-      return total + (isNaN(prepTime) ? 0 : prepTime);
-    }, 0);
-
-    const currentTime = new Date();
-
-    // Find all "Order Placed" and "Preparing" orders before the current order
-    const previousOrders = await prisma.order.findMany({
-      where: {
-        status: { in: ["Order Placed", "Preparing"] },
-        date: { lt: currentTime },
-      },
-      include: {
-        orderItem: {
-          include: { food: true, Drink: true },
-        },
-      },
-    });
-
-    let totalPreviousOrdersPrepTime = 0;
-    previousOrders.forEach((order) => {
-      order.orderItem.forEach((item) => {
-        if (item.food && item.food.prepTime) {
-          totalPreviousOrdersPrepTime += parseInt(item.food.prepTime, 10) || 0;
-        }
-      });
-    });
-
-    const totalTimeInMinutes =
-      totalPreviousOrdersPrepTime + totalPrepTimeInMinutes;
-    const estimatedCompletionTime = new Date(
-      currentTime.getTime() + totalTimeInMinutes * 60000
-    );
-
-    // Prepare the address field based on service type
-    const formattedAddress =
-      serviceType === "Delivery"
-        ? {
-            firstName: address.firstName,
-            lastName: address.lastName,
-            email: address.email,
-            phone: address.phone,
-            line1: address.line1,
-            line2: address.line2,
-          }
-        : {
-            firstName: address.firstName,
-            lastName: address.lastName,
-            email: address.email,
-            phone: address.phone,
-          };
-
-    // Create the order in the database
-    const newOrder = await prisma.order.create({
-      data: {
-        userId,
-        address: formattedAddress,
-        serviceType,
-        dineInTime: dineInTimestamp,
-        amount,
-        items, // Save items as an array
-        paymentMethod: "COD",
-        isPaid: false,
-        date: currentTime,
-        status: "Order Placed",
-        estimatedCompletionTime,
-        totalPrepTime: totalPrepTimeInMinutes,
-      },
-    });
-
-    // Insert items into the orderItem table
-    const orderItems = items
-      .map((item) => {
-        if (item.type === "food") {
-          return {
-            orderId: newOrder.id,
-            foodId: item.id,
-            quantity: item.quantity,
-            price: item.price,
-            cookingStatus: "Not Started",
-          };
-        } else if (item.type === "drink") {
-          return {
-            orderId: newOrder.id,
-            drinkId: item.id,
-            quantity: item.quantity,
-            price: item.price,
-            cookingStatus: "Not Started",
-          };
-        }
-        return null;
-      })
-      .filter(Boolean);
-
-    await prisma.orderItem.createMany({ data: orderItems });
-
-    // Clear the user's cart after placing the order
-    await prisma.user.update({
-      where: { id: userId },
-      data: { cartData: {} },
-    });
-
-    res.json({
-      success: true,
-      message: "Order placed successfully",
-      orderId: newOrder.id,
-    });
-  } catch (error) {
-    console.error("Error placing order:", error);
-    res.status(500).json({ success: false, message: "Error placing order" });
-  }
-};
-
-// Placing orders using Stripe method
-const PlaceOrderStripe = async (req, res) => {
-  try {
-    const { userId, items, amount, address } = req.body;
-    const { origin } = req.headers;
-
-    const newOrder = await prisma.order.create({
-      data: {
-        userId,
-        items,
-        address,
-        amount,
-        paymentMethod: "stripe",
-        isPaid: true,
-        date: new Date(),
-        status: "Order Placed", // Set initial status to "Order Placed"
-      },
-    });
-
-    const line_items = items.map((item) => ({
-      price_data: {
-        currency,
-        product_data: { name: item.name },
-        unit_amount: item.price * 100,
-      },
-      quantity: item.quantity,
-    }));
-
-    line_items.push({
-      price_data: {
-        currency,
-        product_data: { name: "Delivery Charges" },
-        unit_amount: delivery_charge * 100,
-      },
-      quantity: 1,
-    });
-
-    const session = await stripe.checkout.sessions.create({
-      line_items: line_items,
-      mode: "payment",
-      success_url: `${origin}/verify?success=true&orderId=${newOrder.id}`,
-      cancel_url: `${origin}/verify?success=false&orderId=${newOrder.id}`,
-    });
-
-    res.json({ success: true, session_url: session.url });
-  } catch (error) {
-    console.log(error);
-    res.json({ success: false, message: "Error" });
   }
 };
 
@@ -640,6 +732,7 @@ export {
   getCustomizationNotes,
   getOrderItemsForChef,
   PlaceOrder,
+  PlaceOrderChapa,
   PlaceOrderRazorpay,
   PlaceOrderStripe,
   updateStatus,

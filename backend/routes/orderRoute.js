@@ -1,7 +1,7 @@
 import express from "express";
 import {
   PlaceOrder,
-  PlaceOrderRazorpay,
+  PlaceOrderChapa,
   PlaceOrderStripe,
   acceptOrder,
   allOrders,
@@ -27,7 +27,7 @@ orderRouter.post("/status", adminAuth, updateStatus);
 //payment methods
 orderRouter.post("/place", authUser, PlaceOrder);
 orderRouter.post("/stripe", authUser, PlaceOrderStripe);
-orderRouter.post("/razorpay", authUser, PlaceOrderRazorpay);
+orderRouter.post("/chapa", authUser, PlaceOrderChapa);
 orderRouter.post("/cancel", authUser, cancelOrder);
 
 //user features
