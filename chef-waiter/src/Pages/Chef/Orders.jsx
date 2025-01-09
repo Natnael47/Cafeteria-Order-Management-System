@@ -244,27 +244,31 @@ const ChefOrders = () => {
                                         <ChefHat size={60} className="text-yellow-500" />
                                     </div>
                                     <div>
-                                        {order.items.map((item, index) => (
-                                            <p
-                                                key={index}
-                                                className={`text-lg font-medium flex items-center mb-2 ${item.type === "drink" ? "bg-blue-50 p-2 rounded-md" : ""
-                                                    }`}
-                                            >
-                                                {item.type === "drink" ? <CupSoda className="text-blue-500 mr-2" /> : <CookingPot className="text-blue-500 mr-2" />}
-                                                {item.name}
-                                                <span className="mx-2 text-gray-500">x</span>
-                                                {item.quantity}
-                                            </p>
-                                        ))}
+                                        {Array.isArray(order.items) && order.items.length > 0 ? (
+                                            order.items.map((item, index) => (
+                                                <p
+                                                    key={index}
+                                                    className={`text-lg font-medium flex items-center mb-2 ${item.type === "drink" ? "bg-blue-50 p-2 rounded-md" : ""
+                                                        }`}
+                                                >
+                                                    {item.type === "drink" ? <CupSoda className="text-blue-500 mr-2" /> : <CookingPot className="text-blue-500 mr-2" />}
+                                                    {item.name}
+                                                    <span className="mx-2 text-gray-500">x</span>
+                                                    {item.quantity}
+                                                </p>
+                                            ))
+                                        ) : (
+                                            <p className="text-sm text-gray-600">No items available</p>
+                                        )}
                                         <p className="mt-3 font-medium text-gray-700">{order.address.firstName} {order.address.lastName}</p>
-                                        <p className="text-gray-600">{order.address.street},</p>
+                                        <p className="text-gray-600">{order.address.line1}, {order.address.line2}</p>
                                         <p className="text-gray-600">{order.address.phone}</p>
                                     </div>
                                     <div>
                                         <p className="font-medium text-gray-700">Items: {order.items.length}</p>
                                         <p className="text-gray-600 mt-2">Method: {order.paymentMethod}</p>
-                                        <p className={`font-semibold ${order.payment ? "text-green-500" : "text-red-500"} mt-1`}>
-                                            Payment: {order.payment ? "Done" : "Pending"}
+                                        <p className={`font-semibold ${order.isPaid ? "text-green-500" : "text-red-500"} mt-1`}>
+                                            Payment: {order.isPaid ? "Done" : "Pending"}
                                         </p>
                                         <p className="text-gray-600 mt-1">Date: {new Date(order.date).toLocaleDateString()}</p>
                                     </div>
@@ -288,6 +292,7 @@ const ChefOrders = () => {
             )}
         </div>
     );
+
 
 };
 
