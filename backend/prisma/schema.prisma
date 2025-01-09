@@ -184,11 +184,13 @@ model feedback {
 
 // Order model - Represents user orders
 model order {
-  id                      Int       @id @default(autoincrement()) // Unique identifier for each order
+  id                      Int       @id @default(autoincrement())
   userId                  Int // Foreign key to User table
   items                   Json // List of items in the order (stored as JSON)
   amount                  Float // Total amount of the order
-  address                 Json // Delivery address for the order (stored as JSON)
+  address                 Json? // Delivery address for the order (optional for dine-in)
+  serviceType             String    @default("Delivery") @db.VarChar(50) // "Dine-In" or "Delivery"
+  dineInTime              DateTime? // Desired dine-in time (null for delivery)
   status                  String    @default("Order Placed") @db.VarChar(255) // Order status
   paymentMethod           String    @db.VarChar(255) // Payment method used for the order
   isPaid                  Boolean   @default(false) // Indicates if payment is completed
