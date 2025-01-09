@@ -251,7 +251,6 @@ const PlaceOrder = async (req, res) => {
         minutes
       );
 
-      // Ensure the date is valid
       if (isNaN(dineInTimestamp.getTime())) {
         return res
           .status(400)
@@ -265,30 +264,21 @@ const PlaceOrder = async (req, res) => {
       return total + (isNaN(prepTime) ? 0 : prepTime);
     }, 0);
 
-    // Get the current time
     const currentTime = new Date();
 
     // Find all "Order Placed" and "Preparing" orders before the current order
     const previousOrders = await prisma.order.findMany({
       where: {
-        status: {
-          in: ["Order Placed", "Preparing"], // Include both statuses
-        },
-        date: {
-          lt: currentTime, // Orders placed before the current order
-        },
+        status: { in: ["Order Placed", "Preparing"] },
+        date: { lt: currentTime },
       },
       include: {
         orderItem: {
-          include: {
-            food: true,
-            Drink: true,
-          },
+          include: { food: true, Drink: true },
         },
       },
     });
 
-    // Calculate the total preparation time for previous orders
     let totalPreviousOrdersPrepTime = 0;
     previousOrders.forEach((order) => {
       order.orderItem.forEach((item) => {
@@ -298,30 +288,29 @@ const PlaceOrder = async (req, res) => {
       });
     });
 
-    // Estimate the completion time for the current order
     const totalTimeInMinutes =
       totalPreviousOrdersPrepTime + totalPrepTimeInMinutes;
     const estimatedCompletionTime = new Date(
       currentTime.getTime() + totalTimeInMinutes * 60000
-    ); // Convert minutes to milliseconds
+    );
 
     // Prepare the address field based on service type
     const formattedAddress =
       serviceType === "Delivery"
-        ? JSON.stringify({
+        ? {
             firstName: address.firstName,
             lastName: address.lastName,
             email: address.email,
             phone: address.phone,
-            line1: address.line1, // Include line1 for delivery
-            line2: address.line2, // Include line2 for delivery
-          }) // Full address for delivery
-        : JSON.stringify({
+            line1: address.line1,
+            line2: address.line2,
+          }
+        : {
             firstName: address.firstName,
             lastName: address.lastName,
             email: address.email,
             phone: address.phone,
-          }); // Basic info for dine-in
+          };
 
     // Create the order in the database
     const newOrder = await prisma.order.create({
@@ -331,7 +320,7 @@ const PlaceOrder = async (req, res) => {
         serviceType,
         dineInTime: dineInTimestamp,
         amount,
-        items: JSON.stringify(items), // Store items as JSON
+        items, // Save items as an array
         paymentMethod: "COD",
         isPaid: false,
         date: currentTime,
@@ -347,7 +336,7 @@ const PlaceOrder = async (req, res) => {
         if (item.type === "food") {
           return {
             orderId: newOrder.id,
-            foodId: item.id, // Save as foodId
+            foodId: item.id,
             quantity: item.quantity,
             price: item.price,
             cookingStatus: "Not Started",
@@ -355,7 +344,7 @@ const PlaceOrder = async (req, res) => {
         } else if (item.type === "drink") {
           return {
             orderId: newOrder.id,
-            drinkId: item.id, // Save as drinkId
+            drinkId: item.id,
             quantity: item.quantity,
             price: item.price,
             cookingStatus: "Not Started",
@@ -365,9 +354,7 @@ const PlaceOrder = async (req, res) => {
       })
       .filter(Boolean);
 
-    await prisma.orderItem.createMany({
-      data: orderItems,
-    });
+    await prisma.orderItem.createMany({ data: orderItems });
 
     // Clear the user's cart after placing the order
     await prisma.user.update({

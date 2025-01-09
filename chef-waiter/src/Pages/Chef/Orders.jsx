@@ -192,7 +192,7 @@ const ChefOrders = () => {
                                     <div>
                                         <p className="text-lg font-semibold text-gray-800 flex items-center mb-2">
                                             <Utensils className="mr-2 text-green-600" />
-                                            {item.name}
+                                            {item.foodName}
                                         </p>
                                         <p className="text-sm text-gray-600">{item.description || "No description available"}</p>
                                         <p className="text-gray-700 mt-1 font-medium">Quantity: {item.quantity}</p>
