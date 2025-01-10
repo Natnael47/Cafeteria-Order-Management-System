@@ -78,7 +78,7 @@ const PlaceOrderChapa = async (req, res) => {
     // Initialize the Chapa transaction
     const response = await chapa.initialize(payload);
 
-    console.log("Chapa Response:", response);
+    //console.log("Chapa Response:", response);
 
     if (response.status === "success") {
       // Create the order in the database

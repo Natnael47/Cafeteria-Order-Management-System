@@ -9,6 +9,7 @@ import feedBackRoute from "./routes/feedBackRoute.js";
 import foodRouter from "./routes/foodRoute.js";
 import inventoryRoute from "./routes/inventoryRoute.js";
 import orderRouter from "./routes/orderRoute.js";
+import ReportRouter from "./routes/reportRoute.js";
 import userRouter from "./routes/userRoute.js";
 
 // app config
@@ -44,6 +45,8 @@ app.use("/api/employee", employeeRoute);
 app.use("/api/feedback", feedBackRoute);
 //API for Inventory
 app.use("/api/inventory", inventoryRoute);
+//API for report
+app.use("/api/report", ReportRouter);
 
 // Define the route
 app.get("/", (req, res) => {

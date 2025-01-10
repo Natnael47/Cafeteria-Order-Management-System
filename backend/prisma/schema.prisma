@@ -341,6 +341,7 @@ model supplierorder {
   supplier        supplier? @relation(fields: [supplierId], references: [id])
 }
 
+// the request from chef to inventory manager on inventory stock
 model inventoryrequest {
   id              Int      @id @default(autoincrement()) // Unique identifier for each request
   inventoryId     Int // Foreign key to Inventory table
@@ -377,6 +378,7 @@ model supplier {
   StockBatch        StockBatch[]
 }
 
+//track which inventory item is get from which supplier
 model inventorySupplier {
   id           Int      @id @default(autoincrement()) // Unique identifier for the mapping
   inventoryId  Int // Foreign key to Inventory table
