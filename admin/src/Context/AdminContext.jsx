@@ -12,6 +12,8 @@ const AdminContextProvider = (props) => {
     const [token, setToken] = useState(localStorage.getItem('token') || '');
     const [profile, setProfile] = useState(null);
     const [employees, setEmployees] = useState([]);
+    const [time, setTime] = useState("monthly");
+    const [reports, setReport] = useState([]);
     const [employeeProfile, setEmployeeProfile] = useState({}); // Initialize as an object
     const [dashboardData, setDashData] = useState({
         users: 0,
@@ -30,6 +32,27 @@ const AdminContextProvider = (props) => {
             );
             if (data.success) {
                 setEmployees(data.employees);
+            } else {
+                toast.error(data.message);
+            }
+        } catch (error) {
+            toast.error(error.message);
+        }
+    };
+
+    const getReport = async () => {
+        try {
+            if (!token) return; // Ensure token exists
+            const response = await axios.post(
+                `${backendUrl}/api/report/admin/reports`,
+                {
+                    "timePeriod": time
+                },
+                { headers: { token } }
+            );
+            if (response.data.success) {
+                setReport(response.data.data);
+                console.log(response.data.data);
             } else {
                 toast.error(data.message);
             }
@@ -190,7 +213,8 @@ const AdminContextProvider = (props) => {
         getDashData,
         getProfile,
         profile, setProfile,
-        loadUserProfileData, setUserData, userData
+        loadUserProfileData, setUserData, userData,
+        getReport, reports, setReport, time, setTime
     };
 
     return (
