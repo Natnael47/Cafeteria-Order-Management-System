@@ -1,6 +1,7 @@
 import axios from "axios";
 import { Eye, EyeOff, X } from "lucide-react";
 import React, { useContext, useEffect, useState } from "react";
+import { toast } from 'react-toastify';
 import { backendUrl } from "../App";
 import { StoreContext } from "../context/StoreContext";
 
@@ -53,7 +54,7 @@ const LoginPopUp = ({ setShowLogin }) => {
                 localStorage.setItem("token", response.data.token);
                 setShowLogin(false);
             } else {
-                alert(response.data.message);
+                toast.error(response.data.message);
             }
         } catch (error) {
             console.error("Error during login/register:", error);
