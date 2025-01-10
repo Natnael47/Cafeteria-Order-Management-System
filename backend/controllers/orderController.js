@@ -166,13 +166,62 @@ const PlaceOrderStripe = async (req, res) => {
   }
 };
 
-// Placing orders with support for delivery and dine-in
+const updateEstimatedCompletionTimes = async () => {
+  // Fetch all active orders sorted by placement date
+  const activeOrders = await prisma.order.findMany({
+    where: {
+      status: { in: ["Order Placed", "Preparing"] },
+    },
+    orderBy: { date: "asc" },
+    include: { orderItem: { include: { food: true } } }, // Include only food
+  });
+
+  const currentTime = new Date();
+  let accumulatedTime = 0;
+
+  for (const order of activeOrders) {
+    // Calculate the total preparation time only for food items
+    const prepTime = order.orderItem.reduce((total, item) => {
+      if (item.food) {
+        return total + (item.food.prepTime || 0); // Use food prep time
+      }
+      return total;
+    }, 0);
+
+    // For Dine-In orders, adjust the estimated completion time based on dineInTime
+    let adjustedPrepTime = prepTime;
+    if (order.serviceType === "Dine-In" && order.dineInTime) {
+      const dineInTimestamp = new Date(order.dineInTime);
+      const dineInTimeBuffer = Math.max(
+        (dineInTimestamp.getTime() - currentTime.getTime()) / 60000,
+        0
+      ); // Minutes left until dine-in time
+
+      adjustedPrepTime = Math.min(prepTime, dineInTimeBuffer);
+    }
+
+    // Calculate the estimated completion time for the current order
+    const estimatedCompletionTime = new Date(
+      currentTime.getTime() + (accumulatedTime + adjustedPrepTime) * 60000
+    );
+
+    // Update the order with the new estimated completion time
+    await prisma.order.update({
+      where: { id: order.id },
+      data: { estimatedCompletionTime },
+    });
+
+    // Update accumulated time for subsequent orders
+    accumulatedTime += prepTime;
+  }
+};
+
 const PlaceOrder = async (req, res) => {
   try {
     const { userId, items, amount, address, serviceType, dineInTime } =
       req.body;
 
-    // Validate the required fields
+    // Validate required fields
     if (!userId || !items || !items.length || !amount || !serviceType) {
       return res
         .status(400)
@@ -195,16 +244,8 @@ const PlaceOrder = async (req, res) => {
           .json({ success: false, message: "Dine-in time is required" });
       }
 
-      // Convert "HH:mm" format to ISO 8601 timestamp
       const currentDate = new Date();
       const [hours, minutes] = dineInTime.split(":").map(Number);
-
-      if (isNaN(hours) || isNaN(minutes)) {
-        return res
-          .status(400)
-          .json({ success: false, message: "Invalid dine-in time format" });
-      }
-
       dineInTimestamp = new Date(
         currentDate.getFullYear(),
         currentDate.getMonth(),
@@ -220,7 +261,7 @@ const PlaceOrder = async (req, res) => {
       }
     }
 
-    // Validate and calculate the total preparation time for the order
+    // Calculate the total preparation time for this order
     const totalPrepTimeInMinutes = items.reduce((total, item) => {
       const prepTime = parseInt(item.prepTime, 10);
       return total + (isNaN(prepTime) ? 0 : prepTime);
@@ -228,35 +269,7 @@ const PlaceOrder = async (req, res) => {
 
     const currentTime = new Date();
 
-    // Find all "Order Placed" and "Preparing" orders before the current order
-    const previousOrders = await prisma.order.findMany({
-      where: {
-        status: { in: ["Order Placed", "Preparing"] },
-        date: { lt: currentTime },
-      },
-      include: {
-        orderItem: {
-          include: { food: true, Drink: true },
-        },
-      },
-    });
-
-    let totalPreviousOrdersPrepTime = 0;
-    previousOrders.forEach((order) => {
-      order.orderItem.forEach((item) => {
-        if (item.food && item.food.prepTime) {
-          totalPreviousOrdersPrepTime += parseInt(item.food.prepTime, 10) || 0;
-        }
-      });
-    });
-
-    const totalTimeInMinutes =
-      totalPreviousOrdersPrepTime + totalPrepTimeInMinutes;
-    const estimatedCompletionTime = new Date(
-      currentTime.getTime() + totalTimeInMinutes * 60000
-    );
-
-    // Prepare the address field based on service type
+    // Prepare the address based on service type
     const formattedAddress =
       serviceType === "Delivery"
         ? {
@@ -287,7 +300,6 @@ const PlaceOrder = async (req, res) => {
         isPaid: false,
         date: currentTime,
         status: "Order Placed",
-        estimatedCompletionTime,
         totalPrepTime: totalPrepTimeInMinutes,
       },
     });
@@ -324,6 +336,9 @@ const PlaceOrder = async (req, res) => {
       data: { cartData: {} },
     });
 
+    // Update estimated completion times for all active orders
+    await updateEstimatedCompletionTimes();
+
     res.json({
       success: true,
       message: "Order placed successfully",
@@ -342,10 +357,31 @@ const displayOrdersForChef = async (req, res) => {
       where: {
         status: "Order Placed",
       },
-      orderBy: { date: "asc" },
+      orderBy: [
+        { priority: "desc" }, // Assuming "Urgent" > "High" > "Normal" in terms of sorting
+        { dineInTime: "asc" },
+        { date: "asc" },
+      ],
     });
 
-    res.json({ success: true, orders });
+    const formattedOrders = orders.map((order) => ({
+      id: order.id,
+      items: order.items,
+      amount: order.amount,
+      address: order.address,
+      serviceType: order.serviceType,
+      dineInTime: order.dineInTime,
+      status: order.status,
+      paymentMethod: order.paymentMethod,
+      isPaid: order.isPaid,
+      priority: order.priority,
+      date: order.date,
+      totalPrepTime: order.totalPrepTime,
+      estimatedCompletionTime: order.estimatedCompletionTime,
+      chefId: order.chefId,
+    }));
+
+    res.json({ success: true, orders: formattedOrders });
   } catch (error) {
     console.log(error);
     res.json({ success: false, message: error.message });
