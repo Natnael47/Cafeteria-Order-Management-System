@@ -4,19 +4,17 @@ import { AdminContext } from '../context/AdminContext';
 
 const Reports = () => {
     const { getReport, reports, time, setTime } = useContext(AdminContext);
-    const [selectedTables, setSelectedTables] = useState({}); // Track selected tables for export
+    const [selectedTables, setSelectedTables] = useState({});
+    const [expandedTables, setExpandedTables] = useState({});
+    const [pageSize] = useState(6);
+    const [currentPage, setCurrentPage] = useState({});
 
-    // Load report data when the component mounts or when time period changes
     useEffect(() => {
         getReport(time);
     }, [time]);
 
-    // Handle time period change
-    const handleTimePeriodChange = (event) => {
-        setTime(event.target.value);
-    };
+    const handleTimePeriodChange = (event) => setTime(event.target.value);
 
-    // Toggle table selection
     const toggleTableSelection = (tableKey) => {
         setSelectedTables((prev) => ({
             ...prev,
@@ -24,7 +22,26 @@ const Reports = () => {
         }));
     };
 
-    // Handle export for selected tables
+    const toggleExpandedView = (tableKey) => {
+        setExpandedTables((prev) => ({
+            ...prev,
+            [tableKey]: !prev[tableKey],
+        }));
+    };
+
+    const handlePageChange = (tableKey, direction) => {
+        setCurrentPage((prev) => ({
+            ...prev,
+            [tableKey]: (prev[tableKey] || 0) + direction,
+        }));
+    };
+
+    const downloadItemReport = (item) => {
+        const content = JSON.stringify(item, null, 2);
+        const blob = new Blob([content], { type: 'application/json' });
+        saveAs(blob, `${item.id}_report.json`);
+    };
+
     const handleExport = (type) => {
         const selectedReports = Object.keys(selectedTables)
             .filter((key) => selectedTables[key])
@@ -37,114 +54,150 @@ const Reports = () => {
         const blob = new Blob([reportContent], { type: 'application/json' });
 
         if (type === 'pdf') {
-            console.log('PDF export (mock)'); // PDF export logic placeholder
+            console.log('PDF export (mock)');
         } else if (type === 'word') {
             const file = new Blob([reportContent], { type: 'application/msword' });
             saveAs(file, `report_${time}.docx`);
         }
     };
 
-    return (
-        <div className="container mx-auto p-6">
-            <h1 className="text-4xl font-bold mb-8 text-center">Reports Dashboard</h1>
+    const renderTable = (title, tableKey, data, columns) => {
+        const isExpanded = expandedTables[tableKey];
+        const page = currentPage[tableKey] || 0;
+        const paginatedData = isExpanded ? data : data.slice(page * pageSize, (page + 1) * pageSize);
 
-            <div className="flex flex-wrap justify-between items-center mb-8">
-                <div className="flex items-center space-x-4">
-                    <label htmlFor="time-period" className="text-lg font-medium">Time Period:</label>
-                    <select
-                        id="time-period"
-                        value={time}
-                        onChange={handleTimePeriodChange}
-                        className="border rounded-lg p-2 focus:outline-none focus:ring focus:ring-blue-300"
-                    >
-                        <option value="daily">Daily</option>
-                        <option value="weekly">Weekly</option>
-                        <option value="monthly">Monthly</option>
-                        <option value="yearly">Yearly</option>
-                    </select>
+        return (
+            <div className="p-6 mb-6 bg-white rounded-lg shadow-md hover:shadow-lg transition-shadow">
+                <div className="flex justify-between items-center mb-4">
+                    <h2 className="text-2xl font-bold text-gray-700">{title}</h2>
+                    <div className="flex space-x-2">
+                        <button
+                            className="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600"
+                            onClick={() => toggleExpandedView(tableKey)}
+                        >
+                            {isExpanded ? 'Collapse' : 'Expand'}
+                        </button>
+                        <button
+                            className={`px-4 py-2 rounded ${selectedTables[tableKey] ? 'bg-red-500 text-white' : 'bg-green-500 text-white'} hover:opacity-90`}
+                            onClick={() => toggleTableSelection(tableKey)}
+                        >
+                            {selectedTables[tableKey] ? 'Unselect' : 'Select'}
+                        </button>
+                    </div>
                 </div>
-                <div className="flex space-x-4">
-                    <button
-                        onClick={() => handleExport('pdf')}
-                        className="bg-blue-500 text-white px-4 py-2 rounded-lg shadow hover:bg-blue-600"
-                    >
-                        Export PDF
-                    </button>
-                    <button
-                        onClick={() => handleExport('word')}
-                        className="bg-green-500 text-white px-4 py-2 rounded-lg shadow hover:bg-green-600"
-                    >
-                        Export Word
-                    </button>
-                </div>
+                <table className="min-w-full mt-4 border-collapse border border-gray-200">
+                    <thead>
+                        <tr className="bg-gray-100">
+                            {columns.map((column) => (
+                                <th key={column.key} className="px-6 py-3 border-b border-gray-200 text-left text-sm font-medium text-gray-600 uppercase tracking-wider">
+                                    {column.label}
+                                </th>
+                            ))}
+                            <th className="px-6 py-3 border-b border-gray-200"></th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {paginatedData.map((row, index) => (
+                            <tr key={index} className="border-b border-gray-200 hover:bg-gray-50">
+                                {columns.map((column) => (
+                                    <td key={column.key} className="px-6 py-4 text-sm text-gray-700">
+                                        {column.render ? column.render(row) : row[column.key]}
+                                    </td>
+                                ))}
+                                <td className="px-6 py-4">
+                                    <button
+                                        className="px-4 py-2 bg-indigo-500 text-white rounded hover:bg-indigo-600"
+                                        onClick={() => downloadItemReport(row)}
+                                    >
+                                        Download
+                                    </button>
+                                </td>
+                            </tr>
+                        ))}
+                    </tbody>
+                </table>
+                {!isExpanded && (
+                    <div className="flex justify-end mt-4 space-x-2">
+                        <button
+                            className="px-4 py-2 bg-gray-300 text-gray-700 rounded hover:bg-gray-400"
+                            onClick={() => handlePageChange(tableKey, -1)}
+                            disabled={page === 0}
+                        >
+                            Previous
+                        </button>
+                        <button
+                            className="px-4 py-2 bg-gray-300 text-gray-700 rounded hover:bg-gray-400"
+                            onClick={() => handlePageChange(tableKey, 1)}
+                            disabled={page >= Math.ceil(data.length / pageSize) - 1}
+                        >
+                            Next
+                        </button>
+                    </div>
+                )}
+            </div>
+        );
+    };
+
+    return (
+        <div className="container mx-auto p-4">
+            <div className="mb-6 p-4 bg-gray-100 rounded-lg shadow">
+                <label htmlFor="time-period" className="mr-2 font-medium text-gray-700">Select Time Period:</label>
+                <select id="time-period" className="px-4 py-2 border border-gray-300 rounded" value={time} onChange={handleTimePeriodChange}>
+                    <option value="daily">Daily</option>
+                    <option value="weekly">Weekly</option>
+                    <option value="monthly">Monthly</option>
+                    <option value="yearly">Yearly</option>
+                </select>
+            </div>
+            <div className="flex space-x-4 mb-6">
+                <button
+                    className="px-6 py-3 bg-green-500 text-white rounded-lg shadow hover:bg-green-600"
+                    onClick={() => handleExport('pdf')}
+                >
+                    Export to PDF
+                </button>
+                <button
+                    className="px-6 py-3 bg-blue-500 text-white rounded-lg shadow hover:bg-blue-600"
+                    onClick={() => handleExport('word')}
+                >
+                    Export to Word
+                </button>
             </div>
 
-            <div className="space-y-8">
-                {/* Inventory Overview */}
-                <div className="p-6 bg-white shadow rounded-lg">
-                    <div className="flex justify-between items-center mb-4">
-                        <h2 className="text-xl font-semibold">Inventory Overview</h2>
-                        <input
-                            type="checkbox"
-                            checked={selectedTables.inventoryOverview || false}
-                            onChange={() => toggleTableSelection('inventoryOverview')}
-                            className="w-5 h-5"
-                        />
-                    </div>
-                    <table className="w-full border-collapse border border-gray-300">
-                        <thead>
-                            <tr className="bg-gray-100">
-                                <th className="border p-2">ID</th>
-                                <th className="border p-2">Name</th>
-                                <th className="border p-2">Category</th>
-                                <th className="border p-2">Quantity</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            {reports?.inventoryOverview?.map((item) => (
-                                <tr key={item.id} className="hover:bg-gray-50">
-                                    <td className="border p-2">{item.id}</td>
-                                    <td className="border p-2">{item.name}</td>
-                                    <td className="border p-2">{item.category}</td>
-                                    <td className="border p-2">{item.quantity}</td>
-                                </tr>
-                            ))}
-                        </tbody>
-                    </table>
-                </div>
+            {renderTable('Top Selling Items', 'topSellingItems', reports.topSellingItems, [
+                { key: 'name', label: 'Item Name' },
+                { key: 'count', label: 'Sold Count' },
+            ])}
 
-                {/* Employee Work Logs */}
-                <div className="p-6 bg-white shadow rounded-lg">
-                    <div className="flex justify-between items-center mb-4">
-                        <h2 className="text-xl font-semibold">Employee Work Logs</h2>
-                        <input
-                            type="checkbox"
-                            checked={selectedTables.employeeWorkLogs || false}
-                            onChange={() => toggleTableSelection('employeeWorkLogs')}
-                            className="w-5 h-5"
-                        />
-                    </div>
-                    <table className="w-full border-collapse border border-gray-300">
-                        <thead>
-                            <tr className="bg-gray-100">
-                                <th className="border p-2">Employee</th>
-                                <th className="border p-2">Login Time</th>
-                                <th className="border p-2">Logout Time</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            {reports?.employeeWorkLogs?.map((log) => (
-                                <tr key={log.id} className="hover:bg-gray-50">
-                                    <td className="border p-2">
-                                        {log.employee?.firstName} {log.employee?.lastName}
-                                    </td>
-                                    <td className="border p-2">{log.loginTime}</td>
-                                    <td className="border p-2">{log.logoutTime}</td>
-                                </tr>
-                            ))}
-                        </tbody>
-                    </table>
-                </div>
+            {renderTable('Inventory to Expire Soon', 'inventoryToExpireSoon', reports.inventoryToExpireSoon, [
+                { key: 'inventoryId', label: 'Inventory ID' },
+                { key: 'expiryDate', label: 'Expiry Date' },
+            ])}
+
+            {renderTable('Inventory Withdrawals', 'inventoryWithdrawals', reports.inventoryWithdrawals, [
+                { key: 'inventoryId', label: 'Inventory ID' },
+                { key: 'employeeId', label: 'Employee ID' },
+                { key: 'reason', label: 'Reason' },
+                { key: 'quantity', label: 'Quantity' },
+            ])}
+
+            {renderTable('Employee Work Logs', 'employeeWorkLogs', reports.employeeWorkLogs, [
+                { key: 'id', label: 'Log ID' },
+                { key: 'employeeId', label: 'Employee ID' },
+                { key: 'loginTime', label: 'Login Time' },
+                { key: 'logoutTime', label: 'Logout Time' },
+            ])}
+
+            {renderTable('Chef Order Summary', 'chefOrderSummary', reports.chefOrderSummary, [
+                { key: 'chefId', label: 'Chef ID' },
+                { key: 'orderCount', label: 'Order Count' },
+                { key: 'totalTime', label: 'Total Time' },
+                { key: 'avgTime', label: 'Average Time' },
+            ])}
+
+            <div className="p-6 bg-white rounded-lg shadow-md">
+                <h2 className="text-2xl font-bold text-gray-700">Orders Total Income</h2>
+                <p className="mt-4 text-lg text-gray-600">Total Income: ${reports.ordersTotalIncome}</p>
             </div>
         </div>
     );
