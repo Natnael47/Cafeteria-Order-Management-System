@@ -1,71 +1,58 @@
-import axios from 'axios';
-import React, { useContext, useEffect, useState } from 'react';
+import axios from "axios";
+import React, { useContext, useEffect, useState } from "react";
 import { toast } from "react-toastify";
-import { backendUrl } from '../App';
-import { assets } from '../assets/assets';
-import { AdminContext } from '../context/AdminContext';
+import { backendUrl } from "../App";
+import { assets } from "../assets/assets";
+import { AdminContext } from "../context/AdminContext";
 
 const Orders = () => {
-
     const { token } = useContext(AdminContext);
-
     const [orders, setOrders] = useState([]);
 
-    const fetchAllOrders = async () => {
-        const response = await axios.get(backendUrl + "/api/order/list", { headers: { token } });
-        if (response.data.success) {
-            setOrders(response.data.data);
-            console.log(response.data.data);
-        } else {
-            toast.error("Error");
+    const fetchOrders = async () => {
+        if (!token) return;
+
+        try {
+            const response = await axios.post(
+                backendUrl + "/api/order/list",
+                {},
+                { headers: { token } }
+            );
+
+            if (response.data.success) {
+                setOrders(response.data.orders);
+            } else {
+                toast.error(response.data.message);
+            }
+        } catch (error) {
+            toast.error("Failed to fetch orders. Please try again.");
         }
     };
 
-    const fetchOrder = async () => {
-        if (!token) {
-            return null;
-        }
-        try {
-            const response = await axios.post(backendUrl + "/api/order/list", {}, { headers: { token } })
-            if (response.data.success) {
-                setOrders(response.data.orders);
-                //console.log(response.data.orders);
-
-            } else {
-                toast.error(response.data.message)
-            }
-
-        } catch (error) {
-            toast.error(error.message)
-        }
-    }
-
     const statusHandler = async (event, orderId) => {
         try {
-            // Send a request to update the order status
-            const response = await axios.post(backendUrl + "/api/order/status", {
-                orderId,
-                status: event.target.value, // Send the selected status value
-            }, { headers: { token } });
+            const response = await axios.post(
+                backendUrl + "/api/order/status",
+                {
+                    orderId,
+                    status: event.target.value,
+                },
+                { headers: { token } }
+            );
 
-            // Check if the response indicates success
             if (response.data.success) {
-                // Refresh the list of orders after updating the status
-                await fetchOrder(); //this must be this fetchAllOrders()
+                toast.success("Order status updated.");
+                fetchOrders();
             } else {
-                // Handle the error if the update was not successful
-                console.error("Failed to update status:", response.data.message);
-                toast.error("Failed to update status.");
+                toast.error(response.data.message);
             }
         } catch (error) {
-            // Handle any errors that occur during the request
-            console.error("Error updating status:", error);
-            toast.error("An error occurred while updating the status.");
+            toast.error("Failed to update order status. Please try again.");
         }
     };
 
     useEffect(() => {
-        fetchOrder();
+        fetchOrders();
     }, [token]);
 
     return (
@@ -94,57 +81,53 @@ const Orders = () => {
                             <div>
                                 {/* Items */}
                                 <div className="mb-3">
-                                    {order.items.map((item, index) => (
-                                        <p className="py-0.5 text-gray-700" key={index}>
-                                            {item.name} x{" "}
-                                            <span className="font-medium">{item.quantity}</span>
-                                            {index < order.items.length - 1 && ","}
-                                        </p>
-                                    ))}
+                                    {Array.isArray(order.items) &&
+                                        order.items.map((item, idx) => (
+                                            <p className="py-0.5 text-gray-700" key={idx}>
+                                                {item.name} x{" "}
+                                                <span className="font-medium">{item.quantity}</span>
+                                                {idx < order.items.length - 1 && ","}
+                                            </p>
+                                        ))}
                                 </div>
 
                                 {/* Customer Name */}
                                 <p className="mt-3 mb-2 font-semibold text-gray-900">
-                                    {order.address.firstName + " " + order.address.lastName}
+                                    {order.address?.firstName} {order.address?.lastName}
                                 </p>
 
-                                {/* Address */}
-                                <div className="text-gray-600">
-                                    <p>{order.address.street},</p>
-                                    <p>
-                                        {order.address.city}, {order.address.state}, {order.address.country}, {order.address.zipcode}
-                                    </p>
-                                </div>
-
                                 {/* Phone */}
-                                <p className="mt-2 text-gray-800">{order.address.phone}</p>
+                                <p className="mt-2 text-gray-800">{order.address?.phone}</p>
                             </div>
 
                             {/* Payment Details */}
                             <div>
                                 <p className="text-sm sm:text-base font-semibold text-gray-700">
-                                    Items: <span>{order.items.length}</span>
+                                    Items: <span>{order.items?.length || 0}</span>
                                 </p>
                                 <p className="mt-3 text-gray-600">
-                                    Method: <span>{order.paymentMethod}</span>
+                                    Method: <span>{order.paymentMethod || "N/A"}</span>
                                 </p>
                                 <div className="flex items-center mt-2">
                                     <p className="mr-2">Payment:</p>
                                     <p
-                                        className={`font-semibold ${order.payment ? "text-green-500" : "text-red-500"
+                                        className={`font-semibold ${order.isPaid ? "text-green-500" : "text-red-500"
                                             }`}
                                     >
-                                        {order.payment ? "Done" : "Pending"}
+                                        {order.isPaid ? "Done" : "Pending"}
                                     </p>
                                 </div>
                                 <p className="mt-3 text-gray-600">
-                                    Date: {new Date(order.date).toLocaleDateString()}
+                                    Date:{" "}
+                                    {order.date
+                                        ? new Date(order.date).toLocaleDateString()
+                                        : "N/A"}
                                 </p>
                             </div>
 
                             {/* Order Amount */}
                             <p className="text-lg sm:text-xl font-bold text-gray-800 text-right">
-                                ${order.amount.toFixed(2)}
+                                ${order.amount?.toFixed(2) || "0.00"}
                             </p>
 
                             {/* Status Selector */}
@@ -169,7 +152,6 @@ const Orders = () => {
             </div>
         </div>
     );
-
 };
 
 export default Orders;

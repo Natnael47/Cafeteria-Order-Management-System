@@ -52,7 +52,7 @@ const AdminContextProvider = (props) => {
             );
             if (response.data.success) {
                 setReport(response.data.data);
-                console.log(response.data.data);
+                //console.log(response.data.data);
             } else {
                 toast.error(data.message);
             }

@@ -3,7 +3,6 @@ import { Star } from 'lucide-react';
 import React, { useContext, useEffect, useState } from 'react';
 import { toast } from "react-toastify";
 import { backendUrl } from "../App";
-import { assets } from '../assets/assets';
 import { AdminContext } from '../context/AdminContext';
 
 const Users = () => {
@@ -186,12 +185,6 @@ const Users = () => {
                 >
                     Feedback
                 </button>
-                <button
-                    className={`px-4 py-2 rounded ${currentView === "orders" ? "bg-green-500 text-white" : "bg-gray-200 text-gray-700"} hover:bg-green-500 hover:text-white`}
-                    onClick={() => handleTabChange("orders")} // Switch to 'orders'
-                >
-                    Orders
-                </button>
             </div>
 
             {/* Search and Show */}
@@ -350,58 +343,6 @@ const Users = () => {
                                     );
                                 })
                             )}
-                        </div>
-                    </div>
-                )}
-
-                {currentView === "orders" && (
-                    <div className="p-5 bg-white shadow rounded w-full max-w-6.3xl max-h-[90vh] overflow-scroll">
-                        {/* Orders Content */}
-                        <h2 className="text-lg font-semibold text-gray-700">Orders</h2>
-                        {/* Your Orders Table Here */}
-                        <div className='bg-[#F3F4F6]'>
-                            {
-                                orders.map((order, index) => (
-                                    <div className='grid grid-cols-1 sm:grid-cols-[0.5fr_2fr_1fr] lg:grid-cols-[0.5fr_2fr_1fr_1fr_1fr] gap-3 items-start border-2 border-black p-5 md:p-8 my-3 md:my-4 text-xs sm:text-sm text-black bg-white' key={index}>
-                                        <img className='w-16' src={assets.parcel_icon} alt="" />
-                                        <div>
-
-                                            <div>
-                                                {order.items.map((item, index) => {
-                                                    if (index === order.items.length - 1) {
-                                                        return <p className='py-0.5' key={index}> {item.name} X <span>  {item.quantity} </span></p>
-                                                    } else {
-                                                        return <p className='py-0.5' key={index}> {item.name} X <span>  {item.quantity} ,</span></p>
-                                                    }
-                                                })}
-                                            </div>
-                                            <p className='mt-3 mb-2 font-medium'>{order.address.firstName + " " + order.address.lastName}</p>
-                                            <div>
-                                                <p>{order.address.street + ","}</p>
-                                                <p>{order.address.city + ", " + order.address.state + ", " + order.address.country + ", " + order.address.zipcode}</p>
-                                            </div>
-                                            <p>{order.address.phone}</p>
-                                        </div>
-                                        <div>
-                                            <p className='text-sm sm:text-[15px]'>Items : {order.items.length}</p>
-                                            <p className='mt-3'>Method : {order.paymentMethod}</p>
-                                            <div className='flex flex-row'>
-                                                <p>Payment : </p>
-                                                <p className={order.payment ? 'text-green-500 font-semibold' : 'text-red-500 font-semibold'}>_{order.payment ? "Done" : "Pending"}</p>
-                                            </div>
-                                            <p>Date : {new Date(order.date).toLocaleDateString()}</p>
-                                        </div>
-                                        <p className='text-sm sm:text-[15px] font-bold'>${order.amount}</p>
-                                        <select onChange={(event) => statusHandler(event, order.id)} value={order.status} className='p-2 font-semibold'>
-                                            <option value="Order Placed">Order Placed</option>
-                                            <option value="Food Processing">Food Processing</option>
-                                            <option value="Shipped">Shipped</option>
-                                            <option value="Out For Delivery">Out For Delivery</option>
-                                            <option value="Delivered">Delivered</option>
-                                        </select>
-                                    </div>
-                                ))
-                            }
                         </div>
                     </div>
                 )}

@@ -61,10 +61,15 @@ const Reports = () => {
         }
     };
 
-    const renderTable = (title, tableKey, data, columns) => {
+    const renderTable = (title, tableKey, data = [], columns) => {
+        // Ensure data is an array
+        const validData = Array.isArray(data) ? data : [];
+
         const isExpanded = expandedTables[tableKey];
         const page = currentPage[tableKey] || 0;
-        const paginatedData = isExpanded ? data : data.slice(page * pageSize, (page + 1) * pageSize);
+        const paginatedData = isExpanded
+            ? validData
+            : validData.slice(page * pageSize, (page + 1) * pageSize);
 
         return (
             <div className="p-6 mb-6 bg-white rounded-lg shadow-md hover:shadow-lg transition-shadow">
@@ -128,7 +133,7 @@ const Reports = () => {
                         <button
                             className="px-4 py-2 bg-gray-300 text-gray-700 rounded hover:bg-gray-400"
                             onClick={() => handlePageChange(tableKey, 1)}
-                            disabled={page >= Math.ceil(data.length / pageSize) - 1}
+                            disabled={page >= Math.ceil(validData.length / pageSize) - 1}
                         >
                             Next
                         </button>
@@ -137,6 +142,7 @@ const Reports = () => {
             </div>
         );
     };
+
 
     return (
         <div className="container mx-auto p-4">
