@@ -118,42 +118,155 @@ const PlaceOrderChapa = async (req, res) => {
 // Placing orders using Stripe method
 const PlaceOrderStripe = async (req, res) => {
   try {
-    const { userId, items, amount, address } = req.body;
+    const { userId, items, amount, address, serviceType, dineInTime } =
+      req.body;
     const { origin } = req.headers;
 
+    // Validate required fields
+    if (!userId || !items || !items.length || !amount || !serviceType) {
+      return res
+        .status(400)
+        .json({ success: false, message: "Invalid input data" });
+    }
+
+    // Validate service type
+    if (!["Delivery", "Dine-In"].includes(serviceType)) {
+      return res
+        .status(400)
+        .json({ success: false, message: "Invalid service type" });
+    }
+
+    // Handle dineInTime for Dine-In orders
+    let dineInTimestamp = null;
+    if (serviceType === "Dine-In") {
+      if (!dineInTime) {
+        return res
+          .status(400)
+          .json({ success: false, message: "Dine-in time is required" });
+      }
+
+      const currentDate = new Date();
+      const [hours, minutes] = dineInTime.split(":").map(Number);
+      dineInTimestamp = new Date(
+        currentDate.getFullYear(),
+        currentDate.getMonth(),
+        currentDate.getDate(),
+        hours,
+        minutes
+      );
+
+      if (isNaN(dineInTimestamp.getTime())) {
+        return res
+          .status(400)
+          .json({ success: false, message: "Invalid dine-in time" });
+      }
+    }
+
+    // Calculate the total preparation time for this order
+    const totalPrepTimeInMinutes = items.reduce((total, item) => {
+      const prepTime = parseInt(item.prepTime, 10);
+      return total + (isNaN(prepTime) ? 0 : prepTime);
+    }, 0);
+
+    const currentTime = new Date();
+
+    // Prepare the address based on service type
+    const formattedAddress =
+      serviceType === "Delivery"
+        ? {
+            firstName: address.firstName,
+            lastName: address.lastName,
+            email: address.email,
+            phone: address.phone,
+            line1: address.line1,
+            line2: address.line2,
+          }
+        : {
+            firstName: address.firstName,
+            lastName: address.lastName,
+            email: address.email,
+            phone: address.phone,
+          };
+
+    // Create the order in the database
     const newOrder = await prisma.order.create({
       data: {
         userId,
-        items,
-        address,
+        address: formattedAddress,
+        serviceType,
+        dineInTime: dineInTimestamp,
         amount,
+        items, // Save items as an array
         paymentMethod: "stripe",
-        isPaid: true,
-        date: new Date(),
-        status: "Order Placed", // Set initial status to "Order Placed"
+        isPaid: false,
+        date: currentTime,
+        status: "Order Placed",
+        totalPrepTime: totalPrepTimeInMinutes,
       },
     });
 
+    // Insert items into the orderItem table
+    const orderItems = items
+      .map((item) => {
+        if (item.type === "food") {
+          return {
+            orderId: newOrder.id,
+            foodId: item.id,
+            quantity: item.quantity,
+            price: item.price,
+            cookingStatus: "Not Started",
+          };
+        } else if (item.type === "drink") {
+          return {
+            orderId: newOrder.id,
+            drinkId: item.id,
+            quantity: item.quantity,
+            price: item.price,
+            cookingStatus: "Not Started",
+          };
+        }
+        return null;
+      })
+      .filter(Boolean);
+
+    await prisma.orderItem.createMany({ data: orderItems });
+
+    // Clear the user's cart after placing the order
+    await prisma.user.update({
+      where: { id: userId },
+      data: { cartData: {} },
+    });
+
+    // Update estimated completion times for all active orders
+    await updateEstimatedCompletionTimes();
+
+    // Create Stripe line items
     const line_items = items.map((item) => ({
       price_data: {
-        currency,
+        currency: "usd", // Replace with appropriate currency
         product_data: { name: item.name },
         unit_amount: item.price * 100,
       },
       quantity: item.quantity,
     }));
 
-    line_items.push({
-      price_data: {
-        currency,
-        product_data: { name: "Delivery Charges" },
-        unit_amount: delivery_charge * 100,
-      },
-      quantity: 1,
-    });
+    // Add delivery charge if the service type is Delivery
+    if (serviceType === "Delivery") {
+      const delivery_charge = 500; // Replace with actual delivery charge
+      line_items.push({
+        price_data: {
+          currency: "usd", // Replace with appropriate currency
+          product_data: { name: "Delivery Charges" },
+          unit_amount: delivery_charge * 100,
+        },
+        quantity: 1,
+      });
+    }
 
+    // Create Stripe session
     const session = await stripe.checkout.sessions.create({
-      line_items: line_items,
+      payment_method_types: ["card"],
+      line_items,
       mode: "payment",
       success_url: `${origin}/verify?success=true&orderId=${newOrder.id}`,
       cancel_url: `${origin}/verify?success=false&orderId=${newOrder.id}`,
@@ -161,8 +274,8 @@ const PlaceOrderStripe = async (req, res) => {
 
     res.json({ success: true, session_url: session.url });
   } catch (error) {
-    console.log(error);
-    res.json({ success: false, message: "Error" });
+    console.error("Error placing order with Stripe:", error);
+    res.status(500).json({ success: false, message: "Error placing order" });
   }
 };
 
@@ -559,7 +672,7 @@ const verifyStripe = async (req, res) => {
   try {
     if (success === "true") {
       await prisma.order.update({
-        where: { id: orderId },
+        where: { id: parseInt(orderId, 10) }, // Ensure orderId is an integer
         data: { isPaid: true },
       });
 
@@ -570,12 +683,12 @@ const verifyStripe = async (req, res) => {
 
       res.json({ success: true, message: "Payment Successful" });
     } else {
-      await prisma.order.delete({ where: { id: orderId } });
+      await prisma.order.delete({ where: { id: parseInt(orderId, 10) } }); // Ensure orderId is an integer
       res.json({ success: false, message: "Payment Failed" });
     }
   } catch (error) {
-    console.log(error);
-    res.json({ success: false, message: "Error" });
+    console.error("Error verifying Stripe payment:", error);
+    res.status(500).json({ success: false, message: "Error" });
   }
 };
 
