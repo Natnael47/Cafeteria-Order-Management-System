@@ -17,8 +17,8 @@ const MyOrders = () => {
     const [currentTab, setCurrentTab] = useState("all");
     const [countdowns, setCountdowns] = useState({});
     const [loading, setLoading] = useState(true);
-
-
+    // State to hold the selected time period
+    const [timePeriod, setTimePeriod] = useState("all");
 
     const { token } = useContext(StoreContext);
 
@@ -28,6 +28,7 @@ const MyOrders = () => {
     };
 
     // Load order data
+    // Load order data and filter based on time period
     const loadOrderData = async () => {
         try {
             if (!token) return;
@@ -36,7 +37,31 @@ const MyOrders = () => {
             const response = await axios.post(`${backendUrl}/api/order/user-orders`, {}, { headers: { token } });
 
             if (response.data.success) {
-                const orders = response.data.orders.reverse();
+                let orders = response.data.orders.reverse();
+
+                // Filter orders based on selected time period
+                if (timePeriod === "today") {
+                    orders = orders.filter(order => {
+                        const orderDate = new Date(order.date);
+                        const today = new Date();
+                        return orderDate.toDateString() === today.toDateString();
+                    });
+                } else if (timePeriod === "week") {
+                    orders = orders.filter(order => {
+                        const orderDate = new Date(order.date);
+                        const startOfWeek = new Date();
+                        startOfWeek.setDate(startOfWeek.getDate() - startOfWeek.getDay());
+                        return orderDate >= startOfWeek;
+                    });
+                } else if (timePeriod === "month") {
+                    orders = orders.filter(order => {
+                        const orderDate = new Date(order.date);
+                        const startOfMonth = new Date();
+                        startOfMonth.setDate(1);
+                        return orderDate >= startOfMonth;
+                    });
+                }
+
                 const countdownTimers = { ...countdowns };
 
                 orders.forEach(order => {
@@ -48,7 +73,6 @@ const MyOrders = () => {
                 });
 
                 setOrders(orders);
-                //console.log(orders);
                 setCountdowns(countdownTimers);
             }
         } catch (error) {
@@ -58,6 +82,11 @@ const MyOrders = () => {
         }
     };
 
+    useEffect(() => {
+        if (token) {
+            loadOrderData();
+        }
+    }, [timePeriod, token]); // Add `timePeriod` to the dependency array
 
 
     useEffect(() => {
@@ -158,22 +187,47 @@ const MyOrders = () => {
         }));
     };
 
+    // Handle time period change
+    const handleTimePeriodChange = (event) => {
+        setTimePeriod(event.target.value);
+    };
+
     return (
         <div className="border-t pt-16">
             <div className="text-2xl">
                 <Title text1="MY" text2="ORDERS" />
-                {/* Tabs */}
-                <div className="flex items-center space-x-4 mb-6">
-                    {["all", "preparing", "complete", "canceled"].map((tab) => (
-                        <button
-                            key={tab}
-                            className={`px-4 py-2 rounded ${currentTab === tab ? "bg-green-500 text-white" : "bg-gray-200 text-gray-700"} hover:bg-green-500 hover:text-white`}
-                            onClick={() => setCurrentTab(tab)}
+                {/* Tabs and Time Period Filter */}
+                <div className="flex items-center justify-between mb-6">
+                    {/* Tabs Section */}
+                    <div className="flex items-center space-x-4">
+                        {["all", "preparing", "complete", "canceled"].map((tab) => (
+                            <button
+                                key={tab}
+                                className={`px-4 py-2 rounded ${currentTab === tab ? "bg-green-500 text-white" : "bg-gray-200 text-gray-700"} hover:bg-green-500 hover:text-white`}
+                                onClick={() => setCurrentTab(tab)}
+                            >
+                                {tab.charAt(0).toUpperCase() + tab.slice(1)}
+                            </button>
+                        ))}
+                    </div>
+
+                    {/* Time Period Filter */}
+                    <div className="flex items-center space-x-3">
+                        <label htmlFor="timePeriod" className="text-gray-700 font-medium">Filter by:</label>
+                        <select
+                            id="timePeriod"
+                            className="border border-gray-300 px-4 py-2 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-green-500"
+                            value={timePeriod}
+                            onChange={handleTimePeriodChange}
                         >
-                            {tab.charAt(0).toUpperCase() + tab.slice(1)}
-                        </button>
-                    ))}
+                            <option value="all">All Orders</option>
+                            <option value="today">Today's Orders</option>
+                            <option value="week">This Week's Orders</option>
+                            <option value="month">This Month's Orders</option>
+                        </select>
+                    </div>
                 </div>
+
             </div>
 
             <div>

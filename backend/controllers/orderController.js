@@ -14,10 +14,6 @@ const chapa = new Chapa({
 
 // const tx_ref = await chapa.genTxRef(); // result: TX-JHBUVLM7HYMSWDA
 
-// Global Variables
-const currency = "ETB";
-const delivery_charge = 10;
-
 const PlaceOrderChapa = async (req, res) => {
   try {
     const { userId, items, amount, address } = req.body;
