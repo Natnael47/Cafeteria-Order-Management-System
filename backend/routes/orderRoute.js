@@ -10,6 +10,7 @@ import {
   displayOrdersForChef,
   getCustomizationNotes,
   getOrderItemsForChef,
+  getTransactionDetails,
   updateStatus,
   userOrders,
   verifyStripe,
@@ -43,5 +44,6 @@ orderRouter.get("/chef-orders", empAuth, displayOrdersForChef);
 orderRouter.post("/order-items", empAuth, getOrderItemsForChef);
 
 orderRouter.get("/customization-notes", getCustomizationNotes);
+orderRouter.post("/transaction-details", getTransactionDetails);
 
 export default orderRouter;

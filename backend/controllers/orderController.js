@@ -917,6 +917,101 @@ const getOrderItemsForChef = async (req, res) => {
   }
 };
 
+// Function to retrieve Stripe transaction details using the orderId
+const getTransactionDetails = async (req, res) => {
+  try {
+    const { orderId } = req.body;
+
+    if (!orderId) {
+      return res.json({
+        success: false,
+        message: "Order ID is required",
+      });
+    }
+
+    // Fetch the order from the database
+    const order = await prisma.order.findUnique({
+      where: { id: parseInt(orderId) },
+      include: { payment: true }, // Include the related payment data
+    });
+
+    if (!order) {
+      return res.json({
+        success: false,
+        message: "Order not found",
+      });
+    }
+
+    // Check if the order is paid
+    if (!order.isPaid) {
+      return res.json({
+        success: false,
+        message: "Payment not completed for this order",
+      });
+    }
+
+    // Get the transaction ID from the payment table
+    const payment = order.payment[0]; // Assuming one payment per order
+    if (!payment || !payment.transactionId) {
+      return res.json({
+        success: false,
+        message: "Transaction ID not found",
+      });
+    }
+
+    // Fetch transaction details from Stripe using the session ID
+    const session = await stripe.checkout.sessions.retrieve(
+      payment.transactionId
+    );
+
+    if (!session) {
+      return res.json({
+        success: false,
+        message: "Transaction details not found in Stripe",
+      });
+    }
+
+    // Fetch line items associated with this session
+    const lineItems = await stripe.checkout.sessions.listLineItems(
+      payment.transactionId,
+      {
+        limit: 100, // Adjust this limit if needed
+      }
+    );
+
+    if (!lineItems || lineItems.data.length === 0) {
+      return res.json({
+        success: false,
+        message: "No line items found for this transaction",
+      });
+    }
+
+    // Prepare transaction details from the Stripe session and line items
+    const transactionDetails = {
+      amount: session.amount_total / 100, // Convert from cents to dollars (assuming your Stripe account uses USD)
+      currency: session.currency,
+      items: lineItems.data.map((item) => ({
+        name: item.description,
+        quantity: item.quantity,
+        amount: item.amount_total / 100, // Convert from cents to dollars
+      })),
+    };
+
+    // Return the transaction details
+    res.json({
+      success: true,
+      message: "Transaction details fetched successfully",
+      transactionDetails,
+    });
+  } catch (error) {
+    console.error("Error fetching transaction details:", error);
+    res.json({
+      success: false,
+      message: error.message,
+    });
+  }
+};
+
 export {
   acceptOrder,
   allOrders,
@@ -925,6 +1020,7 @@ export {
   displayOrdersForChef,
   getCustomizationNotes,
   getOrderItemsForChef,
+  getTransactionDetails,
   PlaceOrder,
   PlaceOrderChapa,
   PlaceOrderRazorpay,
