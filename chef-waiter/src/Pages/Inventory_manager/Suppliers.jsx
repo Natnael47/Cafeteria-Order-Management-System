@@ -2,7 +2,6 @@ import { Pencil, Plus, Trash2 } from 'lucide-react';
 import React, { useContext, useEffect, useState } from "react";
 import Modal from "react-modal";
 import { toast } from "react-toastify";
-import SortingDropdown from '../../Components/SortingDropdown';
 import { InventoryContext } from "../../Context/InventoryContext";
 
 const Suppliers = () => {
@@ -142,8 +141,6 @@ const Suppliers = () => {
                     </div>
                     {/* Sorting  & search */}
                     <div className="flex items-center justify-end gap-5">
-                        <SortingDropdown onSortChange={handleSortChange} />
-                        {/* Search Bar */}
                         <input
                             type="text"
                             placeholder="Search by item name"

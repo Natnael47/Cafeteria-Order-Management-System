@@ -9,7 +9,7 @@ const Menu = () => {
     const { filteredFoodList, drink_list } = useContext(StoreContext);
 
     const foodCategories = ["All", "Salad", "Rolls", "Deserts", "Sandwich", "Cake", "Pure Veg", "Pasta", "Noodles"];
-    const drinkCategories = ["All", "Cocktails", "Mocktails", "Smoothies", "Soda", "Hot Beverages"];
+    const drinkCategories = ["All", "Cocktails", "Mocktails", "Smoothies", "Soda", "Hot Beverages", "Pure Veg", "Pasta", "Noodles"];
 
     const handleCategoryClick = (cat) => {
         setCategory(prevCategory => (prevCategory === cat ? "All" : cat));
@@ -49,16 +49,17 @@ const Menu = () => {
             </div>
 
             {/* Categories Horizontal Scroll */}
-            <div className="mt-8">
-                <div className="flex overflow-x-auto gap-4 scrollbar-hide">
+            <div className="mt-8 w-full">
+                <div className="flex justify-between gap-3 w-full overflow-x-auto scrollbar-hide">
                     {(menuType === "Food" ? foodCategories : drinkCategories).map((cat) => (
                         <button
                             key={cat}
                             onClick={() => handleCategoryClick(cat)}
-                            className={`whitespace-nowrap px-6 py-2 rounded-full text-sm font-medium transition-all ${category === cat
+                            className={`flex-1 text-center px-6 py-2 rounded-full text-sm font-medium transition-all whitespace-nowrap truncate ${category === cat
                                 ? "bg-green-500 text-white shadow-md"
                                 : "bg-gray-200 text-black hover:bg-gray-300"
                                 }`}
+                            style={{ minWidth: '120px' }}
                         >
                             {cat}
                         </button>

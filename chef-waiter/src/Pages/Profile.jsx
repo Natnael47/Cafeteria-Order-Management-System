@@ -89,16 +89,11 @@ const Profile = () => {
                             </p>
                         </div>
                         <div className="bg-gray-100 p-4 rounded-lg shadow-inner">
-                            <h2 className="text-lg font-semibold text-gray-700 mb-2">Salary</h2>
-                            <p className="text-2xl font-bold text-gray-800">${profileData.salary}</p>
+                            <h2 className="text-lg font-semibold text-gray-700 mb-2">Address</h2>
+                            <p className="text-gray-700">{profileData.address.line1}</p>
+                            <p className="text-gray-700">{profileData.address.line2}</p>
                         </div>
-                    </div>
 
-                    <div className="bg-gray-100 p-4 rounded-lg shadow-inner mt-6">
-                        <h2 className="text-lg font-semibold text-gray-700 mb-2">Address</h2>
-                        <p className="text-gray-700">
-                            {profileData.address.line1}, {profileData.address.line2}
-                        </p>
                     </div>
                 </div>
             ) : (
