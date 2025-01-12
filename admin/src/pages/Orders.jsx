@@ -21,8 +21,7 @@ const Orders = () => {
 
             if (response.data.success) {
                 setOrders(response.data.orders);
-                console.log(response.data.orders);
-
+                // console.log(response.data.orders);
             } else {
                 toast.error(response.data.message);
             }
@@ -163,14 +162,15 @@ const Orders = () => {
                                     Date:{" "}
                                     {order.date ? (
                                         <>
-                                            <formatted_date>{formatDate(order.date)}</formatted_date>
+                                            <span>{formatDate(order.date)}</span>
                                             <br />
-                                            <formatted_time>{formatTime(order.date)}</formatted_time>
+                                            <span>{formatTime(order.date)}</span>
                                         </>
                                     ) : (
                                         "N/A"
                                     )}
                                 </p>
+
                             </div>
 
                             {/* Order Amount */}

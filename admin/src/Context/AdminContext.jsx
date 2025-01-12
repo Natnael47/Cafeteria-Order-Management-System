@@ -191,6 +191,7 @@ const AdminContextProvider = (props) => {
             const response = await axios.get(backendUrl + "/api/admin/dashboard", { headers: { token } });
             if (response.data.success) {
                 setDashData(response.data.data);
+                //console.log(response.data.data);
             } else {
                 toast.error("Error fetching dashboard data");
             }

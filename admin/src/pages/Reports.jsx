@@ -145,7 +145,27 @@ const Reports = () => {
 
 
     return (
-        <div className="container mx-auto p-4">
+        <div className="m-5 w-full max-w-6.5xl max-h-[90vh]">
+            {/* Header */}
+            <div className="flex items-center justify-between mb-2">
+                <h1 className="text-3xl font-bold text-gray-800">Reports</h1>
+                <div className="flex items-center space-x-4">
+                    <div className="flex space-x-4">
+                        <button
+                            className="px-6 py-3 bg-green-500 text-white rounded-lg shadow hover:bg-green-600"
+                            onClick={() => handleExport('pdf')}
+                        >
+                            Export to PDF
+                        </button>
+                        <button
+                            className="px-6 py-3 bg-blue-500 text-white rounded-lg shadow hover:bg-blue-600"
+                            onClick={() => handleExport('word')}
+                        >
+                            Export to Word
+                        </button>
+                    </div>
+                </div>
+            </div>
             <div className="mb-6 p-4 bg-gray-100 rounded-lg shadow">
                 <label htmlFor="time-period" className="mr-2 font-medium text-gray-700">Select Time Period:</label>
                 <select id="time-period" className="px-4 py-2 border border-gray-300 rounded" value={time} onChange={handleTimePeriodChange}>
@@ -155,55 +175,43 @@ const Reports = () => {
                     <option value="yearly">Yearly</option>
                 </select>
             </div>
-            <div className="flex space-x-4 mb-6">
-                <button
-                    className="px-6 py-3 bg-green-500 text-white rounded-lg shadow hover:bg-green-600"
-                    onClick={() => handleExport('pdf')}
-                >
-                    Export to PDF
-                </button>
-                <button
-                    className="px-6 py-3 bg-blue-500 text-white rounded-lg shadow hover:bg-blue-600"
-                    onClick={() => handleExport('word')}
-                >
-                    Export to Word
-                </button>
-            </div>
+            <div className="bg-gray-100 rounded-lg w-full max-h-[74vh] overflow-scroll shadow-lg">
 
-            {renderTable('Top Selling Items', 'topSellingItems', reports.topSellingItems, [
-                { key: 'name', label: 'Item Name' },
-                { key: 'count', label: 'Sold Count' },
-            ])}
+                {renderTable('Top Selling Items', 'topSellingItems', reports.topSellingItems, [
+                    { key: 'name', label: 'Item Name' },
+                    { key: 'count', label: 'Sold Count' },
+                ])}
 
-            {renderTable('Inventory to Expire Soon', 'inventoryToExpireSoon', reports.inventoryToExpireSoon, [
-                { key: 'inventoryId', label: 'Inventory ID' },
-                { key: 'expiryDate', label: 'Expiry Date' },
-            ])}
+                {renderTable('Inventory to Expire Soon', 'inventoryToExpireSoon', reports.inventoryToExpireSoon, [
+                    { key: 'inventoryId', label: 'Inventory ID' },
+                    { key: 'expiryDate', label: 'Expiry Date' },
+                ])}
 
-            {renderTable('Inventory Withdrawals', 'inventoryWithdrawals', reports.inventoryWithdrawals, [
-                { key: 'inventoryId', label: 'Inventory ID' },
-                { key: 'employeeId', label: 'Employee ID' },
-                { key: 'reason', label: 'Reason' },
-                { key: 'quantity', label: 'Quantity' },
-            ])}
+                {renderTable('Inventory Withdrawals', 'inventoryWithdrawals', reports.inventoryWithdrawals, [
+                    { key: 'inventoryId', label: 'Inventory ID' },
+                    { key: 'employeeId', label: 'Employee ID' },
+                    { key: 'reason', label: 'Reason' },
+                    { key: 'quantity', label: 'Quantity' },
+                ])}
 
-            {renderTable('Employee Work Logs', 'employeeWorkLogs', reports.employeeWorkLogs, [
-                { key: 'id', label: 'Log ID' },
-                { key: 'employeeId', label: 'Employee ID' },
-                { key: 'loginTime', label: 'Login Time' },
-                { key: 'logoutTime', label: 'Logout Time' },
-            ])}
+                {renderTable('Employee Work Logs', 'employeeWorkLogs', reports.employeeWorkLogs, [
+                    { key: 'id', label: 'Log ID' },
+                    { key: 'employeeId', label: 'Employee ID' },
+                    { key: 'loginTime', label: 'Login Time' },
+                    { key: 'logoutTime', label: 'Logout Time' },
+                ])}
 
-            {renderTable('Chef Order Summary', 'chefOrderSummary', reports.chefOrderSummary, [
-                { key: 'chefId', label: 'Chef ID' },
-                { key: 'orderCount', label: 'Order Count' },
-                { key: 'totalTime', label: 'Total Time' },
-                { key: 'avgTime', label: 'Average Time' },
-            ])}
+                {renderTable('Chef Order Summary', 'chefOrderSummary', reports.chefOrderSummary, [
+                    { key: 'chefId', label: 'Chef ID' },
+                    { key: 'orderCount', label: 'Order Count' },
+                    { key: 'totalTime', label: 'Total Time' },
+                    { key: 'avgTime', label: 'Average Time' },
+                ])}
 
-            <div className="p-6 bg-white rounded-lg shadow-md">
-                <h2 className="text-2xl font-bold text-gray-700">Orders Total Income</h2>
-                <p className="mt-4 text-lg text-gray-600">Total Income: ${reports.ordersTotalIncome}</p>
+                <div className="p-6 bg-white rounded-lg shadow-md">
+                    <h2 className="text-2xl font-bold text-gray-700">Orders Total Income</h2>
+                    <p className="mt-4 text-lg text-gray-600">Total Income: ${reports.ordersTotalIncome}</p>
+                </div>
             </div>
         </div>
     );

@@ -8,7 +8,7 @@ const Dashboard = () => {
 
     useEffect(() => {
         getDashData();
-    }, [getDashData]);
+    }, []);
 
     const iconSize = 50; // Adjust icon size
     const iconColor = '#22C55E'; // Use a consistent primary color for icons
@@ -56,7 +56,7 @@ const Dashboard = () => {
                                 alt="Order Icon"
                             />
                             <div className="flex-1 text-sm">
-                                <p className="font-medium text-gray-700">
+                                <p className="font-medium text-gray-700 text-lg">
                                     {item.address.firstName} {item.address.lastName}
                                 </p>
                                 <p className="text-gray-500">Items: {item.items.length}</p>
@@ -66,12 +66,13 @@ const Dashboard = () => {
                             </div>
                             <div className="text-right">
                                 <p
-                                    className={`font-semibold ${item.payment ? 'text-green-500' : 'text-red-500'
+                                    className={`font-semibold ${item.isPaid ? 'text-green-500' : 'text-red-500'
                                         }`}
                                 >
-                                    Payment: {item.payment ? 'Done' : 'Pending'}
+                                    Payment: {item.isPaid ? 'Done' : 'Pending'}
                                 </p>
                                 <p className="mt-2 text-gray-500">{item.status}</p>
+                                <p className="mt-2 text-gray-500">{item.serviceType}</p>
                             </div>
                         </div>
                     ))}

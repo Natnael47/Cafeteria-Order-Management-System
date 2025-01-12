@@ -162,8 +162,8 @@ const Profile = () => {
     return (
         <div className="m-5 w-full max-w-6xl">
             {/* Header Section */}
-            <div className="flex flex-row items-center justify-between mb-8">
-                <h1 className="text-4xl font-extrabold text-gray-800">Admin Profile</h1>
+            <div className="flex flex-row items-center justify-between mb-4">
+                <h1 className="text-3xl font-bold text-gray-800">Admin profile</h1>
             </div>
 
             {userData ? (
