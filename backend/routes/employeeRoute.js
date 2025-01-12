@@ -5,6 +5,7 @@ import {
   employee_Profile,
   get_Single_Employee_Profile,
   getCashierEmailsAndNames,
+  getChefDashboardData,
   login_Chef,
   login_InventoryManager,
   logoutEmployee,
@@ -27,5 +28,7 @@ employeeRoute.post("/change-password", empAuth, change_Employee_Password);
 employeeRoute.post("/delete-employee", adminAuth, delete_Employee);
 
 employeeRoute.get("/get-cashier-emails-and-names", getCashierEmailsAndNames);
+
+employeeRoute.get("/chef-dashboard", empAuth, getChefDashboardData);
 
 export default employeeRoute;

@@ -393,4 +393,74 @@ export const change_Employee_Password = async (req, res) => {
   }
 };
 
-export const getChefDashboardData = async (req, res) => {};
+export const getChefDashboardData = async (req, res) => {
+  try {
+    // Fetch relevant metrics for the chef
+    const [
+      totalOrdersCount,
+      completedOrdersCount,
+      pendingOrdersCount,
+      topSellingItems,
+      totalPreparationTime,
+      averagePreparationTime,
+      recentFeedback,
+    ] = await Promise.all([
+      prisma.order.count(), // Total orders
+      prisma.order.count({
+        where: { status: "Completed" }, // Completed orders
+      }),
+      prisma.order.count({
+        where: { status: "Pending" }, // Pending orders
+      }),
+      prisma.orderItem.groupBy({
+        by: ["foodId"],
+        _count: { foodId: true },
+        orderBy: { _count: { foodId: "desc" } },
+        take: 5, // Top 5 selling items
+      }),
+      prisma.order.aggregate({
+        _sum: { totalPrepTime: true }, // Sum of all preparation times
+      }),
+      prisma.order.aggregate({
+        _avg: { totalPrepTime: true }, // Average preparation time
+      }),
+      prisma.feedback.findMany({
+        orderBy: { date: "desc" },
+        take: 5, // Recent 5 feedback
+      }),
+    ]);
+
+    // Fetch food details for the top-selling items
+    const topSellingItemsWithDetails = await Promise.all(
+      topSellingItems.map(async (item) => {
+        const foodDetails = await prisma.food.findUnique({
+          where: { id: item.foodId },
+          select: { name: true, category: true },
+        });
+        return {
+          foodId: item.foodId,
+          name: foodDetails?.name || "Unknown",
+          category: foodDetails?.category || "Unknown",
+          count: item._count.foodId,
+        };
+      })
+    );
+
+    // Calculate average preparation time
+    const avgPrepTime = averagePreparationTime._avg.totalPrepTime || 0;
+
+    const dashData = {
+      totalOrders: totalOrdersCount,
+      completedOrders: completedOrdersCount,
+      pendingOrders: pendingOrdersCount,
+      topSellingItems: topSellingItemsWithDetails, // Updated with detailed info
+      averagePreparationTime: avgPrepTime.toFixed(2), // Display average prep time
+      recentFeedback: recentFeedback,
+    };
+
+    res.json({ success: true, data: dashData });
+  } catch (error) {
+    console.log("Error fetching chef dashboard data:", error);
+    res.json({ success: false, message: error.message });
+  }
+};
