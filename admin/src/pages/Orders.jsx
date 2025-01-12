@@ -21,6 +21,8 @@ const Orders = () => {
 
             if (response.data.success) {
                 setOrders(response.data.orders);
+                console.log(response.data.orders);
+
             } else {
                 toast.error(response.data.message);
             }
@@ -55,15 +57,42 @@ const Orders = () => {
         fetchOrders();
     }, [token]);
 
+    function formatDate(dateString) {
+        const months = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
+        const date = new Date(dateString);
+        const month = months[date.getMonth()];
+        const day = date.getDate();
+        const year = date.getFullYear().toString().slice(-2);
+        return `${month}/${day}/${year}`;
+    }
+
+    function formatTime(dateString) {
+        const date = new Date(dateString);
+        let hours = date.getHours();
+        const minutes = date.getMinutes().toString().padStart(2, '0');
+        const ampm = hours >= 12 ? "pm" : "am";
+        hours = hours % 12 || 12;
+        return `${hours}:${minutes} ${ampm}`;
+    }
+
     return (
-        <div className="m-5 w-full">
+        <div className="m-5 w-full max-w-6.5xl max-h-[90vh]">
             {/* Title */}
-            <h1 className="text-4xl font-extrabold text-gray-800 mb-5 text-center">
-                Orders
-            </h1>
+            {/* Header */}
+            <div className="flex items-center justify-between mb-2">
+                <h1 className="text-3xl font-bold text-gray-800">Drink Items</h1>
+                <div className="flex items-center space-x-4">
+                    {/* Icon Button */}
+                    <button className="p-2 bg-gray-200 rounded hover:bg-gray-300">
+                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" className="w-5 h-5">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M4 8h16M4 16h16" />
+                        </svg>
+                    </button>
+                </div>
+            </div>
 
             {/* Orders Container */}
-            <div className="bg-gray-50 rounded-lg shadow-lg p-5 max-w-6xl mx-auto max-h-[85vh] overflow-y-auto">
+            <div className="rounded-lg max-w-6xl max-h-[85vh] overflow-y-auto">
                 {orders.length > 0 ? (
                     orders.map((order, index) => (
                         <div
@@ -83,21 +112,35 @@ const Orders = () => {
                                 <div className="mb-3">
                                     {Array.isArray(order.items) &&
                                         order.items.map((item, idx) => (
-                                            <p className="py-0.5 text-gray-700" key={idx}>
-                                                {item.name} x{" "}
-                                                <span className="font-medium">{item.quantity}</span>
+                                            <p className="py-0.5 text-lg font-semibold text-gray-700" key={idx}>
+                                                {item.name} x <span className="font-medium">{item.quantity}</span>
                                                 {idx < order.items.length - 1 && ","}
                                             </p>
                                         ))}
                                 </div>
 
-                                {/* Customer Name */}
-                                <p className="mt-3 mb-2 font-semibold text-gray-900">
-                                    {order.address?.firstName} {order.address?.lastName}
-                                </p>
+                                {/* Customer Info */}
+                                <div className="mb-3">
+                                    <p className="font-semibold text-gray-900">
+                                        {order.address?.firstName} {order.address?.lastName}
+                                    </p>
+                                    <p className="text-gray-800">{order.address?.phone}</p>
+                                </div>
 
-                                {/* Phone */}
-                                <p className="mt-2 text-gray-800">{order.address?.phone}</p>
+                                {/* Service Type Details */}
+                                <div className="mb-3">
+                                    <p className="text-gray-800">Service Type: {order.serviceType}</p>
+                                    {order.serviceType === "Dine-In" ? (
+                                        <p className="text-gray-800">
+                                            Dine-In Time: {formatTime(order.dineInTime)}
+                                        </p>
+                                    ) : (
+                                        <>
+                                            <p className="text-gray-800">Address Line 1: {order.address?.line1}</p>
+                                            <p className="text-gray-800">Address Line 2: {order.address?.line2}</p>
+                                        </>
+                                    )}
+                                </div>
                             </div>
 
                             {/* Payment Details */}
@@ -105,28 +148,33 @@ const Orders = () => {
                                 <p className="text-sm sm:text-base font-semibold text-gray-700">
                                     Items: <span>{order.items?.length || 0}</span>
                                 </p>
-                                <p className="mt-3 text-gray-600">
-                                    Method: <span>{order.paymentMethod || "N/A"}</span>
-                                </p>
                                 <div className="flex items-center mt-2">
                                     <p className="mr-2">Payment:</p>
                                     <p
-                                        className={`font-semibold ${order.isPaid ? "text-green-500" : "text-red-500"
-                                            }`}
+                                        className={`font-semibold ${order.isPaid ? "text-green-500" : "text-red-500"}`}
                                     >
                                         {order.isPaid ? "Done" : "Pending"}
                                     </p>
                                 </div>
                                 <p className="mt-3 text-gray-600">
+                                    Method: <span>{order.paymentMethod || "N/A"}</span>
+                                </p>
+                                <p className="mt-3 text-gray-600">
                                     Date:{" "}
-                                    {order.date
-                                        ? new Date(order.date).toLocaleDateString()
-                                        : "N/A"}
+                                    {order.date ? (
+                                        <>
+                                            <formatted_date>{formatDate(order.date)}</formatted_date>
+                                            <br />
+                                            <formatted_time>{formatTime(order.date)}</formatted_time>
+                                        </>
+                                    ) : (
+                                        "N/A"
+                                    )}
                                 </p>
                             </div>
 
                             {/* Order Amount */}
-                            <p className="text-lg sm:text-xl font-bold text-gray-800 text-right">
+                            <p className="text-lg sm:text-xl font-bold mr-8 text-gray-800 text-right">
                                 ${order.amount?.toFixed(2) || "0.00"}
                             </p>
 
@@ -145,11 +193,10 @@ const Orders = () => {
                         </div>
                     ))
                 ) : (
-                    <p className="text-center text-gray-500 font-medium py-10">
-                        No orders available.
-                    </p>
+                    <p className="text-center text-gray-500 font-medium py-10">No orders available.</p>
                 )}
             </div>
+
         </div>
     );
 };

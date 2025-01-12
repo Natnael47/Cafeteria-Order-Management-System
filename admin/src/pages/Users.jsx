@@ -21,7 +21,7 @@ const Users = () => {
 
             if (response.data.success) {
                 setUsersData(response.data.data); // Assuming the response contains a 'data' field with the users
-                console.log(response.data.data);
+                //console.log(response.data.data);
             } else {
                 toast.error("Error fetching user list");
             }

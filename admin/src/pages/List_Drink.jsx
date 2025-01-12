@@ -37,7 +37,7 @@ const List_Drink = () => {
         });
         if (response.data.success) {
             setList(response.data.data);
-            console.log(response.data.data);
+            //console.log(response.data.data);
         } else {
             toast.error("Error fetching list");
         }
