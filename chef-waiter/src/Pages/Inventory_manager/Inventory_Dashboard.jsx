@@ -90,23 +90,23 @@ const Inventory_Dashboard = () => {
             <h1 className="text-2xl font-bold mb-5">Inventory Dashboard</h1>
 
             {/* KPI Section */}
+            {/* KPI Overview Cards */}
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 mb-5">
                 {[
-                    { icon: <ShoppingBag size={24} color="#007BFF" />, label: 'Total Items', value: KPIs.totalItems || 0, bgColor: 'bg-blue-100', textColor: 'text-blue-700' },
-                    { icon: <ArrowDownUp size={24} color="#FF4F5A" />, label: 'Low Stock Items', value: KPIs.lowStockItems || 0, bgColor: 'bg-red-100', textColor: 'text-red-700' },
-                    { icon: <ShieldQuestion size={24} color="#28A745" />, label: 'Requests Processed', value: KPIs.totalRequestsProcessed || 0, bgColor: 'bg-green-100', textColor: 'text-green-700' },
-                    { icon: <CircleDollarSign size={24} color="#FFC107" />, label: 'Total Inventory Value', value: `Etb. ${(KPIs.totalInventoryValue || 0).toLocaleString()}`, bgColor: 'bg-yellow-100', textColor: 'text-yellow-700' }
-
+                    { icon: <ShoppingBag size={24} color="#007BFF" />, label: 'Total Items', value: KPIs.totalItems || 0 },
+                    { icon: <ArrowDownUp size={24} color="#FF4F5A" />, label: 'Low Stock Items', value: KPIs.lowStockItems || 0 },
+                    { icon: <ShieldQuestion size={24} color="#28A745" />, label: 'Requests Processed', value: KPIs.totalRequestsProcessed || 0 },
+                    { icon: <CircleDollarSign size={24} color="#FFC107" />, label: 'Total Inventory Value', value: `Etb. ${(KPIs.totalInventoryValue || 0).toLocaleString()}` }
                 ].map((item, index) => (
                     <div
                         key={index}
-                        className={`flex items-center gap-4 ${item.bgColor} p-6 rounded-lg shadow-lg transition-transform transform hover:scale-105`}
+                        className="flex items-center gap-4 bg-white p-6 rounded-lg shadow-lg transition-transform transform hover:scale-105"
                     >
-                        <div className="p-3 bg-white rounded-full">
+                        <div className="p-3 bg-[#F1FAF2] rounded-full">
                             {item.icon}
                         </div>
                         <div>
-                            <p className={`text-2xl font-bold ${item.textColor}`}>{item.value}</p>
+                            <p className="text-2xl font-bold text-gray-700">{item.value}</p>
                             <p className="text-gray-500">{item.label}</p>
                         </div>
                     </div>

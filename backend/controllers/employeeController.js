@@ -392,3 +392,5 @@ export const change_Employee_Password = async (req, res) => {
     res.status(500).json({ success: false, message: "Internal server error" });
   }
 };
+
+export const getChefDashboardData = async (req, res) => {};
