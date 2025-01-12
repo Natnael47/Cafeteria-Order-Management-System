@@ -4,6 +4,7 @@ import {
   delete_Employee,
   employee_Profile,
   get_Single_Employee_Profile,
+  getCashierEmailsAndNames,
   login_Chef,
   login_InventoryManager,
   logoutEmployee,
@@ -24,5 +25,7 @@ employeeRoute.get("/employee-profile/:empId", get_Single_Employee_Profile);
 employeeRoute.post("/change-password", empAuth, change_Employee_Password);
 //for admin
 employeeRoute.post("/delete-employee", adminAuth, delete_Employee);
+
+employeeRoute.get("/get-cashier-emails-and-names", getCashierEmailsAndNames);
 
 export default employeeRoute;

@@ -19,8 +19,14 @@ const PlaceOrder = () => {
         getTotalCartAmount,
         userData,
         setUserData,
-        loadUserProfileData
+        loadUserProfileData,
+        fetchCashierData,
+        cashierData
     } = useContext(StoreContext);
+
+    useEffect(() => {
+        fetchCashierData();
+    }, []);
 
     const [orderType, setOrderType] = useState('delivery'); // 'delivery' or 'dine-in'
     const [dineInTime, setDineInTime] = useState(''); // Time selection for dine-in
@@ -48,6 +54,7 @@ const PlaceOrder = () => {
         } else {
             // Preload user data
             loadUserProfileData();
+
             if (!loaded) {
                 setData({
                     firstName: userData.firstName || '',
@@ -59,10 +66,20 @@ const PlaceOrder = () => {
                         landmark: userData.address?.line2 || '',
                     },
                 });
+
+                // Add the following block to check if COD should be available
+                const cashierEmails = cashierData.map((cashier) => cashier.email.toLowerCase());
+                if (cashierEmails.includes((userData.email || '').toLowerCase())) {
+                    setMethod('cod'); // Default to COD for cashiers
+                } else {
+                    setMethod('stripe'); // Default to Stripe for non-cashiers
+                }
+
                 setLoaded(true);
             }
         }
-    }, [token, cartItems, userData, loadUserProfileData, navigate, loaded]);
+    }, [token, cartItems, userData, loadUserProfileData, navigate, loaded, cashierData]);
+
 
     const onChangeHandler = (event) => {
         const { name, value } = event.target;
@@ -302,7 +319,7 @@ const PlaceOrder = () => {
                         </div>
                     </div>
                     {/* Right side */}
-                    <div className="mt-8">
+                    <div className="mt-8 w-full sm:max-w-[500px]">
                         <div className="mt-8 min-w-80">
                             <CartTotal />
                         </div>
@@ -311,35 +328,35 @@ const PlaceOrder = () => {
                             <div className="flex gap-3 flex-col lg:flex-row">
                                 <div
                                     onClick={() => setMethod('stripe')}
-                                    className="flex items-center gap-3 border border-gray-500 p-2 px-3 cursor-pointer"
+                                    className={`flex items-center gap-3 border border-gray-500 p-2 px-3 cursor-pointer ${method === 'stripe' ? 'selected' : ''}`}
                                 >
                                     <p
-                                        className={`min-w-3.5 h-3.5 border rounded-full ${method === 'stripe' ? 'bg-green-500' : ''
-                                            }`}
+                                        className={`min-w-3.5 h-3.5 border rounded-full ${method === 'stripe' ? 'bg-green-500' : ''}`}
                                     ></p>
                                     <img className="h-5 mx-4" src={assets.stripe_logo} alt="" />
                                 </div>
                                 <div
                                     onClick={() => setMethod('chapa')}
-                                    className="flex items-center gap-3 border border-gray-500 p-2 px-3 cursor-pointer"
+                                    className={`flex items-center gap-3 border border-gray-500 p-2 px-3 cursor-pointer ${method === 'chapa' ? 'selected' : ''}`}
                                 >
                                     <p
-                                        className={`min-w-3.5 h-3.5 border rounded-full ${method === 'chapa' ? 'bg-green-500' : ''
-                                            }`}
+                                        className={`min-w-3.5 h-3.5 border rounded-full ${method === 'chapa' ? 'bg-green-500' : ''}`}
                                     ></p>
                                     <img className="h-5 mx-4" src={assets.razorpay_logo} alt="" />
                                 </div>
-                                <div
-                                    onClick={() => setMethod('cod')}
-                                    className="flex items-center gap-3 border border-gray-500 p-2 px-3 cursor-pointer"
-                                >
-                                    <p
-                                        className={`min-w-3.5 h-3.5 border rounded-full ${method === 'cod' ? 'bg-green-500' : ''
-                                            }`}
-                                    ></p>
-                                    <p className="text-gray-500 text-sm font-medium mx-4">CASH ON DELIVERY</p>
-                                </div>
+                                {cashierData.some((cashier) => cashier.email.toLowerCase() === data.email.toLowerCase()) && (
+                                    <div
+                                        onClick={() => setMethod('cod')}
+                                        className={`flex items-center gap-3 border border-gray-500 p-2 px-3 cursor-pointer ${method === 'cod' ? 'selected' : ''}`}
+                                    >
+                                        <p
+                                            className={`min-w-3.5 h-3.5 border rounded-full ${method === 'cod' ? 'bg-green-500' : ''}`}
+                                        ></p>
+                                        <p className="text-gray-500 text-sm font-medium mx-4">CASH ON DELIVERY</p>
+                                    </div>
+                                )}
                             </div>
+
                             <div className="w-full text-end mt-8">
                                 <button
                                     type="submit"

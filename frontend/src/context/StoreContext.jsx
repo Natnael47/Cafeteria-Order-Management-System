@@ -11,6 +11,7 @@ export const StoreContext = createContext(null);
 const StoreContextProvider = (props) => {
     const [food_list, setFoodList] = useState([]);
     const [drink_list, setDrinkList] = useState([]);
+    const [cashierData, setCashierData] = useState([]);
     const [cartItems, setCartItems] = useState(() => {
         const savedCart = localStorage.getItem("cartItems");
         return savedCart ? JSON.parse(savedCart) : {};
@@ -115,6 +116,21 @@ const StoreContextProvider = (props) => {
             if (response.data.success) {
                 setDrinkList(response.data.data);
                 //console.log(response.data.data);
+            } else {
+                toast.error(response.data.message);
+            }
+        } catch (error) {
+            console.error(error);
+            toast.error(error.message);
+        }
+    };
+
+    const fetchCashierData = async () => {
+        try {
+            const response = await axios.get(`${backendUrl}/api/employee/get-cashier-emails-and-names`);
+            if (response.data.success) {
+                setCashierData(response.data.cashierData);
+                //console.log(response.data.cashierData);
             } else {
                 toast.error(response.data.message);
             }
@@ -283,6 +299,7 @@ const StoreContextProvider = (props) => {
         filteredFoodList: prioritizedFoodList, // Use prioritized list
         autocompleteSuggestions,
         fetchFavorites,
+        fetchCashierData, cashierData
     };
 
     return (

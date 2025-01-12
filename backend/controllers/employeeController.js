@@ -176,6 +176,32 @@ export const employee_Profile = async (req, res) => {
   }
 };
 
+// API to get employee emails and names with position 'cashier'
+export const getCashierEmailsAndNames = async (req, res) => {
+  try {
+    // Fetching employee data with the position 'cashier' from the database using Prisma
+    const cashierData = await prisma.employee.findMany({
+      where: { position: "cashier" },
+      select: {
+        firstName: true,
+        lastName: true,
+        email: true,
+      },
+    });
+
+    // Check if any cashiers are found
+    if (cashierData.length === 0) {
+      return res.json({ success: false, message: "No cashiers found" });
+    }
+
+    // Respond with success and cashier data
+    res.json({ success: true, cashierData });
+  } catch (error) {
+    console.log("Error fetching cashier data:", error);
+    res.status(500).json({ success: false, message: "Internal server error" });
+  }
+};
+
 // API to update employee profile
 export const update_Employee_Profile = async (req, res) => {
   try {
