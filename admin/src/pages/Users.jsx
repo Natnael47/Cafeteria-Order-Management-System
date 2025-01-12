@@ -160,9 +160,7 @@ const Users = () => {
             <div className="flex items-center justify-between mb-6">
                 <h1 className="text-3xl font-bold text-gray-800">Customer</h1>
                 <div className="flex items-center space-x-4">
-                    <button className="px-4 py-2 bg-green-500 text-white rounded hover:bg-green-600">
-                        + New
-                    </button>
+
                     <button className="p-2 bg-gray-200 rounded hover:bg-gray-300">
                         <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" className="w-5 h-5">
                             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M4 8h16M4 16h16" />
