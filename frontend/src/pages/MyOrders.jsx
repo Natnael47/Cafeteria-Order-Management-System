@@ -90,8 +90,6 @@ const MyOrders = () => {
         return () => clearInterval(timer); // Cleanup on unmount
     }, [loading]); // Depend on loading to delay notification updates
 
-
-
     // Cancel order function
     const cancelOrder = async () => {
         try {
@@ -102,7 +100,16 @@ const MyOrders = () => {
             );
 
             if (response.data.success) {
-                toast.success("Order canceled successfully.");
+                // Show the success message from backend
+                const message = response.data.message;
+
+                // If there is an amount paid (for paid orders), show that too
+                if (response.data.amountPaid) {
+                    toast.success(`${message} Amount refunded: $${response.data.amountPaid}`);
+                } else {
+                    toast.success(message); // Order was canceled successfully
+                }
+
                 loadOrderData(); // Reload orders to reflect the updated status
             } else {
                 alert(response.data.message || "Failed to cancel the order.");
@@ -114,6 +121,7 @@ const MyOrders = () => {
             closeModal();
         }
     };
+
 
     // Open modal and set selected order ID
     const openModal = (orderId) => {

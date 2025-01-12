@@ -841,17 +841,68 @@ const cancelOrder = async (req, res) => {
       });
     }
 
-    // Update the order status to "canceled"
-    const updatedOrder = await prisma.order.update({
+    // Fetch the order with its associated payment details
+    const order = await prisma.order.findUnique({
       where: { id: parseInt(orderId) },
-      data: { status: "Canceled" },
+      include: { payment: true }, // Include related payment data
     });
 
-    res.json({
-      success: true,
-      message: "Order has been canceled successfully",
-      order: updatedOrder,
-    });
+    if (!order) {
+      return res.json({
+        success: false,
+        message: "Order not found",
+      });
+    }
+
+    // Check if the order is paid
+    if (order.isPaid) {
+      const payment = order.payment[0]; // Assuming one payment per order
+
+      if (!payment || !payment.transactionId) {
+        return res.json({
+          success: false,
+          message: "Payment transaction not found",
+        });
+      }
+
+      // Fetch the payment details from Stripe using the transactionId
+      const session = await stripe.checkout.sessions.retrieve(
+        payment.transactionId
+      );
+
+      if (!session) {
+        return res.json({
+          success: false,
+          message: "Error retrieving transaction from Stripe",
+        });
+      }
+
+      // Calculate the amount paid (in cents)
+      const amountPaid = session.amount_total / 100; // Convert from cents to dollars
+
+      // Here you can add logic to refund the payment if needed.
+      // For now, just return the amount paid.
+
+      // Return the amount paid if the payment was successful
+      return res.json({
+        success: true,
+        message: "Order canceled successfully, and payment details returned",
+        order: { ...order, status: "Canceled" },
+        amountPaid: amountPaid, // Return the amount paid by Stripe
+      });
+    } else {
+      // If the order was not paid, simply cancel the order
+      const updatedOrder = await prisma.order.update({
+        where: { id: parseInt(orderId) },
+        data: { status: "Canceled" },
+      });
+
+      res.json({
+        success: true,
+        message: "Order has been canceled successfully",
+        order: updatedOrder,
+      });
+    }
   } catch (error) {
     console.error("Error canceling order:", error);
     res.json({
