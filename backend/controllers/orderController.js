@@ -243,7 +243,7 @@ const PlaceOrderStripe = async (req, res) => {
     // Create Stripe line items
     const line_items = items.map((item) => ({
       price_data: {
-        currency: "usd", // Replace with appropriate currency
+        currency: "ETB", // Replace with appropriate currency
         product_data: { name: item.name },
         unit_amount: item.price * 100,
       },
@@ -252,10 +252,10 @@ const PlaceOrderStripe = async (req, res) => {
 
     // Add delivery charge if the service type is Delivery
     if (serviceType === "Delivery") {
-      const delivery_charge = 500; // Replace with actual delivery charge
+      const delivery_charge = 80; // Replace with actual delivery charge
       line_items.push({
         price_data: {
-          currency: "usd", // Replace with appropriate currency
+          currency: "ETB", // Replace with appropriate currency
           product_data: { name: "Delivery Charges" },
           unit_amount: delivery_charge * 100,
         },

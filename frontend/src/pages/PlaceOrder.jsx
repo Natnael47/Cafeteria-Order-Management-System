@@ -163,38 +163,44 @@ const PlaceOrder = () => {
                 serviceType: orderType === 'delivery' ? 'Delivery' : 'Dine-In',
                 ...(orderType === 'dine-in' && { dineInTime }),
             };
-            //console.log(orderData);
 
             let response;
+
             if (method === 'cod') {
+                // For COD, just place the order and show success
                 response = await axios.post(`${backendUrl}/api/order/place`, orderData, { headers: { token } });
+                if (response?.data?.success) {
+                    toast.success('Order placed successfully!');
+                    clearCart(); // Clears the cart
+                    navigate('/myorders');
+                } else {
+                    toast.error(response?.data?.message || 'Order placement failed.');
+                }
             } else if (method === 'stripe') {
+                // For Stripe, initiate payment and redirect to Stripe checkout
                 response = await axios.post(`${backendUrl}/api/order/stripe`, orderData, { headers: { token } });
                 if (response.data.success) {
-                    window.location.replace(response.data.session_url);
+                    window.location.replace(response.data.session_url); // Redirect to Stripe checkout
+                } else {
+                    toast.error(response.data.message || 'Failed to initiate payment.');
                 }
             } else if (method === 'chapa') {
+                // For Chapa, initiate payment and redirect to Chapa checkout
                 response = await axios.post(`${backendUrl}/api/order/chapa`, orderData, { headers: { token } });
                 if (response.data.success) {
                     window.location.href = response.data.checkout_url; // Redirect to Chapa checkout
                 } else {
                     console.error('Chapa Payment Error:', response.data.message);
-                    alert(response.data.message || "Failed to initialize payment.");
+                    toast.error(response.data.message || 'Failed to initialize payment.');
                 }
             }
 
-            if (response?.data?.success) {
-                toast.success('Order placed successfully!');
-                clearCart(); // Clears the cart
-                navigate('/myorders');
-            } else {
-                toast.error(response?.data?.message || 'Order placement failed.');
-            }
         } catch (error) {
             console.error('Error placing order:', error);
             toast.error('An error occurred while placing the order.');
         }
     };
+
 
     return (
         <>
