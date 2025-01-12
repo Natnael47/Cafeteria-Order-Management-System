@@ -42,14 +42,14 @@ const Menu = () => {
             </div>
 
             {/* Header */}
-            <div className="text-center mt-6">
+            <div className="text-center mt-4">
                 <p className="text-gray-600 mt-2">
                     Browse through our handpicked selection of {menuType.toLowerCase()}.
                 </p>
             </div>
 
             {/* Categories Horizontal Scroll */}
-            <div className="mt-8 w-full">
+            <div className="mt-5 w-full">
                 <div className="flex justify-between gap-3 w-full overflow-x-auto scrollbar-hide">
                     {(menuType === "Food" ? foodCategories : drinkCategories).map((cat) => (
                         <button
