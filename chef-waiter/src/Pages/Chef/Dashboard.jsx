@@ -16,7 +16,7 @@ const Dashboard = () => {
             });
             if (response.data.success) {
                 setDashboardData(response.data.data);
-                console.log(response.data.data);
+                //console.log(response.data.data);
             } else {
                 console.error('Error fetching Dashboard data');
             }

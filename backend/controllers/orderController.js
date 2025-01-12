@@ -508,6 +508,7 @@ const displayOrdersForChef = async (req, res) => {
       totalPrepTime: order.totalPrepTime,
       estimatedCompletionTime: order.estimatedCompletionTime,
       chefId: order.chefId,
+      userId: order.userId,
     }));
 
     res.json({ success: true, orders: formattedOrders });

@@ -1,5 +1,5 @@
 import axios from "axios";
-import { Check, ChefHat, CookingPot, CupSoda, Timer, Utensils } from 'lucide-react';
+import { Check, CookingPot, CupSoda, Timer, Utensils } from 'lucide-react';
 import React, { useContext, useEffect, useState } from "react";
 import { backendUrl } from "../../App";
 import { ChefContext } from "../../Context/ChefContext";
@@ -161,7 +161,6 @@ const ChefOrders = () => {
         setTimeLeft(null); // Reset timer
         fetchOrders(); // Refresh the orders
     };
-
     return (
         <div className="m-5 w-full max-w-6xl mx-auto">
             {currentOrderId ? (
@@ -171,59 +170,83 @@ const ChefOrders = () => {
                         <div className="flex items-center justify-center py-4 px-6 mb-6 bg-yellow-100 text-yellow-800 font-bold text-lg rounded-lg shadow-lg">
                             <Timer className="text-2xl mr-2" />
                             <span>
-                                Time Remaining:{" "}
+                                Order Time:{" "}
                                 {timeLeft >= 3600
-                                    ? `${Math.floor(timeLeft / 3600)}:${String(Math.floor((timeLeft % 3600) / 60)).padStart(2, "0")}:${String(timeLeft % 60).padStart(2, "0")}`
-                                    : `${Math.floor(timeLeft / 60)}:${String(timeLeft % 60).padStart(2, "0")}`}
+                                    ? `${Math.floor(timeLeft / 3600)}:${String(
+                                        Math.floor((timeLeft % 3600) / 60)
+                                    ).padStart(2, "0")}:${String(timeLeft % 60).padStart(2, "0")}`
+                                    : `${Math.floor(timeLeft / 60)}:${String(timeLeft % 60).padStart(
+                                        2,
+                                        "0"
+                                    )}`}
                             </span>
                         </div>
                     )}
 
-                    {/* Order Items Section */}
+                    {/* Current Order Items Section */}
                     <h2 className="text-3xl font-bold text-gray-800 mb-6">Order Items</h2>
-                    <div className="bg-gray-50 rounded-lg p-6 shadow-md max-h-[85vh] overflow-y-auto">
+                    <div className=" rounded-lg max-h-[85vh] overflow-y-auto">
                         {currentOrderItems.length > 0 ? (
-                            currentOrderItems.map((item) => (
+                            currentOrderItems.map((item, index) => (
                                 <div
                                     key={item.id}
-                                    className={`flex justify-between items-center border rounded-lg p-5 my-4 shadow-md hover:shadow-lg transition-shadow ${item.type === "drink" ? "bg-blue-50" : "bg-white"
-                                        }`}
+                                    className={`flex items-center border rounded-lg p-5 my-4 shadow-lg hover:shadow-2xl transition-shadow ${item.type === "drink" ? "bg-blue-50" : "bg-white"}`}
                                 >
-                                    <div>
-                                        <p className="text-lg font-semibold text-gray-800 flex items-center mb-2">
-                                            <Utensils className="mr-2 text-green-600" />
+                                    {/* Number Badge */}
+                                    <div className="flex items-center justify-center w-12 h-12 rounded-full bg-green-500 text-white font-bold text-xl mr-6">
+                                        {index + 1}
+                                    </div>
+                                    <div className="flex-grow">
+                                        <p className="text-xl font-semibold text-gray-800 flex items-center mb-3">
+                                            <Utensils className="mr-3 text-green-600 text-2xl" />
                                             {item.foodName}
                                         </p>
-                                        <p className="text-sm text-gray-600">{item.description || "No description available"}</p>
-                                        <p className="text-gray-700 mt-1 font-medium">Quantity: {item.quantity}</p>
-                                        {item.customNote && <p className="text-sm text-red-600 mt-1">Customization: {item.customNote}</p>}
+
+                                        <p className="text-lg text-gray-700 font-medium mt-2">
+                                            Quantity: <span className="text-blue-600 font-semibold">{item.quantity}</span>
+                                        </p>
+
+                                        {item.customNote && (
+                                            <p className="text-sm text-red-600 mt-2 font-semibold">
+                                                <span className="font-bold">Customization:</span> {item.customNote}
+                                            </p>
+                                        )}
                                     </div>
-                                    {item.cookingStatus === "Done" ? (
-                                        <div className="text-green-600 font-semibold flex items-center">
-                                            <Check className="text-2xl mr-2" />
-                                            Completed
-                                        </div>
-                                    ) : (
-                                        <button
-                                            onClick={() => completeItem(item.id)}
-                                            className="p-2 bg-green-500 text-white font-semibold rounded-lg hover:bg-green-600 transition flex items-center"
-                                        >
-                                            <Check className="mr-2" /> Done
-                                        </button>
-                                    )}
+
+                                    <div>
+                                        {item.cookingStatus === "Done" ? (
+                                            <div className="text-green-600 font-semibold flex items-center mt-2">
+                                                <Check className="text-2xl mr-2" />
+                                                <span className="text-lg">Completed</span>
+                                            </div>
+                                        ) : (
+                                            <button
+                                                onClick={() => completeItem(item.id)}
+                                                className="p-3 bg-green-500 text-white font-semibold rounded-lg hover:bg-green-600 transition flex items-center"
+                                            >
+                                                <Check className="mr-2" />
+                                                Mark as Done
+                                            </button>
+                                        )}
+                                    </div>
                                 </div>
                             ))
                         ) : (
-                            <p className="text-center text-gray-700">No order items found.</p>
+                            <p className="text-center text-gray-700 text-xl">No order items found.</p>
                         )}
+
                         <div className="text-center mt-6">
                             <button
                                 onClick={completeOrder}
-                                className={`p-3 font-semibold rounded-lg shadow-lg transition ${currentOrderItems.every((item) => item.cookingStatus === "Done")
+                                className={`p-3 font-semibold rounded-lg shadow-lg transition ${currentOrderItems.every(
+                                    (item) => item.cookingStatus === "Done"
+                                )
                                     ? "bg-blue-500 text-white hover:bg-blue-600"
                                     : "bg-gray-300 text-gray-500 cursor-not-allowed"
                                     }`}
-                                disabled={!currentOrderItems.every((item) => item.cookingStatus === "Done")}
+                                disabled={!currentOrderItems.every(
+                                    (item) => item.cookingStatus === "Done"
+                                )}
                             >
                                 Complete Order
                             </button>
@@ -233,25 +256,54 @@ const ChefOrders = () => {
             ) : (
                 <div>
                     <h2 className="text-3xl font-bold text-gray-800 mb-6">New Orders</h2>
-                    <div className="bg-gray-50 rounded-lg p-6 shadow-md max-h-[85vh] overflow-y-auto">
+                    <div className=" rounded-lg max-h-[85vh] overflow-y-auto">
                         {orders.length > 0 ? (
-                            orders.map((order) => (
+                            orders.map((order, orderIndex) => (
                                 <div
                                     key={order.id}
-                                    className="grid grid-cols-1 sm:grid-cols-[0.5fr_2fr_1fr_1fr] gap-6 items-center border rounded-lg p-5 my-4 bg-white shadow-md hover:shadow-lg transition-shadow"
+                                    className="grid grid-cols-1 sm:grid-cols-[0.5fr_2fr_2fr_1fr] gap-6 items-start border rounded-lg p-5 my-4 bg-white shadow-md hover:shadow-lg transition-shadow"
                                 >
+                                    {/* Number Badge */}
                                     <div className="flex justify-center items-center">
-                                        <ChefHat size={60} className="text-yellow-500" />
+                                        <div className="w-12 h-12 rounded-full bg-green-500 text-white font-bold text-lg flex items-center justify-center">
+                                            {orderIndex + 1}
+                                        </div>
                                     </div>
+
+                                    {/* Order Details */}
+                                    <div>
+                                        <p className="text-lg font-semibold text-gray-800 mb-2">
+                                            Order ID: <span className="font-mono text-green-600">OR-{order.id}</span>
+                                        </p>
+                                        <p className="text-sm text-gray-600">
+                                            Date: {new Date(order.date).toLocaleString()}
+                                        </p>
+                                        <p className="text-sm text-gray-600">
+                                            Service Type: <span className="font-medium">{order.serviceType}</span>
+                                        </p>
+                                        {order.serviceType === "Dine In" && order.dineInTime && (
+                                            <p className="text-sm text-gray-600">
+                                                Dine-In Time: {new Date(order.dineInTime).toLocaleTimeString()}
+                                            </p>
+                                        )}
+                                    </div>
+
+                                    {/* Order Items */}
                                     <div>
                                         {Array.isArray(order.items) && order.items.length > 0 ? (
                                             order.items.map((item, index) => (
                                                 <p
                                                     key={index}
-                                                    className={`text-lg font-medium flex items-center mb-2 ${item.type === "drink" ? "bg-blue-50 p-2 rounded-md" : ""
+                                                    className={`text-lg font-medium flex items-center mb-2 ${item.type === "drink"
+                                                        ? "bg-blue-50 p-2 rounded-md"
+                                                        : ""
                                                         }`}
                                                 >
-                                                    {item.type === "drink" ? <CupSoda className="text-blue-500 mr-2" /> : <CookingPot className="text-blue-500 mr-2" />}
+                                                    {item.type === "drink" ? (
+                                                        <CupSoda className="text-blue-500 mr-2" />
+                                                    ) : (
+                                                        <CookingPot className="text-blue-500 mr-2" />
+                                                    )}
                                                     {item.name}
                                                     <span className="mx-2 text-gray-500">x</span>
                                                     {item.quantity}
@@ -260,23 +312,16 @@ const ChefOrders = () => {
                                         ) : (
                                             <p className="text-sm text-gray-600">No items available</p>
                                         )}
-                                        <p className="mt-3 font-medium text-gray-700">{order.address.firstName} {order.address.lastName}</p>
-                                        <p className="text-gray-600">{order.address.line1}, {order.address.line2}</p>
-                                        <p className="text-gray-600">{order.address.phone}</p>
                                     </div>
-                                    <div>
-                                        <p className="font-medium text-gray-700">Items: {order.items.length}</p>
-                                        <p className="text-gray-600 mt-2">Method: {order.paymentMethod}</p>
-                                        <p className={`font-semibold ${order.isPaid ? "text-green-500" : "text-red-500"} mt-1`}>
-                                            Payment: {order.isPaid ? "Done" : "Pending"}
-                                        </p>
-                                        <p className="text-gray-600 mt-1">Date: {new Date(order.date).toLocaleDateString()}</p>
-                                    </div>
+
+                                    {/* Action Button */}
                                     <div className="flex justify-center">
                                         <button
                                             onClick={() => acceptOrder(order.id)}
                                             disabled={!!currentOrderId}
-                                            className={`p-3 rounded-lg shadow-lg transition ${currentOrderId ? "bg-gray-400 text-gray-500 cursor-not-allowed" : "bg-blue-500 text-white hover:bg-blue-600"
+                                            className={`p-3 rounded-lg shadow-lg transition ${currentOrderId
+                                                ? "bg-gray-400 text-gray-500 cursor-not-allowed"
+                                                : "bg-blue-500 text-white hover:bg-blue-600"
                                                 }`}
                                         >
                                             Accept Order
@@ -287,6 +332,7 @@ const ChefOrders = () => {
                         ) : (
                             <p className="text-center text-gray-700">No orders to display.</p>
                         )}
+
                     </div>
                 </div>
             )}
