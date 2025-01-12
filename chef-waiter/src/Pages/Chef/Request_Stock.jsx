@@ -14,6 +14,7 @@ const Request_Stock = () => {
     const [searchTerm, setSearchTerm] = useState("");
     const [selectedIndex, setSelectedIndex] = useState(null);
     const [requestQuantity, setRequestQuantity] = useState("");
+    const [requestReason, setRequestReason] = useState("");
     const [error, setError] = useState(null);
     const requestRef = useRef(null);
 
@@ -76,10 +77,10 @@ const Request_Stock = () => {
     return (
         <div className="flex flex-col m-5 w-full max-w-6.5xl">
             {/* Header Section */}
-            <p className="mb-4 text-xl font-bold text-gray-800">Request Inventory Stock</p>
+            <p className="mb-6 text-2xl font-bold text-gray-800">Request Inventory Stock</p>
 
             {/* Search and Add Button */}
-            <div className="flex items-center justify-between mb-4">
+            <div className="flex items-center justify-between mb-6">
                 <div className="flex items-center gap-4">
                     <span className="text-gray-600 font-medium">{getFormattedDate()}</span>
                     <input
@@ -90,36 +91,32 @@ const Request_Stock = () => {
                         className="border border-gray-300 rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500 transition"
                     />
                 </div>
-                <button
-                    className="bg-blue-600 text-white rounded-lg px-6 py-2 hover:bg-blue-700 transition w-40 shadow-md"
-                >
-                    Add Item
-                </button>
             </div>
 
             {/* Inventory List Section */}
-            <div className="bg-gray-100 rounded-lg w-full max-h-[80vh] overflow-auto shadow-md">
+            <div className="bg-white rounded-xl w-full max-h-[80vh] overflow-auto shadow-lg border border-gray-200">
                 {/* Table Header */}
-                <div className="grid grid-cols-[1fr_1fr_1fr_0.6fr_0.6fr_0.6fr] items-center gap-4 p-3 border-b bg-gray-200 text-sm font-semibold text-gray-700">
+                <div className="grid grid-cols-[1fr_1fr_1fr_0.6fr_0.6fr_0.6fr] items-center gap-6 p-4 bg-gray-100 text-sm font-bold text-gray-800 border-b">
                     <span>Status</span>
                     <span>Name</span>
                     <span>Category</span>
                     <span>Quantity</span>
                     <span>Price / Unit</span>
-                    <span>Request</span>
+                    <span>Action</span>
                 </div>
 
                 {/* Inventory Items */}
                 {filteredInventoryList.map((item, index) => (
-                    <div key={index} className="border-b">
+                    <div key={index} className="border-b last:border-none">
                         {/* Inventory Row */}
                         <div
-                            className={`grid grid-cols-[1fr_1fr_1fr_0.6fr_0.6fr_0.6fr] items-center gap-4 p-3 text-sm bg-white hover:bg-gray-50 transition ${item.status === "out of stock" && "bg-red-50"
+                            className={`grid grid-cols-[1fr_1fr_1fr_0.6fr_0.3fr_0.9fr] items-center gap-6 p-4 text-sm transition ${item.status === "out of stock" ? "bg-red-50" : "bg-white hover:bg-gray-50"
                                 }`}
                         >
-                            <div className="relative w-full bg-gray-300 rounded h-6">
+                            {/* Status Bar */}
+                            <div className="relative w-full bg-gray-200 rounded-full h-6 overflow-hidden">
                                 <div
-                                    className="absolute top-0 left-0 h-6 rounded transition-all"
+                                    className="absolute top-0 left-0 h-6 rounded-full transition-all"
                                     style={{
                                         width: `${Math.min(Number(item.status), 100)}%`,
                                         backgroundColor: `hsl(${Math.min(Number(item.status), 100) * 1.2}, 100%, 50%)`,
@@ -129,25 +126,25 @@ const Request_Stock = () => {
                                     {item.status}%
                                 </p>
                             </div>
-                            <p className="text-gray-700 font-medium">{item.name}</p>
+                            <p className="text-gray-800 font-medium">{item.name}</p>
                             <p className="text-gray-600">{item.category}</p>
                             <p className="text-gray-600">{item.quantity} {item.unit}</p>
                             <p className="text-gray-600">${item.pricePerUnit}</p>
                             <button
-                                className="text-blue-500 hover:text-blue-700 font-semibold transition"
+                                className="text-blue-600 hover:text-blue-800 font-semibold transition"
                                 onClick={() => handleRequestClick(index)}
                             >
                                 Request More
                             </button>
                         </div>
 
-                        {/* Request Modal (Stays in Place) */}
+                        {/* Request Modal */}
                         {selectedIndex === index && (
-                            <div ref={requestRef} className="p-4 bg-gray-50 border-t">
-                                <h3 className="text-lg font-bold text-gray-800 mb-2">Request Inventory Stock</h3>
-                                {error && <p className="text-red-500 text-sm mb-2">{error}</p>}
-                                <div className="mb-3">
-                                    <label className="block text-sm font-medium text-gray-700">Quantity</label>
+                            <div ref={requestRef} className="p-6 bg-gray-50 border-t">
+                                <h3 className="text-lg font-bold text-gray-900 mb-4">Request Inventory Stock</h3>
+                                {error && <p className="text-red-500 text-sm mb-3">{error}</p>}
+                                <div className="mb-4">
+                                    <label className="block text-sm font-medium text-gray-700 mb-1">Quantity</label>
                                     <input
                                         type="number"
                                         value={requestQuantity}
@@ -155,10 +152,23 @@ const Request_Stock = () => {
                                         className="border border-gray-300 rounded-lg px-4 py-2 w-full focus:ring-2 focus:ring-blue-500"
                                     />
                                 </div>
+                                <div className="mb-4">
+                                    <label className="block text-sm font-medium text-gray-700 mb-1">Reason</label>
+                                    <select
+                                        value={requestReason}
+                                        onChange={(e) => setRequestReason(e.target.value)}
+                                        className="border border-gray-300 rounded-lg px-4 py-2 w-full focus:ring-2 focus:ring-blue-500"
+                                    >
+                                        <option value="finish">Finish</option>
+                                        <option value="damaged">Damaged</option>
+                                        <option value="expired">Expired</option>
+                                        <option value="other">Other</option>
+                                    </select>
+                                </div>
                                 <div className="flex gap-4 mt-4">
                                     <button
                                         onClick={() => setSelectedIndex(null)}
-                                        className="px-4 py-2 bg-gray-300 text-gray-700 rounded-lg hover:bg-gray-400 transition"
+                                        className="px-4 py-2 bg-gray-200 text-gray-800 rounded-lg hover:bg-gray-300 transition"
                                     >
                                         Cancel
                                     </button>
@@ -174,8 +184,10 @@ const Request_Stock = () => {
                     </div>
                 ))}
             </div>
+
         </div>
     );
+
 };
 
 export default Request_Stock;
