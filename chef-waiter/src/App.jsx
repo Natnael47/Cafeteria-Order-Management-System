@@ -13,7 +13,6 @@ import AddInventory from './Pages/Inventory_manager/AddInventory';
 import Inventory from './Pages/Inventory_manager/Inventory';
 import Inventory_Dashboard from './Pages/Inventory_manager/Inventory_Dashboard';
 import Inventory_Orders from './Pages/Inventory_manager/Inventory_Orders';
-import Reports from './Pages/Inventory_manager/Reports';
 import Stock from './Pages/Inventory_manager/Stock';
 import Suppliers from './Pages/Inventory_manager/Suppliers';
 import Login from './Pages/Login';
@@ -43,7 +42,6 @@ const App = () => {
 
           {/* inventory manager Route----- */}
           <Route path='/inventory' element={<Inventory />} />
-          <Route path='/reports' element={<Reports />} />
           <Route path='/inv-dashboard' element={<Inventory_Dashboard />} />
           <Route path='/suppliers' element={<Suppliers />} />
           <Route path='/inv-orders' element={<Inventory_Orders />} />

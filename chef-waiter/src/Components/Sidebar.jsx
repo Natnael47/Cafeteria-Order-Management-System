@@ -1,6 +1,5 @@
 import {
     ArrowUpDown,
-    ClipboardList,
     HandPlatter,
     LayoutDashboard,
     PackageOpen,
@@ -163,7 +162,7 @@ const SideBar = () => {
                     </NavLink>
 
                     <NavLink
-                        to="/reports"
+                        to="/inventory"
                         className={({ isActive }) =>
                             `flex items-center gap-3 py-3.5 px-3 md:px-9 md:min-w-72 cursor-pointer transition-transform duration-300 ease-in-out ${isActive
                                 ? "bg-[#22C55E] scale-95 border-r-4 rounded-md shadow-lg border-[#22C55E]"
@@ -173,7 +172,7 @@ const SideBar = () => {
                     >
                         {({ isActive }) => (
                             <>
-                                <ClipboardList
+                                <Store
                                     size={isActive ? activeIconSize : defaultIconSize}
                                     color={isActive ? activeIconColor : defaultIconColor}
                                     strokeWidth={isActive ? 2.5 : 2}
@@ -182,7 +181,7 @@ const SideBar = () => {
                                     className={`hidden md:block transition-colors duration-300 ease-in-out ${isActive ? "text-white font-bold" : "text-black"
                                         }`}
                                 >
-                                    Reports
+                                    Inventory
                                 </p>
                             </>
                         )}
@@ -209,32 +208,6 @@ const SideBar = () => {
                                         }`}
                                 >
                                     Suppliers
-                                </p>
-                            </>
-                        )}
-                    </NavLink>
-
-                    <NavLink
-                        to="/inventory"
-                        className={({ isActive }) =>
-                            `flex items-center gap-3 py-3.5 px-3 md:px-9 md:min-w-72 cursor-pointer transition-transform duration-300 ease-in-out ${isActive
-                                ? "bg-[#22C55E] scale-95 border-r-4 rounded-md shadow-lg border-[#22C55E]"
-                                : "hover:bg-gray-100  hover:scale-95 hover:rounded-md"
-                            }`
-                        }
-                    >
-                        {({ isActive }) => (
-                            <>
-                                <Store
-                                    size={isActive ? activeIconSize : defaultIconSize}
-                                    color={isActive ? activeIconColor : defaultIconColor}
-                                    strokeWidth={isActive ? 2.5 : 2}
-                                />
-                                <p
-                                    className={`hidden md:block transition-colors duration-300 ease-in-out ${isActive ? "text-white font-bold" : "text-black"
-                                        }`}
-                                >
-                                    Inventory
                                 </p>
                             </>
                         )}

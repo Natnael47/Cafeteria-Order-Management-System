@@ -197,7 +197,7 @@ const PlaceOrderStripe = async (req, res) => {
         dineInTime: dineInTimestamp,
         amount,
         items, // Save items as an array
-        paymentMethod: "stripe",
+        paymentMethod: "stripe", // Set payment method
         isPaid: false,
         date: currentTime,
         status: "Order Placed",
@@ -270,6 +270,26 @@ const PlaceOrderStripe = async (req, res) => {
       mode: "payment",
       success_url: `${origin}/verify?success=true&orderId=${newOrder.id}`,
       cancel_url: `${origin}/verify?success=false&orderId=${newOrder.id}`,
+    });
+
+    // Save the Stripe session ID to the payment table
+    const payment = await prisma.payment.create({
+      data: {
+        amount, // Original amount before any adjustments
+        totalAmount: amount, // Final amount, could include taxes and discounts
+        method: "stripe",
+        status: "Pending", // Initial status
+        transactionId: session.id, // Save the Stripe session ID as the transactionId
+        orderId: newOrder.id, // Associate payment with the order
+      },
+    });
+
+    // Update the order with the payment session ID (this should be in the `payment` table)
+    await prisma.order.update({
+      where: { id: newOrder.id },
+      data: {
+        paymentMethod: "stripe", // Ensure payment method is marked as stripe
+      },
     });
 
     res.json({ success: true, session_url: session.url });
@@ -671,11 +691,36 @@ const verifyStripe = async (req, res) => {
 
   try {
     if (success === "true") {
-      await prisma.order.update({
+      // Update the order status
+      const updatedOrder = await prisma.order.update({
         where: { id: parseInt(orderId, 10) }, // Ensure orderId is an integer
-        data: { isPaid: true },
+        data: {
+          isPaid: true,
+          paymentMethod: "stripe", // Ensure payment method is stripe
+        },
       });
 
+      // Find the payment record associated with the order
+      const paymentRecord = await prisma.payment.findFirst({
+        where: { orderId: updatedOrder.id },
+      });
+
+      if (!paymentRecord) {
+        return res
+          .status(404)
+          .json({ success: false, message: "Payment record not found" });
+      }
+
+      // Update the payment session ID in the payment table
+      await prisma.payment.update({
+        where: { id: paymentRecord.id }, // Use the unique ID of the payment record
+        data: {
+          status: "Paid", // Update payment status
+          transactionId: req.query.session_id, // Save Stripe session ID
+        },
+      });
+
+      // Clear user's cart after successful payment
       await prisma.user.update({
         where: { id: userId },
         data: { cartData: {} },
