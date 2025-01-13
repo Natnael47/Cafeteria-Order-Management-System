@@ -27,7 +27,6 @@ const MyOrders = () => {
         return orders.filter(order => order.status.toLowerCase() === currentTab);
     };
 
-    // Load order data
     // Load order data and filter based on time period
     const loadOrderData = async () => {
         try {
@@ -151,24 +150,44 @@ const MyOrders = () => {
         }
     };
 
-    const GenerateReceipt = async () => {
+    // Function to fetch receipt data for the selected order
+    const GenerateReceipt = async (orderId) => {
         try {
             const response = await axios.post(
                 `${backendUrl}/api/order/payment-receipt`,
-                { orderId: selectedOrderId },
+                { orderId }, // Use the passed orderId directly
                 { headers: { token } }
             );
-
             if (response.data.success) {
-
+                setReceiptData(response.data.receipt); // Update receipt data
+                //console.log(response.data.receipt);
             } else {
-
+                toast.error(response.data.message);
             }
         } catch (error) {
-        } finally {
-            closeModal();
+            console.error("Error generating receipt:", error);
+            toast.error("Failed to generate receipt. Please try again.");
         }
     };
+
+    // Handler to open receipt modal and fetch receipt data
+    const openReceiptModal = async (orderId) => {
+        setSelectedOrderId(orderId); // Update state for selected order
+        try {
+            await GenerateReceipt(orderId); // Pass orderId directly to GenerateReceipt
+            setReceiptModalIsOpen(true); // Open the modal after fetching receipt data
+        } catch (error) {
+            console.error("Error opening receipt modal:", error);
+        }
+    };
+
+    // Close the receipt modal
+    const closeReceiptModal = () => {
+        setReceiptModalIsOpen(false);
+        setReceiptData(null); // Clear receipt data
+    };
+
+
 
     // Open modal and set selected order ID
     const openModal = (orderId) => {
@@ -212,16 +231,6 @@ const MyOrders = () => {
 
     const [receiptModalIsOpen, setReceiptModalIsOpen] = useState(false);
     const [receiptData, setReceiptData] = useState(null);
-
-    const openReceiptModal = (order) => {
-        setReceiptData(order);
-        setReceiptModalIsOpen(true);
-    };
-
-    const closeReceiptModal = () => {
-        setReceiptModalIsOpen(false);
-        setReceiptData(null);
-    };
 
 
     return (
@@ -337,11 +346,12 @@ const MyOrders = () => {
                                     )}
                                     <h3 className="font-semibold">Order Details</h3>
                                     <button
-                                        onClick={() => openReceiptModal(order)}
+                                        onClick={() => openReceiptModal(order.id)}
                                         className="border border-blue-500 px-4 py-2 text-sm font-semibold rounded-sm mt-3 hover:bg-blue-200"
                                     >
                                         Generate Receipt
                                     </button>
+
 
                                     <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                                         {items.map((item, idx) => (
@@ -434,10 +444,13 @@ const MyOrders = () => {
                 <h2 className="font-semibold">Payment Receipt</h2>
                 {receiptData && (
                     <div>
-                        <p>Transaction ID: <strong>{receiptData.transactionId}</strong></p>
-                        <p>Order ID: <strong>{receiptData.id}</strong></p>
+                        <p>Transaction ID: <strong>{receiptData.paymentDetails.transactionId}</strong></p>
+                        <p>Order ID: <strong>{receiptData.orderId}</strong></p>
                         <p>Amount: <strong>${receiptData.amount}.00</strong></p>
                         <p>Date: <strong>{new Date(receiptData.date).toDateString()}</strong></p>
+                        <p>Service type: <strong>{receiptData.serviceType}</strong></p>
+                        <p>payment method: <strong>{receiptData.paymentDetails.method}</strong></p>
+                        <p>order status: <strong>{receiptData.status}</strong></p>
                         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mt-4">
                             {receiptData.items.map((item, idx) => (
                                 <div key={idx} className="flex flex-col items-center">

@@ -1,5 +1,5 @@
 import axios from "axios";
-import { ArrowDownToLine, ArrowUpFromLine } from "lucide-react";
+import { ArrowDown, ArrowUp } from "lucide-react";
 import React, { useContext, useEffect, useState } from "react";
 import { toast } from "react-toastify";
 import { backendUrl } from "../../App";
@@ -409,7 +409,7 @@ const Stock = () => {
                                             onClick={() => handleStockAction(item, "in")}
                                             className="px-3 py-2 mr-4 text-white bg-green-600 rounded hover:bg-green-700 border border-green-600 text-xs font-medium transition-all"
                                         >
-                                            <ArrowDownToLine />
+                                            <ArrowDown />
                                         </button>
                                     </div>
 
@@ -423,7 +423,7 @@ const Stock = () => {
                                                 : "text-gray-400 bg-gray-200 border border-gray-300 cursor-not-allowed"
                                                 }`}
                                         >
-                                            <ArrowUpFromLine />
+                                            <ArrowUp />
                                         </button>
                                     </div>
                                 </div>
