@@ -22,6 +22,8 @@ const InventoryOrders = () => {
             });
             if (response.data.success) {
                 setRequestList(response.data.data); // Update the state with fetched order data
+                console.log(response.data.data);
+
             } else {
                 toast.error("Error fetching inventory orders");
             }
@@ -405,7 +407,7 @@ const InventoryOrders = () => {
 
                                     {/* Quantity */}
                                     <div className="px-4 py-3 border-r border-gray-300 text-center">
-                                        {request.quantity}
+                                        {request.quantity} {request.inventory.unit}
                                     </div>
 
                                     {/* Requested By */}

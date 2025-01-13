@@ -213,7 +213,8 @@ const InventoryContextProvide = (props) => {
         } catch (error) {
             console.error("Error adding supplier:", error);
             if (error.response) {
-                toast.error(` ${error.response.data.message || "Failed to add supplier"}`);
+                // Display the specific error message from the backend
+                toast.error(`${error.response.data.message || "Failed to add supplier"}`);
             } else if (error.request) {
                 toast.error("Network Error: No response received from the server");
             } else {
@@ -221,6 +222,7 @@ const InventoryContextProvide = (props) => {
             }
         }
     };
+
 
     // Function to update a supplier
     const updateSupplier = async (editSupplier, fetchSuppliers, cancelEdit) => {

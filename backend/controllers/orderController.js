@@ -877,14 +877,17 @@ const cancelOrder = async (req, res) => {
       // Calculate the amount paid (in cents)
       const amountPaid = session.amount_total / 100; // Convert from cents to dollars
 
-      // Here you can add logic to refund the payment if needed.
-      // For now, just return the amount paid.
+      // Update the order status to "Canceled"
+      const updatedOrder = await prisma.order.update({
+        where: { id: parseInt(orderId) },
+        data: { status: "Canceled" },
+      });
 
       // Return the amount paid if the payment was successful
       return res.json({
         success: true,
         message: "Order canceled successfully, and payment details returned",
-        order: { ...order, status: "Canceled" },
+        order: updatedOrder,
         amountPaid: amountPaid, // Return the amount paid by Stripe
       });
     } else {

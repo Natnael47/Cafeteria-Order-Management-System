@@ -910,13 +910,25 @@ const addSupplier = async (req, res) => {
       ? JSON.parse(req.body.contactInfo)
       : null;
 
+    // Check if a supplier with the same name already exists
+    const existingSupplierByName = await prisma.supplier.findUnique({
+      where: { name: req.body.name },
+    });
+
+    if (existingSupplierByName) {
+      return res.status(400).json({
+        success: false,
+        message: "Supplier name already exists",
+      });
+    }
+
     // Check if contactInfo exists and has an email
     if (contactInfo && contactInfo.email) {
-      const existingSupplier = await prisma.supplier.findUnique({
+      const existingSupplierByEmail = await prisma.supplier.findUnique({
         where: { email: contactInfo.email },
       });
 
-      if (existingSupplier) {
+      if (existingSupplierByEmail) {
         return res.status(400).json({
           success: false,
           message: "Email is already associated with another supplier",
@@ -1642,6 +1654,7 @@ const listInventoryRequests = async (req, res) => {
             image: true,
             status: true,
             quantity: true,
+            unit: true,
           },
         },
       },

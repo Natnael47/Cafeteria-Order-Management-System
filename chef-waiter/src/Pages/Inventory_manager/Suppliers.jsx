@@ -23,9 +23,9 @@ const Suppliers = () => {
     const [sortOrder, setSortOrder] = useState('ascending');     // Default ascending
 
     const handleEntriesChange = (e) => {
-        setEntriesPerPage(parseInt(e.target.value, 10)); // Update the state with the selected value
+        const value = e.target.value === 'all' ? 0 : parseInt(e.target.value, 10);
+        setEntriesPerPage(value); // Update the state with the selected value
     };
-    const displayedSuppliers = entriesPerPage === 0 ? supplierList : supplierList.slice(0, entriesPerPage);
 
     const [newSupplierData, setNewSupplierData] = useState({
         name: "",
@@ -88,6 +88,24 @@ const Suppliers = () => {
         }
     };
 
+    const filteredSuppliers = supplierList
+        .filter((supplier) =>
+            supplier.name.toLowerCase().includes(searchTerm.toLowerCase())
+        )
+        .sort((a, b) => {
+            if (sortAttribute === 'name') {
+                return sortOrder === 'ascending'
+                    ? a.name.localeCompare(b.name)
+                    : b.name.localeCompare(a.name);
+            }
+            // Add more sorting logic for other attributes if needed
+            return 0;
+        });
+
+    const displayedSuppliers =
+        entriesPerPage === 0 ? filteredSuppliers : filteredSuppliers.slice(0, entriesPerPage);
+
+
     return (
         <div className="flex flex-col m-5 w-full max-w-6.5xl">
             {/* Header */}
@@ -124,12 +142,16 @@ const Suppliers = () => {
                     {/* Entries Dropdown */}
                     <div className="flex items-center space-x-2 text-sm">
                         <label className="font-medium text-gray-700">Show</label>
-                        <select className="border border-gray-300 rounded px-3 py-1.5 focus:ring focus:ring-gray-200">
+                        <select
+                            className="border border-gray-300 rounded px-3 py-1.5 focus:ring focus:ring-gray-200"
+                            onChange={handleEntriesChange}
+                        >
                             <option value="all">All</option>
                             <option value="10">10</option>
                             <option value="25">25</option>
                             <option value="50">50</option>
                         </select>
+
                         <label className="font-medium text-gray-700">entries</label>
                     </div>
                     {/* Sorting  & search */}
@@ -141,6 +163,7 @@ const Suppliers = () => {
                             onChange={(e) => setSearchTerm(e.target.value)}
                             className="border border-gray-300 rounded px-4 py-2 w-full sm:w-64 shadow-sm focus:ring focus:ring-gray-200"
                         />
+
                     </div>
                 </div>
             </div>
