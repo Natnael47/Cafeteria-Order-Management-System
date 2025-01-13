@@ -395,7 +395,6 @@ export const change_Employee_Password = async (req, res) => {
 
 export const getChefDashboardData = async (req, res) => {
   try {
-    // Fetch relevant metrics for the chef
     const [
       totalOrdersCount,
       completedOrdersCount,
@@ -405,56 +404,48 @@ export const getChefDashboardData = async (req, res) => {
       averagePreparationTime,
       recentFeedback,
     ] = await Promise.all([
-      prisma.order.count(), // Total orders
-      prisma.order.count({
-        where: { status: "Completed" }, // Completed orders
-      }),
-      prisma.order.count({
-        where: { status: "Pending" }, // Pending orders
-      }),
+      prisma.order.count(),
+      prisma.order.count({ where: { status: "Completed" } }),
+      prisma.order.count({ where: { status: "Pending" } }),
       prisma.orderItem.groupBy({
         by: ["foodId"],
         _count: { foodId: true },
         orderBy: { _count: { foodId: "desc" } },
-        take: 5, // Top 5 selling items
+        take: 5,
       }),
-      prisma.order.aggregate({
-        _sum: { totalPrepTime: true }, // Sum of all preparation times
-      }),
-      prisma.order.aggregate({
-        _avg: { totalPrepTime: true }, // Average preparation time
-      }),
+      prisma.order.aggregate({ _sum: { totalPrepTime: true } }),
+      prisma.order.aggregate({ _avg: { totalPrepTime: true } }),
       prisma.feedback.findMany({
         orderBy: { date: "desc" },
-        take: 5, // Recent 5 feedback
+        take: 5,
       }),
     ]);
 
-    // Fetch food details for the top-selling items
     const topSellingItemsWithDetails = await Promise.all(
-      topSellingItems.map(async (item) => {
-        const foodDetails = await prisma.food.findUnique({
-          where: { id: item.foodId },
-          select: { name: true, category: true },
-        });
-        return {
-          foodId: item.foodId,
-          name: foodDetails?.name || "Unknown",
-          category: foodDetails?.category || "Unknown",
-          count: item._count.foodId,
-        };
-      })
+      topSellingItems
+        .filter((item) => item.foodId !== null) // Filter out items with null foodId
+        .map(async (item) => {
+          const foodDetails = await prisma.food.findUnique({
+            where: { id: item.foodId },
+            select: { name: true, category: true },
+          });
+          return {
+            foodId: item.foodId,
+            name: foodDetails?.name || "Unknown",
+            category: foodDetails?.category || "Unknown",
+            count: item._count.foodId,
+          };
+        })
     );
 
-    // Calculate average preparation time
     const avgPrepTime = averagePreparationTime._avg.totalPrepTime || 0;
 
     const dashData = {
       totalOrders: totalOrdersCount,
       completedOrders: completedOrdersCount,
       pendingOrders: pendingOrdersCount,
-      topSellingItems: topSellingItemsWithDetails, // Updated with detailed info
-      averagePreparationTime: avgPrepTime.toFixed(2), // Display average prep time
+      topSellingItems: topSellingItemsWithDetails,
+      averagePreparationTime: avgPrepTime.toFixed(2),
       recentFeedback: recentFeedback,
     };
 
