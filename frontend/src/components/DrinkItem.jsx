@@ -76,14 +76,14 @@ const DrinkItem = ({ id, name, price, description, image, rating, isAlcoholic })
                             className="w-8 h-8 flex items-center justify-center rounded-full bg-red-100 cursor-pointer hover:bg-red-200 transition"
                             onClick={() => removeFromCart(id, 'drink')} // Pass true for drinks
                         >
-                            <Minus className="text-red-700 w-4 h-4" />
+                            <Minus className="text-red-700 w-4 h-4" strokeWidth={4} />
                         </div>
                         <p className="text-base font-medium">{cartItemCount}</p>
                         <div
                             className="w-8 h-8 flex items-center justify-center rounded-full bg-green-100 cursor-pointer hover:bg-green-200 transition"
                             onClick={() => addToCart(id, 'drink')} // Pass true for drinks
                         >
-                            <Plus className="text-green-700 w-4 h-4" />
+                            <Plus className="text-green-700 w-4 h-4" strokeWidth={4} />
                         </div>
                     </div>
                 )}

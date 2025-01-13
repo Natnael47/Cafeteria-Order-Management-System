@@ -88,14 +88,6 @@ const Suppliers = () => {
         }
     };
 
-    const handleSortChange = (attribute, order) => {
-        setSortAttribute(attribute);
-        setSortOrder(order);
-        // Save the selected sorting state to localStorage
-        localStorage.setItem('sortAttribute', attribute);
-        localStorage.setItem('sortOrder', order);
-    };
-
     return (
         <div className="flex flex-col m-5 w-full max-w-6.5xl">
             {/* Header */}
@@ -133,6 +125,7 @@ const Suppliers = () => {
                     <div className="flex items-center space-x-2 text-sm">
                         <label className="font-medium text-gray-700">Show</label>
                         <select className="border border-gray-300 rounded px-3 py-1.5 focus:ring focus:ring-gray-200">
+                            <option value="all">All</option>
                             <option value="10">10</option>
                             <option value="25">25</option>
                             <option value="50">50</option>
@@ -156,14 +149,14 @@ const Suppliers = () => {
                 {/* Data Grid */}
                 <div className="bg-white shadow-lg border border-gray-300 rounded-lg overflow-hidden">
                     {/* Header Row */}
-                    <div className="grid grid-cols-[2fr_2fr_2fr_2fr_1fr_1fr_1fr] bg-gray-100 border-b border-gray-300 font-semibold text-gray-800">
-                        <div className="px-6 py-3 border-r border-gray-300 text-left">Supplier Name</div>
-                        <div className="px-6 py-3 border-r border-gray-300 text-left">Email</div>
-                        <div className="px-6 py-3 border-r border-gray-300 text-left">Phone</div>
-                        <div className="px-6 py-3 border-r border-gray-300 text-left">Address</div>
-                        <div className="px-6 py-3 border-r border-gray-300 text-center">Status</div>
-                        <div className="px-6 py-3 border-r border-gray-300 text-center">Modify</div>
-                        <div className="px-6 py-3 text-center">Remove</div>
+                    <div className="grid grid-cols-[1.5fr_2fr_1.5fr_2fr_1fr_1fr_1fr] bg-gray-200 border-b border-gray-300 font-semibold text-gray-800 text-sm">
+                        <div className="px-4 py-3 border-r border-gray-300 text-left">Supplier Name</div>
+                        <div className="px-4 py-3 border-r border-gray-300 text-left">Email</div>
+                        <div className="px-4 py-3 border-r border-gray-300 text-left">Phone</div>
+                        <div className="px-4 py-3 border-r border-gray-300 text-left">Address</div>
+                        <div className="px-4 py-3 border-r border-gray-300 text-center">Status</div>
+                        <div className="px-4 py-3 border-r border-gray-300 text-center">Modify</div>
+                        <div className="px-4 py-3 text-center">Remove</div>
                     </div>
 
                     {/* Data Rows */}
@@ -171,20 +164,20 @@ const Suppliers = () => {
                         displayedSuppliers.map((supplier, index) => (
                             <div
                                 key={supplier.id}
-                                className={`grid grid-cols-[2fr_2fr_2fr_2fr_1fr_1fr_1fr] text-sm ${index % 2 === 0 ? "bg-gray-50" : "bg-white"
-                                    } border-b border-gray-300 hover:bg-blue-50`}
+                                className={`grid grid-cols-[1.5fr_2fr_1.5fr_2fr_1fr_1fr_1fr] text-sm ${index % 2 === 0 ? "bg-gray-50" : "bg-white"
+                                    } border-b border-gray-300 hover:bg-blue-50 transition-all duration-150`}
                             >
-                                <div className="px-6 py-3 border-r border-gray-300">{supplier.name}</div>
-                                <div className="px-6 py-3 border-r border-gray-300">
+                                <div className="px-4 py-3 border-r border-gray-300 truncate">{supplier.name}</div>
+                                <div className="px-4 py-3 border-r border-gray-300 truncate">
                                     {supplier.contactInfo?.email || <span className="italic text-gray-500">N/A</span>}
                                 </div>
-                                <div className="px-6 py-3 border-r border-gray-300">
+                                <div className="px-4 py-3 border-r border-gray-300 truncate">
                                     {supplier.contactInfo?.phone || <span className="italic text-gray-500">N/A</span>}
                                 </div>
-                                <div className="px-6 py-3 border-r border-gray-300">
+                                <div className="px-4 py-3 border-r border-gray-300 truncate">
                                     {supplier.contactInfo?.address || <span className="italic text-gray-500">N/A</span>}
                                 </div>
-                                <div className="px-6 py-3 border-r border-gray-300 text-center">
+                                <div className="px-4 py-3 border-r border-gray-300 text-center">
                                     <span
                                         className={`px-2 py-1 rounded-full text-xs ${supplier.status === "active"
                                             ? "bg-green-100 text-green-800"
@@ -194,7 +187,7 @@ const Suppliers = () => {
                                         {supplier.status}
                                     </span>
                                 </div>
-                                <div className="px-6 py-3 border-r border-gray-300 text-center flex justify-center items-center">
+                                <div className="px-4 py-3 border-r border-gray-300 text-center flex justify-center items-center">
                                     <Pencil
                                         className="text-blue-500 cursor-pointer hover:text-blue-700"
                                         onClick={() => {
@@ -210,7 +203,7 @@ const Suppliers = () => {
                                         }}
                                     />
                                 </div>
-                                <div className="px-6 py-3 text-center flex justify-center items-center">
+                                <div className="px-4 py-3 text-center flex justify-center items-center">
                                     <Trash2
                                         className="text-red-500 cursor-pointer hover:text-red-700"
                                         onClick={() => {
