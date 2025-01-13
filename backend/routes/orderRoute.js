@@ -8,6 +8,7 @@ import {
   cancelOrder,
   completeOrderItem,
   displayOrdersForChef,
+  generatePaymentReceipt,
   getCustomizationNotes,
   getOrderItemsForChef,
   getTransactionDetails,
@@ -45,5 +46,6 @@ orderRouter.post("/order-items", empAuth, getOrderItemsForChef);
 
 orderRouter.get("/customization-notes", getCustomizationNotes);
 orderRouter.post("/transaction-details", getTransactionDetails);
+orderRouter.post("/payment-receipt", generatePaymentReceipt);
 
 export default orderRouter;

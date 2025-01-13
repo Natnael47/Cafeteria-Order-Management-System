@@ -1063,12 +1063,75 @@ const getTransactionDetails = async (req, res) => {
   }
 };
 
+// Generate order payment receipt
+const generatePaymentReceipt = async (req, res) => {
+  try {
+    const { orderId } = req.body;
+
+    // Validate required field
+    if (!orderId) {
+      return res
+        .status(400)
+        .json({ success: false, message: "Order ID is required" });
+    }
+
+    // Fetch order details along with associated payment details
+    const order = await prisma.order.findUnique({
+      where: { id: parseInt(orderId, 10) },
+      include: { payment: true }, // Include related payment data
+    });
+
+    if (!order) {
+      return res
+        .status(404)
+        .json({ success: false, message: "Order not found" });
+    }
+
+    // Ensure payment data is available
+    const payment = order.payment;
+
+    if (!payment || payment.length === 0) {
+      return res
+        .status(404)
+        .json({ success: false, message: "Payment details not found" });
+    }
+
+    // Construct receipt data
+    const receiptData = {
+      orderId: order.id,
+      userId: order.userId,
+      items: order.items,
+      amount: order.amount,
+      serviceType: order.serviceType,
+      address: order.address,
+      dineInTime: order.dineInTime,
+      date: order.date,
+      status: order.status,
+      paymentDetails: {
+        amount: payment[0].amount,
+        totalAmount: payment[0].totalAmount,
+        method: payment[0].method,
+        status: payment[0].status,
+        transactionId: payment[0].transactionId,
+      },
+    };
+
+    res.json({ success: true, receipt: receiptData });
+  } catch (error) {
+    console.error("Error generating payment receipt:", error);
+    res
+      .status(500)
+      .json({ success: false, message: "Error generating payment receipt" });
+  }
+};
+
 export {
   acceptOrder,
   allOrders,
   cancelOrder,
   completeOrderItem,
   displayOrdersForChef,
+  generatePaymentReceipt,
   getCustomizationNotes,
   getOrderItemsForChef,
   getTransactionDetails,
