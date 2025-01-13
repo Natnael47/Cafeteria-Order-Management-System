@@ -151,6 +151,24 @@ const MyOrders = () => {
         }
     };
 
+    const GenerateReceipt = async () => {
+        try {
+            const response = await axios.post(
+                `${backendUrl}/api/order/payment-receipt`,
+                { orderId: selectedOrderId },
+                { headers: { token } }
+            );
+
+            if (response.data.success) {
+
+            } else {
+
+            }
+        } catch (error) {
+        } finally {
+            closeModal();
+        }
+    };
 
     // Open modal and set selected order ID
     const openModal = (orderId) => {
@@ -191,6 +209,20 @@ const MyOrders = () => {
     const handleTimePeriodChange = (event) => {
         setTimePeriod(event.target.value);
     };
+
+    const [receiptModalIsOpen, setReceiptModalIsOpen] = useState(false);
+    const [receiptData, setReceiptData] = useState(null);
+
+    const openReceiptModal = (order) => {
+        setReceiptData(order);
+        setReceiptModalIsOpen(true);
+    };
+
+    const closeReceiptModal = () => {
+        setReceiptModalIsOpen(false);
+        setReceiptData(null);
+    };
+
 
     return (
         <div className="border-t pt-16">
@@ -304,6 +336,13 @@ const MyOrders = () => {
                                         </div>
                                     )}
                                     <h3 className="font-semibold">Order Details</h3>
+                                    <button
+                                        onClick={() => openReceiptModal(order)}
+                                        className="border border-blue-500 px-4 py-2 text-sm font-semibold rounded-sm mt-3 hover:bg-blue-200"
+                                    >
+                                        Generate Receipt
+                                    </button>
+
                                     <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                                         {items.map((item, idx) => (
                                             <div key={idx} className="flex flex-col sm:flex-row gap-4 items-center">
@@ -370,6 +409,51 @@ const MyOrders = () => {
                     </button>
                 </div>
             </Modal>
+            <Modal
+                isOpen={receiptModalIsOpen}
+                onRequestClose={closeReceiptModal}
+                style={{
+                    content: {
+                        top: "50%",
+                        left: "50%",
+                        right: "auto",
+                        bottom: "auto",
+                        marginRight: "-50%",
+                        transform: "translate(-50%, -50%)",
+                        padding: "20px",
+                        borderRadius: "10px",
+                        width: "400px",
+                        textAlign: "center",
+                    },
+                    overlay: {
+                        backgroundColor: "rgba(0, 0, 0, 0.5)",
+                        zIndex: 1000,
+                    },
+                }}
+            >
+                <h2 className="font-semibold">Payment Receipt</h2>
+                {receiptData && (
+                    <div>
+                        <p>Transaction ID: <strong>{receiptData.transactionId}</strong></p>
+                        <p>Order ID: <strong>{receiptData.id}</strong></p>
+                        <p>Amount: <strong>${receiptData.amount}.00</strong></p>
+                        <p>Date: <strong>{new Date(receiptData.date).toDateString()}</strong></p>
+                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mt-4">
+                            {receiptData.items.map((item, idx) => (
+                                <div key={idx} className="flex flex-col items-center">
+                                    <img className="w-20 rounded-[15px]" src={`${backendUrl}/images/${item.image || ''}`} alt={item.name} />
+                                    <p>{item.name} x{item.quantity}</p>
+                                    <p>${item.price * item.quantity}</p>
+                                </div>
+                            ))}
+                        </div>
+                        <button onClick={closeReceiptModal} className="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600 mt-4">
+                            Close
+                        </button>
+                    </div>
+                )}
+            </Modal>
+
         </div>
     );
 };
