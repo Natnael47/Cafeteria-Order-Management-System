@@ -160,7 +160,7 @@ const MyOrders = () => {
             );
             if (response.data.success) {
                 setReceiptData(response.data.receipt); // Update receipt data
-                //console.log(response.data.receipt);
+                console.log(response.data.receipt);
             } else {
                 toast.error(response.data.message);
             }
@@ -430,37 +430,76 @@ const MyOrders = () => {
                         bottom: "auto",
                         marginRight: "-50%",
                         transform: "translate(-50%, -50%)",
-                        padding: "20px",
-                        borderRadius: "10px",
-                        width: "400px",
+                        padding: "25px",
+                        borderRadius: "15px",
+                        width: "600px", // Adjusted width
+                        maxWidth: "90%", // Responsive adjustment
                         textAlign: "center",
+                        backgroundColor: "#f9f9f9",
+                        boxShadow: "0 4px 8px rgba(0, 0, 0, 0.1)",
                     },
                     overlay: {
-                        backgroundColor: "rgba(0, 0, 0, 0.5)",
+                        backgroundColor: "rgba(0, 0, 0, 0.7)",
                         zIndex: 1000,
+                        animation: "fadeIn 0.5s",
                     },
                 }}
             >
-                <h2 className="font-semibold">Payment Receipt</h2>
+                <h2 className="font-bold text-2xl mb-6 text-blue-600">Payment Receipt</h2>
                 {receiptData && (
                     <div>
-                        <p>Transaction ID: <strong>{receiptData.paymentDetails.transactionId}</strong></p>
-                        <p>Order ID: <strong>{receiptData.orderId}</strong></p>
-                        <p>Amount: <strong>${receiptData.amount}.00</strong></p>
-                        <p>Date: <strong>{new Date(receiptData.date).toDateString()}</strong></p>
-                        <p>Service type: <strong>{receiptData.serviceType}</strong></p>
-                        <p>payment method: <strong>{receiptData.paymentDetails.method}</strong></p>
-                        <p>order status: <strong>{receiptData.status}</strong></p>
-                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mt-4">
-                            {receiptData.items.map((item, idx) => (
-                                <div key={idx} className="flex flex-col items-center">
-                                    <img className="w-20 rounded-[15px]" src={`${backendUrl}/images/${item.image || ''}`} alt={item.name} />
-                                    <p>{item.name} x{item.quantity}</p>
-                                    <p>${item.price * item.quantity}</p>
-                                </div>
-                            ))}
+                        <div className="grid grid-cols-2 gap-4 text-left mb-6">
+                            <div>
+                                <p><span className="font-medium text-gray-600">Order ID:</span></p>
+                                <p><span className="font-medium text-gray-600">Amount:</span></p>
+                                <p><span className="font-medium text-gray-600">Date:</span></p>
+                                <p><span className="font-medium text-gray-600">Service Type:</span></p>
+                                <p><span className="font-medium text-gray-600">Customer:</span></p>
+                                <p><span className="font-medium text-gray-600">Order Status:</span></p>
+                            </div>
+                            <div>
+                                <p className="text-right"><strong>{receiptData.orderId}</strong></p>
+                                <p className="text-right"><strong>${receiptData.amount}.00</strong></p>
+                                <p className="text-right"><strong>{new Date(receiptData.date).toDateString()}</strong></p>
+                                <p className="text-right"><strong>{receiptData.serviceType}</strong></p>
+                                <p className="text-right"><strong>{receiptData.address.firstName} {receiptData.address.lastName}</strong></p>
+                                <p className="text-right"><strong>{receiptData.status}</strong></p>
+                            </div>
                         </div>
-                        <button onClick={closeReceiptModal} className="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600 mt-4">
+
+                        <table className="w-full border-collapse border border-gray-300 mb-6">
+                            <thead>
+                                <tr>
+                                    <th className="border border-gray-300 p-2 bg-gray-100">Item</th>
+                                    <th className="border border-gray-300 p-2 bg-gray-100">Quantity</th>
+                                    <th className="border border-gray-300 p-2 bg-gray-100">Total Price</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {receiptData.items.map((item, idx) => (
+                                    <tr key={idx} className="text-center">
+                                        <td className="border border-gray-300 p-2 flex items-center justify-center">
+                                            <img className="w-12 h-12 rounded-lg mr-4" src={`${backendUrl}/images/${item.image || ''}`} alt={item.name} />
+                                            <div className="flex flex-col">
+                                                <span className="font-semibold">{item.name}</span>
+                                                <span className="text-sm text-gray-600">x{item.quantity}</span>
+                                            </div>
+                                        </td>
+                                        <td className="border border-gray-300 p-2">x{item.quantity}</td>
+                                        <td className="border border-gray-300 p-2">${item.price * item.quantity}</td>
+                                    </tr>
+                                ))}
+                            </tbody>
+                        </table>
+
+                        <p className="text-left font-medium text-gray-600 mb-4">
+                            Transaction ID:
+                        </p>
+                        <p className="break-all text-right text-gray-700 text-sm font-mono">
+                            <strong>{receiptData.paymentDetails.transactionId}</strong>
+                        </p>
+
+                        <button onClick={closeReceiptModal} className="px-6 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition mt-6">
                             Close
                         </button>
                     </div>

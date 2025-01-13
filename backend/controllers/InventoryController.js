@@ -261,6 +261,7 @@ const addStock = async (req, res) => {
         pricePerUnit: pricePerUnit,
         initialQuantity: updatedInitialQuantity,
         dateUpdated: new Date(),
+        expiryDate: new Date(expiryDate),
       },
     });
 

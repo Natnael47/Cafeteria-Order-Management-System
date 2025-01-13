@@ -24,6 +24,7 @@ const Inventory = () => {
         name: "",
         category: "",
         quantity: "",
+        description: "",
         initialQuantity: "",
         unit: "",
         pricePerUnit: "",
@@ -245,12 +246,12 @@ const Inventory = () => {
 
             <div className="bg-gray-100 rounded-lg w-full max-w-full max-h-[77vh] overflow-scroll shadow-lg">
                 {/* Header */}
-                <div className="grid grid-cols-[0.4fr_0.8fr_0.7fr_0.6fr_0.5fr_0.5fr_0.5fr] items-center gap-4 p-4 border-b bg-[#FAFAFA] text-sm font-semibold text-gray-800">
+                <div className="grid grid-cols-[0.4fr_0.8fr_0.7fr_0.6fr_0.5fr_0.5fr_0.5fr] items-center gap-4 p-4 border-b bg-[#22C55E] text-white text-sm font-semibold">
                     <b>Name</b>
                     <b>Status</b>
                     <b className="ml-2">Quantity</b>
                     <b>Category</b>
-                    <b>Price / Unit</b>
+                    <b>Unit Cost</b>
                     <b>Remove</b>
                     <b>Modify</b>
                 </div>
@@ -286,11 +287,11 @@ const Inventory = () => {
                             <p>${item.pricePerUnit}</p>
                             <Trash2
                                 onClick={() => openModal(item.id)}
-                                className="cursor-pointer text-red-500 hover:text-red-700"
+                                className="cursor-pointer ml-4 text-red-500 hover:text-red-700"
                                 size={20}
                             />
                             <Pencil
-                                className="cursor-pointer text-blue-500 hover:text-blue-700"
+                                className="cursor-pointer ml-2 text-blue-500 hover:text-blue-700"
                                 onClick={() => handleEditClick(item, index)}
                                 size={20}
                             />
@@ -402,22 +403,29 @@ const Inventory = () => {
                                             onChange={handleInputChange}
                                             className="border border-gray-300 rounded-lg p-2 w-full focus:ring focus:ring-blue-200"
                                         >
-                                            <option value="Food Supplies">Food Supplies</option>
+                                            <option value="Dairy Products">Dairy Products</option>
                                             <option value="Beverages">Beverages</option>
-                                            <option value="Cleaning Supplies">Cleaning Supplies</option>
+                                            <option value="Bakery">Bakery</option>
+                                            <option value="Grains">Grains</option>
+                                            <option value="Fruit">Fruit</option>
                                             <option value="Utensils">Utensils</option>
-                                            <option value="Electronics">Electronics</option>
+                                            <option value="Meat & Poultry">Meat & Poultry</option>
+                                            <option value="Snacks">Snacks</option>
+                                            <option value="Spices">Spices</option>
+                                            <option value="Condiments">Condiments</option>
+                                            <option value="Cleaning Supplies">Cleaning Supplies</option>
+                                            <option value="Other">Other</option>
                                         </select>
                                     </div>
 
                                     {/* Quantity and Unit */}
                                     <div className="grid grid-cols-2 gap-4 col-span-2">
                                         <div>
-                                            <label className="block text-sm font-medium text-gray-700 mb-1">Quantity</label>
+                                            <label className="block text-sm font-medium text-gray-700 mb-1">Description</label>
                                             <input
-                                                type="number"
-                                                name="quantity"
-                                                value={editInventory.quantity}
+                                                type="text"
+                                                name="description"
+                                                value={editInventory.description}
                                                 onChange={handleInputChange}
                                                 className="border border-gray-300 rounded-lg p-2 w-full focus:ring focus:ring-blue-200"
                                             />
@@ -431,10 +439,17 @@ const Inventory = () => {
                                                 className="border border-gray-300 rounded-lg p-2 w-full focus:ring focus:ring-blue-200"
                                             >
                                                 <option value="kg">kg</option>
+                                                <option value="grams">grams</option>
                                                 <option value="liters">liters</option>
+                                                <option value="milliliters">milliliters</option>
                                                 <option value="packs">packs</option>
                                                 <option value="pieces">pieces</option>
-                                                <option value="grams">grams</option>
+                                                <option value="dozens">dozens</option>
+                                                <option value="cans">cans</option>
+                                                <option value="bottles">bottles</option>
+                                                <option value="cartons">cartons</option>
+                                                <option value="slices">slices</option>
+                                                <option value="jars">jars</option>
                                             </select>
                                         </div>
                                     </div>
@@ -446,30 +461,6 @@ const Inventory = () => {
                                             type="number"
                                             name="pricePerUnit"
                                             value={editInventory.pricePerUnit}
-                                            onChange={handleInputChange}
-                                            className="border border-gray-300 rounded-lg p-2 w-full focus:ring focus:ring-blue-200"
-                                        />
-                                    </div>
-
-                                    {/* Status */}
-                                    <div className="col-span-2 md:col-span-1">
-                                        <label className="block text-sm font-medium text-gray-700 mb-1">Status</label>
-                                        <input
-                                            type="number"
-                                            name="status"
-                                            value={editInventory.status}
-                                            onChange={handleInputChange}
-                                            className="border border-gray-300 rounded-lg p-2 w-full focus:ring focus:ring-blue-200"
-                                        />
-                                    </div>
-
-                                    {/* quantity */}
-                                    <div className="col-span-2 md:col-span-1">
-                                        <label className="block text-sm font-medium text-gray-700 mb-1">initialQuantity</label>
-                                        <input
-                                            type="number"
-                                            name="initialQuantity"
-                                            value={editInventory.initialQuantity}
                                             onChange={handleInputChange}
                                             className="border border-gray-300 rounded-lg p-2 w-full focus:ring focus:ring-blue-200"
                                         />

@@ -352,7 +352,7 @@ const Stock = () => {
 
             <div className="bg-[#F3F4F6] rounded w-full max-h-[78vh] overflow-scroll">
                 <div>
-                    <div className="grid grid-cols-[1fr_1fr_1fr_1fr_1fr_0.5fr_0.5fr] items-center gap-4 p-5 border-b text-[15px] font-semibold bg-[#FAFAFA] border-gray-500 text-black sm:grid">
+                    <div className="grid grid-cols-[1fr_1fr_1fr_1fr_1fr_0.5fr_0.5fr] items-center gap-4 p-5 border-b text-[15px] font-semibold bg-[#22C55E] text-white border-gray-500  sm:grid">
                         <div className="text-center font-medium">Status</div>
                         <div className="text-center font-medium">Name</div>
                         <div className="text-center font-medium">Remaining Stock</div>

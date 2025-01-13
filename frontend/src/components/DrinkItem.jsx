@@ -65,10 +65,10 @@ const DrinkItem = ({ id, name, price, description, image, rating, isAlcoholic })
                 {/* Add to cart button or quantity controls */}
                 {cartItemCount === 0 ? (
                     <div
-                        className="absolute bottom-4 right-4 flex items-center justify-center rounded-full bg-green-500 w-9 h-9 cursor-pointer hover:bg-green-600 shadow-md transition"
+                        className="absolute bottom-4 right-4 flex items-center justify-center rounded-full bg-white w-9 h-9 cursor-pointer hover:bg-gray-100 shadow-md transition"
                         onClick={() => addToCart(id, 'drink')} // Pass true for drinks
                     >
-                        <Plus className="text-white w-5 h-5" />
+                        <Plus className="text-black w-5 h-5" />
                     </div>
                 ) : (
                     <div className="absolute bottom-4 right-4 flex items-center gap-2 p-2 rounded-full bg-white shadow-md">

@@ -90,15 +90,17 @@ const AddInventory = () => {
                             name="category"
                             required
                         >
-                            <option value="Beverages">Beverages</option>
-                            <option value="Snacks">Snacks</option>
                             <option value="Dairy Products">Dairy Products</option>
-                            <option value="Produce">Produce</option>
-                            <option value="Meat & Poultry">Meat & Poultry</option>
+                            <option value="Beverages">Beverages</option>
+                            <option value="Bakery">Bakery</option>
                             <option value="Grains">Grains</option>
+                            <option value="Fruit">Fruit</option>
+                            <option value="Utensils">Utensils</option>
+                            <option value="Meat & Poultry">Meat & Poultry</option>
+                            <option value="Snacks">Snacks</option>
+                            <option value="Spices">Spices</option>
                             <option value="Condiments">Condiments</option>
                             <option value="Cleaning Supplies">Cleaning Supplies</option>
-                            <option value="Bakery">Bakery</option>
                             <option value="Other">Other</option>
                         </select>
                     </div>
@@ -115,13 +117,17 @@ const AddInventory = () => {
                             name="unit"
                         >
                             <option value="kg">kg</option>
-                            <option value="g">g</option>
+                            <option value="grams">grams</option>
                             <option value="liters">liters</option>
-                            <option value="ml">ml</option>
-                            <option value="pieces">pieces</option>
+                            <option value="milliliters">milliliters</option>
                             <option value="packs">packs</option>
-                            <option value="boxes">boxes</option>
-                            <option value="loaves">Loaf (kg)</option>
+                            <option value="pieces">pieces</option>
+                            <option value="dozens">dozens</option>
+                            <option value="cans">cans</option>
+                            <option value="bottles">bottles</option>
+                            <option value="cartons">cartons</option>
+                            <option value="slices">slices</option>
+                            <option value="jars">jars</option>
                         </select>
                     </div>
                 </div>
