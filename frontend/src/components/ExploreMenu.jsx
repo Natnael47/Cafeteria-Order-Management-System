@@ -67,10 +67,10 @@ const ExploreMenu = ({ category, setCategory, type, setType }) => {
                         className="flex flex-col items-center cursor-pointer"
                     >
                         <img
-                            className={`w-[7vw] min-w-[80px] rounded-full transition-all duration-200 ${category === item.menu_name ? "border-[4px] border-green-500 shadow-lg p-[2px]" : "border-[2px] border-gray-200 hover:border-gray-400"
-                                }`}
+                            className={`w-[92px] h-[92px] rounded-full transition-all duration-200 ${category === item.menu_name ? "border-[4px] border-green-500 shadow-lg p-[2px]" : "border-[2px] border-gray-200 hover:border-gray-400"}`}
                             src={item.menu_image}
                             alt={item.menu_name}
+                            style={{ objectFit: 'cover' }}
                         />
                         <p
                             className={`mt-2 text-[max(1.2vw,16px)] font-medium transition-all duration-200 ${category === item.menu_name ? "text-green-600 font-semibold" : "text-gray-800 hover:text-primary"

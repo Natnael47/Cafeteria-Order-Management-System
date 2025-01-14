@@ -1,14 +1,24 @@
 import basket_icon from "./basket_icon.png";
+import menu_5 from "./beyaynetu-vegetarian.png";
 import header_img from "./header_img.png";
 import logo from "./logo.png";
 import menu_1 from "./menu_1.png";
 import menu_2 from "./menu_2.png";
 import menu_3 from "./menu_3.png";
 import menu_4 from "./menu_4.png";
-import menu_5 from "./menu_5.png";
 import menu_6 from "./menu_6.png";
 import menu_7 from "./menu_7.png";
-import menu_8 from "./menu_8.png";
+import menu_8 from "./pizza.png";
+
+import menu_15 from "./Cocktail.png";
+import menu_9 from "./Coffee.png";
+import menu_10 from "./ethiopian-tea.png";
+import menu_11 from "./images (3).png";
+import menu_14 from "./milkshak.png";
+import menu_16 from "./Mocktail.png";
+import menu_12 from "./smoothie.png";
+import menu_13 from "./soda.png";
+
 import search_icon from "./search_icon.png";
 
 import food_1 from "./food_1.png";
@@ -128,7 +138,7 @@ export const menu_list = [
     menu_image: menu_2,
   },
   {
-    menu_name: "Deserts",
+    menu_name: "Deserts & Cakes",
     menu_image: menu_3,
   },
   {
@@ -136,11 +146,11 @@ export const menu_list = [
     menu_image: menu_4,
   },
   {
-    menu_name: "Cake",
+    menu_name: "Fasting",
     menu_image: menu_5,
   },
   {
-    menu_name: "Pure Veg",
+    menu_name: "Main Dishes",
     menu_image: menu_6,
   },
   {
@@ -148,43 +158,43 @@ export const menu_list = [
     menu_image: menu_7,
   },
   {
-    menu_name: "Noodles",
+    menu_name: "Pizzas",
     menu_image: menu_8,
   },
 ];
 
 export const menu_list_drink = [
   {
-    menu_name: "Cocktails",
-    menu_image: menu_1,
+    menu_name: "Coffee",
+    menu_image: menu_9,
   },
   {
-    menu_name: "Milkshake",
-    menu_image: menu_2,
+    menu_name: "Tea",
+    menu_image: menu_10,
   },
   {
-    menu_name: "Hot Beverages",
-    menu_image: menu_3,
+    menu_name: "Juice",
+    menu_image: menu_11,
+  },
+  {
+    menu_name: "Smoothie",
+    menu_image: menu_12,
   },
   {
     menu_name: "Soda",
-    menu_image: menu_4,
+    menu_image: menu_13,
   },
   {
-    menu_name: "Smoothies",
-    menu_image: menu_5,
+    menu_name: "Milkshake",
+    menu_image: menu_14,
   },
   {
-    menu_name: "Juices",
-    menu_image: menu_6,
+    menu_name: "Cocktail",
+    menu_image: menu_15,
   },
   {
-    menu_name: "Iced Drinks",
-    menu_image: menu_7,
-  },
-  {
-    menu_name: "Mocktails",
-    menu_image: menu_8,
+    menu_name: "Mocktail",
+    menu_image: menu_16,
   },
 ];
 

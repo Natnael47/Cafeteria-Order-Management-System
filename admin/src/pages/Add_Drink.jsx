@@ -114,14 +114,14 @@ const Add_Drink = () => {
                             name="category"
                             required
                         >
-                            <option value="Salad">Salad</option>
-                            <option value="Rolls">Rolls</option>
-                            <option value="Deserts">Deserts</option>
-                            <option value="Sandwich">Sandwich</option>
-                            <option value="Cake">Cake</option>
-                            <option value="Pure Veg">Pure Veg</option>
-                            <option value="Pasta">Pasta</option>
-                            <option value="Noodles">Noodles</option>
+                            <option value="Coffee">Coffee</option>
+                            <option value="Tea">Tea</option>
+                            <option value="Juice">Juice</option>
+                            <option value="Smoothie">Smoothie</option>
+                            <option value="Soda">Soda</option>
+                            <option value="Milkshake">Milkshake</option>
+                            <option value="Cocktail">Cocktail</option>
+                            <option value="Mocktail">Mocktail</option>
                         </select>
                     </div>
                 </div>
