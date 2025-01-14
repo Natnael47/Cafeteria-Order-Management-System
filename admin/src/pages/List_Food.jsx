@@ -401,12 +401,15 @@ const List = () => {
                                                 >
                                                     <option value="Salad">Salad</option>
                                                     <option value="Rolls">Rolls</option>
-                                                    <option value="Desserts">Desserts</option>
+                                                    <option value="Deserts & Cakes">Deserts & Cakes</option>
                                                     <option value="Sandwich">Sandwich</option>
-                                                    <option value="Cake">Cake</option>
-                                                    <option value="Pure Veg">Pure Veg</option>
+                                                    <option value="Special">Special</option>
                                                     <option value="Pasta">Pasta</option>
-                                                    <option value="Noodles">Noodles</option>
+                                                    <option value="Breakfast">Breakfast</option>
+                                                    <option value="Pizzas">Pizzas</option>
+                                                    <option value="Fasting">Fasting</option>
+                                                    <option value="Main Dishes">Main Dishes</option>
+                                                    <option value="Appetizers">Appetizers</option>
                                                 </select>
                                                 <div className="mb-4">
                                                     <label className="block text-sm font-medium mb-1 mt-4">

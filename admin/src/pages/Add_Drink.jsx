@@ -14,7 +14,7 @@ const Add_Drink = () => {
         name: "",
         description: "",
         price: "",
-        category: "Salad",
+        category: "Coffee",
         size: "Small",
         isAlcoholic: false,
     });
