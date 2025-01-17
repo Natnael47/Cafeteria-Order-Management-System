@@ -262,6 +262,7 @@ const addStock = async (req, res) => {
         initialQuantity: updatedInitialQuantity,
         dateUpdated: new Date(),
         expiryDate: new Date(expiryDate),
+        supplierId: supplierId,
       },
     });
 
@@ -738,7 +739,6 @@ const orderInventory = async (inventoryId) => {
       select: {
         quantity: true,
         initialQuantity: true,
-        status: true,
         supplierId: true,
       },
     });
@@ -748,23 +748,13 @@ const orderInventory = async (inventoryId) => {
       return;
     }
 
-    // Convert status to an integer
-    const status = parseInt(inventoryItem.status, 10);
-
-    if (isNaN(status)) {
-      console.error(
-        "Status is not a valid number. Cannot determine reorder necessity."
-      );
-      return;
-    }
-
-    // Check if status is below the reorder threshold
-    const reorderThreshold = 10;
-    if (status >= reorderThreshold) {
+    // Check if the inventory quantity is below the 10% threshold
+    const reorderThreshold = inventoryItem.initialQuantity * 0.1;
+    if (inventoryItem.quantity >= reorderThreshold) {
       console.log(
-        "Stock status is sufficient, no order needed.",
+        "Stock quantity is sufficient, no order needed.",
         inventoryId,
-        status
+        inventoryItem.quantity
       );
       return;
     }
@@ -780,12 +770,15 @@ const orderInventory = async (inventoryId) => {
       return;
     }
 
-    // Create a supplier order
     const newSupplierOrder = await prisma.supplierorder.create({
       data: {
-        inventoryId: inventoryId,
+        inventory: {
+          connect: { id: inventoryId }, // Connects the existing inventory record
+        },
         quantityOrdered: quantityToOrder,
-        supplierId: inventoryItem.supplierId,
+        supplier: {
+          connect: { id: inventoryItem.supplierId }, // Correctly connects to the supplier relation
+        },
         status: "Sent",
         orderDate: new Date(),
       },
