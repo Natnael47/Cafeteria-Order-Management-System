@@ -50,7 +50,7 @@ app.use("/api/report", ReportRouter);
 
 // Define the route
 app.get("/", (req, res) => {
-  res.send("API is Working");
+  res.send(`API is Working on Port: ${port}`);
 });
 
 // Start the server
