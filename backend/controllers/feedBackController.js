@@ -55,6 +55,7 @@ const getAllFeedback = async (req, res) => {
           select: {
             firstName: true,
             lastName: true,
+            email: true,
           },
         },
       },
@@ -63,6 +64,7 @@ const getAllFeedback = async (req, res) => {
     // Format the feedback data to include user's name, comment, rating, and date
     const formattedFeedback = feedback.map((fb) => ({
       username: `${fb.user.firstName} ${fb.user.lastName}`,
+      email: fb.user.email,
       rating: fb.rating,
       comment: fb.comment,
       date: fb.date.toLocaleString(), // Format the date to a readable string
